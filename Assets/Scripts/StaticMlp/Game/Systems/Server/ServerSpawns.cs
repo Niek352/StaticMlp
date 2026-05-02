@@ -33,6 +33,29 @@ namespace StaticMlp.Game.Systems.Server {
             return e.GID;
         }
 
+        public static EntityGID ServerSpawnPhysicsCube(NetworkPeerId owner, Vector3 spawnPosition, Quaternion rotation) {
+            EnsureNetworkedEntityCluster();
+            var e = SW.NewEntity<Default>(NETWORKED_ENTITY_CLUSTER);
+
+            e.Set(new NetworkIdentity {
+                Owner = owner,
+                Authority = NetworkAuthority.Server,
+                NetworkArchetypeId = BuiltinGameplayFeature.PHYSICS_CUBE
+            });
+
+            e.Set<NetworkedTag>();
+            e.Set<CubeTag>();
+            e.Set(new PhysicsCubeNetState {
+                Position = spawnPosition,
+                Velocity = Vector3.zero,
+                Rotation = rotation
+            });
+
+            OwnershipTags.ApplyForServer(e, owner, NetworkAuthority.Server);
+            SpawnBroadcaster.SendSpawn(e);
+            return e.GID;
+        }
+
         private static void EnsureNetworkedEntityCluster() {
             if (!SW.ClusterIsRegistered(NETWORKED_ENTITY_CLUSTER))
                 SW.RegisterCluster(NETWORKED_ENTITY_CLUSTER);

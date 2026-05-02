@@ -9,6 +9,7 @@ namespace StaticMlp.Game.Bootstrap
     public sealed class BuiltinGameplayFeature : GameplayFeature
     {
         public const int PLAYER = 1;
+        public const int PHYSICS_CUBE = 2;
         
         public override void RegisterPrefabs()
         {
@@ -22,16 +23,29 @@ namespace StaticMlp.Game.Bootstrap
             });
 
             NetArchetypeRegistry.RegisterServer(PLAYER, e => e.Set<PlayerTag>());
+
+            NetArchetypeRegistry.RegisterClient(PHYSICS_CUBE, e =>
+            {
+                e.Set<CubeTag>();
+                e.Set(new ViewTransform
+                {
+                    RenderRotation = UnityEngine.Quaternion.identity
+                });
+            });
+
+            NetArchetypeRegistry.RegisterServer(PHYSICS_CUBE, e => e.Set<CubeTag>());
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
             systems.Add(new ServerPlayerJoinSpawnSystem(), GameplaySystemOrder.ServerConnectionGameplay);
+            systems.Add(new ServerSpawnCubeRequestSystem(), GameplaySystemOrder.Gameplay - 50);
             systems.Add(new ServerAiSystem(), GameplaySystemOrder.Gameplay);
         }
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
+            systems.Add(new CubeSpawnInputSystem(), GameplaySystemOrder.Gameplay - 50);
             systems.Add(new LocalPlayerMovementSystem(), GameplaySystemOrder.Gameplay);
             ReplicationRegistry.RegisterClientCoreInterpolationSystems(systems);
             systems.Add(new LocalViewSyncSystem(), GameplaySystemOrder.ClientPresentation);

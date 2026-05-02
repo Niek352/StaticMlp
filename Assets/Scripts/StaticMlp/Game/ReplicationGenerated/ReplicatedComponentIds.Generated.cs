@@ -2,6 +2,7 @@
 namespace StaticMlp.Networking.Replication {
     public static class ReplicatedComponentIds {
         public const ushort CharacterNetState = 1;
+        public const ushort PhysicsCubeNetState = 39412;
         public const ushort NetworkIdentity = 2;
     }
 }

@@ -48,6 +48,15 @@ MonoBehaviour:
       - className: CharacterNetState
         namespaceName: StaticMlp.Game.Components
         assembly: Game.Core
+    - guid: 85f080de-0634-4b3d-bc95-c361c73d7f98
+      current:
+        className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
     tags: []
     events: []
     links: []
@@ -86,6 +95,15 @@ MonoBehaviour:
         namespaceName: StaticMlp.Game.Components
         assembly: Ecs.Game.Player
       - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: 85f080de-0634-4b3d-bc95-c361c73d7f98
+      current:
+        className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: PhysicsCubeNetState
         namespaceName: StaticMlp.Game.Components
         assembly: Game.Core
     tags: []

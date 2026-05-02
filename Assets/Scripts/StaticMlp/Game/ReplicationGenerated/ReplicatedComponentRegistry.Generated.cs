@@ -15,6 +15,9 @@ namespace StaticMlp.Networking.Replication {
                 case ReplicatedComponentIds.CharacterNetState:
                     CharacterNetStateReplication.ApplyClientDelta(e, delta.Payload);
                     break;
+                case ReplicatedComponentIds.PhysicsCubeNetState:
+                    PhysicsCubeNetStateReplication.ApplyClientDelta(e, delta.Payload);
+                    break;
                 case ReplicatedComponentIds.NetworkIdentity:
                     e.Set(NetworkIdentityReplication.Read(delta.Payload));
                     break;
@@ -26,6 +29,9 @@ namespace StaticMlp.Networking.Replication {
                 case ReplicatedComponentIds.CharacterNetState:
                     e.Set(CharacterNetStateReplication.Read(delta.Payload));
                     break;
+                case ReplicatedComponentIds.PhysicsCubeNetState:
+                    e.Set(PhysicsCubeNetStateReplication.Read(delta.Payload));
+                    break;
                 case ReplicatedComponentIds.NetworkIdentity:
                     e.Set(NetworkIdentityReplication.Read(delta.Payload));
                     break;
@@ -35,22 +41,32 @@ namespace StaticMlp.Networking.Replication {
         public static void CollectDirty(CW.Entity e, NetOutbox outbox, NetworkPeerId peer) {
             if (e.Has<CharacterNetState>() && e.HasChanged<CharacterNetState>())
                 outbox.EnqueueComponentDelta(peer, CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()), CharacterNetStateReplication.Delivery);
+            if (e.Has<PhysicsCubeNetState>() && e.HasChanged<PhysicsCubeNetState>())
+                outbox.EnqueueComponentDelta(peer, PhysicsCubeNetStateReplication.CreateDelta(e.GID, e.Read<PhysicsCubeNetState>()), PhysicsCubeNetStateReplication.Delivery);
         }
 
         public static void CollectDirty(SW.Entity e, NetOutbox outbox, NetworkPeerId peer) {
             if (e.Has<CharacterNetState>() && e.HasChanged<CharacterNetState>())
                 outbox.EnqueueComponentDelta(peer, CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()), CharacterNetStateReplication.Delivery);
+            if (e.Has<PhysicsCubeNetState>() && e.HasChanged<PhysicsCubeNetState>())
+                outbox.EnqueueComponentDelta(peer, PhysicsCubeNetStateReplication.CreateDelta(e.GID, e.Read<PhysicsCubeNetState>()), PhysicsCubeNetStateReplication.Delivery);
         }
 
         public static void CollectClientOwnedDirty(NetOutbox outbox, NetworkPeerId peer) {
             foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, CharacterNetState>, AllChanged<CharacterNetState>>().Entities())
                 outbox.EnqueueComponentDelta(peer, CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()), CharacterNetStateReplication.Delivery);
+            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, PhysicsCubeNetState>, AllChanged<PhysicsCubeNetState>>().Entities())
+                outbox.EnqueueComponentDelta(peer, PhysicsCubeNetStateReplication.CreateDelta(e.GID, e.Read<PhysicsCubeNetState>()), PhysicsCubeNetStateReplication.Delivery);
         }
 
         public static void CollectServerOwnedDirty(NetOutbox outbox, IReadOnlyList<NetworkPeerId> peers) {
             foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, CharacterNetState>, AllChanged<CharacterNetState>>().Entities()) {
                 for (var i = 0; i < peers.Count; i++)
                     outbox.EnqueueComponentDelta(peers[i], CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()), CharacterNetStateReplication.Delivery);
+            }
+            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, PhysicsCubeNetState>, AllChanged<PhysicsCubeNetState>>().Entities()) {
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], PhysicsCubeNetStateReplication.CreateDelta(e.GID, e.Read<PhysicsCubeNetState>()), PhysicsCubeNetStateReplication.Delivery);
             }
         }
 
@@ -60,17 +76,24 @@ namespace StaticMlp.Networking.Replication {
 
             if (e.Has<CharacterNetState>())
                 components.Add(CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()));
+
+            if (e.Has<PhysicsCubeNetState>())
+                components.Add(PhysicsCubeNetStateReplication.CreateDelta(e.GID, e.Read<PhysicsCubeNetState>()));
         }
 
         public static void RegisterClientCoreGeneratedTypes() {
             CW.Types()
                 .Component<Interpolated<CharacterNetState>>()
                 .Component<InterpolatedPrevious<CharacterNetState>>()
-                .Component<InterpolatedClock<CharacterNetState>>();
+                .Component<InterpolatedClock<CharacterNetState>>()
+                .Component<Interpolated<PhysicsCubeNetState>>()
+                .Component<InterpolatedPrevious<PhysicsCubeNetState>>()
+                .Component<InterpolatedClock<PhysicsCubeNetState>>();
         }
 
         public static void RegisterClientCoreInterpolationSystems(ClientCoreSystemsBuilder systems) {
             systems.Add(new ReplicatedInterpolationSystem<CharacterNetState>(CharacterNetStateReplication.Interpolate), GameplaySystemOrder.ClientPresentation);
+            systems.Add(new ReplicatedInterpolationSystem<PhysicsCubeNetState>(PhysicsCubeNetStateReplication.Interpolate), GameplaySystemOrder.ClientPresentation);
         }
 
         public static void InitializeClientCoreInterpolatedState(CW.Entity e) {
@@ -83,10 +106,23 @@ namespace StaticMlp.Networking.Replication {
                     Duration = CharacterNetStateReplication.SendRate == 0 ? 0f : 1f / CharacterNetStateReplication.SendRate
                 });
             }
+            if (e.Has<PhysicsCubeNetState>() && !e.Has<Interpolated<PhysicsCubeNetState>>()) {
+                var state = e.Read<PhysicsCubeNetState>();
+                e.Set(new Interpolated<PhysicsCubeNetState>(state));
+                e.Set(new InterpolatedPrevious<PhysicsCubeNetState>(state));
+                e.Set(new InterpolatedClock<PhysicsCubeNetState> {
+                    StartedAt = Time.time,
+                    Duration = PhysicsCubeNetStateReplication.SendRate == 0 ? 0f : 1f / PhysicsCubeNetStateReplication.SendRate
+                });
+            }
         }
 
         public static ComponentDelta CreateDelta(EntityGID gid, in CharacterNetState state) {
             return CharacterNetStateReplication.CreateDelta(gid, state);
+        }
+
+        public static ComponentDelta CreateDelta(EntityGID gid, in PhysicsCubeNetState state) {
+            return PhysicsCubeNetStateReplication.CreateDelta(gid, state);
         }
 
         public static ComponentDelta CreateDelta(EntityGID gid, in NetworkIdentity identity) {

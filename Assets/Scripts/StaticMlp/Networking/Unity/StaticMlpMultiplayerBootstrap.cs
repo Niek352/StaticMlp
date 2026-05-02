@@ -101,6 +101,7 @@ namespace StaticMlp.Networking.Unity
             if (bindDefaultMoveInput)
             {
                 NetworkInput.MoveProvider = ReadMoveInput;
+                NetworkInput.SpawnCubeWasPressedProvider = ReadSpawnCubeInput;
                 Log("Bound default move input");
             }
 
@@ -137,6 +138,12 @@ namespace StaticMlp.Networking.Unity
                 move.y += 1f;
 
             return move != Vector2.zero ? move : Vector2.zero;
+        }
+
+        private static bool ReadSpawnCubeInput()
+        {
+            var keyboard = Keyboard.current;
+            return keyboard != null && keyboard.cKey.wasPressedThisFrame;
         }
 
         private static WorldConfig DefaultWorldConfig()

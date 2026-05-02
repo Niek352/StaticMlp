@@ -15,6 +15,14 @@ namespace StaticMlp.Game.Systems.Client {
                 view.RenderPosition = state.Position;
                 view.RenderRotation = state.Rotation;
             }
+
+            foreach (var e in CW.Query<All<RemoteOwned, Interpolated<PhysicsCubeNetState>, ViewTransform>>().Entities()) {
+                var state = e.Read<Interpolated<PhysicsCubeNetState>>().Value;
+                ref var view = ref e.Mut<ViewTransform>();
+
+                view.RenderPosition = state.Position;
+                view.RenderRotation = state.Rotation;
+            }
         }
     }
 }

@@ -17,6 +17,7 @@ namespace StaticMlp.Game.Presentation
 
         [SerializeField] private GameObject remotePlayerPrefab;
         [SerializeField] private GameObject monsterPrefab;
+        [SerializeField] private GameObject physicsCubePrefab;
         [SerializeField] private bool createPrimitiveFallback = true;
 
         [Header("Fallback Colors")] [SerializeField]
@@ -24,6 +25,7 @@ namespace StaticMlp.Game.Presentation
 
         [SerializeField] private Color remotePlayerColor = new(0.95f, 0.75f, 0.2f);
         [SerializeField] private Color monsterColor = new(0.9f, 0.15f, 0.2f);
+        [SerializeField] private Color physicsCubeColor = new(0.35f, 0.9f, 0.55f);
 
         private readonly Dictionary<EntityGID, Transform> _views = new();
         private readonly List<EntityGID> _deadViews = new();
@@ -39,7 +41,7 @@ namespace StaticMlp.Game.Presentation
             if (CW.Status != WorldStatus.Initialized)
                 return;
 
-            foreach (var e in CW.Query<All<NetworkedTag, CharacterNetState, ViewTransform>>().Entities())
+            foreach (var e in CW.Query<All<NetworkedTag, ViewTransform>>().Entities())
             {
                 var view = GetOrCreateView(e);
                 ref readonly var viewTransform = ref e.Read<ViewTransform>();
@@ -71,8 +73,8 @@ namespace StaticMlp.Game.Presentation
                 throw new System.InvalidOperationException(
                     "Character view prefab is not assigned and primitive fallback is disabled.");
 
-            var primitive = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            primitive.transform.localScale = new Vector3(0.8f, 1f, 0.8f);
+            var primitive = GameObject.CreatePrimitive(e.Has<CubeTag>() ? PrimitiveType.Cube : PrimitiveType.Capsule);
+            primitive.transform.localScale = e.Has<CubeTag>() ? Vector3.one : new Vector3(0.8f, 1f, 0.8f);
             primitive.GetComponent<Renderer>().material.color = SelectFallbackColor(e);
             return primitive;
         }
@@ -81,6 +83,9 @@ namespace StaticMlp.Game.Presentation
         {
             if (e.Has<PlayerTag>())
                 return e.Has<LocalOwned>() ? localPlayerPrefab : remotePlayerPrefab;
+
+            if (e.Has<CubeTag>())
+                return physicsCubePrefab;
 
             if (e.Has<MonsterTag>())
                 return monsterPrefab;
@@ -93,6 +98,9 @@ namespace StaticMlp.Game.Presentation
             if (e.Has<PlayerTag>())
                 return e.Has<LocalOwned>() ? localPlayerColor : remotePlayerColor;
 
+            if (e.Has<CubeTag>())
+                return physicsCubeColor;
+
             if (e.Has<MonsterTag>())
                 return monsterColor;
 
@@ -103,6 +111,9 @@ namespace StaticMlp.Game.Presentation
         {
             if (e.Has<PlayerTag>())
                 return e.Has<LocalOwned>() ? "Local Player View" : "Remote Player View";
+
+            if (e.Has<CubeTag>())
+                return "Physics Cube View";
 
             if (e.Has<MonsterTag>())
                 return "Monster View";

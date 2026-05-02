@@ -80,6 +80,18 @@ namespace StaticMlp.Networking.Replication {
             return bytes;
         }
 
+        public static byte[] EncodeNetworkEvent(ushort eventTypeId, byte[] payload) {
+            var writer = BinaryPackWriter.CreateFromPool();
+            writer.WriteByte((byte)NetPacketType.NetworkEvent);
+            writer.WriteInt(payload?.Length ?? 0);
+            writer.WriteUshort(eventTypeId);
+            if (payload != null)
+                writer.WriteBytes(payload);
+            var bytes = writer.CopyToBytes();
+            writer.Dispose();
+            return bytes;
+        }
+
         public static bool Decode(NetworkPeerId sourcePeer, byte[] payload, NetInbox inbox) {
             if (payload == null || payload.Length == 0)
                 return false;

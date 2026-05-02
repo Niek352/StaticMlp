@@ -19,6 +19,10 @@ namespace StaticMlp.Networking.Replication {
             batch.Batch.Deltas.Add(delta);
         }
 
+        public void EnqueueNetworkEvent(NetworkPeerId peer, ushort eventTypeId, byte[] payload, NetDelivery delivery) {
+            Enqueue(peer, PacketCodec.EncodeNetworkEvent(eventTypeId, payload), delivery);
+        }
+
         public void FlushComponentBatches() {
             foreach (var pending in _componentBatches)
                 Enqueue(pending.Peer, PacketCodec.EncodeComponentBatch(pending.Batch), pending.Delivery);
