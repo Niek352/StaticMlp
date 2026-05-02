@@ -2,6 +2,7 @@ using System.Reflection;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Systems.Client;
+using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -72,7 +73,7 @@ namespace StaticMlp.Networking.Unity {
             }
 
             Log("Creating server world");
-            MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(), GameplayAssemblies());
+            MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(), registerGeneratedTypes: null, ecsTypeAssemblies: GameplayAssemblies());
             Log($"Starting server transport on 0.0.0.0:{port}");
             _serverTransport = UtpTransportStartup.StartServer(port);
             MultiplayerSystemBootstrap.CreateServerSystems();
@@ -87,8 +88,8 @@ namespace StaticMlp.Networking.Unity {
             }
 
             Log("Creating client worlds");
-            MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig(), GameplayAssemblies());
-            MultiplayerWorldBootstrap.CreateClientUx(DefaultWorldConfig(), GameplayAssemblies());
+            MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig(), ReplicationRegistry.RegisterClientCoreGeneratedTypes, ecsTypeAssemblies: GameplayAssemblies());
+            MultiplayerWorldBootstrap.CreateClientUx(DefaultWorldConfig(), registerGeneratedTypes: null, ecsTypeAssemblies: GameplayAssemblies());
 
             if (bindDefaultMoveInput) {
                 NetworkInput.MoveProvider = ReadMoveInput;

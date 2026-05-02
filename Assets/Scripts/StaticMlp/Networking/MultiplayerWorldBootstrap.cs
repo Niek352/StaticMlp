@@ -6,23 +6,38 @@ using FFS.Libraries.StaticEcs;
 namespace StaticMlp.Networking {
     public static class MultiplayerWorldBootstrap {
         public static void CreateServer(WorldConfig config = default, params Assembly[] ecsTypeAssemblies) {
+            CreateServer(config, null, ecsTypeAssemblies);
+        }
+
+        public static void CreateServer(WorldConfig config, Action registerGeneratedTypes, params Assembly[] ecsTypeAssemblies) {
             SW.Create(config);
             var assemblies = BuildAssemblies(typeof(ServerWT), ecsTypeAssemblies);
             SW.Types().RegisterAll(assemblies.First, assemblies.Rest);
+            registerGeneratedTypes?.Invoke();
             SW.Initialize();
         }
 
         public static void CreateClientCore(WorldConfig config = default, params Assembly[] ecsTypeAssemblies) {
+            CreateClientCore(config, null, ecsTypeAssemblies);
+        }
+
+        public static void CreateClientCore(WorldConfig config, Action registerGeneratedTypes, params Assembly[] ecsTypeAssemblies) {
             CW.Create(config);
             var assemblies = BuildAssemblies(typeof(ClientCoreWT), ecsTypeAssemblies);
             CW.Types().RegisterAll(assemblies.First, assemblies.Rest);
+            registerGeneratedTypes?.Invoke();
             CW.Initialize();
         }
 
         public static void CreateClientUx(WorldConfig config = default, params Assembly[] ecsTypeAssemblies) {
+            CreateClientUx(config, null, ecsTypeAssemblies);
+        }
+
+        public static void CreateClientUx(WorldConfig config, Action registerGeneratedTypes, params Assembly[] ecsTypeAssemblies) {
             UXW.Create(config);
             var assemblies = BuildAssemblies(typeof(ClientUxWT), ecsTypeAssemblies);
             UXW.Types().RegisterAll(assemblies.First, assemblies.Rest);
+            registerGeneratedTypes?.Invoke();
             UXW.Initialize();
         }
 

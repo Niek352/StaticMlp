@@ -45,6 +45,7 @@ namespace StaticMlp.Networking.Replication {
                 e.Set<NetworkedTag>();
                 PrefabRegistry.Apply(identity.PrefabId, e);
                 OwnershipTags.ApplyForClient(e, identity.Owner, identity.Authority);
+                ReplicationRegistry.InitializeClientCoreInterpolatedState(e);
             }
         }
     }

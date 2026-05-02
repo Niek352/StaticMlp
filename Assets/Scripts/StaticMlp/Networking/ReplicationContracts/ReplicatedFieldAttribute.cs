@@ -5,5 +5,6 @@ namespace StaticMlp.Networking.Replication {
     public sealed class ReplicatedFieldAttribute : Attribute {
         public float Quantize;
         public bool Compress;
+        public ReplicatedFieldInterpolation Interpolation;
     }
 }

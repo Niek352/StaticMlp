@@ -50,7 +50,7 @@ Use these order constants first:
 
 - `GameplaySystemOrder.ServerConnectionGameplay`: server logic that reacts to new peers, such as spawning a player.
 - `GameplaySystemOrder.Gameplay`: normal simulation.
-- `GameplaySystemOrder.ClientPresentation`: local view sync and remote smoothing.
+- `GameplaySystemOrder.ClientPresentation`: local view sync and generated remote interpolation.
 - `GameplaySystemOrder.CollectReplication`: boundary where dirty state collection starts; gameplay should normally run before it.
 
 ## Replicated Component
@@ -64,13 +64,13 @@ Use `[ReplicatedComponent]`.
     sendRate: 20
 )]
 public struct CharacterNetState : IComponent, IComponentConfig<CharacterNetState> {
-    [ReplicatedField(Quantize = 0.01f)]
+    [ReplicatedField(Quantize = 0.01f, Interpolation = ReplicatedFieldInterpolation.Auto)]
     public Vector3 Position;
 
     [ReplicatedField(Quantize = 0.01f)]
     public Vector3 Velocity;
 
-    [ReplicatedField(Compress = true)]
+    [ReplicatedField(Compress = true, Interpolation = ReplicatedFieldInterpolation.Auto)]
     public Quaternion Rotation;
 
     public ComponentTypeConfig<CharacterNetState> Config() => new(
@@ -89,6 +89,8 @@ Rules:
 - Prefer quantization for floats.
 - Use `UnreliableSequenced` for frequently updated state.
 - Use `ReliableSequenced` for spawn/despawn/ownership/inventory/quest state.
+- Add `Interpolation = ReplicatedFieldInterpolation.Auto` for remote presentation fields such as position and rotation.
+- `Auto` supports `float`, `Vector2`, `Vector3`, and `Quaternion`.
 
 ## Gameplay System
 
@@ -126,22 +128,23 @@ Use `Mut<T>()` for replicated changes.
 
 ## Remote Visual System
 
-Remote entities should not simulate gameplay. They should smooth replicated state.
+Remote entities should not simulate gameplay. For fields marked with `Interpolation = Auto`, read `Interpolated<T>` and copy it into presentation state.
 
 ```csharp
-public sealed class RemoteSmoothingSystem : ISystem {
+public sealed class RemoteInterpolatedViewSyncSystem : ISystem {
     public void Update() {
-        foreach (var e in CW.Query<All<RemoteOwned, CharacterNetState, ViewTransform>>().Entities()) {
-            ref readonly var state = ref e.Read<CharacterNetState>();
+        foreach (var e in CW.Query<All<RemoteOwned, Interpolated<CharacterNetState>, ViewTransform>>().Entities()) {
+            var state = e.Read<Interpolated<CharacterNetState>>().Value;
             ref var view = ref e.Mut<ViewTransform>();
 
-            var t = 1f - MathF.Exp(-12f * Time.deltaTime);
-            view.RenderPosition = Vector3.Lerp(view.RenderPosition, state.Position, t);
-            view.RenderRotation = Quaternion.Slerp(view.RenderRotation, state.Rotation, t);
+            view.RenderPosition = state.Position;
+            view.RenderRotation = state.Rotation;
         }
     }
 }
 ```
+
+Do not write custom lerp systems for every replicated component. The generated `ReplicatedInterpolationSystem<T>` updates `Interpolated<T>` from `InterpolatedPrevious<T>` and the latest network value using the component `sendRate`.
 
 ## Spawning Networked Entities
 
@@ -299,4 +302,5 @@ if (evt.Door.TryUnpack<ServerWT>(out var door)) {
 9. Replication collect sends dirty `CharacterNetState`.
 10. Server validates `ClientOwned` and relays.
 11. Remote clients apply deltas.
-12. `RemoteSmoothingSystem` displays movement.
+12. Generated interpolation updates `Interpolated<CharacterNetState>`.
+13. `RemoteInterpolatedViewSyncSystem` displays movement.

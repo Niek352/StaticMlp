@@ -12,13 +12,13 @@ namespace StaticMlp.Game.Components {
         sendRate: 20
     )]
     public struct CharacterNetState : IComponent, IComponentConfig<CharacterNetState>, ITrackableAdded, ITrackableChanged, ITrackableDeleted {
-        [ReplicatedField(Quantize = 0.01f)]
+        [ReplicatedField(Quantize = 0.01f, Interpolation = ReplicatedFieldInterpolation.Auto)]
         public Vector3 Position;
 
         [ReplicatedField(Quantize = 0.01f)]
         public Vector3 Velocity;
 
-        [ReplicatedField(Compress = true)]
+        [ReplicatedField(Compress = true, Interpolation = ReplicatedFieldInterpolation.Auto)]
         public Quaternion Rotation;
 
         public ComponentTypeConfig<CharacterNetState> Config() => new(guid: new Guid("5f52be22-6d13-4f7a-9d2c-111111111111"));

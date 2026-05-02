@@ -36,6 +36,29 @@ namespace StaticMlp.Networking.Replication.Generated {
             };
         }
 
+        public static void ApplyClientDelta(CW.Entity e, byte[] payload) {
+            var next = Read(payload);
+            if (e.Has<CharacterNetState>())
+                e.Set(new InterpolatedPrevious<CharacterNetState>(e.Read<CharacterNetState>()));
+            else
+                e.Set(new InterpolatedPrevious<CharacterNetState>(next));
+
+            if (!e.Has<Interpolated<CharacterNetState>>())
+                e.Set(new Interpolated<CharacterNetState>(next));
+
+            e.Set(next);
+            e.Set(new InterpolatedClock<CharacterNetState> {
+                StartedAt = Time.time,
+                Duration = SendRate == 0 ? 0f : 1f / SendRate
+            });
+        }
+
+        public static void Interpolate(in CharacterNetState previous, in CharacterNetState current, ref CharacterNetState interpolated, float alpha) {
+            interpolated.Position = Vector3.LerpUnclamped(previous.Position, current.Position, alpha);
+            interpolated.Velocity = current.Velocity;
+            interpolated.Rotation = Quaternion.Slerp(previous.Rotation, current.Rotation, alpha);
+        }
+
         private static float Quantize001(float value) {
             return (float)Math.Round(value / 0.01f) * 0.01f;
         }

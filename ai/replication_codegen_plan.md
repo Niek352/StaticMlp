@@ -49,7 +49,7 @@ public struct CharacterNetState :
     ITrackableChanged,
     ITrackableDeleted {
 
-    [ReplicatedField(Quantize = 0.01f)]
+    [ReplicatedField(Quantize = 0.01f, Interpolation = ReplicatedFieldInterpolation.Auto)]
     public Vector3 Position;
 
     public ComponentTypeConfig<CharacterNetState> Config() => new(
@@ -66,6 +66,35 @@ Rules:
 - It must implement `ITrackableChanged` if deltas should be collected.
 - Replicated fields must use supported primitive, enum, `Vector2`, `Vector3`, or `Quaternion` types.
 - Gameplay systems must mutate replicated state through `Mut<T>()`.
+
+## Interpolated Replicated Fields
+
+Use `Interpolation = ReplicatedFieldInterpolation.Auto` on replicated fields that should be smoothed on remote clients:
+
+```csharp
+[ReplicatedField(Quantize = 0.01f, Interpolation = ReplicatedFieldInterpolation.Auto)]
+public Vector3 Position;
+
+[ReplicatedField(Compress = true, Interpolation = ReplicatedFieldInterpolation.Auto)]
+public Quaternion Rotation;
+```
+
+The generated client path keeps the replicated component as the network truth and writes presentation state into:
+
+- `Interpolated<T>`: current blended value for rendering.
+- `InterpolatedPrevious<T>`: previous received network value.
+- `InterpolatedClock<T>`: interpolation start time and duration.
+
+Generated code registers the closed generic client-core components, applies deltas through `ApplyClientDelta`, initializes interpolated state after snapshots, and adds `ReplicatedInterpolationSystem<T>`.
+
+Rules:
+
+- `Auto` supports only `float`, `Vector2`, `Vector3`, and `Quaternion`.
+- Unsupported interpolated field types produce codegen diagnostics.
+- `float` and vectors use lerp; `Quaternion` uses slerp.
+- Non-interpolated fields in the same component are copied from the current replicated value into `Interpolated<T>`.
+- Presentation systems for remote entities should read `Interpolated<T>`, not mutate the replicated component.
+- Local-owned presentation should continue to read the replicated component directly.
 
 ## Extension Note
 

@@ -33,8 +33,9 @@ namespace StaticMlp.Game.Bootstrap {
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems) {
             systems.Add(new LocalPlayerMovementSystem(), GameplaySystemOrder.Gameplay);
+            ReplicationRegistry.RegisterClientCoreInterpolationSystems(systems);
             systems.Add(new LocalViewSyncSystem(), GameplaySystemOrder.ClientPresentation);
-            systems.Add(new RemoteSmoothingSystem(), GameplaySystemOrder.ClientPresentation + 50);
+            systems.Add(new RemoteInterpolatedViewSyncSystem(), GameplaySystemOrder.ClientPresentation + 50);
         }
     }
 }
