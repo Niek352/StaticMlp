@@ -105,18 +105,11 @@ public abstract class ServerSys : SW.Systems<ServerSystemsT> { }
 public struct ClientCoreWT : IWorldType { }
 public abstract class CW : World<ClientCoreWT> { }
 
-public struct ClientUxWT : IWorldType { }
-public abstract class UXW : World<ClientUxWT> { }
-
 public struct ClientCoreSystemsT : ISystemsType { }
 public abstract class ClientCoreSys : CW.Systems<ClientCoreSystemsT> { }
-
-public struct ClientUxSystemsT : ISystemsType { }
-public abstract class ClientUxSys : UXW.Systems<ClientUxSystemsT> { }
 ```
 
 `ClientCoreWorld` содержит replicated gameplay state.  
-`ClientUxWorld` содержит input, camera, UI, cursor, selection, render smoothing.
 
 ## 3. StaticEcs требования
 
@@ -423,7 +416,6 @@ public sealed class ServerRelayClientOwnedStateSystem : ISystem {
  -770 ClientComponentDeltaApplySystem
  -760 ClientNetworkEventApplySystem
 
- -100 ClientUxToCoreBridgeSystem
     0 LocalPlayerMovementSystem
    10 OwnedRigidbodyCaptureSystem
 
@@ -565,7 +557,7 @@ public static class OwnershipTags {
 ### 9.1 Client-owned player movement
 
 ```text
-Client UX:
+MonoBehaviour input/camera bridge:
     Read input
 
 Client Core:
@@ -827,7 +819,7 @@ public static EntityGID ServerSpawnPlayer(NetworkPeerId owner, Vector3 spawnPosi
    - StaticPack.
 
 2. Define worlds:
-   - `ServerWT`, `ClientCoreWT`, `ClientUxWT`.
+   - `ServerWT`, `ClientCoreWT`.
 
 3. Register types:
    - components: `NetworkIdentity`, replicated state components, view components;

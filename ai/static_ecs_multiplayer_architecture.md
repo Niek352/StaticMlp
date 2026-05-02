@@ -45,7 +45,6 @@ Feature discovery currently provides:
 - Prefab factory registration through `RegisterPrefabs()`.
 - Server systems registration.
 - Client core systems registration.
-- Client UX systems registration hook.
 
 ## Ownership Rules
 
@@ -162,10 +161,6 @@ Client core:
       700 send packets
      1000 schedule transport jobs
           CW.Tick()
-
-Client UX:
-        0 feature UX/input/camera systems
-          UXW.Tick()
 ```
 
 ## Unity Physics for Coop

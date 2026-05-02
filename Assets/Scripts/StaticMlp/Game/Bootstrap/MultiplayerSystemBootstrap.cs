@@ -42,14 +42,6 @@ namespace StaticMlp.Game.Bootstrap
             ClientCoreSys.Initialize();
         }
 
-        public static void CreateClientUxSystems()
-        {
-            ClientUxSys.Create();
-            GameplayFeatureDiscovery.RegisterClientUxSystems(new ClientUxSystemsBuilder());
-            EcsDebug<ClientUxWT>.AddWorld<ClientUxSystemsT>();
-            ClientUxSys.Initialize();
-        }
-
         public static void UpdateServerFrame()
         {
             ServerSys.Update();
@@ -60,12 +52,6 @@ namespace StaticMlp.Game.Bootstrap
         {
             ClientCoreSys.Update();
             CW.Tick();
-        }
-
-        public static void UpdateClientUxFrame()
-        {
-            ClientUxSys.Update();
-            UXW.Tick();
         }
     }
 }

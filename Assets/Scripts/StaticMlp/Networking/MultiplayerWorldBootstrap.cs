@@ -29,21 +29,8 @@ namespace StaticMlp.Networking {
             CW.Initialize();
         }
 
-        public static void CreateClientUx(WorldConfig config = default, params Assembly[] ecsTypeAssemblies) {
-            CreateClientUx(config, null, ecsTypeAssemblies);
-        }
-
-        public static void CreateClientUx(WorldConfig config, Action registerGeneratedTypes, params Assembly[] ecsTypeAssemblies) {
-            UXW.Create(config);
-            var assemblies = BuildAssemblies(typeof(ClientUxWT), ecsTypeAssemblies);
-            UXW.Types().RegisterAll(assemblies.First, assemblies.Rest);
-            registerGeneratedTypes?.Invoke();
-            UXW.Initialize();
-        }
-
         public static void TickServer() => SW.Tick();
         public static void TickClientCore() => CW.Tick();
-        public static void TickClientUx() => UXW.Tick();
 
         private static AssemblyList BuildAssemblies(Type worldType, Assembly[] ecsTypeAssemblies) {
             var assemblies = new List<Assembly>();

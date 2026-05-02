@@ -49,12 +49,6 @@ namespace StaticMlp.Game.Bootstrap
                 feature.RegisterClientCoreSystems(systems);
         }
 
-        public static void RegisterClientUxSystems(ClientUxSystemsBuilder systems)
-        {
-            foreach (var feature in GetFeatures())
-                feature.RegisterClientUxSystems(systems);
-        }
-
         private static IGameplayFeature[] GetFeatures()
         {
             if (_features != null)

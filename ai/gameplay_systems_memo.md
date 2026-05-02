@@ -6,7 +6,7 @@ Short human checklist for writing gameplay systems in this project.
 
 Before writing a system, answer:
 
-1. Which world owns this logic: `SW`, `CW`, or `UXW`?
+1. Which world owns this logic: `SW` or `CW`?
 2. Which ownership tag should the query use: `ServerOwned`, `ClientOwned`, `LocalOwned`, or `RemoteOwned`?
 3. Is this replicated state, a replicated event, or presentation-only state?
 4. Does it belong in `Game.Core` or in a feature asmdef such as `Game.FeatureA`?
@@ -29,7 +29,7 @@ Client remote presentation:
     query RemoteOwned, read replicated state, smooth/render locally
 
 Client UX/input/camera:
-    UXW or MonoBehaviour bridge
+    CW presentation systems or MonoBehaviour bridge
     do not replicate UI-only state
 ```
 

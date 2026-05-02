@@ -94,11 +94,9 @@ namespace StaticMlp.Networking.Unity
                 return;
             }
 
-            Log("Creating client worlds");
+            Log("Creating client world");
             MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig(),
                 ReplicationRegistry.RegisterClientCoreGeneratedTypes, ecsTypeAssemblies: GameplayAssemblies());
-            MultiplayerWorldBootstrap.CreateClientUx(DefaultWorldConfig(), registerGeneratedTypes: null,
-                ecsTypeAssemblies: GameplayAssemblies());
 
             if (bindDefaultMoveInput)
             {
@@ -109,7 +107,6 @@ namespace StaticMlp.Networking.Unity
             Log($"Starting client transport to {connectHost}:{port}");
             _clientTransport = UtpTransportStartup.StartClient(connectHost, port);
             MultiplayerSystemBootstrap.CreateClientCoreSystems();
-            MultiplayerSystemBootstrap.CreateClientUxSystems();
             _clientStarted = true;
             Log("Client systems initialized");
         }
@@ -121,9 +118,6 @@ namespace StaticMlp.Networking.Unity
 
             if (_clientStarted)
                 MultiplayerSystemBootstrap.UpdateClientCoreFrame();
-
-            if (_clientStarted)
-                MultiplayerSystemBootstrap.UpdateClientUxFrame();
         }
 
         private static Vector2 ReadMoveInput()
@@ -178,14 +172,8 @@ namespace StaticMlp.Networking.Unity
                 if (ClientCoreSys.IsInitialized)
                     ClientCoreSys.Destroy();
 
-                if (ClientUxSys.IsInitialized)
-                    ClientUxSys.Destroy();
-
                 if (CW.Status != WorldStatus.NotCreated)
                     CW.Destroy();
-
-                if (UXW.Status != WorldStatus.NotCreated)
-                    UXW.Destroy();
 
                 _clientTransport?.Dispose();
                 _clientTransport = null;
