@@ -1,5 +1,6 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking.Diagnostics;
 using StaticMlp.Networking.Replication;
 using Unity.Collections;
 using Unity.Networking.Transport;
@@ -19,6 +20,7 @@ namespace StaticMlp.Networking.Transport {
                 if (evt == NetworkEvent.Type.Data) {
                     var payload = new byte[reader.Length];
                     reader.ReadBytes(payload.AsSpan());
+                    NetworkTrafficProfiler.RecordReceived(new NetworkPeerId(0), payload);
                     ctx.RawInbox.Enqueue(new RawNetworkPacket(new NetworkPeerId(0), payload));
                 } else if (evt == NetworkEvent.Type.Connect) {
                     UtpTransportContext.Log("Client connected to server; sending hello");
