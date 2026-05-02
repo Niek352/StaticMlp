@@ -1,5 +1,3 @@
-using StaticMlp.Game.Components;
-using StaticMlp.Networking;
 using StaticMlp.Networking.Transport;
 
 namespace StaticMlp.Networking.Replication {
@@ -16,9 +14,7 @@ namespace StaticMlp.Networking.Replication {
                 PrefabId = identity.PrefabId
             };
 
-            spawn.Components.Add(ReplicationRegistry.CreateDelta(entity.GID, identity));
-            if (entity.Has<CharacterNetState>())
-                spawn.Components.Add(ReplicationRegistry.CreateDelta(entity.GID, entity.Read<CharacterNetState>()));
+            ReplicationRegistry.CollectInitialState(entity, spawn.Components);
 
             ref var outbox = ref SW.GetResource<NetOutbox>();
             foreach (var peer in ServerPeerRegistry.Peers)

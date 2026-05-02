@@ -55,6 +55,21 @@ namespace StaticMlp.Networking.Replication {
             return bytes;
         }
 
+        public static byte[] EncodeSnapshot(ReplicationSnapshotMessage msg) {
+            var writer = BinaryPackWriter.CreateFromPool();
+            writer.WriteByte((byte)NetPacketType.Snapshot);
+            writer.WriteByte((byte)msg.Kind);
+            writer.WriteUshort(msg.ClusterId);
+            writer.WriteUint(msg.ChunkIdx);
+            writer.WriteBool(msg.Gzip);
+            writer.WriteInt(msg.Payload?.Length ?? 0);
+            if (msg.Payload != null)
+                writer.WriteBytes(msg.Payload);
+            var bytes = writer.CopyToBytes();
+            writer.Dispose();
+            return bytes;
+        }
+
         public static byte[] EncodeComponentBatch(ComponentBatch batch) {
             var writer = BinaryPackWriter.CreateFromPool();
             writer.WriteByte((byte)NetPacketType.ComponentBatch);
@@ -89,6 +104,9 @@ namespace StaticMlp.Networking.Replication {
                         (NetworkAuthority)reader.ReadByte()
                     ));
                     return true;
+                case NetPacketType.Snapshot:
+                    inbox.Snapshots.Add(ReadSnapshot(ref reader));
+                    return true;
                 case NetPacketType.ComponentBatch:
                     inbox.ComponentBatches.Add(ReadComponentBatch(ref reader, sourcePeer));
                     return true;
@@ -109,6 +127,19 @@ namespace StaticMlp.Networking.Replication {
             };
             ReadDeltaList(ref reader, spawn.Components);
             return spawn;
+        }
+
+        private static ReplicationSnapshotMessage ReadSnapshot(ref BinaryPackReader reader) {
+            var msg = new ReplicationSnapshotMessage {
+                Kind = (ReplicationSnapshotKind)reader.ReadByte(),
+                ClusterId = reader.ReadUshort(),
+                ChunkIdx = reader.ReadUint(),
+                Gzip = reader.ReadBool()
+            };
+
+            var length = reader.ReadInt();
+            msg.Payload = length > 0 ? reader.ReadBytesAsSpan((uint)length).ToArray() : Array.Empty<byte>();
+            return msg;
         }
 
         private static ComponentBatch ReadComponentBatch(ref BinaryPackReader reader, NetworkPeerId fallbackSource) {

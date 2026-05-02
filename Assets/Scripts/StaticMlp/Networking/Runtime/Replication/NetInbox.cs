@@ -6,6 +6,7 @@ namespace StaticMlp.Networking.Replication {
         public readonly List<SpawnMessage> Spawns = new();
         public readonly List<DespawnMessage> Despawns = new();
         public readonly List<OwnershipChangedMessage> OwnershipChanges = new();
+        public readonly List<ReplicationSnapshotMessage> Snapshots = new();
         public readonly List<ComponentBatch> ComponentBatches = new();
         public readonly List<NetworkEventMessage> Events = new();
 
@@ -13,6 +14,7 @@ namespace StaticMlp.Networking.Replication {
             Spawns.Clear();
             Despawns.Clear();
             OwnershipChanges.Clear();
+            Snapshots.Clear();
             ComponentBatches.Clear();
             Events.Clear();
         }

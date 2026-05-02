@@ -27,6 +27,7 @@ namespace StaticMlp.Game.Bootstrap {
             ClientCoreSys.Create();
             ClientCoreSys.Add(new ClientTransportCompleteSystem(), order: -1000);
             ClientCoreSys.Add(new ClientRawInboxDrainSystem(), order: -900);
+            ClientCoreSys.Add(new ClientSnapshotApplySystem(), order: -810);
             ClientCoreSys.Add(new ClientSpawnApplySystem(), order: -800);
             ClientCoreSys.Add(new ClientDespawnApplySystem(), order: -790);
             ClientCoreSys.Add(new ClientOwnershipApplySystem(), order: -780);

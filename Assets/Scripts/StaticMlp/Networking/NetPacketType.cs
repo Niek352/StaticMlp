@@ -5,6 +5,7 @@ namespace StaticMlp.Networking {
         Spawn = 10,
         Despawn = 11,
         OwnershipChanged = 12,
+        Snapshot = 13,
         ComponentBatch = 20,
         NetworkEvent = 30,
         Ping = 40,

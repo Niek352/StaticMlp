@@ -8,6 +8,7 @@ Short operational rules for this Unity project. Keep this file small; put detail
 - [Networked gameplay feature recipes](ai/networked_feature_recipes.md)
 - [StaticEcs quick reference](ai/static_ecs_reference.md)
 - [Original multiplayer implementation plan](ai/static_ecs_unity_transport_multiplayer_plan.md)
+- Full StaticEcs documentation is available at [static-ecs FULL.txt](ai/static-ecs%20FULL.txt) when deeper API/reference details are needed.
 
 ## Core Model
 
@@ -40,6 +41,8 @@ Gameplay systems should only:
 
 - AI agents must not create prefab assets.
 - Do not generate `.prefab` files through code, YAML patches, editor scripts, or batchmode.
+- Do not launch Unity in BatchMode.
+- Do not run `dotnet build` on your own; ask the user to run Unity/build checks when verification is needed.
 - Prefabs, Canvas hierarchies, and inspector references are assembled manually by a human in the Unity Editor.
 - Null UI references are bugs. Fail fast instead of using defensive `if (x != null)` guards.
 - Do not write `ValidateReferences` or helper methods that search the scene/hierarchy instead of explicit inspector wiring.

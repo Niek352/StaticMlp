@@ -17,6 +17,7 @@ namespace StaticMlp.Networking.Transport {
                 UtpTransportContext.Log($"Accepted client connection as peer {peer}");
                 ctx.Send(peer, PacketCodec.EncodeWelcome(peer), NetDelivery.ReliableSequenced);
                 UtpTransportContext.Log($"Sent welcome to peer {peer}");
+                ReplicationSnapshotBroadcaster.SendClusterSnapshot(peer, 0);
             }
         }
     }

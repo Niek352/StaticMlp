@@ -1,0 +1,22 @@
+{
+    "name": "StaticMlp.ReplicationCodeGen.Editor",
+    "rootNamespace": "StaticMlp.Editor.ReplicationCodeGen",
+    "references": [
+        "AnnulusGames.UnityCodeGen.Editor",
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking",
+        "Ecs.Game.Player"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -7,6 +7,8 @@ namespace StaticMlp.Networking.Transport {
             ref var ctx = ref CW.GetResource<UtpTransportContext>();
             ref var outbox = ref CW.GetResource<NetOutbox>();
 
+            outbox.FlushComponentBatches();
+
             foreach (var packet in outbox.Packets)
                 ctx.Send(packet.Peer, packet.Payload, packet.Delivery);
 
