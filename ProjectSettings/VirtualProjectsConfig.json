@@ -1,0 +1,8 @@
+{
+  "PlayerTags": [
+    "IsClient",
+    "IsServer",
+    "IsHost"
+  ],
+  "version": "6000.6.0a3"
+}
