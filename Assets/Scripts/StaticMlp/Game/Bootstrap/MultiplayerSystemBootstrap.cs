@@ -13,6 +13,7 @@ namespace StaticMlp.Game.Bootstrap {
             ServerSys.Add(new ServerTransportCompleteSystem(), order: -1000);
             ServerSys.Add(new ServerRawInboxDrainSystem(), order: -900);
             ServerSys.Add(new ServerConnectionLifecycleSystem(), order: -850);
+            ServerSys.Add(new ServerPlayerJoinSpawnSystem(), order: -830);
             ServerSys.Add(new ServerReceiveClientOwnedStateSystem(), order: -780);
             ServerSys.Add(new ServerAiSystem(), order: 0);
             ServerSys.Add(new ServerOwnedReplicationCollectSystem(), order: 500);
@@ -33,6 +34,7 @@ namespace StaticMlp.Game.Bootstrap {
             ClientCoreSys.Add(new ClientOwnershipApplySystem(), order: -780);
             ClientCoreSys.Add(new ClientComponentDeltaApplySystem(), order: -770);
             ClientCoreSys.Add(new LocalPlayerMovementSystem(), order: 0);
+            ClientCoreSys.Add(new LocalViewSyncSystem(), order: 250);
             ClientCoreSys.Add(new RemoteSmoothingSystem(), order: 300);
             ClientCoreSys.Add(new ClientReplicationCollectSystem(), order: 500);
             ClientCoreSys.Add(new ClientTransportSendSystem(), order: 700);

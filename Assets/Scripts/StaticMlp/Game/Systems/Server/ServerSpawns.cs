@@ -7,8 +7,11 @@ using UnityEngine;
 
 namespace StaticMlp.Game.Systems.Server {
     public static class ServerSpawns {
+        private const ushort NetworkedEntityCluster = 1;
+
         public static EntityGID ServerSpawnPlayer(NetworkPeerId owner, Vector3 spawnPosition) {
-            var e = SW.NewEntity<Default>();
+            EnsureNetworkedEntityCluster();
+            var e = SW.NewEntity<Default>(NetworkedEntityCluster);
 
             e.Set(new NetworkIdentity {
                 Owner = owner,
@@ -30,7 +33,8 @@ namespace StaticMlp.Game.Systems.Server {
         }
 
         public static EntityGID ServerSpawnOwnedMonster(Vector3 spawnPosition) {
-            var e = SW.NewEntity<Default>();
+            EnsureNetworkedEntityCluster();
+            var e = SW.NewEntity<Default>(NetworkedEntityCluster);
 
             e.Set(new NetworkIdentity {
                 Owner = new NetworkPeerId(0),
@@ -49,6 +53,11 @@ namespace StaticMlp.Game.Systems.Server {
             OwnershipTags.ApplyForServer(e, new NetworkPeerId(0), NetworkAuthority.Server);
             SpawnBroadcaster.SendSpawn(e);
             return e.GID;
+        }
+
+        private static void EnsureNetworkedEntityCluster() {
+            if (!SW.ClusterIsRegistered(NetworkedEntityCluster))
+                SW.RegisterCluster(NetworkedEntityCluster);
         }
     }
 }

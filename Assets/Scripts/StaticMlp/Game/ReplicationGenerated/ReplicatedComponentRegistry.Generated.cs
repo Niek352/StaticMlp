@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
-using StaticMlp.Game.Components;
 using StaticMlp.Networking.Ownership;
+using StaticMlp.Game.Components;
 using StaticMlp.Networking.Replication.Generated;
 
 namespace StaticMlp.Networking.Replication {

@@ -17,7 +17,8 @@ namespace StaticMlp.Game.Systems.Client {
                 ref var state = ref e.Mut<CharacterNetState>();
 
                 var input = NetworkInput.MoveProvider();
-                var move = new Vector3(input.x, 0f, input.y);
+                var cameraYaw = Quaternion.Euler(0f, NetworkInput.CameraYawProvider(), 0f);
+                var move = cameraYaw * new Vector3(input.x, 0f, input.y);
 
                 if (move.sqrMagnitude > 1f)
                     move.Normalize();

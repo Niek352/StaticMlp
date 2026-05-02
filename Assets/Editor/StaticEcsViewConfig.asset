@@ -27,8 +27,7 @@ MonoBehaviour:
       - StaticMlp/Networking/Ownership/ServerOwned
       - StaticMlp/Networking/Ownership/ClientOwned
       - StaticMlp/Networking/Ownership/NetworkedTag
-      showTableDataTypes:
-      - StaticMlp/Networking/NetworkIdentity
+      showTableDataTypes: []
       sortByType: 
       maxEntityResult: 100
       pinnedEntities: 

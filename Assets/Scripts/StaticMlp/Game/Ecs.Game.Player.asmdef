@@ -5,7 +5,8 @@
         "FFS.StaticEcs",
         "FFS.StaticPack",
         "Ecs.Networking",
-        "FFS.StaticEcs.Unity"
+        "FFS.StaticEcs.Unity",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

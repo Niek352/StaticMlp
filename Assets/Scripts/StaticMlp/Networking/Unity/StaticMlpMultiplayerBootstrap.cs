@@ -1,8 +1,15 @@
+using System.Reflection;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Bootstrap;
+using StaticMlp.Game.Components;
+using StaticMlp.Game.Presentation;
 using StaticMlp.Game.Systems.Client;
 using StaticMlp.Networking.Transport;
 using UnityEngine;
+using UnityEngine.Serialization;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace StaticMlp.Networking.Unity {
     public sealed class StaticMlpMultiplayerBootstrap : MonoBehaviour {
@@ -24,7 +31,8 @@ namespace StaticMlp.Networking.Unity {
         [SerializeField] private ushort port = 7777;
 
         [Header("Input")]
-        [SerializeField] private bool bindLegacyInputAxes = true;
+        [FormerlySerializedAs("bindLegacyInputAxes")]
+        [SerializeField] private bool bindDefaultMoveInput = true;
         [SerializeField] private string horizontalAxis = "Horizontal";
         [SerializeField] private string verticalAxis = "Vertical";
 
@@ -65,7 +73,7 @@ namespace StaticMlp.Networking.Unity {
             }
 
             Log("Creating server world");
-            MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig());
+            MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(), GameplayAssemblies());
             Log($"Starting server transport on 0.0.0.0:{port}");
             _serverTransport = UtpTransportStartup.StartServer(port);
             MultiplayerSystemBootstrap.CreateServerSystems();
@@ -80,12 +88,12 @@ namespace StaticMlp.Networking.Unity {
             }
 
             Log("Creating client worlds");
-            MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig());
-            MultiplayerWorldBootstrap.CreateClientUx(DefaultWorldConfig());
+            MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig(), GameplayAssemblies());
+            MultiplayerWorldBootstrap.CreateClientUx(DefaultWorldConfig(), GameplayAssemblies());
 
-            if (bindLegacyInputAxes) {
-                NetworkInput.MoveProvider = ReadLegacyMoveInput;
-                Log($"Bound legacy input axes: {horizontalAxis}/{verticalAxis}");
+            if (bindDefaultMoveInput) {
+                NetworkInput.MoveProvider = ReadMoveInput;
+                Log("Bound default move input");
             }
 
             Log($"Starting client transport to {connectHost}:{port}");
@@ -103,17 +111,47 @@ namespace StaticMlp.Networking.Unity {
                 MultiplayerSystemBootstrap.UpdateClientCoreFrame();
         }
 
-        private Vector2 ReadLegacyMoveInput() {
+        private Vector2 ReadMoveInput() {
+#if ENABLE_INPUT_SYSTEM
+            var keyboard = Keyboard.current;
+            if (keyboard != null) {
+                var move = Vector2.zero;
+
+                if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
+                    move.x -= 1f;
+                if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
+                    move.x += 1f;
+                if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
+                    move.y -= 1f;
+                if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
+                    move.y += 1f;
+
+                if (move != Vector2.zero)
+                    return move;
+            }
+#endif
+
+#if ENABLE_LEGACY_INPUT_MANAGER
             return new Vector2(
                 Input.GetAxisRaw(horizontalAxis),
                 Input.GetAxisRaw(verticalAxis)
             );
+#else
+            return Vector2.zero;
+#endif
         }
 
         private static WorldConfig DefaultWorldConfig() {
             return new WorldConfig {
                 TrackCreated = true,
                 TrackingBufferSize = 64
+            };
+        }
+
+        private static Assembly[] GameplayAssemblies() {
+            return new[] {
+                typeof(CharacterNetState).Assembly,
+                typeof(ViewTransform).Assembly
             };
         }
 

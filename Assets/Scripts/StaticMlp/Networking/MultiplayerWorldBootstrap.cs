@@ -1,27 +1,67 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using FFS.Libraries.StaticEcs;
 
 namespace StaticMlp.Networking {
     public static class MultiplayerWorldBootstrap {
-        public static void CreateServer(WorldConfig config = default) {
+        public static void CreateServer(WorldConfig config = default, params Assembly[] ecsTypeAssemblies) {
             SW.Create(config);
-            SW.Types().RegisterAll();
+            var assemblies = BuildAssemblies(typeof(ServerWT), ecsTypeAssemblies);
+            SW.Types().RegisterAll(assemblies.First, assemblies.Rest);
             SW.Initialize();
         }
 
-        public static void CreateClientCore(WorldConfig config = default) {
+        public static void CreateClientCore(WorldConfig config = default, params Assembly[] ecsTypeAssemblies) {
             CW.Create(config);
-            CW.Types().RegisterAll();
+            var assemblies = BuildAssemblies(typeof(ClientCoreWT), ecsTypeAssemblies);
+            CW.Types().RegisterAll(assemblies.First, assemblies.Rest);
             CW.Initialize();
         }
 
-        public static void CreateClientUx(WorldConfig config = default) {
+        public static void CreateClientUx(WorldConfig config = default, params Assembly[] ecsTypeAssemblies) {
             UXW.Create(config);
-            UXW.Types().RegisterAll();
+            var assemblies = BuildAssemblies(typeof(ClientUxWT), ecsTypeAssemblies);
+            UXW.Types().RegisterAll(assemblies.First, assemblies.Rest);
             UXW.Initialize();
         }
 
         public static void TickServer() => SW.Tick();
         public static void TickClientCore() => CW.Tick();
         public static void TickClientUx() => UXW.Tick();
+
+        private static AssemblyList BuildAssemblies(Type worldType, Assembly[] ecsTypeAssemblies) {
+            var assemblies = new List<Assembly>();
+            var seen = new HashSet<Assembly>();
+
+            AddAssembly(worldType.Assembly, assemblies, seen);
+
+            if (ecsTypeAssemblies != null)
+                for (var i = 0; i < ecsTypeAssemblies.Length; i++)
+                    AddAssembly(ecsTypeAssemblies[i], assemblies, seen);
+
+            var rest = new Assembly[assemblies.Count - 1];
+            for (var i = 1; i < assemblies.Count; i++)
+                rest[i - 1] = assemblies[i];
+
+            return new AssemblyList(assemblies[0], rest);
+        }
+
+        private static void AddAssembly(Assembly assembly, List<Assembly> assemblies, HashSet<Assembly> seen) {
+            if (assembly == null || !seen.Add(assembly))
+                return;
+
+            assemblies.Add(assembly);
+        }
+
+        private readonly struct AssemblyList {
+            public readonly Assembly First;
+            public readonly Assembly[] Rest;
+
+            public AssemblyList(Assembly first, Assembly[] rest) {
+                First = first;
+                Rest = rest;
+            }
+        }
     }
 }
