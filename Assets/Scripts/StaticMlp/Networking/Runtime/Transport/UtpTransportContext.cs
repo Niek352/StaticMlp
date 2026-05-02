@@ -7,23 +7,6 @@ using Unity.Networking.Transport;
 using UnityEngine;
 
 namespace StaticMlp.Networking.Transport {
-    public readonly struct RawNetworkPacket {
-        public readonly NetworkPeerId SourcePeer;
-        public readonly byte[] Payload;
-
-        public RawNetworkPacket(NetworkPeerId sourcePeer, byte[] payload) {
-            SourcePeer = sourcePeer;
-            Payload = payload;
-        }
-    }
-
-    public interface INetworkTransport {
-        bool IsServer { get; }
-        void Send(NetworkPeerId peer, ReadOnlySpan<byte> payload, NetDelivery delivery);
-        bool TryReceive(out NetworkPeerId peer, out ReadOnlySpan<byte> payload);
-        void Poll();
-    }
-
     public sealed class UtpTransportContext : IDisposable, INetworkTransport, IResource {
         public static bool EnableLogs = true;
 
@@ -120,20 +103,5 @@ namespace StaticMlp.Networking.Transport {
             if (EnableLogs)
                 Debug.LogWarning($"[StaticMlpTransport] {message}");
         }
-    }
-
-    public static class ServerPeerRegistry {
-        public static readonly List<NetworkPeerId> Peers = new();
-
-        public static void Add(NetworkPeerId peer) {
-            if (!Peers.Contains(peer))
-                Peers.Add(peer);
-        }
-
-        public static void Remove(NetworkPeerId peer) {
-            Peers.Remove(peer);
-        }
-
-        public static void Clear() => Peers.Clear();
     }
 }

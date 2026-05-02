@@ -37,8 +37,4 @@ namespace StaticMlp.Game.Components {
             });
         }
     }
-
-    public struct PlayerTag : ITag { }
-    public struct MonsterTag : ITag { }
-    public struct DoorTag : ITag { }
 }

@@ -4,11 +4,6 @@ using StaticMlp.Game.Components;
 using StaticMlp.Game.Presentation;
 
 namespace StaticMlp.Networking.Replication {
-    public static class Prefabs {
-        public const ushort Player = 1;
-        public const ushort Monster = 2;
-    }
-
     public static class PrefabRegistry {
         private static readonly Dictionary<ushort, Action<CW.Entity>> ClientFactories = new();
         private static readonly Dictionary<ushort, Action<SW.Entity>> ServerFactories = new();

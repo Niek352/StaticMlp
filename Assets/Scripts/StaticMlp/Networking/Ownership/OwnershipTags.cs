@@ -1,12 +1,4 @@
-using FFS.Libraries.StaticEcs;
-
 namespace StaticMlp.Networking.Ownership {
-    public struct LocalOwned : ITag { }
-    public struct RemoteOwned : ITag { }
-    public struct ServerOwned : ITag { }
-    public struct ClientOwned : ITag { }
-    public struct NetworkedTag : ITag { }
-
     public static class OwnershipTags {
         public static void ApplyForClient(StaticMlp.Networking.CW.Entity e, NetworkPeerId owner, NetworkAuthority authority) {
             if (e.Has<LocalOwned>()) e.Delete<LocalOwned>();
@@ -33,9 +25,8 @@ namespace StaticMlp.Networking.Ownership {
                 return;
             }
 
-            if (authority == NetworkAuthority.Owner) {
+            if (authority == NetworkAuthority.Owner)
                 e.Set<ClientOwned>();
-            }
         }
     }
 }
