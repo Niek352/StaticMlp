@@ -13,6 +13,40 @@ Gameplay Systems = normal ECS logic
 
 Networking logic belongs in replication and transport layers. Gameplay systems should not manually serialize packets or touch Unity Transport directly.
 
+## Current Runtime Layout
+
+```text
+Assets/Scripts/StaticMlp/Networking
+    Ecs.Networking
+    StaticEcs worlds, ownership tags, packet types, transport runtime,
+    replication runtime contracts and transport systems.
+
+Assets/Scripts/StaticMlp/Networking/Unity
+    Ecs.Networking.Unity
+    MonoBehaviour bootstrap for Unity play mode.
+
+Assets/Scripts/StaticMlp/Game
+    Game.Core
+    Gameplay bootstrap, feature discovery, built-in demo gameplay,
+    prefab registry, replication collect/apply systems, generated replication code,
+    presentation-only components.
+
+Future feature assemblies
+    Game.FeatureA
+    Feature-local components, tags, systems, presentation state and a small
+    GameplayFeature class that registers systems/prefabs.
+```
+
+`Game.Core` owns the composition points. A new feature assembly should reference `Game.Core` and implement `GameplayFeature`; the bootstrap discovers it through loaded assemblies. This keeps the main startup code free from per-feature `using` statements and manual `Add(new FeatureSystem())` calls.
+
+Feature discovery currently provides:
+
+- ECS type assembly discovery before `RegisterAll(...)`.
+- Prefab factory registration through `RegisterPrefabs()`.
+- Server systems registration.
+- Client core systems registration.
+- Client UX systems registration hook.
+
 ## Ownership Rules
 
 Client:
@@ -98,6 +132,42 @@ Tick world
 
 Do not collect replication before gameplay mutates state. Do not apply network state after local gameplay in the same frame unless that is explicitly required.
 
+Current core order:
+
+```text
+Server:
+    -1000 complete transport jobs
+     -900 drain raw inbox
+     -850 connection lifecycle
+     -830 feature connection gameplay, for example player spawn
+     -780 receive client-owned state
+        0 feature gameplay
+      500 collect server-owned dirty state
+      550 relay client-owned state
+      700 send packets
+     1000 schedule transport jobs
+          SW.Tick()
+
+Client core:
+    -1000 complete transport jobs
+     -900 drain raw inbox
+     -810 apply snapshots
+     -800 apply spawns
+     -790 apply despawns
+     -780 apply ownership
+     -770 apply component deltas
+        0 feature local gameplay
+      250 feature presentation sync
+      500 collect local-owned dirty state
+      700 send packets
+     1000 schedule transport jobs
+          CW.Tick()
+
+Client UX:
+        0 feature UX/input/camera systems
+          UXW.Tick()
+```
+
 ## Unity Physics for Coop
 
 The owner simulates physics. Everyone else renders kinematic replicated state.
@@ -123,7 +193,7 @@ Do not try to make Unity Physics deterministic across clients.
 ## Standard Module Layout
 
 ```text
-/Networking
+/Networking                 asmdef: Ecs.Networking
     NetworkIdentity.cs
     NetworkAuthority.cs
     NetworkPeerId.cs
@@ -159,22 +229,55 @@ Do not try to make Unity Physics deterministic across clients.
     ClientOwned.cs
     OwnershipTags.cs
 
-/Game/Components
-    CharacterNetState.cs
-    DoorState.cs
-    Health.cs
+/Game                         asmdef: Game.Core
+    Bootstrap/
+        GameplayFeature.cs
+        GameplayFeatureDiscovery.cs
+        MultiplayerSystemBootstrap.cs
+    Replication/
+    ReplicationGenerated/
+    Presentation/
 
-/Game/Systems/Client
-    LocalPlayerMovementSystem.cs
-    RemoteSmoothingSystem.cs
+/Game/Features/FeatureA        asmdef: Game.FeatureA
+    FeatureAGameplayFeature.cs
+    Components/
+    Tags/
+    Systems/Client/
+    Systems/Server/
+    Presentation/
+```
 
-/Game/Systems/Server
-    ServerAiSystem.cs
-    ServerDoorSystem.cs
-    ServerLootSystem.cs
+Recommended feature asmdef:
 
-/Game/Presentation
-    ViewTransform.cs
-    CameraFollowSystem.cs
-    AnimationBindingSystem.cs
+```json
+{
+    "name": "Game.FeatureA",
+    "rootNamespace": "StaticMlp.Game.FeatureA",
+    "references": [
+        "Game.Core",
+        "Ecs.Networking",
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "FFS.StaticEcs.Unity"
+    ],
+    "autoReferenced": true
+}
+```
+
+Minimal feature entry point:
+
+```csharp
+using StaticMlp.Game.Bootstrap;
+
+namespace StaticMlp.Game.FeatureA {
+    public sealed class FeatureAGameplayFeature : GameplayFeature {
+        public override void RegisterServerSystems(ServerSystemsBuilder systems) {
+            systems.Add(new FeatureAServerSystem(), GameplaySystemOrder.Gameplay);
+        }
+
+        public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems) {
+            systems.Add(new FeatureAClientSystem(), GameplaySystemOrder.Gameplay);
+        }
+    }
+}
 ```

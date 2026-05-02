@@ -4,7 +4,7 @@
     "references": [
         "FFS.StaticEcs",
         "Ecs.Networking",
-        "Ecs.Game.Player",
+        "Game.Core",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],

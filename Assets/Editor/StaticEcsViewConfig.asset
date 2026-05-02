@@ -59,3 +59,57 @@ MonoBehaviour:
       foldoutTags: 1
     systems:
       drawLevel: 10
+  - worldTypeFullName: StaticMlp.Networking.ClientCoreWT
+    main:
+      selectedTabName: Entities
+      drawRate: 0.5
+      drawFrames: 2
+    entities:
+      componentColumns:
+      - StaticMlp/Networking/NetworkIdentity
+      - StaticMlp/Game/Presentation/ViewTransform
+      - StaticMlp/Game/Components/CharacterNetState
+      tagColumns:
+      - StaticMlp/Networking/Ownership/ClientOwned
+      - StaticMlp/Networking/Ownership/LocalOwned
+      - StaticMlp/Networking/Ownership/NetworkedTag
+      - StaticMlp/Networking/Ownership/RemoteOwned
+      - StaticMlp/Networking/Ownership/ServerOwned
+      - StaticMlp/Game/Components/DoorTag
+      - StaticMlp/Game/Components/MonsterTag
+      - StaticMlp/Game/Components/PlayerTag
+      showTableDataTypes:
+      - StaticMlp/Networking/NetworkIdentity
+      - StaticMlp/Game/Presentation/ViewTransform
+      - StaticMlp/Game/Components/CharacterNetState
+      sortByType: 
+      maxEntityResult: 100
+      pinnedEntities: 
+      filterActive: 0
+      gidFilterActive: 0
+      gidFilterValue: 0
+      filterAll: []
+      filterAllOnlyDisabled: []
+      filterAllWithDisabled: []
+      filterNone: []
+      filterNoneWithDisabled: []
+      filterAny: []
+      filterAnyOnlyDisabled: []
+      filterAnyWithDisabled: []
+      foldoutMode: 1
+      autoExpandComponentTypes: []
+      sortComponents: 0
+      defaultGroupExpanded: 1
+      groupOverrides: []
+    events:
+      latest: 1
+      filterTypeNames: []
+    stats:
+      showNotRegistered: 0
+      fragmentationThreshold: 512
+      foldoutEntityTypes: 1
+      foldoutEvents: 1
+      foldoutComponents: 1
+      foldoutTags: 1
+    systems:
+      drawLevel: 10

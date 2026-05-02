@@ -1,8 +1,6 @@
 using System.Reflection;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Bootstrap;
-using StaticMlp.Game.Components;
-using StaticMlp.Game.Presentation;
 using StaticMlp.Game.Systems.Client;
 using StaticMlp.Networking.Transport;
 using UnityEngine;
@@ -58,6 +56,7 @@ namespace StaticMlp.Networking.Unity {
             }
 
             Log($"Starting multiplayer as {runMode} on port {port}");
+            GameplayFeatureDiscovery.RegisterPrefabs();
 
             if (runMode == RunMode.Server || runMode == RunMode.Host)
                 StartServerSide();
@@ -99,6 +98,7 @@ namespace StaticMlp.Networking.Unity {
             Log($"Starting client transport to {connectHost}:{port}");
             _clientTransport = UtpTransportStartup.StartClient(connectHost, port);
             MultiplayerSystemBootstrap.CreateClientCoreSystems();
+            MultiplayerSystemBootstrap.CreateClientUxSystems();
             _clientStarted = true;
             Log("Client systems initialized");
         }
@@ -109,6 +109,9 @@ namespace StaticMlp.Networking.Unity {
 
             if (_clientStarted)
                 MultiplayerSystemBootstrap.UpdateClientCoreFrame();
+
+            if (_clientStarted)
+                MultiplayerSystemBootstrap.UpdateClientUxFrame();
         }
 
         private Vector2 ReadMoveInput() {
@@ -149,10 +152,7 @@ namespace StaticMlp.Networking.Unity {
         }
 
         private static Assembly[] GameplayAssemblies() {
-            return new[] {
-                typeof(CharacterNetState).Assembly,
-                typeof(ViewTransform).Assembly
-            };
+            return GameplayFeatureDiscovery.GetEcsTypeAssemblies();
         }
 
         private void OnDestroy() {
@@ -169,6 +169,9 @@ namespace StaticMlp.Networking.Unity {
 
                 if (ClientCoreSys.IsInitialized)
                     ClientCoreSys.Destroy();
+
+                if (ClientUxSys.IsInitialized)
+                    ClientUxSys.Destroy();
 
                 if (CW.Status != WorldStatus.NotCreated)
                     CW.Destroy();

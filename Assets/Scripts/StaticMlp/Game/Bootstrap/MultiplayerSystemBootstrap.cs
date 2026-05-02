@@ -1,6 +1,4 @@
 using FFS.Libraries.StaticEcs.Unity;
-using StaticMlp.Game.Systems.Client;
-using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
@@ -13,9 +11,8 @@ namespace StaticMlp.Game.Bootstrap {
             ServerSys.Add(new ServerTransportCompleteSystem(), order: -1000);
             ServerSys.Add(new ServerRawInboxDrainSystem(), order: -900);
             ServerSys.Add(new ServerConnectionLifecycleSystem(), order: -850);
-            ServerSys.Add(new ServerPlayerJoinSpawnSystem(), order: -830);
             ServerSys.Add(new ServerReceiveClientOwnedStateSystem(), order: -780);
-            ServerSys.Add(new ServerAiSystem(), order: 0);
+            GameplayFeatureDiscovery.RegisterServerSystems(new ServerSystemsBuilder());
             ServerSys.Add(new ServerOwnedReplicationCollectSystem(), order: 500);
             ServerSys.Add(new ServerRelayClientOwnedStateSystem(), order: 550);
             ServerSys.Add(new ServerTransportSendSystem(), order: 700);
@@ -33,15 +30,20 @@ namespace StaticMlp.Game.Bootstrap {
             ClientCoreSys.Add(new ClientDespawnApplySystem(), order: -790);
             ClientCoreSys.Add(new ClientOwnershipApplySystem(), order: -780);
             ClientCoreSys.Add(new ClientComponentDeltaApplySystem(), order: -770);
-            ClientCoreSys.Add(new LocalPlayerMovementSystem(), order: 0);
-            ClientCoreSys.Add(new LocalViewSyncSystem(), order: 250);
-            ClientCoreSys.Add(new RemoteSmoothingSystem(), order: 300);
+            GameplayFeatureDiscovery.RegisterClientCoreSystems(new ClientCoreSystemsBuilder());
             ClientCoreSys.Add(new ClientReplicationCollectSystem(), order: 500);
             ClientCoreSys.Add(new ClientTransportSendSystem(), order: 700);
             ClientCoreSys.Add(new ClientTransportScheduleSystem(), order: 1000);
             EcsDebug<ClientCoreWT>.AddWorld<ClientCoreSystemsT>();
             
             ClientCoreSys.Initialize();
+        }
+
+        public static void CreateClientUxSystems() {
+            ClientUxSys.Create();
+            GameplayFeatureDiscovery.RegisterClientUxSystems(new ClientUxSystemsBuilder());
+            EcsDebug<ClientUxWT>.AddWorld<ClientUxSystemsT>();
+            ClientUxSys.Initialize();
         }
 
         public static void UpdateServerFrame() {
@@ -52,6 +54,11 @@ namespace StaticMlp.Game.Bootstrap {
         public static void UpdateClientCoreFrame() {
             ClientCoreSys.Update();
             CW.Tick();
+        }
+
+        public static void UpdateClientUxFrame() {
+            ClientUxSys.Update();
+            UXW.Tick();
         }
     }
 }

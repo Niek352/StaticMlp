@@ -1,31 +1,14 @@
 using System;
 using System.Collections.Generic;
-using StaticMlp.Game.Components;
-using StaticMlp.Game.Presentation;
 
 namespace StaticMlp.Networking.Replication {
     public static class PrefabRegistry {
         private static readonly Dictionary<ushort, Action<CW.Entity>> ClientFactories = new();
         private static readonly Dictionary<ushort, Action<SW.Entity>> ServerFactories = new();
 
-        static PrefabRegistry() {
-            RegisterClient(Prefabs.Player, e => {
-                e.Set<PlayerTag>();
-                e.Set(new ViewTransform {
-                    RenderRotation = UnityEngine.Quaternion.identity
-                });
-            });
-
-            RegisterServer(Prefabs.Player, e => e.Set<PlayerTag>());
-
-            RegisterClient(Prefabs.Monster, e => {
-                e.Set<MonsterTag>();
-                e.Set(new ViewTransform {
-                    RenderRotation = UnityEngine.Quaternion.identity
-                });
-            });
-
-            RegisterServer(Prefabs.Monster, e => e.Set<MonsterTag>());
+        public static void Clear() {
+            ClientFactories.Clear();
+            ServerFactories.Clear();
         }
 
         public static void RegisterClient(ushort prefabId, Action<CW.Entity> apply) {

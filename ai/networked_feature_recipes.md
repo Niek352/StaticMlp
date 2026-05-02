@@ -2,6 +2,57 @@
 
 Examples and checklists for adding replicated gameplay.
 
+## New Feature Assembly
+
+Create a new folder under `Assets/Scripts/StaticMlp/Game/Features/FeatureA` with its own asmdef:
+
+```json
+{
+    "name": "Game.FeatureA",
+    "rootNamespace": "StaticMlp.Game.FeatureA",
+    "references": [
+        "Game.Core",
+        "Ecs.Networking",
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "FFS.StaticEcs.Unity"
+    ],
+    "autoReferenced": true,
+    "noEngineReferences": false
+}
+```
+
+Then add one feature entry point:
+
+```csharp
+using StaticMlp.Game.Bootstrap;
+
+namespace StaticMlp.Game.FeatureA {
+    public sealed class FeatureAGameplayFeature : GameplayFeature {
+        public override void RegisterPrefabs() {
+            // Optional: PrefabRegistry.RegisterClient/RegisterServer(...)
+        }
+
+        public override void RegisterServerSystems(ServerSystemsBuilder systems) {
+            systems.Add(new FeatureAServerSystem(), GameplaySystemOrder.Gameplay);
+        }
+
+        public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems) {
+            systems.Add(new FeatureAClientSystem(), GameplaySystemOrder.Gameplay);
+        }
+    }
+}
+```
+
+No central bootstrap edit is needed for ordinary feature systems. `GameplayFeatureDiscovery` finds `GameplayFeature` classes in loaded assemblies, passes their assemblies to StaticEcs `RegisterAll(...)`, and lets each feature register server/client/UX systems.
+
+Use these order constants first:
+
+- `GameplaySystemOrder.ServerConnectionGameplay`: server logic that reacts to new peers, such as spawning a player.
+- `GameplaySystemOrder.Gameplay`: normal simulation.
+- `GameplaySystemOrder.ClientPresentation`: local view sync and remote smoothing.
+- `GameplaySystemOrder.CollectReplication`: boundary where dirty state collection starts; gameplay should normally run before it.
+
 ## Replicated Component
 
 Use `[ReplicatedComponent]`.
@@ -132,6 +183,21 @@ OwnershipTags.ApplyForClient(e, spawn.Owner, spawn.Authority);
 ```
 
 Do not use `NewEntity()` for network spawn on clients. Use `NewEntityByGID`.
+
+Feature-local prefabs should be registered from the feature entry point:
+
+```csharp
+public override void RegisterPrefabs() {
+    PrefabRegistry.RegisterClient(MyPrefabs.Door, e => {
+        e.Set<DoorTag>();
+        e.Set(new DoorViewState());
+    });
+
+    PrefabRegistry.RegisterServer(MyPrefabs.Door, e => e.Set<DoorTag>());
+}
+```
+
+Keep `PrefabId` values stable. Treat them as protocol ids, not as scene or prefab instance ids.
 
 ## Server-Owned Door Example
 

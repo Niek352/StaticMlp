@@ -28,20 +28,26 @@ MonoBehaviour:
       current:
         className: ViewTransform
         namespaceName: StaticMlp.Game.Presentation
-        assembly: Ecs.Game.Player
+        assembly: Game.Core
       history:
       - className: ViewTransform
         namespaceName: StaticMlp.Game.Presentation
         assembly: Ecs.Game.Player
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
     - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
       current:
         className: CharacterNetState
         namespaceName: StaticMlp.Game.Components
-        assembly: Ecs.Game.Player
+        assembly: Game.Core
       history:
       - className: CharacterNetState
         namespaceName: StaticMlp.Game.Components
         assembly: Ecs.Game.Player
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
     tags: []
     events: []
     links: []
@@ -62,20 +68,26 @@ MonoBehaviour:
       current:
         className: ViewTransform
         namespaceName: StaticMlp.Game.Presentation
-        assembly: Ecs.Game.Player
+        assembly: Game.Core
       history:
       - className: ViewTransform
         namespaceName: StaticMlp.Game.Presentation
         assembly: Ecs.Game.Player
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
     - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
       current:
         className: CharacterNetState
         namespaceName: StaticMlp.Game.Components
-        assembly: Ecs.Game.Player
+        assembly: Game.Core
       history:
       - className: CharacterNetState
         namespaceName: StaticMlp.Game.Components
         assembly: Ecs.Game.Player
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
     tags: []
     events: []
     links: []
@@ -96,20 +108,26 @@ MonoBehaviour:
       current:
         className: ViewTransform
         namespaceName: StaticMlp.Game.Presentation
-        assembly: Ecs.Game.Player
+        assembly: Game.Core
       history:
       - className: ViewTransform
         namespaceName: StaticMlp.Game.Presentation
         assembly: Ecs.Game.Player
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
     - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
       current:
         className: CharacterNetState
         namespaceName: StaticMlp.Game.Components
-        assembly: Ecs.Game.Player
+        assembly: Game.Core
       history:
       - className: CharacterNetState
         namespaceName: StaticMlp.Game.Components
         assembly: Ecs.Game.Player
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
     tags: []
     events: []
     links: []

@@ -27,6 +27,14 @@ Strict order:
 W.Types().RegisterAll(typeof(TWorld).Assembly, typeof(OtherAssemblyMarker).Assembly);
 ```
 
+In this project, Unity startup gets extra gameplay assemblies from:
+
+```csharp
+GameplayFeatureDiscovery.GetEcsTypeAssemblies()
+```
+
+Any loaded assembly with a concrete parameterless `GameplayFeature` is passed to `RegisterAll(...)` automatically.
+
 ## Critical Rules
 
 - Register all component/tag/event/link types between `Create()` and `Initialize()`.

@@ -1,5 +1,5 @@
 {
-    "name": "Ecs.Game.Player",
+    "name": "Game.Core",
     "rootNamespace": "StaticMlp.Game",
     "references": [
         "FFS.StaticEcs",

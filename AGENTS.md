@@ -6,6 +6,7 @@ Short operational rules for this Unity project. Keep this file small; put detail
 
 - [StaticEcs + Unity Transport architecture](ai/static_ecs_multiplayer_architecture.md)
 - [Networked gameplay feature recipes](ai/networked_feature_recipes.md)
+- [Gameplay systems memo](ai/gameplay_systems_memo.md)
 - [StaticEcs quick reference](ai/static_ecs_reference.md)
 - [Original multiplayer implementation plan](ai/static_ecs_unity_transport_multiplayer_plan.md)
 - Full StaticEcs documentation is available at [static-ecs FULL.txt](ai/static-ecs%20FULL.txt) when deeper API/reference details are needed.
@@ -33,6 +34,8 @@ Gameplay systems should only:
 - File name must match the top-level type name.
 - Do not collect many unrelated classes in one file.
 - Keep gameplay, replication, transport, ownership, and presentation code in separate folders/modules.
+- Put shared gameplay/bootstrap contracts in `Game.Core`; put ordinary gameplay features in their own `Game.FeatureX` asmdef.
+- Add feature systems through `GameplayFeature`, not by editing `MultiplayerSystemBootstrap`.
 - Write code inside explicit modules with clear boundaries. Treat modules as separate packages.
 - Do not cross module boundaries with hidden dependencies or direct calls when an event/component boundary belongs there.
 - Do not store `Entity` across frames; use `EntityGID` for persistent references.
