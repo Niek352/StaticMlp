@@ -42,6 +42,7 @@ namespace StaticMlp.Networking.Transport {
             UtpTransportContext.Log($"Server listening on port {port}");
             NetworkRuntime.LocalPeerId = ctx.LocalPeerId;
             ServerPeerRegistry.Clear();
+            ServerDisconnectedPeerQueue.Clear();
 
             SW.SetResource(ctx);
             SW.SetResource(new NetInbox());

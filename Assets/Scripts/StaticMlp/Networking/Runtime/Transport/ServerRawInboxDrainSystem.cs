@@ -29,13 +29,28 @@ namespace StaticMlp.Networking.Transport {
                     UtpTransportContext.Log($"Peer {peer} disconnected");
                     ctx.ConnectionByPeer.Remove(peer.Value);
                     ctx.PeerByConnection.Remove(connection);
+                    RemoveClientConnection(ref ctx, connection);
                     ServerPeerRegistry.Remove(peer);
+                    ServerDisconnectedPeerQueue.Enqueue(peer);
                 }
             }
 
             while (ctx.RawInbox.Count > 0) {
                 var packet = ctx.RawInbox.Dequeue();
                 PacketCodec.Decode(packet.SourcePeer, packet.Payload, inbox);
+            }
+        }
+
+        private static void RemoveClientConnection(ref UtpTransportContext ctx, NetworkConnection connection) {
+            if (!ctx.ClientConnections.IsCreated)
+                return;
+
+            for (var i = 0; i < ctx.ClientConnections.Length; i++) {
+                if (ctx.ClientConnections[i] != connection)
+                    continue;
+
+                ctx.ClientConnections.RemoveAtSwapBack(i);
+                return;
             }
         }
     }

@@ -3,6 +3,10 @@ using FFS.Libraries.StaticEcs;
 
 namespace StaticMlp.Networking.Replication {
     public sealed class NetOutbox : IResource {
+        private const int MAX_COMPONENT_BATCH_BYTES = 1200;
+        private const int COMPONENT_BATCH_HEADER_BYTES = 5;
+        private const int COMPONENT_DELTA_HEADER_BYTES = 14;
+
         public readonly List<OutgoingPacket> Packets = new();
         private readonly List<PendingComponentBatch> _componentBatches = new();
 
@@ -15,8 +19,9 @@ namespace StaticMlp.Networking.Replication {
         }
 
         public void EnqueueComponentDelta(NetworkPeerId peer, ComponentDelta delta, NetDelivery delivery) {
-            var batch = GetOrCreateComponentBatch(peer, delivery);
+            var batch = GetOrCreateComponentBatch(peer, delivery, EncodedDeltaSize(delta));
             batch.Batch.Deltas.Add(delta);
+            batch.EncodedSize += EncodedDeltaSize(delta);
         }
 
         public void EnqueueNetworkEvent(NetworkPeerId peer, ushort eventTypeId, byte[] payload, NetDelivery delivery) {
@@ -35,28 +40,35 @@ namespace StaticMlp.Networking.Replication {
             _componentBatches.Clear();
         }
 
-        private PendingComponentBatch GetOrCreateComponentBatch(NetworkPeerId peer, NetDelivery delivery) {
+        private PendingComponentBatch GetOrCreateComponentBatch(NetworkPeerId peer, NetDelivery delivery, int nextDeltaSize) {
             foreach (var pending in _componentBatches) {
-                if (pending.Peer == peer && pending.Delivery == delivery)
+                if (pending.Peer == peer && pending.Delivery == delivery &&
+                    pending.EncodedSize + nextDeltaSize <= MAX_COMPONENT_BATCH_BYTES)
                     return pending;
             }
 
             var created = new PendingComponentBatch(peer, delivery, new ComponentBatch {
                 SourcePeer = NetworkRuntime.LocalPeerId
-            });
+            }, COMPONENT_BATCH_HEADER_BYTES);
             _componentBatches.Add(created);
             return created;
+        }
+
+        private static int EncodedDeltaSize(ComponentDelta delta) {
+            return COMPONENT_DELTA_HEADER_BYTES + (delta.Payload?.Length ?? 0);
         }
 
         private sealed class PendingComponentBatch {
             public readonly NetworkPeerId Peer;
             public readonly NetDelivery Delivery;
             public readonly ComponentBatch Batch;
+            public int EncodedSize;
 
-            public PendingComponentBatch(NetworkPeerId peer, NetDelivery delivery, ComponentBatch batch) {
+            public PendingComponentBatch(NetworkPeerId peer, NetDelivery delivery, ComponentBatch batch, int encodedSize) {
                 Peer = peer;
                 Delivery = delivery;
                 Batch = batch;
+                EncodedSize = encodedSize;
             }
         }
     }

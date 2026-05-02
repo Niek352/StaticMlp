@@ -76,6 +76,7 @@ namespace StaticMlp.Game.Presentation
             var primitive = GameObject.CreatePrimitive(e.Has<CubeTag>() ? PrimitiveType.Cube : PrimitiveType.Capsule);
             primitive.transform.localScale = e.Has<CubeTag>() ? Vector3.one : new Vector3(0.8f, 1f, 0.8f);
             primitive.GetComponent<Renderer>().material.color = SelectFallbackColor(e);
+            Object.Destroy(primitive.GetComponent<Collider>());
             return primitive;
         }
 

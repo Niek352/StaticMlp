@@ -38,6 +38,7 @@ namespace StaticMlp.Game.Bootstrap
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
+            systems.Add(new ServerPeerDisconnectCleanupSystem(), GameplaySystemOrder.ServerConnectionGameplay - 1);
             systems.Add(new ServerPlayerJoinSpawnSystem(), GameplaySystemOrder.ServerConnectionGameplay);
             systems.Add(new ServerSpawnCubeRequestSystem(), GameplaySystemOrder.Gameplay - 50);
             systems.Add(new ServerAiSystem(), GameplaySystemOrder.Gameplay);
