@@ -8,60 +8,66 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-namespace StaticMlp.Game.Presentation {
-    public sealed class StaticMlpGameplayCamera : MonoBehaviour {
-        [Header("References")]
-        [SerializeField] private Camera targetCamera;
+namespace StaticMlp.Game.Presentation
+{
+    public sealed class StaticMlpGameplayCamera : MonoBehaviour
+    {
+        [Header("References")] [SerializeField]
+        private Camera targetCamera;
 
-        [Header("Orbit")]
-        [SerializeField] private Vector3 pivotOffset = new(0f, 1.35f, 0f);
+        [Header("Orbit")] [SerializeField] private Vector3 pivotOffset = new(0f, 1.35f, 0f);
         [SerializeField] private float distance = 6f;
         [SerializeField] private float minPitch = -35f;
         [SerializeField] private float maxPitch = 65f;
 
-        [Header("Input")]
-        [SerializeField] private float yawSensitivity = 4f;
+        [Header("Input")] [SerializeField] private float yawSensitivity = 4f;
         [SerializeField] private float pitchSensitivity = 3f;
         [SerializeField] private bool lockCursorOnEnable = true;
         [SerializeField] private bool rotateOnlyWhileRightMouseHeld;
 
-        [Header("Follow")]
-        [SerializeField] private float followSharpness = 20f;
+        [Header("Follow")] [SerializeField] private float followSharpness = 20f;
 
         private float _yaw;
         private float _pitch = 18f;
         private Vector3 _smoothedPivot;
         private bool _hasPivot;
 
-        private void Awake() {
+        private void Awake()
+        {
             if (targetCamera == null && !TryGetComponent(out targetCamera))
                 throw new System.InvalidOperationException("StaticMlpGameplayCamera requires a Camera reference.");
 
             _yaw = transform.eulerAngles.y;
         }
 
-        private void OnEnable() {
+        private void OnEnable()
+        {
             NetworkInput.CameraYawProvider = GetCameraYaw;
 
-            if (lockCursorOnEnable) {
+            if (lockCursorOnEnable)
+            {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             }
         }
 
-        private void OnDisable() {
+        private void OnDisable()
+        {
             NetworkInput.CameraYawProvider = () => 0f;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
 
-        private void Update() {
-            if (EscapeWasPressed()) {
+        private void Update()
+        {
+            if (EscapeWasPressed())
+            {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
 
-            if (RightMouseWasPressedThisFrame() && rotateOnlyWhileRightMouseHeld) {
+            if (RightMouseWasPressedThisFrame() && rotateOnlyWhileRightMouseHeld)
+            {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             }
@@ -75,15 +81,19 @@ namespace StaticMlp.Game.Presentation {
             _pitch = Mathf.Clamp(_pitch, minPitch, maxPitch);
         }
 
-        private void LateUpdate() {
+        private void LateUpdate()
+        {
             if (!TryGetLocalPlayerPosition(out var playerPosition))
                 return;
 
             var targetPivot = playerPosition + pivotOffset;
-            if (!_hasPivot) {
+            if (!_hasPivot)
+            {
                 _smoothedPivot = targetPivot;
                 _hasPivot = true;
-            } else {
+            }
+            else
+            {
                 var t = 1f - Mathf.Exp(-followSharpness * Time.deltaTime);
                 _smoothedPivot = Vector3.Lerp(_smoothedPivot, targetPivot, t);
             }
@@ -93,11 +103,13 @@ namespace StaticMlp.Game.Presentation {
             targetCamera.transform.SetPositionAndRotation(position, rotation);
         }
 
-        private float GetCameraYaw() {
+        private float GetCameraYaw()
+        {
             return _yaw;
         }
 
-        private static Vector2 ReadLookDelta() {
+        private static Vector2 ReadLookDelta()
+        {
 #if ENABLE_INPUT_SYSTEM
             var mouse = Mouse.current;
             if (mouse != null)
@@ -111,7 +123,8 @@ namespace StaticMlp.Game.Presentation {
 #endif
         }
 
-        private static bool EscapeWasPressed() {
+        private static bool EscapeWasPressed()
+        {
 #if ENABLE_INPUT_SYSTEM
             var keyboard = Keyboard.current;
             if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
@@ -125,7 +138,8 @@ namespace StaticMlp.Game.Presentation {
 #endif
         }
 
-        private static bool RightMouseWasPressedThisFrame() {
+        private static bool RightMouseWasPressedThisFrame()
+        {
 #if ENABLE_INPUT_SYSTEM
             var mouse = Mouse.current;
             if (mouse != null && mouse.rightButton.wasPressedThisFrame)
@@ -139,7 +153,8 @@ namespace StaticMlp.Game.Presentation {
 #endif
         }
 
-        private static bool RightMouseIsPressed() {
+        private static bool RightMouseIsPressed()
+        {
 #if ENABLE_INPUT_SYSTEM
             var mouse = Mouse.current;
             if (mouse != null)
@@ -153,13 +168,15 @@ namespace StaticMlp.Game.Presentation {
 #endif
         }
 
-        private static bool TryGetLocalPlayerPosition(out Vector3 position) {
+        private static bool TryGetLocalPlayerPosition(out Vector3 position)
+        {
             position = default;
 
             if (CW.Status != WorldStatus.Initialized)
                 return false;
 
-            foreach (var e in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities()) {
+            foreach (var e in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities())
+            {
                 position = e.Read<CharacterNetState>().Position;
                 return true;
             }

@@ -1,5 +1,7 @@
-namespace StaticMlp.Game.Bootstrap {
-    public static class GameplaySystemOrder {
+namespace StaticMlp.Game.Bootstrap
+{
+    public static class GameplaySystemOrder
+    {
         public const short ServerConnectionGameplay = -830;
         public const short ClientApplyNetworkState = -800;
         public const short Gameplay = 0;

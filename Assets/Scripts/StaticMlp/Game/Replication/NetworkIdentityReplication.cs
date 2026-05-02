@@ -14,7 +14,7 @@ namespace StaticMlp.Networking.Replication {
             var writer = BinaryPackWriter.CreateFromPool(8);
             writer.WriteUshort(identity.Owner.Value);
             writer.WriteByte((byte)identity.Authority);
-            writer.WriteUshort(identity.PrefabId);
+            writer.WriteUshort(identity.NetworkArchetypeId);
             var bytes = writer.CopyToBytes();
             writer.Dispose();
             return new ComponentDelta(gid, TypeId, bytes);
@@ -28,7 +28,7 @@ namespace StaticMlp.Networking.Replication {
             return new NetworkIdentity {
                 Owner = new NetworkPeerId(reader.ReadUshort()),
                 Authority = (NetworkAuthority)reader.ReadByte(),
-                PrefabId = reader.ReadUshort()
+                NetworkArchetypeId = reader.ReadUshort()
             };
         }
     }

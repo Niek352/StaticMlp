@@ -69,7 +69,7 @@ Do not replicate ownership tags directly. Replicate only `NetworkIdentity`:
 public struct NetworkIdentity : IComponent {
     public NetworkPeerId Owner;
     public NetworkAuthority Authority;
-    public ushort PrefabId;
+    public ushort NetworkArchetypeId;
 }
 ```
 

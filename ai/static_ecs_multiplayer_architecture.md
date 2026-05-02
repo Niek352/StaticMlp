@@ -76,7 +76,7 @@ Ownership tags are local derived state. Replicate `NetworkIdentity` only:
 public struct NetworkIdentity : IComponent {
     public NetworkPeerId Owner;
     public NetworkAuthority Authority;
-    public ushort PrefabId;
+    public ushort NetworkArchetypeId;
 }
 ```
 

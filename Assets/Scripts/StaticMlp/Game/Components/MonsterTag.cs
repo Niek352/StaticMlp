@@ -1,5 +1,8 @@
 using FFS.Libraries.StaticEcs;
 
-namespace StaticMlp.Game.Components {
-    public struct MonsterTag : ITag { }
+namespace StaticMlp.Game.Components
+{
+    public struct MonsterTag : ITag
+    {
+    }
 }

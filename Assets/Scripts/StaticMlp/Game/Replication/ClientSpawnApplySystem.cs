@@ -14,11 +14,11 @@ namespace StaticMlp.Networking.Replication {
                 e.Set(new NetworkIdentity {
                     Owner = spawn.Owner,
                     Authority = spawn.Authority,
-                    PrefabId = spawn.PrefabId
+                    NetworkArchetypeId = spawn.NetworkArchetypeId
                 });
                 e.Set<NetworkedTag>();
 
-                PrefabRegistry.Apply(spawn.PrefabId, e);
+                NetArchetypeRegistry.Apply(spawn.NetworkArchetypeId, e);
                 ReplicationRegistry.ApplyInitialState(e, spawn.Components);
                 OwnershipTags.ApplyForClient(e, spawn.Owner, spawn.Authority);
             }

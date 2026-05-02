@@ -4,14 +4,18 @@ using System.Linq;
 using System.Reflection;
 using StaticMlp.Networking.Replication;
 
-namespace StaticMlp.Game.Bootstrap {
-    public static class GameplayFeatureDiscovery {
+namespace StaticMlp.Game.Bootstrap
+{
+    public static class GameplayFeatureDiscovery
+    {
         private static IGameplayFeature[] _features;
 
         public static IReadOnlyList<IGameplayFeature> Features => GetFeatures();
 
-        public static Assembly[] GetEcsTypeAssemblies() {
-            var assemblies = new List<Assembly> {
+        public static Assembly[] GetEcsTypeAssemblies()
+        {
+            var assemblies = new List<Assembly>
+            {
                 typeof(GameplayFeatureDiscovery).Assembly
             };
 
@@ -25,29 +29,34 @@ namespace StaticMlp.Game.Bootstrap {
                 .ToArray();
         }
 
-        public static void RegisterPrefabs() {
-            PrefabRegistry.Clear();
+        public static void RegisterPrefabs()
+        {
+            NetArchetypeRegistry.Clear();
 
             foreach (var feature in GetFeatures())
                 feature.RegisterPrefabs();
         }
 
-        public static void RegisterServerSystems(ServerSystemsBuilder systems) {
+        public static void RegisterServerSystems(ServerSystemsBuilder systems)
+        {
             foreach (var feature in GetFeatures())
                 feature.RegisterServerSystems(systems);
         }
 
-        public static void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems) {
+        public static void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
+        {
             foreach (var feature in GetFeatures())
                 feature.RegisterClientCoreSystems(systems);
         }
 
-        public static void RegisterClientUxSystems(ClientUxSystemsBuilder systems) {
+        public static void RegisterClientUxSystems(ClientUxSystemsBuilder systems)
+        {
             foreach (var feature in GetFeatures())
                 feature.RegisterClientUxSystems(systems);
         }
 
-        private static IGameplayFeature[] GetFeatures() {
+        private static IGameplayFeature[] GetFeatures()
+        {
             if (_features != null)
                 return _features;
 
@@ -62,17 +71,24 @@ namespace StaticMlp.Game.Bootstrap {
             return _features;
         }
 
-        private static IEnumerable<Type> GetTypesSafe(Assembly assembly) {
-            try {
+        private static IEnumerable<Type> GetTypesSafe(Assembly assembly)
+        {
+            try
+            {
                 return assembly.GetTypes();
-            } catch (ReflectionTypeLoadException e) {
+            }
+            catch (ReflectionTypeLoadException e)
+            {
                 return e.Types.Where(x => x != null);
-            } catch {
+            }
+            catch
+            {
                 return Array.Empty<Type>();
             }
         }
 
-        private static bool IsFeatureType(Type type) {
+        private static bool IsFeatureType(Type type)
+        {
             return typeof(IGameplayFeature).IsAssignableFrom(type)
                    && !type.IsAbstract
                    && !type.IsInterface

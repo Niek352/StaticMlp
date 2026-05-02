@@ -6,7 +6,7 @@ namespace StaticMlp.Networking.Replication {
         public EntityGID Gid;
         public NetworkPeerId Owner;
         public NetworkAuthority Authority;
-        public ushort PrefabId;
+        public ushort NetworkArchetypeId;
         public readonly List<ComponentDelta> Components = new();
     }
 }

@@ -6,35 +6,41 @@ using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 
-namespace StaticMlp.Game.Presentation {
-    public sealed class StaticMlpCharacterViewPresenter : MonoBehaviour {
-        [Header("Hierarchy")]
-        [SerializeField] private Transform viewRoot;
+namespace StaticMlp.Game.Presentation
+{
+    public sealed class StaticMlpCharacterViewPresenter : MonoBehaviour
+    {
+        [Header("Hierarchy")] [SerializeField] private Transform viewRoot;
 
-        [Header("Optional Prefabs")]
-        [SerializeField] private GameObject localPlayerPrefab;
+        [Header("Optional Prefabs")] [SerializeField]
+        private GameObject localPlayerPrefab;
+
         [SerializeField] private GameObject remotePlayerPrefab;
         [SerializeField] private GameObject monsterPrefab;
         [SerializeField] private bool createPrimitiveFallback = true;
 
-        [Header("Fallback Colors")]
-        [SerializeField] private Color localPlayerColor = new(0.1f, 0.55f, 1f);
+        [Header("Fallback Colors")] [SerializeField]
+        private Color localPlayerColor = new(0.1f, 0.55f, 1f);
+
         [SerializeField] private Color remotePlayerColor = new(0.95f, 0.75f, 0.2f);
         [SerializeField] private Color monsterColor = new(0.9f, 0.15f, 0.2f);
 
         private readonly Dictionary<EntityGID, Transform> _views = new();
         private readonly List<EntityGID> _deadViews = new();
 
-        private void Awake() {
+        private void Awake()
+        {
             if (viewRoot == null)
                 viewRoot = transform;
         }
 
-        private void Update() {
+        private void Update()
+        {
             if (CW.Status != WorldStatus.Initialized)
                 return;
 
-            foreach (var e in CW.Query<All<NetworkedTag, CharacterNetState, ViewTransform>>().Entities()) {
+            foreach (var e in CW.Query<All<NetworkedTag, CharacterNetState, ViewTransform>>().Entities())
+            {
                 var view = GetOrCreateView(e);
                 ref readonly var viewTransform = ref e.Read<ViewTransform>();
                 view.SetPositionAndRotation(viewTransform.RenderPosition, viewTransform.RenderRotation);
@@ -43,7 +49,8 @@ namespace StaticMlp.Game.Presentation {
             CleanupDeadViews();
         }
 
-        private Transform GetOrCreateView(CW.Entity e) {
+        private Transform GetOrCreateView(CW.Entity e)
+        {
             if (_views.TryGetValue(e.GID, out var view))
                 return view;
 
@@ -54,13 +61,15 @@ namespace StaticMlp.Game.Presentation {
             return instance.transform;
         }
 
-        private GameObject CreateViewObject(CW.Entity e) {
+        private GameObject CreateViewObject(CW.Entity e)
+        {
             var prefab = SelectPrefab(e);
             if (prefab != null)
                 return Instantiate(prefab);
 
             if (!createPrimitiveFallback)
-                throw new System.InvalidOperationException("Character view prefab is not assigned and primitive fallback is disabled.");
+                throw new System.InvalidOperationException(
+                    "Character view prefab is not assigned and primitive fallback is disabled.");
 
             var primitive = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             primitive.transform.localScale = new Vector3(0.8f, 1f, 0.8f);
@@ -68,7 +77,8 @@ namespace StaticMlp.Game.Presentation {
             return primitive;
         }
 
-        private GameObject SelectPrefab(CW.Entity e) {
+        private GameObject SelectPrefab(CW.Entity e)
+        {
             if (e.Has<PlayerTag>())
                 return e.Has<LocalOwned>() ? localPlayerPrefab : remotePlayerPrefab;
 
@@ -78,7 +88,8 @@ namespace StaticMlp.Game.Presentation {
             return null;
         }
 
-        private Color SelectFallbackColor(CW.Entity e) {
+        private Color SelectFallbackColor(CW.Entity e)
+        {
             if (e.Has<PlayerTag>())
                 return e.Has<LocalOwned>() ? localPlayerColor : remotePlayerColor;
 
@@ -88,7 +99,8 @@ namespace StaticMlp.Game.Presentation {
             return Color.white;
         }
 
-        private static string CreateViewName(CW.Entity e) {
+        private static string CreateViewName(CW.Entity e)
+        {
             if (e.Has<PlayerTag>())
                 return e.Has<LocalOwned>() ? "Local Player View" : "Remote Player View";
 
@@ -98,15 +110,18 @@ namespace StaticMlp.Game.Presentation {
             return "Networked Character View";
         }
 
-        private void CleanupDeadViews() {
+        private void CleanupDeadViews()
+        {
             _deadViews.Clear();
 
-            foreach (var pair in _views) {
+            foreach (var pair in _views)
+            {
                 if (!pair.Key.TryUnpack<ClientCoreWT>(out var e) || !e.Has<NetworkedTag>() || !e.Has<ViewTransform>())
                     _deadViews.Add(pair.Key);
             }
 
-            for (var i = 0; i < _deadViews.Count; i++) {
+            for (var i = 0; i < _deadViews.Count; i++)
+            {
                 var gid = _deadViews[i];
                 if (_views.TryGetValue(gid, out var view) && view != null)
                     Destroy(view.gameObject);
@@ -115,8 +130,10 @@ namespace StaticMlp.Game.Presentation {
             }
         }
 
-        private void OnDestroy() {
-            foreach (var pair in _views) {
+        private void OnDestroy()
+        {
+            foreach (var pair in _views)
+            {
                 if (pair.Value != null)
                     Destroy(pair.Value.gameObject);
             }

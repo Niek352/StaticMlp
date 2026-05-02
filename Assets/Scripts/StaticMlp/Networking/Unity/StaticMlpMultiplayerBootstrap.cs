@@ -10,37 +10,36 @@ using UnityEngine.Serialization;
 using UnityEngine.InputSystem;
 #endif
 
-namespace StaticMlp.Networking.Unity {
-    public sealed class StaticMlpMultiplayerBootstrap : MonoBehaviour {
-        public enum RunMode {
+namespace StaticMlp.Networking.Unity
+{
+    public sealed class StaticMlpMultiplayerBootstrap : MonoBehaviour
+    {
+        public enum RunMode
+        {
             Server,
             Client,
             Host
         }
 
-        [Header("Mode")]
-        [SerializeField] private RunMode runMode = RunMode.Host;
+        [Header("Mode")] [SerializeField] private RunMode runMode = RunMode.Host;
         [SerializeField] private bool useMultiplayerPlayModeTags = true;
         [SerializeField] private bool startOnAwake = true;
         [SerializeField] private bool dontDestroyOnLoad = true;
         [SerializeField] private bool enableLogs = true;
 
-        [Header("Transport")]
-        [SerializeField] private string connectHost = "127.0.0.1";
+        [Header("Transport")] [SerializeField] private string connectHost = "127.0.0.1";
         [SerializeField] private ushort port = 7777;
 
-        [Header("Input")]
-        [FormerlySerializedAs("bindLegacyInputAxes")]
-        [SerializeField] private bool bindDefaultMoveInput = true;
-        [SerializeField] private string horizontalAxis = "Horizontal";
-        [SerializeField] private string verticalAxis = "Vertical";
+        [Header("Input")] [FormerlySerializedAs("bindLegacyInputAxes")] [SerializeField]
+        private bool bindDefaultMoveInput = true;
 
         private UtpTransportContext _serverTransport;
         private UtpTransportContext _clientTransport;
         private bool _serverStarted;
         private bool _clientStarted;
 
-        private void Awake() {
+        private void Awake()
+        {
             if (dontDestroyOnLoad)
                 DontDestroyOnLoad(gameObject);
 
@@ -48,10 +47,13 @@ namespace StaticMlp.Networking.Unity {
                 StartMultiplayer();
         }
 
-        public void StartMultiplayer() {
+        public void StartMultiplayer()
+        {
             UtpTransportContext.EnableLogs = enableLogs;
 
-            if (useMultiplayerPlayModeTags && MultiplayerPlayModeTools.TryGetRunMode(out var taggedRunMode, out var tag)) {
+            if (useMultiplayerPlayModeTags &&
+                MultiplayerPlayModeTools.TryGetRunMode(out var taggedRunMode, out var tag))
+            {
                 runMode = taggedRunMode;
                 Log($"Run mode resolved from Multiplayer Play Mode tag '{tag}'");
             }
@@ -66,14 +68,17 @@ namespace StaticMlp.Networking.Unity {
                 StartClientSide();
         }
 
-        private void StartServerSide() {
-            if (_serverStarted) {
+        private void StartServerSide()
+        {
+            if (_serverStarted)
+            {
                 Log("Server side is already started");
                 return;
             }
 
             Log("Creating server world");
-            MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(), registerGeneratedTypes: null, ecsTypeAssemblies: GameplayAssemblies());
+            MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(), registerGeneratedTypes: null,
+                ecsTypeAssemblies: GameplayAssemblies());
             Log($"Starting server transport on 0.0.0.0:{port}");
             _serverTransport = UtpTransportStartup.StartServer(port);
             MultiplayerSystemBootstrap.CreateServerSystems();
@@ -81,17 +86,22 @@ namespace StaticMlp.Networking.Unity {
             Log("Server systems initialized");
         }
 
-        private void StartClientSide() {
-            if (_clientStarted) {
+        private void StartClientSide()
+        {
+            if (_clientStarted)
+            {
                 Log("Client side is already started");
                 return;
             }
 
             Log("Creating client worlds");
-            MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig(), ReplicationRegistry.RegisterClientCoreGeneratedTypes, ecsTypeAssemblies: GameplayAssemblies());
-            MultiplayerWorldBootstrap.CreateClientUx(DefaultWorldConfig(), registerGeneratedTypes: null, ecsTypeAssemblies: GameplayAssemblies());
+            MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig(),
+                ReplicationRegistry.RegisterClientCoreGeneratedTypes, ecsTypeAssemblies: GameplayAssemblies());
+            MultiplayerWorldBootstrap.CreateClientUx(DefaultWorldConfig(), registerGeneratedTypes: null,
+                ecsTypeAssemblies: GameplayAssemblies());
 
-            if (bindDefaultMoveInput) {
+            if (bindDefaultMoveInput)
+            {
                 NetworkInput.MoveProvider = ReadMoveInput;
                 Log("Bound default move input");
             }
@@ -104,7 +114,8 @@ namespace StaticMlp.Networking.Unity {
             Log("Client systems initialized");
         }
 
-        private void Update() {
+        private void Update()
+        {
             if (_serverStarted)
                 MultiplayerSystemBootstrap.UpdateServerFrame();
 
@@ -115,57 +126,53 @@ namespace StaticMlp.Networking.Unity {
                 MultiplayerSystemBootstrap.UpdateClientUxFrame();
         }
 
-        private Vector2 ReadMoveInput() {
-#if ENABLE_INPUT_SYSTEM
+        private static Vector2 ReadMoveInput()
+        {
             var keyboard = Keyboard.current;
-            if (keyboard != null) {
-                var move = Vector2.zero;
+            if (keyboard == null)
+                return Vector2.zero;
+            var move = Vector2.zero;
 
-                if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
-                    move.x -= 1f;
-                if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
-                    move.x += 1f;
-                if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
-                    move.y -= 1f;
-                if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
-                    move.y += 1f;
+            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
+                move.x -= 1f;
+            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
+                move.x += 1f;
+            if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
+                move.y -= 1f;
+            if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
+                move.y += 1f;
 
-                if (move != Vector2.zero)
-                    return move;
-            }
-#endif
-
-#if ENABLE_LEGACY_INPUT_MANAGER
-            return new Vector2(
-                Input.GetAxisRaw(horizontalAxis),
-                Input.GetAxisRaw(verticalAxis)
-            );
-#else
-            return Vector2.zero;
-#endif
+            return move != Vector2.zero ? move : Vector2.zero;
         }
 
-        private static WorldConfig DefaultWorldConfig() {
-            return new WorldConfig {
+        private static WorldConfig DefaultWorldConfig()
+        {
+            return new WorldConfig
+            {
                 TrackCreated = true,
                 TrackingBufferSize = 64
             };
         }
 
-        private static Assembly[] GameplayAssemblies() {
+        private static Assembly[] GameplayAssemblies()
+        {
             return GameplayFeatureDiscovery.GetEcsTypeAssemblies();
         }
 
-        private void OnDestroy() {
+        private void OnDestroy()
+        {
             Shutdown();
         }
 
-        private void OnApplicationQuit() {
+        private void OnApplicationQuit()
+        {
             Shutdown();
         }
 
-        public void Shutdown() {
-            if (_clientStarted) {
+        public void Shutdown()
+        {
+            if (_clientStarted)
+            {
                 Log("Shutting down client side");
 
                 if (ClientCoreSys.IsInitialized)
@@ -186,7 +193,8 @@ namespace StaticMlp.Networking.Unity {
                 Log("Client side stopped");
             }
 
-            if (_serverStarted) {
+            if (_serverStarted)
+            {
                 Log("Shutting down server side");
 
                 if (ServerSys.IsInitialized)
@@ -202,10 +210,10 @@ namespace StaticMlp.Networking.Unity {
             }
         }
 
-        private void Log(string message) {
+        private void Log(string message)
+        {
             if (enableLogs)
                 Debug.Log($"[StaticMlpBootstrap] {message}", this);
         }
     }
-
 }

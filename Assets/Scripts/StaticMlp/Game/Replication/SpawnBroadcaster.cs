@@ -37,7 +37,7 @@ namespace StaticMlp.Networking.Replication {
                 Gid = entity.GID,
                 Owner = identity.Owner,
                 Authority = identity.Authority,
-                PrefabId = identity.PrefabId
+                NetworkArchetypeId = identity.NetworkArchetypeId
             };
 
             ReplicationRegistry.CollectInitialState(entity, spawn.Components);

@@ -1,12 +1,16 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking.Ownership;
 
-namespace StaticMlp.Networking.Replication {
-    public sealed class ClientOwnershipApplySystem : ISystem {
-        public void Update() {
+namespace StaticMlp.Networking.Replication
+{
+    public sealed class ClientOwnershipApplySystem : ISystem
+    {
+        public void Update()
+        {
             ref var inbox = ref CW.GetResource<NetInbox>();
 
-            foreach (var msg in inbox.OwnershipChanges) {
+            foreach (var msg in inbox.OwnershipChanges)
+            {
                 if (!msg.Gid.TryUnpack<ClientCoreWT>(out var e))
                     continue;
 

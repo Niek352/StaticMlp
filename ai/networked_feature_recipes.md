@@ -156,7 +156,7 @@ var e = SW.NewEntity<Default>();
 e.Set(new NetworkIdentity {
     Owner = ownerPeer,
     Authority = NetworkAuthority.Owner,
-    PrefabId = Prefabs.Player
+    NetworkArchetypeId = Prefabs.Player
 });
 
 e.Set<NetworkedTag>();
@@ -175,12 +175,12 @@ var e = CW.NewEntityByGID<Default>(spawn.Gid);
 e.Set(new NetworkIdentity {
     Owner = spawn.Owner,
     Authority = spawn.Authority,
-    PrefabId = spawn.PrefabId
+    NetworkArchetypeId = spawn.NetworkArchetypeId
 });
 
 e.Set<NetworkedTag>();
 
-PrefabRegistry.Apply(spawn.PrefabId, e);
+PrefabRegistry.Apply(spawn.NetworkArchetypeId, e);
 ReplicationRegistry.ApplyInitialState(e, spawn.Components);
 OwnershipTags.ApplyForClient(e, spawn.Owner, spawn.Authority);
 ```
@@ -200,7 +200,7 @@ public override void RegisterPrefabs() {
 }
 ```
 
-Keep `PrefabId` values stable. Treat them as protocol ids, not as scene or prefab instance ids.
+Keep `NetworkArchetypeId` values stable. Treat them as protocol ids, not as scene or prefab instance ids.
 
 ## Server-Owned Door Example
 

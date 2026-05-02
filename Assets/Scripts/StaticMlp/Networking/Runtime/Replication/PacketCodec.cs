@@ -28,7 +28,7 @@ namespace StaticMlp.Networking.Replication {
             WriteGid(ref writer, spawn.Gid);
             writer.WriteUshort(spawn.Owner.Value);
             writer.WriteByte((byte)spawn.Authority);
-            writer.WriteUshort(spawn.PrefabId);
+            writer.WriteUshort(spawn.NetworkArchetypeId);
             WriteDeltaList(ref writer, spawn.Components);
             var bytes = writer.CopyToBytes();
             writer.Dispose();
@@ -123,7 +123,7 @@ namespace StaticMlp.Networking.Replication {
                 Gid = ReadGid(ref reader),
                 Owner = new NetworkPeerId(reader.ReadUshort()),
                 Authority = (NetworkAuthority)reader.ReadByte(),
-                PrefabId = reader.ReadUshort()
+                NetworkArchetypeId = reader.ReadUshort()
             };
             ReadDeltaList(ref reader, spawn.Components);
             return spawn;

@@ -3,10 +3,12 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
 
-namespace StaticMlp.Game.Bootstrap {
-    public static class MultiplayerSystemBootstrap {
-        public static void CreateServerSystems() {
-            
+namespace StaticMlp.Game.Bootstrap
+{
+    public static class MultiplayerSystemBootstrap
+    {
+        public static void CreateServerSystems()
+        {
             ServerSys.Create();
             ServerSys.Add(new ServerTransportCompleteSystem(), order: -1000);
             ServerSys.Add(new ServerRawInboxDrainSystem(), order: -900);
@@ -21,7 +23,8 @@ namespace StaticMlp.Game.Bootstrap {
             ServerSys.Initialize();
         }
 
-        public static void CreateClientCoreSystems() {
+        public static void CreateClientCoreSystems()
+        {
             ClientCoreSys.Create();
             ClientCoreSys.Add(new ClientTransportCompleteSystem(), order: -1000);
             ClientCoreSys.Add(new ClientRawInboxDrainSystem(), order: -900);
@@ -35,28 +38,32 @@ namespace StaticMlp.Game.Bootstrap {
             ClientCoreSys.Add(new ClientTransportSendSystem(), order: 700);
             ClientCoreSys.Add(new ClientTransportScheduleSystem(), order: 1000);
             EcsDebug<ClientCoreWT>.AddWorld<ClientCoreSystemsT>();
-            
+
             ClientCoreSys.Initialize();
         }
 
-        public static void CreateClientUxSystems() {
+        public static void CreateClientUxSystems()
+        {
             ClientUxSys.Create();
             GameplayFeatureDiscovery.RegisterClientUxSystems(new ClientUxSystemsBuilder());
             EcsDebug<ClientUxWT>.AddWorld<ClientUxSystemsT>();
             ClientUxSys.Initialize();
         }
 
-        public static void UpdateServerFrame() {
+        public static void UpdateServerFrame()
+        {
             ServerSys.Update();
             SW.Tick();
         }
 
-        public static void UpdateClientCoreFrame() {
+        public static void UpdateClientCoreFrame()
+        {
             ClientCoreSys.Update();
             CW.Tick();
         }
 
-        public static void UpdateClientUxFrame() {
+        public static void UpdateClientUxFrame()
+        {
             ClientUxSys.Update();
             UXW.Tick();
         }

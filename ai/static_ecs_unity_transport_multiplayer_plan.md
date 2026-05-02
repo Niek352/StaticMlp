@@ -58,7 +58,7 @@ public readonly struct NetworkPeerId {
 public struct NetworkIdentity : IComponent {
     public NetworkPeerId Owner;
     public NetworkAuthority Authority;
-    public ushort PrefabId;
+    public ushort NetworkArchetypeId;
 }
 ```
 
@@ -455,12 +455,12 @@ public sealed class ClientSpawnApplySystem : ISystem {
             e.Set(new NetworkIdentity {
                 Owner = spawn.Owner,
                 Authority = spawn.Authority,
-                PrefabId = spawn.PrefabId
+                NetworkArchetypeId = spawn.NetworkArchetypeId
             });
 
             e.Set<NetworkedTag>();
 
-            PrefabRegistry.Apply(spawn.PrefabId, e);
+            PrefabRegistry.Apply(spawn.NetworkArchetypeId, e);
             ReplicationRegistry.ApplyInitialState(e, spawn.Components);
 
             OwnershipTags.ApplyForClient(e, spawn.Owner, spawn.Authority);
@@ -800,7 +800,7 @@ public static EntityGID ServerSpawnPlayer(NetworkPeerId owner, Vector3 spawnPosi
     e.Set(new NetworkIdentity {
         Owner = owner,
         Authority = NetworkAuthority.Owner,
-        PrefabId = Prefabs.Player
+        NetworkArchetypeId = Prefabs.Player
     });
 
     e.Set<NetworkedTag>();
