@@ -1,0 +1,20 @@
+{
+    "name": "Ecs.Networking",
+    "rootNamespace": "StaticMlp.Networking",
+    "references": [
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Unity.Collections",
+        "Unity.Networking.Transport",
+        "FFS.StaticEcs.Unity"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79f2ff30ce594e9489e03e7c9193ff3b, type: 3}
+  m_Name: StaticEcsTypeGuidRegistry
+  m_EditorClassIdentifier: FFS.StaticEcs.Unity.Editor::FFS.Libraries.StaticEcs.Unity.Editor.StaticEcsTypeGuidRegistry
+  worlds:
+  - worldTypeFullName: StaticMlp.Networking.ServerWT
+    components:
+    - guid: 2ac6d128-cd2c-48a4-a18b-6cd79cefe903
+      current:
+        className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+      history:
+      - className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+    - guid: f6427f09-7e12-4b61-b453-b0837d8d08ba
+      current:
+        className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Ecs.Game.Player
+      history:
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Ecs.Game.Player
+    - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
+      current:
+        className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Ecs.Game.Player
+      history:
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Ecs.Game.Player
+    tags: []
+    events: []
+    links: []
+    linksList: []
+    multi: []
+  - worldTypeFullName: StaticMlp.Networking.ClientCoreWT
+    components:
+    - guid: 2ac6d128-cd2c-48a4-a18b-6cd79cefe903
+      current:
+        className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+      history:
+      - className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+    - guid: f6427f09-7e12-4b61-b453-b0837d8d08ba
+      current:
+        className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Ecs.Game.Player
+      history:
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Ecs.Game.Player
+    - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
+      current:
+        className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Ecs.Game.Player
+      history:
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Ecs.Game.Player
+    tags: []
+    events: []
+    links: []
+    linksList: []
+    multi: []
+  - worldTypeFullName: StaticMlp.Networking.ClientUxWT
+    components:
+    - guid: 2ac6d128-cd2c-48a4-a18b-6cd79cefe903
+      current:
+        className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+      history:
+      - className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+    - guid: f6427f09-7e12-4b61-b453-b0837d8d08ba
+      current:
+        className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Ecs.Game.Player
+      history:
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Ecs.Game.Player
+    - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
+      current:
+        className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Ecs.Game.Player
+      history:
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Ecs.Game.Player
+    tags: []
+    events: []
+    links: []
+    linksList: []
+    multi: []

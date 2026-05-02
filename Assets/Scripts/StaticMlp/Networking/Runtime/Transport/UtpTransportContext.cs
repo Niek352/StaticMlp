@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FFS.Libraries.StaticEcs;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Networking.Transport;
@@ -23,7 +24,7 @@ namespace StaticMlp.Networking.Transport {
         void Poll();
     }
 
-    public sealed class UtpTransportContext : IDisposable, INetworkTransport {
+    public sealed class UtpTransportContext : IDisposable, INetworkTransport, IResource {
         public static bool EnableLogs = true;
 
         public NetworkDriver Driver;

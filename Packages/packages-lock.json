@@ -5,7 +5,13 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "dc4d6ff39927cd9b391a341e4784560a17f15ca9"
+      "hash": "b9ab907789ecc5320d5cffa762866629200457a6"
+    },
+    "com.felid-force-studios.static-ecs-unity": {
+      "version": "file:StaticEcs-Unity",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.felid-force-studios.static-pack": {
       "version": "https://github.com/Felid-Force-Studios/StaticPack.git",

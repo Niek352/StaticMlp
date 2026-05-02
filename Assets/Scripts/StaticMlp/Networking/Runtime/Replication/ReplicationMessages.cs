@@ -3,11 +3,6 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Networking.Replication {
-    public static class ComponentTypeIds {
-        public const ushort CharacterNetState = 1;
-        public const ushort NetworkIdentity = 2;
-    }
-
     public readonly struct ComponentDelta {
         public readonly EntityGID Gid;
         public readonly ushort ComponentTypeId;
@@ -59,7 +54,7 @@ namespace StaticMlp.Networking.Replication {
         public byte[] Payload;
     }
 
-    public sealed class NetInbox {
+    public sealed class NetInbox : IResource {
         public readonly List<SpawnMessage> Spawns = new();
         public readonly List<DespawnMessage> Despawns = new();
         public readonly List<OwnershipChangedMessage> OwnershipChanges = new();
@@ -81,7 +76,7 @@ namespace StaticMlp.Networking.Replication {
         public byte[] Payload;
     }
 
-    public sealed class NetOutbox {
+    public sealed class NetOutbox : IResource{
         public readonly List<OutgoingPacket> Packets = new();
 
         public void Enqueue(NetworkPeerId peer, byte[] payload, NetDelivery delivery) {

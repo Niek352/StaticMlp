@@ -1,11 +1,14 @@
+using FFS.Libraries.StaticEcs.Unity;
 using StaticMlp.Game.Systems.Client;
 using StaticMlp.Game.Systems.Server;
+using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
 
-namespace StaticMlp.Networking {
+namespace StaticMlp.Game.Bootstrap {
     public static class MultiplayerSystemBootstrap {
         public static void CreateServerSystems() {
+            
             ServerSys.Create();
             ServerSys.Add(new ServerTransportCompleteSystem(), order: -1000);
             ServerSys.Add(new ServerRawInboxDrainSystem(), order: -900);
@@ -16,6 +19,7 @@ namespace StaticMlp.Networking {
             ServerSys.Add(new ServerRelayClientOwnedStateSystem(), order: 550);
             ServerSys.Add(new ServerTransportSendSystem(), order: 700);
             ServerSys.Add(new ServerTransportScheduleSystem(), order: 1000);
+            EcsDebug<ServerWT>.AddWorld<ServerSystemsT>();
             ServerSys.Initialize();
         }
 
@@ -32,6 +36,8 @@ namespace StaticMlp.Networking {
             ClientCoreSys.Add(new ClientReplicationCollectSystem(), order: 500);
             ClientCoreSys.Add(new ClientTransportSendSystem(), order: 700);
             ClientCoreSys.Add(new ClientTransportScheduleSystem(), order: 1000);
+            EcsDebug<ClientCoreWT>.AddWorld<ClientCoreSystemsT>();
+            
             ClientCoreSys.Initialize();
         }
 

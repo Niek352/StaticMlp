@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using FFS.Libraries.StaticEcs.Unity;
 
 namespace StaticMlp.Networking {
     public struct ServerWT : IWorldType { }

@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33891bec36d852fc70993623063c036e, type: 3}
+  m_Name: StaticEcsViewConfig
+  m_EditorClassIdentifier: FFS.StaticEcs.Unity.Editor::FFS.Libraries.StaticEcs.Unity.Editor.StaticEcsViewConfig
+  worlds:
+  - worldTypeFullName: StaticMlp.Networking.ServerWT
+    main:
+      selectedTabName: Entities
+      drawRate: 0.5
+      drawFrames: 2
+    entities:
+      componentColumns:
+      - StaticMlp/Networking/NetworkIdentity
+      tagColumns:
+      - StaticMlp/Networking/Ownership/LocalOwned
+      - StaticMlp/Networking/Ownership/RemoteOwned
+      - StaticMlp/Networking/Ownership/ServerOwned
+      - StaticMlp/Networking/Ownership/ClientOwned
+      - StaticMlp/Networking/Ownership/NetworkedTag
+      showTableDataTypes:
+      - StaticMlp/Networking/NetworkIdentity
+      sortByType: 
+      maxEntityResult: 100
+      pinnedEntities: 
+      filterActive: 0
+      gidFilterActive: 0
+      gidFilterValue: 0
+      filterAll: []
+      filterAllOnlyDisabled: []
+      filterAllWithDisabled: []
+      filterNone: []
+      filterNoneWithDisabled: []
+      filterAny: []
+      filterAnyOnlyDisabled: []
+      filterAnyWithDisabled: []
+      foldoutMode: 1
+      autoExpandComponentTypes: []
+      sortComponents: 0
+      defaultGroupExpanded: 1
+      groupOverrides: []
+    events:
+      latest: 1
+      filterTypeNames: []
+    stats:
+      showNotRegistered: 0
+      fragmentationThreshold: 512
+      foldoutEntityTypes: 1
+      foldoutEvents: 1
+      foldoutComponents: 1
+      foldoutTags: 1
+    systems:
+      drawLevel: 10

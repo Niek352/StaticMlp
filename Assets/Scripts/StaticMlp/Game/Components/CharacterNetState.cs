@@ -11,7 +11,7 @@ namespace StaticMlp.Game.Components {
         delivery: NetDelivery.UnreliableSequenced,
         sendRate: 20
     )]
-    public struct CharacterNetState : IComponent, IComponentConfig<CharacterNetState> {
+    public struct CharacterNetState : IComponent, IComponentConfig<CharacterNetState>, ITrackableAdded, ITrackableChanged, ITrackableDeleted {
         [ReplicatedField(Quantize = 0.01f)]
         public Vector3 Position;
 
@@ -21,12 +21,7 @@ namespace StaticMlp.Game.Components {
         [ReplicatedField(Compress = true)]
         public Quaternion Rotation;
 
-        public ComponentTypeConfig<CharacterNetState> Config() => new(
-            guid: new Guid("5f52be22-6d13-4f7a-9d2c-111111111111"),
-            trackAdded: true,
-            trackDeleted: true,
-            trackChanged: true
-        );
+        public ComponentTypeConfig<CharacterNetState> Config() => new(guid: new Guid("5f52be22-6d13-4f7a-9d2c-111111111111"));
 
         public void Write<TWorld>(ref BinaryPackWriter writer, World<TWorld>.Entity self) where TWorld : struct, IWorldType {
             writer.WriteFloat(Position.x, Position.y, Position.z);

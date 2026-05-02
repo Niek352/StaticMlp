@@ -25,17 +25,13 @@ namespace StaticMlp.Networking {
         public static bool operator !=(NetworkPeerId left, NetworkPeerId right) => !left.Equals(right);
     }
 
-    public struct NetworkIdentity : IComponent, IComponentConfig<NetworkIdentity> {
+    public struct NetworkIdentity : IComponent, IComponentConfig<NetworkIdentity>, ITrackableAdded, ITrackableChanged, ITrackableDeleted
+    {
         public NetworkPeerId Owner;
         public NetworkAuthority Authority;
         public ushort PrefabId;
 
-        public ComponentTypeConfig<NetworkIdentity> Config() => new(
-            guid: new Guid("2ac6d128-cd2c-48a4-a18b-6cd79cefe903"),
-            trackAdded: true,
-            trackDeleted: true,
-            trackChanged: true
-        );
+        public ComponentTypeConfig<NetworkIdentity> Config() => new(guid: new Guid("2ac6d128-cd2c-48a4-a18b-6cd79cefe903"));
 
         public void Write<TWorld>(ref BinaryPackWriter writer, World<TWorld>.Entity self) where TWorld : struct, IWorldType {
             writer.WriteUshort(Owner.Value);

@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Systems.Client;
 using StaticMlp.Networking.Transport;
 using Unity.Multiplayer.PlayMode;
