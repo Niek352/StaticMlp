@@ -1,8 +1,8 @@
+using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 
@@ -10,50 +10,21 @@ namespace StaticMlp.Features.Buildings
 {
     public static class ServerBuildingSpawns
     {
-        private const ushort NetworkedEntityCluster = 1;
-
         public static EntityGID SpawnConstructionSite(
             NetworkPeerId owner,
             in BuildingDefinition definition,
             Vector3 position,
             Quaternion rotation)
         {
-            EnsureNetworkedEntityCluster();
-            var e = SW.NewEntity<Default>(NetworkedEntityCluster);
+            if (!BuildingNetworkCatalog.TryGetDefinition(definition.Id, out var network))
+                throw new InvalidOperationException($"Missing network catalog entry for building {definition.Id}.");
 
-            e.Set(new NetworkIdentity
-            {
-                Owner = owner,
-                Authority = NetworkAuthority.Server,
-                NetworkArchetypeId = definition.BlueprintArchetypeId
-            });
-
-            e.Set<NetworkedTag>();
-            e.Set<ConstructionSiteTag>();
-            e.Set(new ConstructionSiteState
-            {
-                BuildingId = definition.Id.Value,
-                Phase = ConstructionPhase.WaitingForResources
-            });
-            e.Set(new ConstructionTransform
-            {
-                Position = position,
-                Rotation = rotation
-            });
-            e.Set(new ConstructionResources
-            {
-                WoodRequired = definition.CostWood,
-                StoneRequired = definition.CostStone
-            });
-            e.Set(new ConstructionProgress
-            {
-                BuildWorkRequired = definition.BuildWorkRequired
-            });
-            e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
-
-            OwnershipTags.ApplyForServer(e, owner, NetworkAuthority.Server);
-            SpawnBroadcaster.SendSpawn(e);
-            return e.GID;
+            var localDefinition = definition;
+            return NetworkEntitySpawner.SpawnServerEntity(
+                owner,
+                NetworkAuthority.Server,
+                network.BlueprintArchetypeId,
+                entity => InitializeConstructionSite(entity, in localDefinition, position, rotation));
         }
 
         public static EntityGID SpawnFinishedBuilding(
@@ -61,47 +32,72 @@ namespace StaticMlp.Features.Buildings
             in BuildingDefinition definition,
             in ConstructionTransform transform)
         {
-            EnsureNetworkedEntityCluster();
-            var e = SW.NewEntity<Default>(NetworkedEntityCluster);
+            if (!BuildingNetworkCatalog.TryGetDefinition(definition.Id, out var network))
+                throw new InvalidOperationException($"Missing network catalog entry for building {definition.Id}.");
 
-            e.Set(new NetworkIdentity
+            var localDefinition = definition;
+            var localTransform = transform;
+            return NetworkEntitySpawner.SpawnServerEntity(
+                owner,
+                NetworkAuthority.Server,
+                network.FinishedArchetypeId,
+                entity => InitializeFinishedBuilding(entity, in localDefinition, in localTransform));
+        }
+
+        private static void InitializeConstructionSite(
+            SW.Entity entity,
+            in BuildingDefinition definition,
+            Vector3 position,
+            Quaternion rotation)
+        {
+            entity.Set<ConstructionSiteTag>();
+            entity.Set(new ConstructionSiteState
             {
-                Owner = owner,
-                Authority = NetworkAuthority.Server,
-                NetworkArchetypeId = definition.FinishedArchetypeId
+                BuildingId = definition.Id.Value,
+                Phase = ConstructionPhase.WaitingForResources
             });
+            entity.Set(new ConstructionTransform
+            {
+                Position = position,
+                Rotation = rotation
+            });
+            entity.Set(new ConstructionResources
+            {
+                WoodRequired = definition.CostWood,
+                StoneRequired = definition.CostStone
+            });
+            entity.Set(new ConstructionProgress
+            {
+                BuildWorkRequired = definition.BuildWorkRequired
+            });
+            entity.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
+        }
 
-            e.Set<NetworkedTag>();
-            e.Set<FinishedBuildingTag>();
-            e.Set(new ConstructionSiteState
+        private static void InitializeFinishedBuilding(
+            SW.Entity entity,
+            in BuildingDefinition definition,
+            in ConstructionTransform transform)
+        {
+            entity.Set<FinishedBuildingTag>();
+            entity.Set(new ConstructionSiteState
             {
                 BuildingId = definition.Id.Value,
                 Phase = ConstructionPhase.Completed
             });
-            e.Set(transform);
-            e.Set(new ConstructionResources
+            entity.Set(transform);
+            entity.Set(new ConstructionResources
             {
                 WoodRequired = definition.CostWood,
                 StoneRequired = definition.CostStone,
                 WoodDelivered = definition.CostWood,
                 StoneDelivered = definition.CostStone
             });
-            e.Set(new ConstructionProgress
+            entity.Set(new ConstructionProgress
             {
                 BuildWorkRequired = definition.BuildWorkRequired,
                 BuildWorkDone = definition.BuildWorkRequired
             });
-            e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
-
-            OwnershipTags.ApplyForServer(e, owner, NetworkAuthority.Server);
-            SpawnBroadcaster.SendSpawn(e);
-            return e.GID;
-        }
-
-        private static void EnsureNetworkedEntityCluster()
-        {
-            if (!SW.ClusterIsRegistered(NetworkedEntityCluster))
-                SW.RegisterCluster(NetworkedEntityCluster);
+            entity.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
         }
     }
 }

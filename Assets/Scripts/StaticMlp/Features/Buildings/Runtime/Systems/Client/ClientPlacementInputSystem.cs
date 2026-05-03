@@ -1,10 +1,8 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
-using StaticMlp.Game.Components;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Game.Systems.Client;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Ownership;
 using UnityEngine;
 
 namespace StaticMlp.Features.Buildings
@@ -71,25 +69,13 @@ namespace StaticMlp.Features.Buildings
                     return ray.GetPoint(enter);
             }
 
-            if (TryGetLocalPlayerPosition(out var playerPosition))
+            if (ClientLocalPlayer.TryGetPosition(out var playerPosition))
             {
                 var cameraYaw = Quaternion.Euler(0f, NetworkInput.CameraYawProvider(), 0f);
                 return playerPosition + cameraYaw * Vector3.forward * _fallbackPlacementDistance;
             }
 
             return Vector3.zero;
-        }
-
-        private static bool TryGetLocalPlayerPosition(out Vector3 position)
-        {
-            foreach (var e in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities())
-            {
-                position = e.Read<CharacterNetState>().Position;
-                return true;
-            }
-
-            position = default;
-            return false;
         }
 
         private static void ClearSelection(CW.Entity menuEntity)

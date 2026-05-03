@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Buildings
 {
@@ -10,8 +11,7 @@ namespace StaticMlp.Features.Buildings
             foreach (var e in CW.Query<All<BuildingMenuState>>().Entities())
                 return e;
 
-            EnsureClientOnlyStorage();
-            var created = CW.NewEntityInChunk<Default>(ClientBuildingClusters.ClientOnlyChunk);
+            var created = ClientOnlyEntities.New(ClientBuildingClusters.ClientOnly, ClientBuildingClusters.ClientOnlyChunk);
             created.Set(new BuildingMenuState());
             return created;
         }
@@ -28,15 +28,6 @@ namespace StaticMlp.Features.Buildings
             entity = default;
             state = default;
             return false;
-        }
-
-        private static void EnsureClientOnlyStorage()
-        {
-            if (!CW.ClusterIsRegistered(ClientBuildingClusters.ClientOnly))
-                CW.RegisterCluster(ClientBuildingClusters.ClientOnly);
-
-            if (!CW.ChunkIsRegistered(ClientBuildingClusters.ClientOnlyChunk))
-                CW.RegisterChunk(ClientBuildingClusters.ClientOnlyChunk, ChunkOwnerType.Self, ClientBuildingClusters.ClientOnly);
         }
     }
 }

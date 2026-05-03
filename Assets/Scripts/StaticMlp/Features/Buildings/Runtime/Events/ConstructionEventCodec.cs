@@ -1,12 +1,37 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
+using StaticMlp.Networking;
+using StaticMlp.Networking.Replication;
 using UnityEngine;
 
 namespace StaticMlp.Features.Buildings
 {
     public static class ConstructionEventCodec
     {
+        public static void Register()
+        {
+            NetworkEventRegistry.Register<PlaceBuildingRequestEvent>(
+                BuildingNetworkEventTypeIds.PlaceBuildingRequest,
+                NetDelivery.ReliableSequenced,
+                WritePlaceBuilding,
+                TryReadPlaceBuilding);
+            NetworkEventRegistry.Register<DepositConstructionResourcesRequestEvent>(
+                BuildingNetworkEventTypeIds.DepositConstructionResourcesRequest,
+                NetDelivery.ReliableSequenced,
+                WriteDeposit,
+                TryReadDeposit);
+            NetworkEventRegistry.Register<BuildConstructionRequestEvent>(
+                BuildingNetworkEventTypeIds.BuildConstructionRequest,
+                NetDelivery.ReliableSequenced,
+                WriteBuild,
+                TryReadBuild);
+        }
+
+        private static byte[] WritePlaceBuilding(in PlaceBuildingRequestEvent evt) => Write(in evt);
+        private static byte[] WriteDeposit(in DepositConstructionResourcesRequestEvent evt) => Write(in evt);
+        private static byte[] WriteBuild(in BuildConstructionRequestEvent evt) => Write(in evt);
+
         public static byte[] Write(in PlaceBuildingRequestEvent evt)
         {
             var writer = BinaryPackWriter.CreateFromPool(34);

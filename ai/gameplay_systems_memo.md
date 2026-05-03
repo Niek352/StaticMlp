@@ -43,6 +43,10 @@ using StaticMlp.Game.Bootstrap;
 
 namespace StaticMlp.Features.FeatureA {
     public sealed class FeatureAGameplayFeature : GameplayFeature {
+        public override void RegisterNetworkEvents() {
+            // Register typed client-to-server commands here.
+        }
+
         public override void RegisterServerSystems(ServerSystemsBuilder systems) {
             systems.Add(new FeatureAServerSystem(), GameplaySystemOrder.Gameplay);
         }
@@ -64,6 +68,10 @@ The bootstrap discovers this class automatically. Do not edit `MultiplayerSystem
 
 - Gameplay systems never call Unity Transport APIs.
 - Gameplay systems never serialize packets.
+- Gameplay systems use `NetworkEvents` for replicated commands, not raw `NetInbox` or `NetOutbox`.
+- Server-owned spawns go through `NetworkEntitySpawner`, not handwritten `NetworkIdentity` setup.
+- Domain rules do not know about network archetype ids, view paths, raw inbox/outbox, or concrete UI/input state.
+- Put network and presentation metadata in adapter catalogs keyed by domain ids.
 - Local client gameplay queries `LocalOwned`.
 - Remote client systems query `RemoteOwned` and smooth or render; they do not simulate gameplay.
 - Client view state implements `IViewComponent`, is changed through `Mut<T>()`, and is not replicated.
@@ -118,6 +126,8 @@ public sealed class FeatureAServerSystem : ISystem {
 ## Red Flags
 
 - A gameplay system imports `Unity.Networking.Transport`.
+- A feature gameplay system reads `NetInbox`, writes `NetOutbox`, or hardcodes `new NetworkPeerId(0)`.
+- A feature creates `NetworkIdentity`, applies `OwnershipTags`, or calls spawn/despawn broadcasters directly.
 - A gameplay system checks network authority manually instead of querying ownership tags.
 - A replicated component is changed via `Ref<T>()`.
 - A remote client system writes authoritative gameplay state.
@@ -133,8 +143,9 @@ public sealed class FeatureAServerSystem : ISystem {
 3. Add tags/components/events in the feature assembly.
 4. Add systems in `Systems/Server` and/or `Systems/Client`.
 5. Add `FeatureAGameplayFeature : GameplayFeature`.
-6. Register systems with the correct `GameplaySystemOrder`.
-7. Add client `ViewPath` and view-state components only to client prefab recipes.
-8. Register view-state apply systems in `RegisterClientViewSync`.
-9. Register feature prefab factories only if the feature spawns networked prefabs.
-10. Run Unity/codegen checks after adding replicated components.
+6. Register typed network commands in `RegisterNetworkEvents` when the feature has client-to-server actions.
+7. Register systems with the correct `GameplaySystemOrder`.
+8. Add client `ViewPath` and view-state components only to client network archetype recipes.
+9. Register view-state apply systems in `RegisterClientViewSync`.
+10. Register network archetype recipes only if the feature spawns networked entities.
+11. Run Unity/codegen checks after adding replicated components.

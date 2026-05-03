@@ -2,7 +2,7 @@
     <GameObject name="WoodenHutBlueprint">
         <EntityView />
         <TransformViewComponent />
-        <WoodenHutViewPart
+        <WoodenHutViewPart 
             mode="Blueprint"
             blueprintColor="#4A94D8B8"
             progressColor="#58E68C"

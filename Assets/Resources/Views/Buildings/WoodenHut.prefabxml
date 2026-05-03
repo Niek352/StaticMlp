@@ -2,7 +2,7 @@
     <GameObject name="WoodenHut">
         <EntityView />
         <TransformViewComponent />
-        <WoodenHutViewPart
+        <WoodenHutViewPart 
             mode="Finished"
             finishedWallColor="#8C6038"
             finishedRoofColor="#612E1F" />

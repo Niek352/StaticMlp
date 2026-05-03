@@ -1,5 +1,4 @@
 using FFS.Libraries.StaticEcs;
-using FFS.Libraries.StaticPack;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Systems;
 using StaticMlp.Networking;
@@ -21,22 +20,18 @@ namespace StaticMlp.Game.Systems.Server
 
         public void Update()
         {
-            ref var inbox = ref SW.GetResource<NetInbox>();
+            NetworkEvents.ForEachServer<SpawnPhysicsCubeRequestEvent>(Handle);
+        }
 
-            foreach (var evt in inbox.Events)
-            {
-                if (evt.EventTypeId != GameplayEventTypeIds.SpawnPhysicsCubeRequest)
-                    continue;
+        private void Handle(NetworkPeerId sourcePeer, in SpawnPhysicsCubeRequestEvent request)
+        {
+            if (!TryGetPlayerState(sourcePeer, out var playerState))
+                return;
 
-                if (!TryGetPlayerState(evt.SourcePeer, out var playerState))
-                    continue;
-
-                var yaw = ReadYaw(evt.Payload);
-                var rotation = Quaternion.Euler(0f, yaw, 0f);
-                var forward = rotation * Vector3.forward;
-                var spawnPosition = playerState.Position + forward * _spawnDistance + Vector3.up * _spawnHeight;
-                ServerSpawns.ServerSpawnPhysicsCube(evt.SourcePeer, spawnPosition, rotation);
-            }
+            var rotation = Quaternion.Euler(0f, request.CameraYaw, 0f);
+            var forward = rotation * Vector3.forward;
+            var spawnPosition = playerState.Position + forward * _spawnDistance + Vector3.up * _spawnHeight;
+            ServerSpawns.ServerSpawnPhysicsCube(sourcePeer, spawnPosition, rotation);
         }
 
         private static bool TryGetPlayerState(NetworkPeerId owner, out CharacterNetState state)
@@ -53,15 +48,6 @@ namespace StaticMlp.Game.Systems.Server
 
             state = default;
             return false;
-        }
-
-        private static float ReadYaw(byte[] payload)
-        {
-            if (payload == null || payload.Length == 0)
-                return 0f;
-
-            var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
-            return reader.ReadFloat();
         }
     }
 }

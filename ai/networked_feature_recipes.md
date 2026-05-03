@@ -29,10 +29,14 @@ Then add one feature entry point:
 using StaticMlp.Game.Bootstrap;
 
 namespace StaticMlp.Features.FeatureA {
-    public sealed class FeatureAGameplayFeature : GameplayFeature {
-        public override void RegisterPrefabs() {
-            // Optional: PrefabRegistry.RegisterClient/RegisterServer(...)
-        }
+public sealed class FeatureAGameplayFeature : GameplayFeature {
+    public override void RegisterNetworkEvents() {
+        // Optional: NetworkEventRegistry.Register<MyCommand>(...)
+    }
+
+    public override void RegisterPrefabs() {
+        // Optional: NetArchetypeRegistry.RegisterClient/RegisterServer(...)
+    }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems) {
             systems.Add(new FeatureAServerSystem(), GameplaySystemOrder.Gameplay);
@@ -50,6 +54,17 @@ namespace StaticMlp.Features.FeatureA {
 ```
 
 No central bootstrap edit is needed for ordinary feature systems. `GameplayFeatureDiscovery` finds `GameplayFeature` classes in loaded assemblies, passes their assemblies to StaticEcs `RegisterAll(...)`, and lets each feature register server/client/UX systems.
+
+## Feature Shape
+
+Prefer this split inside a networked feature:
+
+- `Domain`: pure gameplay rules and value decisions. No transport, no inbox/outbox, no prefab paths, no network archetype ids.
+- `Networking`: typed event codecs, event ids, and feature-local protocol adapters.
+- `Presentation`: view paths, preview/view state, and client-only visual mapping.
+- `Systems/Server` and `Systems/Client`: ECS queries, ownership checks, validation against world state, and calls into domain rules.
+
+When domain data needs network or presentation metadata, create a separate adapter catalog keyed by the domain id instead of putting those fields on the domain definition.
 
 Use these order constants first:
 
@@ -163,43 +178,19 @@ Do not write custom lerp systems for every replicated component. The generated `
 Server:
 
 ```csharp
-var e = SW.NewEntity<Default>();
-
-e.Set(new NetworkIdentity {
-    Owner = ownerPeer,
-    Authority = NetworkAuthority.Owner,
-    NetworkArchetypeId = Prefabs.Player
-});
-
-e.Set<NetworkedTag>();
-e.Set<PlayerTag>();
-e.Set(new CharacterNetState { Position = spawnPosition });
-
-OwnershipTags.ApplyForServer(e, ownerPeer, NetworkAuthority.Owner);
-SpawnBroadcaster.SendSpawn(e);
+NetworkEntitySpawner.SpawnServerEntity(
+    ownerPeer,
+    NetworkAuthority.Owner,
+    Prefabs.Player,
+    e => {
+        e.Set<PlayerTag>();
+        e.Set(new CharacterNetState { Position = spawnPosition });
+    });
 ```
 
-Client:
+Feature gameplay should not create `NetworkIdentity`, apply ownership tags, or call `SpawnBroadcaster` directly. The replication layer handles the client-side `NewEntityByGID`, initial state, and ownership tag application.
 
-```csharp
-var e = CW.NewEntityByGID<Default>(spawn.Gid);
-
-e.Set(new NetworkIdentity {
-    Owner = spawn.Owner,
-    Authority = spawn.Authority,
-    NetworkArchetypeId = spawn.NetworkArchetypeId
-});
-
-e.Set<NetworkedTag>();
-
-PrefabRegistry.Apply(spawn.NetworkArchetypeId, e);
-ReplicationRegistry.ApplyInitialState(e, spawn.Components);
-OwnershipTags.ApplyForClient(e, spawn.Owner, spawn.Authority);
-```
-
-Do not use `NewEntity()` for network spawn on clients. Use `NewEntityByGID`.
-
-Feature-local prefabs should be registered from the feature entry point:
+Feature-local network archetypes should be registered from the feature entry point:
 
 ```csharp
 public override void RegisterPrefabs() {
@@ -283,33 +274,54 @@ The Unity prefab should have `EntityView` and one or more `IEntityViewPart<DoorV
 
 ## Client-to-Server Action
 
-For an action, use a network event, not direct state mutation, unless the client owns the entity.
+For an action, use a typed replicated event, not direct state mutation, unless the client owns the entity.
 
 ```csharp
 [ReplicatedEvent(delivery: NetDelivery.ReliableSequenced)]
-public struct UseDoorEvent : IEvent {
+public readonly struct UseDoorEvent {
     public EntityGID Door;
 }
 ```
 
-Client sends:
+Register the event from the feature entry point:
 
 ```csharp
-NetworkEvents.Send(new UseDoorEvent {
+public override void RegisterNetworkEvents() {
+    NetworkEventRegistry.Register<UseDoorEvent>(
+        FeatureNetworkEventTypeIds.UseDoor,
+        NetDelivery.ReliableSequenced,
+        UseDoorEventCodec.Write,
+        UseDoorEventCodec.TryRead);
+}
+```
+
+Client sends through the feature-facing helper:
+
+```csharp
+NetworkEvents.TrySendToServer(new UseDoorEvent {
     Door = doorGid
 });
 ```
 
-Server receives:
+Server receives typed events:
 
 ```csharp
-if (evt.Door.TryUnpack<ServerWT>(out var door)) {
-    if (CanUseDoor(peer, door)) {
+public void Update() {
+    NetworkEvents.ForEachServer<UseDoorEvent>(HandleUseDoor);
+}
+
+private static void HandleUseDoor(NetworkPeerId sourcePeer, in UseDoorEvent evt) {
+    if (!evt.Door.TryUnpack<ServerWT>(out var door))
+        return;
+
+    if (CanUseDoor(sourcePeer, door)) {
         ref var state = ref door.Mut<DoorState>();
         state.IsOpen = !state.IsOpen;
     }
 }
 ```
+
+Feature gameplay systems should not scan `NetInbox.Events`, compare raw event type ids, call `NetOutbox.EnqueueNetworkEvent`, or hardcode `new NetworkPeerId(0)`. Keep byte serialization in a small feature networking adapter or generated codec.
 
 ## Minimal Movement Checklist
 

@@ -1,3 +1,4 @@
+using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Game.Components.Buildings;
@@ -18,12 +19,33 @@ namespace StaticMlp.Features.Buildings
             Vector3 position,
             Quaternion rotation)
         {
+            return Validate(definition, position, rotation, ValidateClientWorld);
+        }
+
+        public static PlacementValidationResult ValidateServer(
+            in BuildingDefinition definition,
+            Vector3 position,
+            Quaternion rotation)
+        {
+            return Validate(definition, position, rotation, ValidateServerWorld);
+        }
+
+        private static PlacementValidationResult Validate(
+            in BuildingDefinition definition,
+            Vector3 position,
+            Quaternion rotation,
+            Func<OrientedFootprint, PlacementValidationResult> validateWorld)
+        {
             var ground = ValidateGround(position);
             if (!ground.IsValid)
                 return ground;
 
             var footprint = CreateFootprint(position, rotation, definition.FootprintWidth, definition.FootprintLength);
+            return validateWorld(footprint);
+        }
 
+        private static PlacementValidationResult ValidateClientWorld(OrientedFootprint footprint)
+        {
             foreach (var e in CW.Query<All<BuildingFootprint, ConstructionTransform>>().Entities())
             {
                 var otherFootprint = e.Read<BuildingFootprint>();
@@ -48,17 +70,8 @@ namespace StaticMlp.Features.Buildings
             return PlacementValidationResult.Valid();
         }
 
-        public static PlacementValidationResult ValidateServer(
-            in BuildingDefinition definition,
-            Vector3 position,
-            Quaternion rotation)
+        private static PlacementValidationResult ValidateServerWorld(OrientedFootprint footprint)
         {
-            var ground = ValidateGround(position);
-            if (!ground.IsValid)
-                return ground;
-
-            var footprint = CreateFootprint(position, rotation, definition.FootprintWidth, definition.FootprintLength);
-
             foreach (var e in SW.Query<All<BuildingFootprint, ConstructionTransform>>().Entities())
             {
                 var otherFootprint = e.Read<BuildingFootprint>();

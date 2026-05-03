@@ -15,12 +15,7 @@ namespace StaticMlp.Features.BuildingCatalog
                 costStone: 4,
                 footprintWidth: 4,
                 footprintLength: 5,
-                buildWorkRequired: 100f,
-                blueprintArchetypeId: BuildingNetworkArchetypeIds.WoodenHutBlueprint,
-                finishedArchetypeId: BuildingNetworkArchetypeIds.WoodenHutFinished,
-                ghostPreviewViewPath: "Views/Buildings/WoodenHutGhostPreview",
-                blueprintViewPath: "Views/Buildings/WoodenHutBlueprint",
-                finishedViewPath: "Views/Buildings/WoodenHut")
+                buildWorkRequired: 100f)
         };
 
         public static IReadOnlyList<BuildingDefinition> All => Definitions;

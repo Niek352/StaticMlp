@@ -1,5 +1,5 @@
+using System;
 using FFS.Libraries.StaticEcs;
-using UnityEngine;
 
 namespace StaticMlp.Features.ResourcesInventoryMinimal
 {
@@ -10,14 +10,14 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
 
         public int SpendWood(int requested)
         {
-            var amount = Mathf.Clamp(requested, 0, Wood);
+            var amount = Math.Min(Math.Max(0, requested), Wood);
             Wood -= amount;
             return amount;
         }
 
         public int SpendStone(int requested)
         {
-            var amount = Mathf.Clamp(requested, 0, Stone);
+            var amount = Math.Min(Math.Max(0, requested), Stone);
             Stone -= amount;
             return amount;
         }

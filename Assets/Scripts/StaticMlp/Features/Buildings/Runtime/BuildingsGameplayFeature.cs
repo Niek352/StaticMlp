@@ -1,3 +1,4 @@
+using System;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Game.Bootstrap;
@@ -10,6 +11,11 @@ namespace StaticMlp.Features.Buildings
 {
     public sealed class BuildingsGameplayFeature : GameplayFeature
     {
+        public override void RegisterNetworkEvents()
+        {
+            ConstructionEventCodec.Register();
+        }
+
         public override void RegisterPrefabs()
         {
             for (var i = 0; i < StaticMlp.Features.BuildingCatalog.BuildingCatalog.All.Count; i++)
@@ -45,7 +51,13 @@ namespace StaticMlp.Features.Buildings
 
         private static void RegisterBuilding(BuildingDefinition definition)
         {
-            NetArchetypeRegistry.RegisterClient(definition.BlueprintArchetypeId, e =>
+            if (!BuildingNetworkCatalog.TryGetDefinition(definition.Id, out var network))
+                throw new InvalidOperationException($"Missing network catalog entry for building {definition.Id}.");
+
+            if (!BuildingPresentationCatalog.TryGetDefinition(definition.Id, out var presentation))
+                throw new InvalidOperationException($"Missing presentation catalog entry for building {definition.Id}.");
+
+            NetArchetypeRegistry.RegisterClient(network.BlueprintArchetypeId, e =>
             {
                 e.Set<ConstructionSiteTag>();
                 e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
@@ -54,16 +66,16 @@ namespace StaticMlp.Features.Buildings
                     RenderRotation = Quaternion.identity
                 });
                 e.Set(new ConstructionViewState());
-                e.Set(new ViewPath(definition.BlueprintViewPath));
+                e.Set(new ViewPath(presentation.BlueprintViewPath));
             });
 
-            NetArchetypeRegistry.RegisterServer(definition.BlueprintArchetypeId, e =>
+            NetArchetypeRegistry.RegisterServer(network.BlueprintArchetypeId, e =>
             {
                 e.Set<ConstructionSiteTag>();
                 e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
             });
 
-            NetArchetypeRegistry.RegisterClient(definition.FinishedArchetypeId, e =>
+            NetArchetypeRegistry.RegisterClient(network.FinishedArchetypeId, e =>
             {
                 e.Set<FinishedBuildingTag>();
                 e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
@@ -80,10 +92,10 @@ namespace StaticMlp.Features.Buildings
                     StoneDelivered = definition.CostStone,
                     Progress01 = 1f
                 });
-                e.Set(new ViewPath(definition.FinishedViewPath));
+                e.Set(new ViewPath(presentation.FinishedViewPath));
             });
 
-            NetArchetypeRegistry.RegisterServer(definition.FinishedArchetypeId, e =>
+            NetArchetypeRegistry.RegisterServer(network.FinishedArchetypeId, e =>
             {
                 e.Set<FinishedBuildingTag>();
                 e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));

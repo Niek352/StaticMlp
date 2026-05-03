@@ -2,7 +2,7 @@
     <GameObject name="WoodenHutGhostPreview">
         <EntityView />
         <TransformViewComponent />
-        <WoodenHutViewPart
+        <WoodenHutViewPart 
             mode="GhostPreview"
             validPreviewColor="#4CE58C88"
             invalidPreviewColor="#F04B4588" />

@@ -1,6 +1,4 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Game.Systems;
-using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 
@@ -16,9 +14,6 @@ namespace StaticMlp.Features.Buildings
             if (BuildingMenuRuntime.SelectionFrame == Time.frameCount)
                 return;
 
-            if (NetworkRuntime.LocalPeerId.Value == 0)
-                return;
-
             if (!PlacementPreviewEntityUtility.TryGet(out var previewEntity)
                 || !previewEntity.Has<PlacementPreview>())
                 return;
@@ -27,17 +22,13 @@ namespace StaticMlp.Features.Buildings
             if (!preview.IsValid)
                 return;
 
-            ref var outbox = ref CW.GetResource<NetOutbox>();
             var request = new PlaceBuildingRequestEvent(
                 preview.BuildingId,
                 preview.Position,
                 preview.Rotation);
 
-            outbox.EnqueueNetworkEvent(
-                new NetworkPeerId(0),
-                GameplayEventTypeIds.PlaceBuildingRequest,
-                ConstructionEventCodec.Write(request),
-                NetDelivery.ReliableSequenced);
+            if (!NetworkEvents.TrySendToServer(in request))
+                return;
 
             if (BuildingMenuStateUtility.TryGet(out var menuEntity, out _))
             {

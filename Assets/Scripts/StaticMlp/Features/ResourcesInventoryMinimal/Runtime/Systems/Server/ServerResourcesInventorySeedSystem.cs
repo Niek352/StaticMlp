@@ -17,7 +17,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
 
         public void Update()
         {
-            foreach (var e in SW.Query<All<PlayerTag, NetworkIdentity>, None<ResourcesInventory>>().Entities())
+            foreach (var e in SW.Query<All<PlayerTag>, None<ResourcesInventory>>().Entities())
             {
                 e.Set(new ResourcesInventory
                 {

@@ -1,9 +1,7 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Game.Components;
 using StaticMlp.Game.Components.Buildings;
-using StaticMlp.Game.Systems;
+using StaticMlp.Game.Systems.Client;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 
@@ -22,10 +20,7 @@ namespace StaticMlp.Features.Buildings
 
         public void Update()
         {
-            if (NetworkRuntime.LocalPeerId.Value == 0)
-                return;
-
-            if (!TryGetLocalPlayerPosition(out var playerPosition))
+            if (!ClientLocalPlayer.TryGetPosition(out var playerPosition))
                 return;
 
             if (!TryFindNearestSite(playerPosition, out var site))
@@ -52,12 +47,7 @@ namespace StaticMlp.Features.Buildings
                 resources.RemainingWood,
                 resources.RemainingStone);
 
-            ref var outbox = ref CW.GetResource<NetOutbox>();
-            outbox.EnqueueNetworkEvent(
-                new NetworkPeerId(0),
-                GameplayEventTypeIds.DepositConstructionResourcesRequest,
-                ConstructionEventCodec.Write(request),
-                NetDelivery.ReliableSequenced);
+            NetworkEvents.TrySendToServer(in request);
         }
 
         private void SendBuild(CW.Entity site)
@@ -76,12 +66,7 @@ namespace StaticMlp.Features.Buildings
                 site.GID,
                 _buildWorkPerSecond * Time.deltaTime);
 
-            ref var outbox = ref CW.GetResource<NetOutbox>();
-            outbox.EnqueueNetworkEvent(
-                new NetworkPeerId(0),
-                GameplayEventTypeIds.BuildConstructionRequest,
-                ConstructionEventCodec.Write(request),
-                NetDelivery.ReliableSequenced);
+            NetworkEvents.TrySendToServer(in request);
         }
 
         private bool TryFindNearestSite(Vector3 playerPosition, out CW.Entity site)
@@ -109,16 +94,5 @@ namespace StaticMlp.Features.Buildings
             return found;
         }
 
-        private static bool TryGetLocalPlayerPosition(out Vector3 position)
-        {
-            foreach (var e in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities())
-            {
-                position = e.Read<CharacterNetState>().Position;
-                return true;
-            }
-
-            position = default;
-            return false;
-        }
     }
 }

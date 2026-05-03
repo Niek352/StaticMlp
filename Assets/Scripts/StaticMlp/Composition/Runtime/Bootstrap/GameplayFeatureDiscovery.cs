@@ -32,6 +32,14 @@ namespace StaticMlp.Composition
                 .ToArray();
         }
 
+        public static void RegisterNetworkEvents()
+        {
+            NetworkEventRegistry.Clear();
+
+            foreach (var feature in GetFeatures())
+                feature.RegisterNetworkEvents();
+        }
+
         public static void RegisterPrefabs()
         {
             NetArchetypeRegistry.Clear();

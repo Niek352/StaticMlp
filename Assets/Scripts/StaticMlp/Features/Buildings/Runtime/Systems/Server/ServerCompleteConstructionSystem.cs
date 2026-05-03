@@ -3,6 +3,7 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Buildings
@@ -28,23 +29,20 @@ namespace StaticMlp.Features.Buildings
 
         private static void Complete(EntityGID gid)
         {
-            if (!gid.TryUnpack<ServerWT>(out var site)
-                || !site.Has<ConstructionSiteTag>()
-                || !site.Has<NetworkIdentity>()
-                || !site.Has<ConstructionSiteState>()
-                || !site.Has<ConstructionTransform>())
+            if (!ConstructionSiteQuery.TryGetServerConstructionSite(gid, out var site))
                 return;
 
-            var identity = site.Read<NetworkIdentity>();
+            if (!NetworkEntityOwnership.TryGetOwner(site, out var owner))
+                return;
+
             var state = site.Read<ConstructionSiteState>();
             var transform = site.Read<ConstructionTransform>();
 
             if (!StaticMlp.Features.BuildingCatalog.BuildingCatalog.TryGetDefinition(new BuildingId(state.BuildingId), out var definition))
                 return;
 
-            ServerBuildingSpawns.SpawnFinishedBuilding(identity.Owner, definition, transform);
-            DespawnBroadcaster.SendDespawn(site.GID);
-            site.Destroy();
+            ServerBuildingSpawns.SpawnFinishedBuilding(owner, definition, transform);
+            NetworkEntityDespawner.DespawnAndDestroy(site);
         }
     }
 }

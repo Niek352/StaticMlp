@@ -47,6 +47,7 @@ Future feature assemblies
 Feature discovery currently provides:
 
 - ECS type assembly discovery before `RegisterAll(...)`.
+- Network event registration through `RegisterNetworkEvents()`.
 - Prefab factory registration through `RegisterPrefabs()`.
 - Server systems registration.
 - Client core systems registration.
@@ -119,6 +120,32 @@ ComponentBatch/move  unreliable sequenced
 Inventory/quest      reliable
 Events               depends on importance
 ```
+
+## Feature-Facing Networking
+
+Feature systems should talk in typed gameplay commands and replicated state, not packets.
+
+- Register typed commands in `GameplayFeature.RegisterNetworkEvents()` with `NetworkEventRegistry`.
+- Send client-to-server commands with `NetworkEvents.TrySendToServer(...)`.
+- Receive server commands with `NetworkEvents.ForEachServer<TCommand>(...)`.
+- Spawn server-owned entities with `NetworkEntitySpawner.SpawnServerEntity(...)`.
+- Despawn networked server entities with `NetworkEntityDespawner.DespawnAndDestroy(...)`.
+- Create client-only ECS entities with `ClientOnlyEntities.New(...)` when a feature needs local UX state.
+
+Feature gameplay should not read `NetInbox`, write `NetOutbox`, hardcode server peer `0`, create `NetworkIdentity`, call `OwnershipTags`, or call spawn/despawn broadcasters directly. Those are replication/lifecycle concerns.
+
+## Feature Domain Boundaries
+
+Feature domain code should describe gameplay concepts and rules. Keep it free from protocol ids, network archetype ids, prefab/view paths, transport resources, Unity view objects, and input/UI state.
+
+Use small adapter catalogs or systems at the boundary:
+
+- Domain catalog: gameplay data such as id, cost, footprint, work required.
+- Network catalog: network archetype ids and replicated lifecycle mapping.
+- Presentation catalog: view paths and local preview/presentation data.
+- Server/client systems: ownership checks, player lookup, inbox/outbox access through `NetworkEvents`, and calls into pure domain rules.
+
+If a feature has to fix a generic networking problem, move that helper to `Networking`, `Game/Replication`, or shared server/client gameplay helpers instead of embedding it in the feature domain.
 
 ## System Ordering
 
@@ -219,6 +246,8 @@ Do not try to make Unity Physics deterministic across clients.
 /Networking/Replication
     ReplicatedComponentAttribute.cs
     ReplicatedFieldAttribute.cs
+    NetworkEventRegistry.cs
+    NetworkEvents.cs
     ReplicationRegistry.cs
     ReplicationCollectSystem.cs
     ReplicationApplySystem.cs
@@ -240,6 +269,8 @@ Do not try to make Unity Physics deterministic across clients.
         MultiplayerSystemBootstrap.cs
         ViewSyncBuilder.cs
     Replication/
+        NetworkEntitySpawner.cs
+        NetworkEntityDespawner.cs
     ReplicationGenerated/
     Presentation/
 

@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Replication;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace StaticMlp.Features.Buildings
 {
@@ -21,8 +24,10 @@ namespace StaticMlp.Features.Buildings
                 DestroyAll();
             }
 
-            EnsureClientOnlyStorage();
-            var created = CW.NewEntityInChunk<Default>(ClientBuildingClusters.ClientOnlyChunk);
+            if (!BuildingPresentationCatalog.TryGetDefinition(definition.Id, out var presentation))
+                throw new InvalidOperationException($"Missing presentation catalog entry for building {definition.Id}.");
+
+            var created = ClientOnlyEntities.New(ClientBuildingClusters.ClientOnly, ClientBuildingClusters.ClientOnlyChunk);
             created.Set<PlacementPreviewTag>();
             created.Set(new PlacementPreview
             {
@@ -38,7 +43,7 @@ namespace StaticMlp.Features.Buildings
             {
                 RenderRotation = Quaternion.identity
             });
-            created.Set(new ViewPath(definition.GhostPreviewViewPath));
+            created.Set(new ViewPath(presentation.GhostPreviewViewPath));
             return created;
         }
 
@@ -76,15 +81,6 @@ namespace StaticMlp.Features.Buildings
 
                 e.Destroy();
             }
-        }
-
-        private static void EnsureClientOnlyStorage()
-        {
-            if (!CW.ClusterIsRegistered(ClientBuildingClusters.ClientOnly))
-                CW.RegisterCluster(ClientBuildingClusters.ClientOnly);
-
-            if (!CW.ChunkIsRegistered(ClientBuildingClusters.ClientOnlyChunk))
-                CW.RegisterChunk(ClientBuildingClusters.ClientOnlyChunk, ChunkOwnerType.Self, ClientBuildingClusters.ClientOnly);
         }
     }
 }

@@ -28,7 +28,7 @@ Gameplay systems should only:
 
 1. Query entities by ownership tags.
 2. Modify replicated components through `Mut<T>()`.
-3. Send gameplay actions through replicated events when direct ownership is absent.
+3. Send gameplay actions through typed replicated events when direct ownership is absent.
 
 ## Code Organization
 
@@ -36,8 +36,10 @@ Gameplay systems should only:
 - File name must match the top-level type name.
 - Do not collect many unrelated classes in one file.
 - Keep gameplay, replication, transport, ownership, and presentation code in separate folders/modules.
+- Keep domain definitions/rules free from network ids, prefab/view paths, transport state, and concrete UI concerns.
 - Put shared gameplay/bootstrap contracts in `Game.Core`; put ordinary gameplay features in their own `StaticMlp.Features.FeatureX` asmdef.
 - Add feature systems through `GameplayFeature`, not by editing `MultiplayerSystemBootstrap`.
+- Register typed network commands through `GameplayFeature.RegisterNetworkEvents`.
 - Write code inside explicit modules with clear boundaries. Treat modules as separate packages.
 - Do not cross module boundaries with hidden dependencies or direct calls when an event/component boundary belongs there.
 - Do not store `Entity` across frames; use `EntityGID` for persistent references.
@@ -92,6 +94,7 @@ Then derive local tags through `OwnershipTags.ApplyForClient` or `OwnershipTags.
 ## Systems
 
 - Systems communicate through event components, not direct calls.
+- Use `NetworkEvents` for client-to-server gameplay actions; do not read/write raw network inbox/outbox in feature logic.
 - Local gameplay queries `LocalOwned`.
 - Remote presentation queries `RemoteOwned` and smooths/render-applies state; it does not simulate gameplay.
 - Server gameplay queries `ServerOwned` or validated `ClientOwned`.
