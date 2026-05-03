@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace StaticMlp.Networking.Unity
+namespace StaticMlp.Composition
 {
     public sealed class MultiplayerStatusUi : MonoBehaviour
     {

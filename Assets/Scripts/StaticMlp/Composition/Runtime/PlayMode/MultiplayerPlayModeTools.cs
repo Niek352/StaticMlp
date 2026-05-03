@@ -1,7 +1,7 @@
 using System;
 using Unity.Multiplayer.PlayMode;
 
-namespace StaticMlp.Networking.Unity {
+namespace StaticMlp.Composition {
     public static class MultiplayerPlayModeTools {
         public const string CLIENT_TAG = "IsClient";
         public const string SERVER_TAG = "IsServer";

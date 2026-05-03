@@ -1,10 +1,11 @@
 using FFS.Libraries.StaticEcs.Unity;
 using StaticMlp.Features.EcsViews;
+using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
 
-namespace StaticMlp.Game.Bootstrap
+namespace StaticMlp.Composition
 {
     public static class MultiplayerSystemBootstrap
     {

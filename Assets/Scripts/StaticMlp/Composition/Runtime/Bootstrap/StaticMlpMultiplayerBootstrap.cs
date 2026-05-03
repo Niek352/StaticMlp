@@ -1,7 +1,7 @@
 using System.Reflection;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Systems.Client;
+using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
 using UnityEngine;
@@ -10,7 +10,7 @@ using UnityEngine.Serialization;
 using UnityEngine.InputSystem;
 #endif
 
-namespace StaticMlp.Networking.Unity
+namespace StaticMlp.Composition
 {
     public sealed class StaticMlpMultiplayerBootstrap : MonoBehaviour
     {

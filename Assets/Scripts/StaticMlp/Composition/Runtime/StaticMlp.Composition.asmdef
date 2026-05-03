@@ -1,10 +1,12 @@
 {
-    "name": "Ecs.Networking.Unity",
-    "rootNamespace": "StaticMlp.Networking.Unity",
+    "name": "StaticMlp.Composition",
+    "rootNamespace": "StaticMlp.Composition",
     "references": [
         "FFS.StaticEcs",
+        "FFS.StaticEcs.Unity",
         "Ecs.Networking",
         "Game.Core",
+        "StaticMlp.Features.EcsViews",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "UnityEngine.UI"

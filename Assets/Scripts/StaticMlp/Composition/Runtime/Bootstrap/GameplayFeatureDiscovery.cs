@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using StaticMlp.Features.EcsViews;
+using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking.Replication;
 
-namespace StaticMlp.Game.Bootstrap
+namespace StaticMlp.Composition
 {
     public static class GameplayFeatureDiscovery
     {
@@ -17,7 +18,7 @@ namespace StaticMlp.Game.Bootstrap
         {
             var assemblies = new List<Assembly>
             {
-                typeof(GameplayFeatureDiscovery).Assembly,
+                typeof(GameplayFeature).Assembly,
                 typeof(ViewPath).Assembly
             };
 

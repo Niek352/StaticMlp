@@ -2,7 +2,7 @@ using StaticMlp.Game.Bootstrap;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Networking.Replication;
 
-namespace StaticMlp.Game.Presentation
+namespace StaticMlp.Game.Features.Builtin
 {
     public sealed class PhysicsCubeViewFeature : GameplayFeature
     {

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Components;
+using StaticMlp.Game.Features.Builtin;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;

@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking;
 
-namespace StaticMlp.Networking {
+namespace StaticMlp.Composition {
     public static class MultiplayerWorldBootstrap {
         public static void CreateServer(WorldConfig config = default, params Assembly[] ecsTypeAssemblies) {
             CreateServer(config, null, ecsTypeAssemblies);

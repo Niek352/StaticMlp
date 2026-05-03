@@ -648,7 +648,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dee233abf08929540b59fc7c8e3f4571, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StaticMlp.Networking.Unity.StaticMlpMultiplayerBootstrap
+  m_EditorClassIdentifier: StaticMlp.Composition::StaticMlp.Composition.StaticMlpMultiplayerBootstrap
   runMode: 2
   useMultiplayerPlayModeTags: 1
   startOnAwake: 1

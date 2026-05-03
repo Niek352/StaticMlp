@@ -1,11 +1,12 @@
 using StaticMlp.Game.Components;
 using StaticMlp.Features.EcsViews;
+using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Game.Systems.Client;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking.Replication;
 
-namespace StaticMlp.Game.Bootstrap
+namespace StaticMlp.Game.Features.Builtin
 {
     public sealed class BuiltinGameplayFeature : GameplayFeature
     {
