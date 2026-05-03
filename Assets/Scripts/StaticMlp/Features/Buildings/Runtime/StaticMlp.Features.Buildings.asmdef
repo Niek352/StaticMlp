@@ -1,0 +1,25 @@
+{
+    "name": "StaticMlp.Features.Buildings",
+    "rootNamespace": "StaticMlp.Features.Buildings",
+    "references": [
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.EcsViews",
+        "StaticMlp.Features.BuildingCatalog",
+        "StaticMlp.Features.ResourcesInventoryMinimal",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

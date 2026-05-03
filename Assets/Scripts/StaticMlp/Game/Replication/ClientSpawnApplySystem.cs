@@ -10,6 +10,7 @@ namespace StaticMlp.Networking.Replication {
                 if (spawn.Gid.TryUnpack<ClientCoreWT>(out _))
                     continue;
 
+                EnsureRemoteChunk(spawn.Gid);
                 var e = CW.NewEntityByGID<Default>(spawn.Gid);
                 e.Set(new NetworkIdentity {
                     Owner = spawn.Owner,
@@ -23,6 +24,22 @@ namespace StaticMlp.Networking.Replication {
                 ReplicationRegistry.InitializeClientCoreInterpolatedState(e);
                 OwnershipTags.ApplyForClient(e, spawn.Owner, spawn.Authority);
             }
+        }
+
+        private static void EnsureRemoteChunk(EntityGID gid) {
+            if (!CW.ClusterIsRegistered(gid.ClusterId))
+                CW.RegisterCluster(gid.ClusterId);
+
+            if (!CW.ChunkIsRegistered(gid.Chunk)) {
+                CW.RegisterChunk(gid.Chunk, ChunkOwnerType.Other, gid.ClusterId);
+                return;
+            }
+
+            if (CW.GetChunkClusterId(gid.Chunk) != gid.ClusterId && !CW.HasEntitiesInChunk(gid.Chunk))
+                CW.ChangeChunkCluster(gid.Chunk, gid.ClusterId);
+
+            if (CW.GetChunkOwner(gid.Chunk) == ChunkOwnerType.Self)
+                CW.ChangeChunkOwner(gid.Chunk, ChunkOwnerType.Other);
         }
     }
 }

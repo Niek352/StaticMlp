@@ -6,12 +6,25 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 using UnityEngine;
 using StaticMlp.Game.Components;
+using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking.Replication.Generated;
 
 namespace StaticMlp.Networking.Replication {
     public static partial class ReplicationRegistry {
         public static void ApplyDelta(CW.Entity e, ComponentDelta delta) {
             switch (delta.ComponentTypeId) {
+                case ReplicatedComponentIds.ConstructionProgress:
+                    e.Set(ConstructionProgressReplication.Read(delta.Payload));
+                    break;
+                case ReplicatedComponentIds.ConstructionResources:
+                    e.Set(ConstructionResourcesReplication.Read(delta.Payload));
+                    break;
+                case ReplicatedComponentIds.ConstructionSiteState:
+                    e.Set(ConstructionSiteStateReplication.Read(delta.Payload));
+                    break;
+                case ReplicatedComponentIds.ConstructionTransform:
+                    e.Set(ConstructionTransformReplication.Read(delta.Payload));
+                    break;
                 case ReplicatedComponentIds.CharacterNetState:
                     CharacterNetStateReplication.ApplyClientDelta(e, delta.Payload);
                     break;
@@ -26,6 +39,18 @@ namespace StaticMlp.Networking.Replication {
 
         public static void ApplyDelta(SW.Entity e, ComponentDelta delta) {
             switch (delta.ComponentTypeId) {
+                case ReplicatedComponentIds.ConstructionProgress:
+                    e.Set(ConstructionProgressReplication.Read(delta.Payload));
+                    break;
+                case ReplicatedComponentIds.ConstructionResources:
+                    e.Set(ConstructionResourcesReplication.Read(delta.Payload));
+                    break;
+                case ReplicatedComponentIds.ConstructionSiteState:
+                    e.Set(ConstructionSiteStateReplication.Read(delta.Payload));
+                    break;
+                case ReplicatedComponentIds.ConstructionTransform:
+                    e.Set(ConstructionTransformReplication.Read(delta.Payload));
+                    break;
                 case ReplicatedComponentIds.CharacterNetState:
                     e.Set(CharacterNetStateReplication.Read(delta.Payload));
                     break;
@@ -39,6 +64,14 @@ namespace StaticMlp.Networking.Replication {
         }
 
         public static void CollectDirty(CW.Entity e, NetOutbox outbox, NetworkPeerId peer) {
+            if (e.Has<ConstructionProgress>() && e.HasChanged<ConstructionProgress>())
+                outbox.EnqueueComponentDelta(peer, ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()), ConstructionProgressReplication.Delivery);
+            if (e.Has<ConstructionResources>() && e.HasChanged<ConstructionResources>())
+                outbox.EnqueueComponentDelta(peer, ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()), ConstructionResourcesReplication.Delivery);
+            if (e.Has<ConstructionSiteState>() && e.HasChanged<ConstructionSiteState>())
+                outbox.EnqueueComponentDelta(peer, ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()), ConstructionSiteStateReplication.Delivery);
+            if (e.Has<ConstructionTransform>() && e.HasChanged<ConstructionTransform>())
+                outbox.EnqueueComponentDelta(peer, ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()), ConstructionTransformReplication.Delivery);
             if (e.Has<CharacterNetState>() && e.HasChanged<CharacterNetState>())
                 outbox.EnqueueComponentDelta(peer, CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()), CharacterNetStateReplication.Delivery);
             if (e.Has<PhysicsCubeNetState>() && e.HasChanged<PhysicsCubeNetState>())
@@ -46,6 +79,14 @@ namespace StaticMlp.Networking.Replication {
         }
 
         public static void CollectDirty(SW.Entity e, NetOutbox outbox, NetworkPeerId peer) {
+            if (e.Has<ConstructionProgress>() && e.HasChanged<ConstructionProgress>())
+                outbox.EnqueueComponentDelta(peer, ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()), ConstructionProgressReplication.Delivery);
+            if (e.Has<ConstructionResources>() && e.HasChanged<ConstructionResources>())
+                outbox.EnqueueComponentDelta(peer, ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()), ConstructionResourcesReplication.Delivery);
+            if (e.Has<ConstructionSiteState>() && e.HasChanged<ConstructionSiteState>())
+                outbox.EnqueueComponentDelta(peer, ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()), ConstructionSiteStateReplication.Delivery);
+            if (e.Has<ConstructionTransform>() && e.HasChanged<ConstructionTransform>())
+                outbox.EnqueueComponentDelta(peer, ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()), ConstructionTransformReplication.Delivery);
             if (e.Has<CharacterNetState>() && e.HasChanged<CharacterNetState>())
                 outbox.EnqueueComponentDelta(peer, CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()), CharacterNetStateReplication.Delivery);
             if (e.Has<PhysicsCubeNetState>() && e.HasChanged<PhysicsCubeNetState>())
@@ -53,6 +94,14 @@ namespace StaticMlp.Networking.Replication {
         }
 
         public static void CollectClientOwnedDirty(NetOutbox outbox, NetworkPeerId peer) {
+            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, ConstructionProgress>, AllChanged<ConstructionProgress>>().Entities())
+                outbox.EnqueueComponentDelta(peer, ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()), ConstructionProgressReplication.Delivery);
+            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, ConstructionResources>, AllChanged<ConstructionResources>>().Entities())
+                outbox.EnqueueComponentDelta(peer, ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()), ConstructionResourcesReplication.Delivery);
+            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, ConstructionSiteState>, AllChanged<ConstructionSiteState>>().Entities())
+                outbox.EnqueueComponentDelta(peer, ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()), ConstructionSiteStateReplication.Delivery);
+            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, ConstructionTransform>, AllChanged<ConstructionTransform>>().Entities())
+                outbox.EnqueueComponentDelta(peer, ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()), ConstructionTransformReplication.Delivery);
             foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, CharacterNetState>, AllChanged<CharacterNetState>>().Entities())
                 outbox.EnqueueComponentDelta(peer, CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()), CharacterNetStateReplication.Delivery);
             foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, PhysicsCubeNetState>, AllChanged<PhysicsCubeNetState>>().Entities())
@@ -60,6 +109,22 @@ namespace StaticMlp.Networking.Replication {
         }
 
         public static void CollectServerOwnedDirty(NetOutbox outbox, IReadOnlyList<NetworkPeerId> peers) {
+            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, ConstructionProgress>, AllChanged<ConstructionProgress>>().Entities()) {
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()), ConstructionProgressReplication.Delivery);
+            }
+            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, ConstructionResources>, AllChanged<ConstructionResources>>().Entities()) {
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()), ConstructionResourcesReplication.Delivery);
+            }
+            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, ConstructionSiteState>, AllChanged<ConstructionSiteState>>().Entities()) {
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()), ConstructionSiteStateReplication.Delivery);
+            }
+            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, ConstructionTransform>, AllChanged<ConstructionTransform>>().Entities()) {
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()), ConstructionTransformReplication.Delivery);
+            }
             foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, CharacterNetState>, AllChanged<CharacterNetState>>().Entities()) {
                 for (var i = 0; i < peers.Count; i++)
                     outbox.EnqueueComponentDelta(peers[i], CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()), CharacterNetStateReplication.Delivery);
@@ -73,6 +138,18 @@ namespace StaticMlp.Networking.Replication {
         public static void CollectInitialState(SW.Entity e, List<ComponentDelta> components) {
             if (e.Has<NetworkIdentity>())
                 components.Add(NetworkIdentityReplication.CreateDelta(e.GID, e.Read<NetworkIdentity>()));
+
+            if (e.Has<ConstructionProgress>())
+                components.Add(ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()));
+
+            if (e.Has<ConstructionResources>())
+                components.Add(ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()));
+
+            if (e.Has<ConstructionSiteState>())
+                components.Add(ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()));
+
+            if (e.Has<ConstructionTransform>())
+                components.Add(ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()));
 
             if (e.Has<CharacterNetState>())
                 components.Add(CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()));
@@ -119,6 +196,22 @@ namespace StaticMlp.Networking.Replication {
 
         public static ComponentDelta CreateDelta(EntityGID gid, in CharacterNetState state) {
             return CharacterNetStateReplication.CreateDelta(gid, state);
+        }
+
+        public static ComponentDelta CreateDelta(EntityGID gid, in ConstructionProgress state) {
+            return ConstructionProgressReplication.CreateDelta(gid, state);
+        }
+
+        public static ComponentDelta CreateDelta(EntityGID gid, in ConstructionResources state) {
+            return ConstructionResourcesReplication.CreateDelta(gid, state);
+        }
+
+        public static ComponentDelta CreateDelta(EntityGID gid, in ConstructionSiteState state) {
+            return ConstructionSiteStateReplication.CreateDelta(gid, state);
+        }
+
+        public static ComponentDelta CreateDelta(EntityGID gid, in ConstructionTransform state) {
+            return ConstructionTransformReplication.CreateDelta(gid, state);
         }
 
         public static ComponentDelta CreateDelta(EntityGID gid, in PhysicsCubeNetState state) {

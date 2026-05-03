@@ -4,9 +4,7 @@ using StaticMlp.Game.Systems.Client;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-#endif
 
 namespace StaticMlp.Game.Presentation
 {
@@ -110,62 +108,29 @@ namespace StaticMlp.Game.Presentation
 
         private static Vector2 ReadLookDelta()
         {
-#if ENABLE_INPUT_SYSTEM
             var mouse = Mouse.current;
             if (mouse != null)
                 return mouse.delta.ReadValue() * 0.08f;
-#endif
 
-#if ENABLE_LEGACY_INPUT_MANAGER
-            return new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
-#else
             return Vector2.zero;
-#endif
         }
 
         private static bool EscapeWasPressed()
         {
-#if ENABLE_INPUT_SYSTEM
             var keyboard = Keyboard.current;
-            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
-                return true;
-#endif
-
-#if ENABLE_LEGACY_INPUT_MANAGER
-            return Input.GetKeyDown(KeyCode.Escape);
-#else
-            return false;
-#endif
+            return keyboard != null && keyboard.escapeKey.wasPressedThisFrame;
         }
 
         private static bool RightMouseWasPressedThisFrame()
         {
-#if ENABLE_INPUT_SYSTEM
             var mouse = Mouse.current;
-            if (mouse != null && mouse.rightButton.wasPressedThisFrame)
-                return true;
-#endif
-
-#if ENABLE_LEGACY_INPUT_MANAGER
-            return Input.GetMouseButtonDown(1);
-#else
-            return false;
-#endif
+            return mouse != null && mouse.rightButton.wasPressedThisFrame;
         }
 
         private static bool RightMouseIsPressed()
         {
-#if ENABLE_INPUT_SYSTEM
             var mouse = Mouse.current;
-            if (mouse != null)
-                return mouse.rightButton.isPressed;
-#endif
-
-#if ENABLE_LEGACY_INPUT_MANAGER
-            return Input.GetMouseButton(1);
-#else
-            return false;
-#endif
+            return mouse != null && mouse.rightButton.isPressed;
         }
 
         private static bool TryGetLocalPlayerPosition(out Vector3 position)

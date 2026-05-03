@@ -24,6 +24,7 @@ namespace StaticMlp.Networking.Replication {
                 CW.RegisterCluster(snapshot.ClusterId);
 
             CW.Serializer.LoadClusterSnapshot(snapshot.Payload, gzip: snapshot.Gzip);
+            MarkClusterAsRemote(snapshot.ClusterId);
             PostLoadCluster(snapshot.ClusterId);
         }
 
@@ -35,7 +36,19 @@ namespace StaticMlp.Networking.Replication {
                 CW.RegisterChunk(snapshot.ChunkIdx, ChunkOwnerType.Other, snapshot.ClusterId);
 
             CW.Serializer.LoadChunkSnapshot(snapshot.Payload, gzip: snapshot.Gzip);
+            MarkChunkAsRemote(snapshot.ChunkIdx);
             PostLoadCluster(snapshot.ClusterId);
+        }
+
+        private static void MarkClusterAsRemote(ushort clusterId) {
+            var chunks = CW.GetClusterChunks(clusterId);
+            foreach (var chunkIdx in chunks)
+                MarkChunkAsRemote(chunkIdx);
+        }
+
+        private static void MarkChunkAsRemote(uint chunkIdx) {
+            if (CW.ChunkIsRegistered(chunkIdx) && CW.GetChunkOwner(chunkIdx) == ChunkOwnerType.Self)
+                CW.ChangeChunkOwner(chunkIdx, ChunkOwnerType.Other);
         }
 
         private static void PostLoadCluster(ushort clusterId) {

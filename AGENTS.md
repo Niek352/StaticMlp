@@ -49,6 +49,7 @@ Gameplay systems should only:
 - Do not launch Unity in BatchMode.
 - Do not run `dotnet build` on your own; ask the user to run Unity/build checks when verification is needed.
 - Prefabs, Canvas hierarchies, and inspector references are assembled manually by a human in the Unity Editor.
+- When using PrefabXML, serialize enum values as numbers.
 - Null UI references are bugs. Fail fast instead of using defensive `if (x != null)` guards.
 - Do not write `ValidateReferences` or helper methods that search the scene/hierarchy instead of explicit inspector wiring.
 - All `.md` files must stay UTF-8 without BOM. Do not convert them to CP1251/ANSI.

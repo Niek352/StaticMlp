@@ -6,9 +6,7 @@ using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
 using UnityEngine;
 using UnityEngine.Serialization;
-#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-#endif
 
 namespace StaticMlp.Composition
 {

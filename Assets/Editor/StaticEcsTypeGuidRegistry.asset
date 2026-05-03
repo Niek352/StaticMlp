@@ -57,6 +57,42 @@ MonoBehaviour:
       - className: PhysicsCubeNetState
         namespaceName: StaticMlp.Game.Components
         assembly: Game.Core
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec04
+      current:
+        className: ConstructionProgress
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+      history:
+      - className: ConstructionProgress
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec03
+      current:
+        className: ConstructionResources
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+      history:
+      - className: ConstructionResources
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec01
+      current:
+        className: ConstructionSiteState
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+      history:
+      - className: ConstructionSiteState
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec02
+      current:
+        className: ConstructionTransform
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+      history:
+      - className: ConstructionTransform
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
     tags: []
     events: []
     links: []
@@ -105,6 +141,42 @@ MonoBehaviour:
       history:
       - className: PhysicsCubeNetState
         namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec04
+      current:
+        className: ConstructionProgress
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+      history:
+      - className: ConstructionProgress
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec03
+      current:
+        className: ConstructionResources
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+      history:
+      - className: ConstructionResources
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec01
+      current:
+        className: ConstructionSiteState
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+      history:
+      - className: ConstructionSiteState
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec02
+      current:
+        className: ConstructionTransform
+        namespaceName: StaticMlp.Game.Components.Buildings
+        assembly: Game.Core
+      history:
+      - className: ConstructionTransform
+        namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
     tags: []
     events: []
