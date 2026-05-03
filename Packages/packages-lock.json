@@ -7,6 +7,12 @@
       "dependencies": {},
       "hash": "f938d8a010a32498bd5cf04187fa3caaa51c5d93"
     },
+    "com.codewriter.unity-prefab-xml": {
+      "version": "file:com.codewriter.unity-prefab-xml",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.felid-force-studios.static-ecs": {
       "version": "https://github.com/Felid-Force-Studios/StaticEcs.git",
       "depth": 0,
