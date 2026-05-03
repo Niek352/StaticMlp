@@ -7,6 +7,11 @@ namespace StaticMlp.Game.Presentation
     {
         public void OnBind(IEntityView view)
         {
+            if (!view.Entity.Has<ViewTransform>())
+                return;
+
+            ref readonly var viewTransform = ref view.Entity.Read<ViewTransform>();
+            Apply(in viewTransform);
         }
 
         public void OnUnbind()

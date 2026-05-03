@@ -29,6 +29,8 @@ namespace StaticMlp.Networking.Transport {
                     UtpTransportContext.Log("Client disconnected from server");
                     if (ctx.ServerConnection.IsCreated && ctx.ServerConnection.Length > 0)
                         ctx.ServerConnection[0] = default;
+                    ctx.LocalPeerId = default;
+                    NetworkRuntime.LocalPeerId = default;
                 }
             }
 

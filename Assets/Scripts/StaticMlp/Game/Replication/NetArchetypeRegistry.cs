@@ -12,11 +12,13 @@ namespace StaticMlp.Networking.Replication {
         }
 
         public static void RegisterClient(ushort networkArchetypeId, Action<CW.Entity> apply) {
-            ClientFactories[networkArchetypeId] = apply;
+            ClientFactories.TryGetValue(networkArchetypeId, out var existing);
+            ClientFactories[networkArchetypeId] = existing + apply;
         }
 
         public static void RegisterServer(ushort networkArchetypeId, Action<SW.Entity> apply) {
-            ServerFactories[networkArchetypeId] = apply;
+            ServerFactories.TryGetValue(networkArchetypeId, out var existing);
+            ServerFactories[networkArchetypeId] = existing + apply;
         }
 
         public static void Apply(ushort networkArchetypeId, CW.Entity e) {

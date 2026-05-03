@@ -72,6 +72,10 @@ namespace StaticMlp.Networking.Transport {
 
         public void Dispose() {
             Log("Disposing transport context");
+            DisconnectActiveConnections();
+            RawInbox.Clear();
+            ConnectionByPeer.Clear();
+            PeerByConnection.Clear();
             TransportJobHandle.Complete();
             if (ServerConnection.IsCreated)
                 ServerConnection.Dispose();
@@ -79,6 +83,49 @@ namespace StaticMlp.Networking.Transport {
                 ClientConnections.Dispose();
             if (Driver.IsCreated)
                 Driver.Dispose();
+        }
+
+        public void DisconnectActiveConnections() {
+            TransportJobHandle.Complete();
+
+            if (!Driver.IsCreated)
+                return;
+
+            if (IsServer) {
+                DisconnectClients();
+                ServerPeerRegistry.Clear();
+                ServerDisconnectedPeerQueue.Clear();
+            } else {
+                DisconnectServer();
+            }
+
+            Driver.ScheduleUpdate().Complete();
+        }
+
+        private void DisconnectServer() {
+            if (!ServerConnection.IsCreated || ServerConnection.Length == 0)
+                return;
+
+            var connection = ServerConnection[0];
+            if (connection.IsCreated)
+                Driver.Disconnect(connection);
+
+            ServerConnection[0] = default;
+            LocalPeerId = default;
+            NetworkRuntime.LocalPeerId = default;
+        }
+
+        private void DisconnectClients() {
+            if (!ClientConnections.IsCreated)
+                return;
+
+            for (var i = 0; i < ClientConnections.Length; i++) {
+                var connection = ClientConnections[i];
+                if (connection.IsCreated)
+                    Driver.Disconnect(connection);
+            }
+
+            ClientConnections.Clear();
         }
 
         public bool TryGetConnection(NetworkPeerId peer, out NetworkConnection connection) {

@@ -9,6 +9,7 @@ Short operational rules for this Unity project. Keep this file small; put detail
 - [Networked gameplay feature recipes](ai/networked_feature_recipes.md)
 - [Gameplay systems memo](ai/gameplay_systems_memo.md)
 - [StaticEcs quick reference](ai/static_ecs_reference.md)
+- [Prefab XML skill](ai/prefabxml)
 - [Original multiplayer implementation plan](ai/static_ecs_unity_transport_multiplayer_plan.md)
 - Full StaticEcs documentation is available at [static-ecs FULL.txt](ai/static-ecs%20FULL.txt) when deeper API/reference details are needed.
 

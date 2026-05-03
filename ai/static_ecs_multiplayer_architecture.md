@@ -162,8 +162,8 @@ Client core:
      -780 apply ownership
      -770 apply component deltas
         0 feature local gameplay
-      200 bind EntityView prefabs for client ViewPath entities
       250 feature presentation sync
+      310 bind EntityView prefabs for client ViewPath entities
       320 apply changed view-state components to EntityView parts
       490 explicit EntityView cleanup
       500 collect local-owned dirty state

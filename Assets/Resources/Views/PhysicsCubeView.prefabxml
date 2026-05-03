@@ -1,0 +1,7 @@
+<UnityPrefab>
+    <GameObject name="PhysicsCubeView">
+        <EntityView />
+        <TransformViewComponent />
+        <PhysicsCubeView color="#59E68B" scale="1, 1, 1" />
+    </GameObject>
+</UnityPrefab>

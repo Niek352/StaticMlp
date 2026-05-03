@@ -129,7 +129,6 @@ GameObject:
   m_Component:
   - component: {fileID: 79928728}
   - component: {fileID: 79928727}
-  - component: {fileID: 79928729}
   m_Layer: 0
   m_Name: ViewPresenter
   m_TagString: Untagged
@@ -153,12 +152,10 @@ MonoBehaviour:
   localPlayerPrefab: {fileID: 0}
   remotePlayerPrefab: {fileID: 0}
   monsterPrefab: {fileID: 0}
-  physicsCubePrefab: {fileID: 0}
   createPrimitiveFallback: 1
   localPlayerColor: {r: 0.1, g: 0.55, b: 1, a: 1}
   remotePlayerColor: {r: 0.95, g: 0.75, b: 0.2, a: 1}
   monsterColor: {r: 0.9, g: 0.15, b: 0.2, a: 1}
-  physicsCubeColor: {r: 0.35, g: 0.9, b: 0.55, a: 1}
 --- !u!4 &79928728
 Transform:
   m_ObjectHideFlags: 0
@@ -174,24 +171,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &79928729
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 79928726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45b4e2359d6431f43818b72778cebe62, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game.Core::StaticMlp.Game.Presentation.StaticMlpServerPhysicsCubePresenter
-  viewRoot: {fileID: 0}
-  cubePrefab: {fileID: 0}
-  mass: 1
-  spawnImpulse: {x: 0, y: 2, z: 4}
-  showServerPhysicsObjects: 0
-  fallbackColor: {r: 0.35, g: 0.9, b: 0.55, a: 1}
 --- !u!1 &272071374
 GameObject:
   m_ObjectHideFlags: 0
@@ -652,7 +631,7 @@ GameObject:
   - component: {fileID: 1258054335}
   - component: {fileID: 1258054334}
   m_Layer: 0
-  m_Name: Multiplayer Bootstrap
+  m_Name: ==== Multiplayer Bootstrap === ==
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -670,7 +649,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dee233abf08929540b59fc7c8e3f4571, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StaticMlp.Networking.Unity.StaticMlpMultiplayerBootstrap
-  runMode: 2
+  runMode: 1
   useMultiplayerPlayModeTags: 1
   startOnAwake: 1
   dontDestroyOnLoad: 1
@@ -693,6 +672,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1625864684
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1625864686}
+  - component: {fileID: 1625864685}
+  m_Layer: 0
+  m_Name: ViewRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1625864685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1625864684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a7fa7063fea9d4dbe56980336de09a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Ecs.Views::StaticMlp.Game.EcsViews.ViewRootProvider
+  _root: {fileID: 1625864686}
+--- !u!4 &1625864686
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1625864684}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -703,3 +727,4 @@ SceneRoots:
   - {fileID: 1258054335}
   - {fileID: 79928728}
   - {fileID: 272071378}
+  - {fileID: 1625864686}

@@ -30,38 +30,59 @@ namespace StaticMlp.Networking.Unity
         [Header("Transport")] [SerializeField] private string connectHost = "127.0.0.1";
         [SerializeField] private ushort port = 7777;
 
+        [Header("UI")] [SerializeField] private bool showMultiplayerUi = true;
+        [SerializeField] private string multiplayerUiResourcePath = "Views/MultiplayerStatusUi";
+
         [Header("Input")] [FormerlySerializedAs("bindLegacyInputAxes")] [SerializeField]
         private bool bindDefaultMoveInput = true;
 
         private UtpTransportContext _serverTransport;
         private UtpTransportContext _clientTransport;
+        private MultiplayerStatusUi _multiplayerStatusUi;
+        private GameObject _multiplayerStatusUiInstance;
         private bool _serverStarted;
         private bool _clientStarted;
+
+        public RunMode CurrentRunMode => runMode;
+        public bool IsServerStarted => _serverStarted;
+        public bool IsClientStarted => _clientStarted;
+        public bool IsRunning => _serverStarted || _clientStarted;
+        public NetworkPeerId LocalPeerId => NetworkRuntime.LocalPeerId;
+        public string ConnectHost => connectHost;
+        public ushort Port => port;
 
         private void Awake()
         {
             if (dontDestroyOnLoad)
                 DontDestroyOnLoad(gameObject);
 
+            CreateMultiplayerUi();
+
             if (startOnAwake)
                 StartMultiplayer();
         }
-        
+
         private void OnDestroy()
         {
             Shutdown();
+            DestroyMultiplayerUi();
         }
 
         private void OnApplicationQuit()
         {
             Shutdown();
         }
-        
+
         public void StartMultiplayer()
+        {
+            StartMultiplayer(resolvePlayModeTags: true);
+        }
+
+        private void StartMultiplayer(bool resolvePlayModeTags)
         {
             UtpTransportContext.EnableLogs = enableLogs;
 
-            if (useMultiplayerPlayModeTags &&
+            if (resolvePlayModeTags && useMultiplayerPlayModeTags &&
                 MultiplayerPlayModeTools.TryGetRunMode(out var taggedRunMode, out var tag))
             {
                 runMode = taggedRunMode;
@@ -76,6 +97,35 @@ namespace StaticMlp.Networking.Unity
 
             if (runMode is RunMode.Client or RunMode.Host)
                 StartClientSide();
+        }
+
+        public void StartHost()
+        {
+            RestartAs(RunMode.Host);
+        }
+
+        public void StartServer()
+        {
+            RestartAs(RunMode.Server);
+        }
+
+        public void StartClient()
+        {
+            RestartAs(RunMode.Client);
+        }
+
+        public void Disconnect()
+        {
+            Shutdown();
+        }
+
+        private void RestartAs(RunMode nextRunMode)
+        {
+            if (IsRunning)
+                Shutdown();
+
+            runMode = nextRunMode;
+            StartMultiplayer(resolvePlayModeTags: false);
         }
 
         private void StartServerSide()
@@ -176,14 +226,15 @@ namespace StaticMlp.Networking.Unity
             {
                 Log("Shutting down client side");
 
+                _clientTransport?.Dispose();
+                _clientTransport = null;
+
                 if (ClientCoreSys.IsInitialized)
                     ClientCoreSys.Destroy();
 
                 if (CW.Status != WorldStatus.NotCreated)
                     CW.Destroy();
 
-                _clientTransport?.Dispose();
-                _clientTransport = null;
                 _clientStarted = false;
                 Log("Client side stopped");
             }
@@ -192,17 +243,48 @@ namespace StaticMlp.Networking.Unity
             {
                 Log("Shutting down server side");
 
+                _serverTransport?.Dispose();
+                _serverTransport = null;
+
                 if (ServerSys.IsInitialized)
                     ServerSys.Destroy();
 
                 if (SW.Status != WorldStatus.NotCreated)
                     SW.Destroy();
 
-                _serverTransport?.Dispose();
-                _serverTransport = null;
                 _serverStarted = false;
                 Log("Server side stopped");
             }
+        }
+
+        private void CreateMultiplayerUi()
+        {
+            if (!showMultiplayerUi)
+                return;
+
+            var prefab = Resources.Load<GameObject>(multiplayerUiResourcePath);
+            if (prefab == null)
+                throw new MissingReferenceException($"Multiplayer UI prefab resource not found: {multiplayerUiResourcePath}");
+
+            _multiplayerStatusUiInstance = Instantiate(prefab);
+            _multiplayerStatusUi = _multiplayerStatusUiInstance.GetComponent<MultiplayerStatusUi>();
+            if (_multiplayerStatusUi == null)
+                throw new MissingComponentException($"Multiplayer UI prefab must have {nameof(MultiplayerStatusUi)} on its root.");
+
+            _multiplayerStatusUi.Bind(this);
+
+            if (dontDestroyOnLoad)
+                DontDestroyOnLoad(_multiplayerStatusUiInstance);
+        }
+
+        private void DestroyMultiplayerUi()
+        {
+            if (_multiplayerStatusUiInstance == null)
+                return;
+
+            Destroy(_multiplayerStatusUiInstance);
+            _multiplayerStatusUiInstance = null;
+            _multiplayerStatusUi = null;
         }
 
         private void Log(string message)

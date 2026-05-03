@@ -20,6 +20,7 @@ namespace StaticMlp.Networking.Replication {
 
                 NetArchetypeRegistry.Apply(spawn.NetworkArchetypeId, e);
                 ReplicationRegistry.ApplyInitialState(e, spawn.Components);
+                ReplicationRegistry.InitializeClientCoreInterpolatedState(e);
                 OwnershipTags.ApplyForClient(e, spawn.Owner, spawn.Authority);
             }
         }

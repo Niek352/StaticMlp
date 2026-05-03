@@ -25,7 +25,7 @@ The asmdef is `Game.Ecs.Views`. It references StaticEcs and `Ecs.Networking`, bu
 ## Client-Only Components
 
 - `ViewPath`: Resources path for the view prefab. Add it only from client prefab recipes or local client-only entities.
-- `View`: runtime reference to the bound `IEntityView`. Never replicate it.
+- `View`: runtime reference to the bound `IEntityView`. Never replicate it. Added tracking is enabled so generic apply systems can push already-existing view state immediately after binding.
 - `DestroyViewRequest`: marker for explicit view cleanup before an entity is destroyed.
 - `IViewComponent`: marker for client-only view state. It requires added and changed tracking.
 
@@ -71,6 +71,10 @@ public override void RegisterClientViewSync(ViewSyncBuilder views)
 ```
 
 `RegisterClientViewSync` is for client view apply systems only. Server systems must never register view systems.
+
+`BindEntityViewSystem` runs after normal presentation state sync. This avoids creating a view prefab while its first `ViewTransform` still contains default values.
+
+`ApplyComponentToViewSystem<T>` also applies when `View` is newly added. This covers the common first-frame case where a view-state component already exists before the Unity view is bound.
 
 ## Networked Prefab Rules
 

@@ -8,6 +8,9 @@ namespace StaticMlp.Game.EcsViews
     {
         public void Update()
         {
+            foreach (var entity in CW.Query<All<View, TComponent>, AllAdded<View>>().Entities())
+                Apply(entity);
+
             foreach (var entity in CW.Query<All<View, TComponent>, AllAdded<TComponent>>().Entities())
                 Apply(entity);
 
