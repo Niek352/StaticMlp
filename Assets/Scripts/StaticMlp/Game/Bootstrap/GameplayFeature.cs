@@ -13,5 +13,9 @@ namespace StaticMlp.Game.Bootstrap
         public virtual void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
         }
+
+        public virtual void RegisterClientViewSync(ViewSyncBuilder views)
+        {
+        }
     }
 }

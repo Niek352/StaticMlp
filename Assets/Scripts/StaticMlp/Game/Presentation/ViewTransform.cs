@@ -1,11 +1,12 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
+using StaticMlp.Game.EcsViews;
 using UnityEngine;
 
 namespace StaticMlp.Game.Presentation
 {
-    public struct ViewTransform : IComponent, IComponentConfig<ViewTransform>, ITrackableAdded, ITrackableChanged,
+    public struct ViewTransform : IViewComponent, IComponentConfig<ViewTransform>,
         ITrackableDeleted
     {
         public Vector3 RenderPosition;

@@ -12,6 +12,7 @@ Create a new folder under `Assets/Scripts/StaticMlp/Game/Features/FeatureA` with
     "rootNamespace": "StaticMlp.Game.FeatureA",
     "references": [
         "Game.Core",
+        "Game.Ecs.Views",
         "Ecs.Networking",
         "FFS.StaticEcs",
         "FFS.StaticPack",
@@ -40,6 +41,10 @@ namespace StaticMlp.Game.FeatureA {
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems) {
             systems.Add(new FeatureAClientSystem(), GameplaySystemOrder.Gameplay);
         }
+
+        public override void RegisterClientViewSync(ViewSyncBuilder views) {
+            views.Register<FeatureAViewState>();
+        }
     }
 }
 ```
@@ -52,6 +57,13 @@ Use these order constants first:
 - `GameplaySystemOrder.Gameplay`: normal simulation.
 - `GameplaySystemOrder.ClientPresentation`: local view sync and generated remote interpolation.
 - `GameplaySystemOrder.CollectReplication`: boundary where dirty state collection starts; gameplay should normally run before it.
+
+Use `ViewSystemOrder` for EntityView-specific work:
+
+- `ViewSystemOrder.BindViews`: bind client `ViewPath` entities to `EntityView` prefabs.
+- `ViewSystemOrder.BuildPresentationState`: copy replicated/interpolated state into client-only view state.
+- `ViewSystemOrder.ApplyPresentationState`: generic `ApplyComponentToViewSystem<T>` calls view parts.
+- `ViewSystemOrder.DestroyViews`: explicit view cleanup before replication collection.
 
 ## Replicated Component
 
@@ -193,6 +205,7 @@ Feature-local prefabs should be registered from the feature entry point:
 public override void RegisterPrefabs() {
     PrefabRegistry.RegisterClient(MyPrefabs.Door, e => {
         e.Set<DoorTag>();
+        e.Set(new ViewPath("Views/Doors/DoorView"));
         e.Set(new DoorViewState());
     });
 
@@ -201,6 +214,7 @@ public override void RegisterPrefabs() {
 ```
 
 Keep `NetworkArchetypeId` values stable. Treat them as protocol ids, not as scene or prefab instance ids.
+Do not put `ViewPath`, `View`, or `IViewComponent` state in server recipes.
 
 ## Server-Owned Door Example
 
@@ -257,7 +271,15 @@ public sealed class DoorViewSystem : ISystem {
 }
 ```
 
-No manual door sync system is needed.
+Then register the view apply system:
+
+```csharp
+public override void RegisterClientViewSync(ViewSyncBuilder views) {
+    views.Register<DoorView>();
+}
+```
+
+The Unity prefab should have `EntityView` and one or more `IEntityViewPart<DoorView>` components.
 
 ## Client-to-Server Action
 

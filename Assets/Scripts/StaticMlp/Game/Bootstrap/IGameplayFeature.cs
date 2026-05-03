@@ -5,5 +5,6 @@ namespace StaticMlp.Game.Bootstrap
         void RegisterPrefabs();
         void RegisterServerSystems(ServerSystemsBuilder systems);
         void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems);
+        void RegisterClientViewSync(ViewSyncBuilder views);
     }
 }

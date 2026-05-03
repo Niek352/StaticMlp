@@ -1,4 +1,5 @@
 using StaticMlp.Game.Components;
+using StaticMlp.Game.EcsViews;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Game.Systems.Client;
 using StaticMlp.Game.Systems.Server;
@@ -51,6 +52,11 @@ namespace StaticMlp.Game.Bootstrap
             ReplicationRegistry.RegisterClientCoreInterpolationSystems(systems);
             systems.Add(new LocalViewSyncSystem(), GameplaySystemOrder.ClientPresentation);
             systems.Add(new RemoteInterpolatedViewSyncSystem(), GameplaySystemOrder.ClientPresentation + 50);
+        }
+
+        public override void RegisterClientViewSync(ViewSyncBuilder views)
+        {
+            views.Register<ViewTransform>();
         }
     }
 }

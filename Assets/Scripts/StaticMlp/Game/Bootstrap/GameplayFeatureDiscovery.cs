@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using StaticMlp.Game.EcsViews;
 using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Game.Bootstrap
@@ -16,7 +17,8 @@ namespace StaticMlp.Game.Bootstrap
         {
             var assemblies = new List<Assembly>
             {
-                typeof(GameplayFeatureDiscovery).Assembly
+                typeof(GameplayFeatureDiscovery).Assembly,
+                typeof(ViewPath).Assembly
             };
 
             foreach (var feature in GetFeatures())
@@ -47,6 +49,12 @@ namespace StaticMlp.Game.Bootstrap
         {
             foreach (var feature in GetFeatures())
                 feature.RegisterClientCoreSystems(systems);
+        }
+
+        public static void RegisterClientViewSync(ViewSyncBuilder views)
+        {
+            foreach (var feature in GetFeatures())
+                feature.RegisterClientViewSync(views);
         }
 
         private static IGameplayFeature[] GetFeatures()

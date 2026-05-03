@@ -1,4 +1,6 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game.EcsViews;
+using UnityEngine;
 
 namespace StaticMlp.Networking.Replication {
     public sealed class ClientDespawnApplySystem : ISystem {
@@ -6,8 +8,17 @@ namespace StaticMlp.Networking.Replication {
             ref var inbox = ref CW.GetResource<NetInbox>();
 
             foreach (var despawn in inbox.Despawns) {
-                if (despawn.Gid.TryUnpack<ClientCoreWT>(out var e))
+                if (despawn.Gid.TryUnpack<ClientCoreWT>(out var e)) {
+                    if (e.Has<View>()) {
+                        ref readonly var view = ref e.Read<View>();
+                        view.Value.Unbind();
+
+                        if (view.Value is MonoBehaviour monoBehaviour)
+                            Object.Destroy(monoBehaviour.gameObject);
+                    }
+
                     e.Destroy();
+                }
             }
         }
     }

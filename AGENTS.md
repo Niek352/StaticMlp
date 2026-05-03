@@ -5,6 +5,7 @@ Short operational rules for this Unity project. Keep this file small; put detail
 ## Read More
 
 - [StaticEcs + Unity Transport architecture](ai/static_ecs_multiplayer_architecture.md)
+- [StaticEcs client view feature](ai/static_ecs_view_feature.md)
 - [Networked gameplay feature recipes](ai/networked_feature_recipes.md)
 - [Gameplay systems memo](ai/gameplay_systems_memo.md)
 - [StaticEcs quick reference](ai/static_ecs_reference.md)

@@ -31,6 +31,11 @@ Assets/Scripts/StaticMlp/Game
     prefab registry, replication collect/apply systems, generated replication code,
     presentation-only components.
 
+Assets/Scripts/StaticMlp/Game/Features/EcsViews
+    Game.Ecs.Views
+    Client-only EntityView binding, ViewPath/View runtime components,
+    Resources-based view factory, and generic view-state apply systems.
+
 Future feature assemblies
     Game.FeatureA
     Feature-local components, tags, systems, presentation state and a small
@@ -45,6 +50,7 @@ Feature discovery currently provides:
 - Prefab factory registration through `RegisterPrefabs()`.
 - Server systems registration.
 - Client core systems registration.
+- Client view-state apply registration through `RegisterClientViewSync(ViewSyncBuilder)`.
 
 ## Ownership Rules
 
@@ -156,7 +162,10 @@ Client core:
      -780 apply ownership
      -770 apply component deltas
         0 feature local gameplay
+      200 bind EntityView prefabs for client ViewPath entities
       250 feature presentation sync
+      320 apply changed view-state components to EntityView parts
+      490 explicit EntityView cleanup
       500 collect local-owned dirty state
       700 send packets
      1000 schedule transport jobs
@@ -229,9 +238,23 @@ Do not try to make Unity Physics deterministic across clients.
         GameplayFeature.cs
         GameplayFeatureDiscovery.cs
         MultiplayerSystemBootstrap.cs
+        ViewSyncBuilder.cs
     Replication/
     ReplicationGenerated/
     Presentation/
+
+/Game/Features/EcsViews        asmdef: Game.Ecs.Views
+    Components/
+        ViewPath.cs
+        View.cs
+        DestroyViewRequest.cs
+    Contracts/
+        IEntityView.cs
+        IEntityViewPart.cs
+        IViewComponent.cs
+    Factory/
+    Systems/
+    Unity/
 
 /Game/Features/FeatureA        asmdef: Game.FeatureA
     FeatureAGameplayFeature.cs

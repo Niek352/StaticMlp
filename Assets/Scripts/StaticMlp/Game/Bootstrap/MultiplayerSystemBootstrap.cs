@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs.Unity;
+using StaticMlp.Game.EcsViews;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
@@ -26,6 +27,7 @@ namespace StaticMlp.Game.Bootstrap
         public static void CreateClientCoreSystems()
         {
             ClientCoreSys.Create();
+            var viewFactory = new ResourcesEntityViewFactory(ViewRootProvider.Root);
             ClientCoreSys.Add(new ClientTransportCompleteSystem(), order: -1000);
             ClientCoreSys.Add(new ClientRawInboxDrainSystem(), order: -900);
             ClientCoreSys.Add(new ClientSnapshotApplySystem(), order: -810);
@@ -33,7 +35,12 @@ namespace StaticMlp.Game.Bootstrap
             ClientCoreSys.Add(new ClientDespawnApplySystem(), order: -790);
             ClientCoreSys.Add(new ClientOwnershipApplySystem(), order: -780);
             ClientCoreSys.Add(new ClientComponentDeltaApplySystem(), order: -770);
-            GameplayFeatureDiscovery.RegisterClientCoreSystems(new ClientCoreSystemsBuilder());
+            var systemsBuilder = new ClientCoreSystemsBuilder();
+            systemsBuilder.Add(new BindEntityViewSystem(viewFactory), ViewSystemOrder.BindViews);
+            GameplayFeatureDiscovery.RegisterClientCoreSystems(systemsBuilder);
+            GameplayFeatureDiscovery.RegisterClientViewSync(
+                new ViewSyncBuilder(systemsBuilder, ViewSystemOrder.ApplyPresentationState));
+            systemsBuilder.Add(new DestroyEntityViewSystem(viewFactory), ViewSystemOrder.DestroyViews);
             ClientCoreSys.Add(new ClientReplicationCollectSystem(), order: 500);
             ClientCoreSys.Add(new ClientTransportSendSystem(), order: 700);
             ClientCoreSys.Add(new ClientTransportScheduleSystem(), order: 1000);

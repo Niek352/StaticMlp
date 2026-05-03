@@ -1,13 +1,10 @@
 {
-    "name": "Game.Core",
-    "rootNamespace": "StaticMlp.Game",
+    "name": "Game.Ecs.Views",
+    "rootNamespace": "StaticMlp.Game.EcsViews",
     "references": [
-        "FFS.StaticEcs",
-        "FFS.StaticPack",
         "Ecs.Networking",
-        "Game.Ecs.Views",
-        "FFS.StaticEcs.Unity",
-        "Unity.InputSystem"
+        "FFS.StaticEcs",
+        "FFS.StaticEcs.Unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
