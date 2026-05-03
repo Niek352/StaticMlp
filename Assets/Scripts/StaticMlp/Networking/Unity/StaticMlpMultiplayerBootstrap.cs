@@ -46,7 +46,17 @@ namespace StaticMlp.Networking.Unity
             if (startOnAwake)
                 StartMultiplayer();
         }
+        
+        private void OnDestroy()
+        {
+            Shutdown();
+        }
 
+        private void OnApplicationQuit()
+        {
+            Shutdown();
+        }
+        
         public void StartMultiplayer()
         {
             UtpTransportContext.EnableLogs = enableLogs;
@@ -61,10 +71,10 @@ namespace StaticMlp.Networking.Unity
             Log($"Starting multiplayer as {runMode} on port {port}");
             GameplayFeatureDiscovery.RegisterPrefabs();
 
-            if (runMode == RunMode.Server || runMode == RunMode.Host)
+            if (runMode is RunMode.Server or RunMode.Host)
                 StartServerSide();
 
-            if (runMode == RunMode.Client || runMode == RunMode.Host)
+            if (runMode is RunMode.Client or RunMode.Host)
                 StartClientSide();
         }
 
@@ -158,16 +168,6 @@ namespace StaticMlp.Networking.Unity
         private static Assembly[] GameplayAssemblies()
         {
             return GameplayFeatureDiscovery.GetEcsTypeAssemblies();
-        }
-
-        private void OnDestroy()
-        {
-            Shutdown();
-        }
-
-        private void OnApplicationQuit()
-        {
-            Shutdown();
         }
 
         public void Shutdown()
