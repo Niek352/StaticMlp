@@ -1,5 +1,5 @@
 using StaticMlp.Game.Components;
-using StaticMlp.Game.EcsViews;
+using StaticMlp.Features.EcsViews;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Game.Systems.Client;
 using StaticMlp.Game.Systems.Server;

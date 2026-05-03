@@ -5,7 +5,7 @@
         "FFS.StaticEcs",
         "FFS.StaticPack",
         "Ecs.Networking",
-        "Game.Ecs.Views",
+        "StaticMlp.Features.EcsViews",
         "FFS.StaticEcs.Unity",
         "Unity.InputSystem"
     ],

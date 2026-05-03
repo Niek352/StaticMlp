@@ -17,10 +17,10 @@ NetworkArchetypeId
 Runtime code lives in:
 
 ```text
-Assets/Scripts/StaticMlp/Game/Features/EcsViews/Runtime
+Assets/Scripts/StaticMlp/Features/EcsViews/Runtime
 ```
 
-The asmdef is `Game.Ecs.Views`. It references StaticEcs and `Ecs.Networking`, but it does not reference `Game.Core`. `Game.Core` references it for bootstrap composition and for built-in presentation state.
+The asmdef is `StaticMlp.Features.EcsViews`. It references StaticEcs and `Ecs.Networking`, but it does not reference `Game.Core`. `Game.Core` references it for bootstrap composition and for built-in presentation state.
 
 ## Client-Only Components
 

@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
-using StaticMlp.Game.EcsViews;
+using StaticMlp.Features.EcsViews;
 using UnityEngine;
 
 namespace StaticMlp.Game.Presentation

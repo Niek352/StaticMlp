@@ -1,7 +1,7 @@
 using StaticMlp.Networking;
 using UnityEngine;
 
-namespace StaticMlp.Game.EcsViews
+namespace StaticMlp.Features.EcsViews
 {
     public sealed class EntityView : MonoBehaviour, IEntityView
     {

@@ -1,4 +1,4 @@
-namespace StaticMlp.Game.EcsViews
+namespace StaticMlp.Features.EcsViews
 {
     public static class ViewSystemOrder
     {

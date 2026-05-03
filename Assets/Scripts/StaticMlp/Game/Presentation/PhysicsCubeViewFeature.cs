@@ -1,5 +1,5 @@
 using StaticMlp.Game.Bootstrap;
-using StaticMlp.Game.EcsViews;
+using StaticMlp.Features.EcsViews;
 using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Game.Presentation

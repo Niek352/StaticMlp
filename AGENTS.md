@@ -36,7 +36,7 @@ Gameplay systems should only:
 - File name must match the top-level type name.
 - Do not collect many unrelated classes in one file.
 - Keep gameplay, replication, transport, ownership, and presentation code in separate folders/modules.
-- Put shared gameplay/bootstrap contracts in `Game.Core`; put ordinary gameplay features in their own `Game.FeatureX` asmdef.
+- Put shared gameplay/bootstrap contracts in `Game.Core`; put ordinary gameplay features in their own `StaticMlp.Features.FeatureX` asmdef.
 - Add feature systems through `GameplayFeature`, not by editing `MultiplayerSystemBootstrap`.
 - Write code inside explicit modules with clear boundaries. Treat modules as separate packages.
 - Do not cross module boundaries with hidden dependencies or direct calls when an event/component boundary belongs there.

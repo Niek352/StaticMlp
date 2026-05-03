@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
 
-namespace StaticMlp.Game.EcsViews
+namespace StaticMlp.Features.EcsViews
 {
     public sealed class DestroyEntityViewSystem : ISystem
     {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace StaticMlp.Game.EcsViews
+namespace StaticMlp.Features.EcsViews
 {
     public sealed class ViewRootProvider : MonoBehaviour
     {

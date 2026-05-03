@@ -100,7 +100,7 @@ Rules:
 
 `Game.Core` now discovers gameplay feature assemblies through `GameplayFeatureDiscovery`, so feature types can be registered into StaticEcs without editing the central bootstrap.
 
-The generated registry is still emitted as one generated gameplay registry. If a feature adds new replicated components, run `StaticMlp/Replication/Generate` and let Unity recompile. The next improvement should be making generated replication registration fully feature-local so a new `Game.FeatureA` asmdef can own both its components and generated serializers without central generated references.
+The generated registry is still emitted as one generated gameplay registry. If a feature adds new replicated components, run `StaticMlp/Replication/Generate` and let Unity recompile. The next improvement should be making generated replication registration fully feature-local so a new `StaticMlp.Features.FeatureA` asmdef can own both its components and generated serializers without central generated references.
 
 ## Remaining Improvements
 

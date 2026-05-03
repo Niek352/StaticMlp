@@ -1,4 +1,4 @@
-using StaticMlp.Game.EcsViews;
+using StaticMlp.Features.EcsViews;
 using UnityEngine;
 
 namespace StaticMlp.Game.Presentation

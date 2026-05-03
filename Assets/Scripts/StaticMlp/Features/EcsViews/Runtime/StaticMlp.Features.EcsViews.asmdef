@@ -1,6 +1,6 @@
 {
-    "name": "Game.Ecs.Views",
-    "rootNamespace": "StaticMlp.Game.EcsViews",
+    "name": "StaticMlp.Features.EcsViews",
+    "rootNamespace": "StaticMlp.Features.EcsViews",
     "references": [
         "Ecs.Networking",
         "FFS.StaticEcs",

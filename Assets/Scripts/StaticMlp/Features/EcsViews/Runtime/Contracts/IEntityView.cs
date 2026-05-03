@@ -1,6 +1,6 @@
 using StaticMlp.Networking;
 
-namespace StaticMlp.Game.EcsViews
+namespace StaticMlp.Features.EcsViews
 {
     public interface IEntityView
     {

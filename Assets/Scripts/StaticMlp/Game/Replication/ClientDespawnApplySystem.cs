@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Game.EcsViews;
+using StaticMlp.Features.EcsViews;
 using UnityEngine;
 
 namespace StaticMlp.Networking.Replication {

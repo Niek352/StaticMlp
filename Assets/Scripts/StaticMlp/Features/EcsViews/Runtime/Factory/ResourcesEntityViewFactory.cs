@@ -2,7 +2,7 @@ using System;
 using StaticMlp.Networking;
 using UnityEngine;
 
-namespace StaticMlp.Game.EcsViews
+namespace StaticMlp.Features.EcsViews
 {
     public sealed class ResourcesEntityViewFactory : IEntityViewFactory
     {

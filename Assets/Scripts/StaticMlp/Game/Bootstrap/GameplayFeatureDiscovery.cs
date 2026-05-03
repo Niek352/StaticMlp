@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using StaticMlp.Game.EcsViews;
+using StaticMlp.Features.EcsViews;
 using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Game.Bootstrap

@@ -31,13 +31,13 @@ Assets/Scripts/StaticMlp/Game
     prefab registry, replication collect/apply systems, generated replication code,
     presentation-only components.
 
-Assets/Scripts/StaticMlp/Game/Features/EcsViews
-    Game.Ecs.Views
+Assets/Scripts/StaticMlp/Features/EcsViews
+    StaticMlp.Features.EcsViews
     Client-only EntityView binding, ViewPath/View runtime components,
     Resources-based view factory, and generic view-state apply systems.
 
 Future feature assemblies
-    Game.FeatureA
+    StaticMlp.Features.FeatureA
     Feature-local components, tags, systems, presentation state and a small
     GameplayFeature class that registers systems/prefabs.
 ```
@@ -243,7 +243,7 @@ Do not try to make Unity Physics deterministic across clients.
     ReplicationGenerated/
     Presentation/
 
-/Game/Features/EcsViews        asmdef: Game.Ecs.Views
+/Features/EcsViews        asmdef: StaticMlp.Features.EcsViews
     Components/
         ViewPath.cs
         View.cs
@@ -256,7 +256,7 @@ Do not try to make Unity Physics deterministic across clients.
     Systems/
     Unity/
 
-/Game/Features/FeatureA        asmdef: Game.FeatureA
+/Features/FeatureA        asmdef: StaticMlp.Features.FeatureA
     FeatureAGameplayFeature.cs
     Components/
     Tags/
@@ -269,8 +269,8 @@ Recommended feature asmdef:
 
 ```json
 {
-    "name": "Game.FeatureA",
-    "rootNamespace": "StaticMlp.Game.FeatureA",
+    "name": "StaticMlp.Features.FeatureA",
+    "rootNamespace": "StaticMlp.Features.FeatureA",
     "references": [
         "Game.Core",
         "Ecs.Networking",
@@ -287,7 +287,7 @@ Minimal feature entry point:
 ```csharp
 using StaticMlp.Game.Bootstrap;
 
-namespace StaticMlp.Game.FeatureA {
+namespace StaticMlp.Features.FeatureA {
     public sealed class FeatureAGameplayFeature : GameplayFeature {
         public override void RegisterServerSystems(ServerSystemsBuilder systems) {
             systems.Add(new FeatureAServerSystem(), GameplaySystemOrder.Gameplay);

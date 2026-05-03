@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace StaticMlp.Game.EcsViews
+namespace StaticMlp.Features.EcsViews
 {
     public readonly struct ViewPath : IComponent
     {

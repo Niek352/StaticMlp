@@ -4,15 +4,15 @@ Examples and checklists for adding replicated gameplay.
 
 ## New Feature Assembly
 
-Create a new folder under `Assets/Scripts/StaticMlp/Game/Features/FeatureA` with its own asmdef:
+Create a new folder under `Assets/Scripts/StaticMlp/Features/FeatureA` with its own asmdef:
 
 ```json
 {
-    "name": "Game.FeatureA",
-    "rootNamespace": "StaticMlp.Game.FeatureA",
+    "name": "StaticMlp.Features.FeatureA",
+    "rootNamespace": "StaticMlp.Features.FeatureA",
     "references": [
         "Game.Core",
-        "Game.Ecs.Views",
+        "StaticMlp.Features.EcsViews",
         "Ecs.Networking",
         "FFS.StaticEcs",
         "FFS.StaticPack",
@@ -28,7 +28,7 @@ Then add one feature entry point:
 ```csharp
 using StaticMlp.Game.Bootstrap;
 
-namespace StaticMlp.Game.FeatureA {
+namespace StaticMlp.Features.FeatureA {
     public sealed class FeatureAGameplayFeature : GameplayFeature {
         public override void RegisterPrefabs() {
             // Optional: PrefabRegistry.RegisterClient/RegisterServer(...)

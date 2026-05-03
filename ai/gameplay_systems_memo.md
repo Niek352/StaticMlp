@@ -9,7 +9,7 @@ Before writing a system, answer:
 1. Which world owns this logic: `SW` or `CW`?
 2. Which ownership tag should the query use: `ServerOwned`, `ClientOwned`, `LocalOwned`, or `RemoteOwned`?
 3. Is this replicated state, a replicated event, or presentation-only state?
-4. Does it belong in `Game.Core` or in a feature asmdef such as `Game.FeatureA`?
+4. Does it belong in `Game.Core` or in a feature asmdef such as `StaticMlp.Features.FeatureA`?
 
 Default choice: put gameplay in a feature asmdef. Put code in `Game.Core` only when multiple features should share it.
 
@@ -17,15 +17,15 @@ Default choice: put gameplay in a feature asmdef. Put code in `Game.Core` only w
 
 ```text
 Server simulation:
-    Game.FeatureA/Systems/Server
+    StaticMlp.Features.FeatureA/Systems/Server
     query ServerOwned or validated ClientOwned
 
 Client local gameplay:
-    Game.FeatureA/Systems/Client
+    StaticMlp.Features.FeatureA/Systems/Client
     query LocalOwned
 
 Client remote presentation:
-    Game.FeatureA/Systems/Client or Presentation
+    StaticMlp.Features.FeatureA/Systems/Client or Presentation
     query RemoteOwned, read replicated state, smooth/render locally
     write IViewComponent state for EntityView parts
 
@@ -41,7 +41,7 @@ Each feature has one entry point:
 ```csharp
 using StaticMlp.Game.Bootstrap;
 
-namespace StaticMlp.Game.FeatureA {
+namespace StaticMlp.Features.FeatureA {
     public sealed class FeatureAGameplayFeature : GameplayFeature {
         public override void RegisterServerSystems(ServerSystemsBuilder systems) {
             systems.Add(new FeatureAServerSystem(), GameplaySystemOrder.Gameplay);
@@ -128,7 +128,7 @@ public sealed class FeatureAServerSystem : ISystem {
 
 ## Minimal New Feature Checklist
 
-1. Create `Game.FeatureA.asmdef`.
+1. Create `StaticMlp.Features.FeatureA.asmdef`.
 2. Reference `Game.Core`, `Ecs.Networking`, `FFS.StaticEcs`, `FFS.StaticPack`, and `FFS.StaticEcs.Unity`.
 3. Add tags/components/events in the feature assembly.
 4. Add systems in `Systems/Server` and/or `Systems/Client`.
