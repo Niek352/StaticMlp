@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Systems;
-using StaticMlp.Networking.Replication;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Game.Systems.Client
 {
@@ -12,7 +12,7 @@ namespace StaticMlp.Game.Systems.Client
                 return;
 
             var request = new SpawnPhysicsCubeRequestEvent(NetworkInput.CameraYawProvider());
-            NetworkEvents.TrySendToServer(in request);
+            CW.SendToServerEvent(in request);
         }
     }
 }

@@ -2,7 +2,6 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Game.Systems.Client;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Replication;
 using UnityEngine;
 
 namespace StaticMlp.Features.Buildings
@@ -47,7 +46,7 @@ namespace StaticMlp.Features.Buildings
                 resources.RemainingWood,
                 resources.RemainingStone);
 
-            NetworkEvents.TrySendToServer(in request);
+            CW.SendToServerEvent(in request);
         }
 
         private void SendBuild(CW.Entity site)
@@ -66,7 +65,7 @@ namespace StaticMlp.Features.Buildings
                 site.GID,
                 _buildWorkPerSecond * Time.deltaTime);
 
-            NetworkEvents.TrySendToServer(in request);
+            CW.SendToServerEvent(in request);
         }
 
         private bool TryFindNearestSite(Vector3 playerPosition, out CW.Entity site)

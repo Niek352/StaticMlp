@@ -1,16 +1,12 @@
 {
-    "name": "StaticMlp.Composition",
-    "rootNamespace": "StaticMlp.Composition",
+    "name": "StaticMlp.Generated",
+    "rootNamespace": "StaticMlp.Generated",
     "references": [
         "FFS.StaticEcs",
-        "FFS.StaticEcs.Unity",
+        "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core",
-        "StaticMlp.Generated",
-        "StaticMlp.Features.EcsViews",
-        "Unity.InputSystem",
-        "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "StaticMlp.Features.Buildings"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

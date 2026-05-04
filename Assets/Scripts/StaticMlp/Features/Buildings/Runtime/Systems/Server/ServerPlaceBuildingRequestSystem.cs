@@ -8,32 +8,49 @@ namespace StaticMlp.Features.Buildings
 {
     public sealed class ServerPlaceBuildingRequestSystem : ISystem
     {
-        public void Update()
+        private EventReceiver<ServerWT, NetworkEventFromClient<PlaceBuildingRequestEvent>> _requests;
+
+        public void Init()
         {
-            NetworkEvents.ForEachServer<PlaceBuildingRequestEvent>(Handle);
+            _requests = SW.RegisterEventReceiver<NetworkEventFromClient<PlaceBuildingRequestEvent>>();
         }
 
-        private static void Handle(NetworkPeerId sourcePeer, in PlaceBuildingRequestEvent request)
+        public void Destroy()
         {
+            SW.DeleteEventReceiver(ref _requests);
+        }
+
+        public void Update()
+        {
+            foreach (var evt in _requests)
+            {
+                var request = evt.Value;
+                Handle(in request);
+            }
+        }
+
+        private static void Handle(in NetworkEventFromClient<PlaceBuildingRequestEvent> request)
+        {
+            var sourcePeer = request.SourcePeer;
             if (!ServerPeerPlayers.HasPlayer(sourcePeer))
                 return;
 
-            var id = new BuildingId(request.BuildingId);
+            var id = new BuildingId(request.Value.BuildingId);
             if (!StaticMlp.Features.BuildingCatalog.BuildingCatalog.TryGetDefinition(id, out var definition))
                 return;
 
-            var validation = ConstructionPlacementValidator.ValidateServer(
+            var validation = ConstructionPlacementValidator.ValidateAuthoritative(
                 definition,
-                request.Position,
-                request.Rotation);
+                request.Value.Position,
+                request.Value.Rotation);
             if (!validation.IsValid)
                 return;
 
             ServerBuildingSpawns.SpawnConstructionSite(
                 sourcePeer,
                 definition,
-                request.Position,
-                request.Rotation);
+                request.Value.Position,
+                request.Value.Rotation);
         }
     }
 }

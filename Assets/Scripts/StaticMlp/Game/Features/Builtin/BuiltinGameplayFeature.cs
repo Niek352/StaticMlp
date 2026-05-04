@@ -13,17 +13,14 @@ namespace StaticMlp.Game.Features.Builtin
     {
         public const int PLAYER = 1;
         public const int PHYSICS_CUBE = 2;
-
-        public override void RegisterNetworkEvents()
-        {
-            SpawnPhysicsCubeRequestEventCodec.Register();
-        }
+        private const string PlayerViewPath = "Views/CharacterView";
 
         public override void RegisterPrefabs()
         {
             NetArchetypeRegistry.RegisterClient(PLAYER, e =>
             {
                 e.Set<PlayerTag>();
+                e.Set(new ViewPath(PlayerViewPath));
                 e.Set(new ViewTransform
                 {
                     RenderRotation = UnityEngine.Quaternion.identity

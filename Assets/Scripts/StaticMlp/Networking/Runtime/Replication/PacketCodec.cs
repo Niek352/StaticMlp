@@ -165,13 +165,18 @@ namespace StaticMlp.Networking.Replication {
             return batch;
         }
 
-        private static NetworkEventMessage ReadNetworkEvent(ref BinaryPackReader reader, NetworkPeerId sourcePeer) {
+        private static NetworkEventPacket ReadNetworkEvent(ref BinaryPackReader reader, NetworkPeerId sourcePeer) {
             var length = reader.ReadInt();
-            return new NetworkEventMessage {
-                SourcePeer = sourcePeer,
-                EventTypeId = reader.ReadUshort(),
-                Payload = reader.ReadBytesAsSpan((uint)length).ToArray()
-            };
+            var eventTypeId = reader.ReadUshort();
+            var payload = length > 0
+                ? reader.ReadBytesAsSpan((uint)length).ToArray()
+                : Array.Empty<byte>();
+            return new NetworkEventPacket(
+                sourcePeer,
+                NetworkRuntime.LocalPeerId,
+                eventTypeId,
+                default,
+                payload);
         }
 
         private static void WriteDeltaList(ref BinaryPackWriter writer, System.Collections.Generic.List<ComponentDelta> deltas) {

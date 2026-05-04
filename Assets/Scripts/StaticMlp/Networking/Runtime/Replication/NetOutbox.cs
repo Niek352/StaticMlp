@@ -28,6 +28,13 @@ namespace StaticMlp.Networking.Replication {
             Enqueue(peer, PacketCodec.EncodeNetworkEvent(eventTypeId, payload), delivery);
         }
 
+        internal void EnqueueNetworkEvent(in NetworkEventPacket packet) {
+            Enqueue(
+                packet.TargetPeer,
+                PacketCodec.EncodeNetworkEvent(packet.EventTypeId, packet.Payload),
+                packet.Delivery);
+        }
+
         public void FlushComponentBatches() {
             foreach (var pending in _componentBatches)
                 Enqueue(pending.Peer, PacketCodec.EncodeComponentBatch(pending.Batch), pending.Delivery);

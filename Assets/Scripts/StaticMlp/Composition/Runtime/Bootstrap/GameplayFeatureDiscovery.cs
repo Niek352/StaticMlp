@@ -5,6 +5,7 @@ using System.Reflection;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking.Replication;
+using StaticMlp.Networking.Replication.Generated;
 
 namespace StaticMlp.Composition
 {
@@ -35,9 +36,7 @@ namespace StaticMlp.Composition
         public static void RegisterNetworkEvents()
         {
             NetworkEventRegistry.Clear();
-
-            foreach (var feature in GetFeatures())
-                feature.RegisterNetworkEvents();
+            ReplicatedNetworkEventRegistry.RegisterNetworkEvents();
         }
 
         public static void RegisterPrefabs()

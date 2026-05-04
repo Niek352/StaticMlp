@@ -29,7 +29,7 @@ namespace StaticMlp.Features.Buildings
 
         private static void Complete(EntityGID gid)
         {
-            if (!ConstructionSiteQuery.TryGetServerConstructionSite(gid, out var site))
+            if (!ConstructionSiteQuery.TryGetConstructionSite(gid, out var site))
                 return;
 
             if (!NetworkEntityOwnership.TryGetOwner(site, out var owner))

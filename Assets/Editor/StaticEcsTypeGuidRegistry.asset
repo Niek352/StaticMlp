@@ -94,7 +94,52 @@ MonoBehaviour:
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
     tags: []
-    events: []
+    events:
+    - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
+      current:
+        className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+      history:
+      - className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+    - guid: 50a2bb5d-99e0-4f12-abb7-d181b1133cb0
+      current:
+        className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+      history:
+      - className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+    - guid: 5d30f087-d3b5-411c-b3be-92faf9f9551f
+      current:
+        className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+      history:
+      - className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+    - guid: b877f5b3-e768-4e7c-8c5a-816ced8e01f2
+      current:
+        className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+      history:
+      - className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+    - guid: f4372422-950d-4411-b8e5-446fa688dc3e
+      current:
+        className: NetworkEventPacket
+        namespaceName: StaticMlp.Networking.Replication
+        assembly: Ecs.Networking
+      history:
+      - className: NetworkEventPacket
+        namespaceName: StaticMlp.Networking.Replication
+        assembly: Ecs.Networking
     links: []
     linksList: []
     multi: []
@@ -179,7 +224,52 @@ MonoBehaviour:
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
     tags: []
-    events: []
+    events:
+    - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
+      current:
+        className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+      history:
+      - className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+    - guid: 50a2bb5d-99e0-4f12-abb7-d181b1133cb0
+      current:
+        className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+      history:
+      - className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+    - guid: 5d30f087-d3b5-411c-b3be-92faf9f9551f
+      current:
+        className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+      history:
+      - className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+    - guid: b877f5b3-e768-4e7c-8c5a-816ced8e01f2
+      current:
+        className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+      history:
+      - className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+    - guid: f4372422-950d-4411-b8e5-446fa688dc3e
+      current:
+        className: NetworkEventPacket
+        namespaceName: StaticMlp.Networking.Replication
+        assembly: Ecs.Networking
+      history:
+      - className: NetworkEventPacket
+        namespaceName: StaticMlp.Networking.Replication
+        assembly: Ecs.Networking
     links: []
     linksList: []
     multi: []

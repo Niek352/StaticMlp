@@ -194,10 +194,6 @@ namespace StaticMlp.Networking.Replication {
             }
         }
 
-        public static ComponentDelta CreateDelta(EntityGID gid, in CharacterNetState state) {
-            return CharacterNetStateReplication.CreateDelta(gid, state);
-        }
-
         public static ComponentDelta CreateDelta(EntityGID gid, in ConstructionProgress state) {
             return ConstructionProgressReplication.CreateDelta(gid, state);
         }
@@ -212,6 +208,10 @@ namespace StaticMlp.Networking.Replication {
 
         public static ComponentDelta CreateDelta(EntityGID gid, in ConstructionTransform state) {
             return ConstructionTransformReplication.CreateDelta(gid, state);
+        }
+
+        public static ComponentDelta CreateDelta(EntityGID gid, in CharacterNetState state) {
+            return CharacterNetStateReplication.CreateDelta(gid, state);
         }
 
         public static ComponentDelta CreateDelta(EntityGID gid, in PhysicsCubeNetState state) {

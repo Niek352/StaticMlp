@@ -2,7 +2,6 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Features.ResourcesInventoryMinimal;
 
@@ -11,23 +10,36 @@ namespace StaticMlp.Features.Buildings
     public sealed class ServerDepositConstructionResourcesSystem : ISystem
     {
         private readonly float _interactionRange;
+        private EventReceiver<ServerWT, NetworkEventFromClient<DepositConstructionResourcesRequestEvent>> _requests;
 
         public ServerDepositConstructionResourcesSystem(float interactionRange = 4f)
         {
             _interactionRange = interactionRange;
         }
 
-        public void Update()
+        public void Init()
         {
-            NetworkEvents.ForEachServer<DepositConstructionResourcesRequestEvent>(Handle);
+            _requests = SW.RegisterEventReceiver<NetworkEventFromClient<DepositConstructionResourcesRequestEvent>>();
         }
 
-        private void Handle(NetworkPeerId sourcePeer, in DepositConstructionResourcesRequestEvent request)
+        public void Destroy()
         {
-            if (!ConstructionSiteQuery.TryGetServerConstructionSite(request.Site, out var site))
-                return;
+            SW.DeleteEventReceiver(ref _requests);
+        }
 
-            if (!NetworkEntityOwnership.IsOwnedBy(site, sourcePeer))
+        public void Update()
+        {
+            foreach (var evt in _requests)
+            {
+                var request = evt.Value;
+                Handle(in request);
+            }
+        }
+
+        private void Handle(in NetworkEventFromClient<DepositConstructionResourcesRequestEvent> request)
+        {
+            var sourcePeer = request.SourcePeer;
+            if (!ConstructionSiteQuery.TryGetConstructionSite(request.Value.Site, out var site))
                 return;
 
             var transform = site.Read<ConstructionTransform>();
@@ -46,8 +58,8 @@ namespace StaticMlp.Features.Buildings
                     in currentResources,
                     inventory.Wood,
                     inventory.Stone,
-                    request.Wood,
-                    request.Stone,
+                    request.Value.Wood,
+                    request.Value.Stone,
                     out var wood,
                     out var stone))
                 return;

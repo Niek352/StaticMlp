@@ -1,0 +1,7 @@
+<UnityPrefab>
+    <GameObject name="CharacterView">
+        <EntityView />
+        <TransformViewComponent />
+        <CharacterView />
+    </GameObject>
+</UnityPrefab>

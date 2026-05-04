@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Networking.Replication;
+using StaticMlp.Networking;
 using UnityEngine;
 
 namespace StaticMlp.Features.Buildings
@@ -27,7 +27,7 @@ namespace StaticMlp.Features.Buildings
                 preview.Position,
                 preview.Rotation);
 
-            if (!NetworkEvents.TrySendToServer(in request))
+            if (!CW.SendToServerEvent(in request))
                 return;
 
             if (BuildingMenuStateUtility.TryGet(out var menuEntity, out _))

@@ -16,6 +16,7 @@ namespace StaticMlp.Composition
             ServerSys.Add(new ServerRawInboxDrainSystem(), order: -900);
             ServerSys.Add(new ServerConnectionLifecycleSystem(), order: -850);
             ServerSys.Add(new ServerReceiveClientOwnedStateSystem(), order: -780);
+            ServerSys.Add(new ServerNetworkEventApplySystem(), order: -770);
             GameplayFeatureDiscovery.RegisterServerSystems(new ServerSystemsBuilder());
             ServerSys.Add(new ServerOwnedReplicationCollectSystem(), order: 500);
             ServerSys.Add(new ServerRelayClientOwnedStateSystem(), order: 550);
@@ -42,6 +43,7 @@ namespace StaticMlp.Composition
             GameplayFeatureDiscovery.RegisterClientViewSync(
                 new ViewSyncBuilder(systemsBuilder, ViewSystemOrder.ApplyPresentationState));
             systemsBuilder.Add(new DestroyEntityViewSystem(viewFactory), ViewSystemOrder.DestroyViews);
+            ClientCoreSys.Add(new ClientNetworkEventSendSystem(), order: 490);
             ClientCoreSys.Add(new ClientReplicationCollectSystem(), order: 500);
             ClientCoreSys.Add(new ClientTransportSendSystem(), order: 700);
             ClientCoreSys.Add(new ClientTransportScheduleSystem(), order: 1000);

@@ -2,10 +2,6 @@ namespace StaticMlp.Game.Bootstrap
 {
     public abstract class GameplayFeature : IGameplayFeature
     {
-        public virtual void RegisterNetworkEvents()
-        {
-        }
-
         public virtual void RegisterPrefabs()
         {
         }

@@ -6,7 +6,7 @@ namespace StaticMlp.Features.Buildings
 {
     public static class ConstructionSiteQuery
     {
-        public static bool TryGetServerConstructionSite(EntityGID gid, out SW.Entity site)
+        public static bool TryGetConstructionSite(EntityGID gid, out SW.Entity site)
         {
             if (gid.TryUnpack<ServerWT>(out site)
                 && site.Has<ConstructionSiteTag>()
@@ -19,9 +19,9 @@ namespace StaticMlp.Features.Buildings
             return false;
         }
 
-        public static bool TryGetServerBuildableSite(EntityGID gid, out SW.Entity site)
+        public static bool TryGetBuildableSite(EntityGID gid, out SW.Entity site)
         {
-            return TryGetServerConstructionSite(gid, out site)
+            return TryGetConstructionSite(gid, out site)
                    && site.Has<ConstructionProgress>();
         }
     }

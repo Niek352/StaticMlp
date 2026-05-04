@@ -22,12 +22,12 @@ namespace StaticMlp.Features.Buildings
             return Validate(definition, position, rotation, ValidateClientWorld);
         }
 
-        public static PlacementValidationResult ValidateServer(
+        public static PlacementValidationResult ValidateAuthoritative(
             in BuildingDefinition definition,
             Vector3 position,
             Quaternion rotation)
         {
-            return Validate(definition, position, rotation, ValidateServerWorld);
+            return Validate(definition, position, rotation, ValidateAuthoritativeWorld);
         }
 
         private static PlacementValidationResult Validate(
@@ -70,7 +70,7 @@ namespace StaticMlp.Features.Buildings
             return PlacementValidationResult.Valid();
         }
 
-        private static PlacementValidationResult ValidateServerWorld(OrientedFootprint footprint)
+        private static PlacementValidationResult ValidateAuthoritativeWorld(OrientedFootprint footprint)
         {
             foreach (var e in SW.Query<All<BuildingFootprint, ConstructionTransform>>().Entities())
             {

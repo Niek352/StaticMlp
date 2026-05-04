@@ -136,7 +136,8 @@ namespace StaticMlp.Composition
             }
 
             Log("Creating server world");
-            MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(), registerGeneratedTypes: null,
+            MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(),
+                NetworkEventRegistry.RegisterServerWorldTypes,
                 ecsTypeAssemblies: GameplayAssemblies());
             Log($"Starting server transport on 0.0.0.0:{port}");
             _serverTransport = UtpTransportStartup.StartServer(port);
@@ -155,7 +156,7 @@ namespace StaticMlp.Composition
 
             Log("Creating client world");
             MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig(),
-                ReplicationRegistry.RegisterClientCoreGeneratedTypes, ecsTypeAssemblies: GameplayAssemblies());
+                RegisterClientCoreGeneratedTypes, ecsTypeAssemblies: GameplayAssemblies());
 
             if (bindDefaultMoveInput)
             {
@@ -217,6 +218,12 @@ namespace StaticMlp.Composition
         private static Assembly[] GameplayAssemblies()
         {
             return GameplayFeatureDiscovery.GetEcsTypeAssemblies();
+        }
+
+        private static void RegisterClientCoreGeneratedTypes()
+        {
+            ReplicationRegistry.RegisterClientCoreGeneratedTypes();
+            NetworkEventRegistry.RegisterClientWorldTypes();
         }
 
         public void Shutdown()

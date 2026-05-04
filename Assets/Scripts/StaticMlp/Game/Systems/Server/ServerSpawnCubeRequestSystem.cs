@@ -11,6 +11,7 @@ namespace StaticMlp.Game.Systems.Server
     {
         private readonly float _spawnDistance;
         private readonly float _spawnHeight;
+        private EventReceiver<ServerWT, NetworkEventFromClient<SpawnPhysicsCubeRequestEvent>> _requests;
 
         public ServerSpawnCubeRequestSystem(float spawnDistance = 1.7f, float spawnHeight = 1.2f)
         {
@@ -18,17 +19,32 @@ namespace StaticMlp.Game.Systems.Server
             _spawnHeight = spawnHeight;
         }
 
-        public void Update()
+        public void Init()
         {
-            NetworkEvents.ForEachServer<SpawnPhysicsCubeRequestEvent>(Handle);
+            _requests = SW.RegisterEventReceiver<NetworkEventFromClient<SpawnPhysicsCubeRequestEvent>>();
         }
 
-        private void Handle(NetworkPeerId sourcePeer, in SpawnPhysicsCubeRequestEvent request)
+        public void Destroy()
         {
+            SW.DeleteEventReceiver(ref _requests);
+        }
+
+        public void Update()
+        {
+            foreach (var evt in _requests)
+            {
+                var request = evt.Value;
+                Handle(in request);
+            }
+        }
+
+        private void Handle(in NetworkEventFromClient<SpawnPhysicsCubeRequestEvent> request)
+        {
+            var sourcePeer = request.SourcePeer;
             if (!TryGetPlayerState(sourcePeer, out var playerState))
                 return;
 
-            var rotation = Quaternion.Euler(0f, request.CameraYaw, 0f);
+            var rotation = Quaternion.Euler(0f, request.Value.CameraYaw, 0f);
             var forward = rotation * Vector3.forward;
             var spawnPosition = playerState.Position + forward * _spawnDistance + Vector3.up * _spawnHeight;
             ServerSpawns.ServerSpawnPhysicsCube(sourcePeer, spawnPosition, rotation);

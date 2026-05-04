@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FFS.Libraries.StaticEcs;
 
 namespace StaticMlp.Networking.Replication
 {
@@ -22,6 +23,7 @@ namespace StaticMlp.Networking.Replication
             NetDelivery delivery,
             Writer<TEvent> writer,
             Reader<TEvent> reader)
+            where TEvent : struct, IEvent
         {
             var eventType = typeof(TEvent);
             if (HandlersById.TryGetValue(eventTypeId, out var existingById)
@@ -34,39 +36,43 @@ namespace StaticMlp.Networking.Replication
             HandlersById[eventTypeId] = handler;
         }
 
-        public static bool TryWrite<TEvent>(
-            in TEvent evt,
-            out ushort eventTypeId,
-            out byte[] payload,
-            out NetDelivery delivery)
+        public static void RegisterClientWorldTypes()
         {
-            if (!HandlersByType.TryGetValue(typeof(TEvent), out var handler))
+            if (!CW.Handle.TryGetEventsHandle(typeof(NetworkEventPacket), out _))
+                CW.Types().Event<NetworkEventPacket>();
+        }
+
+        public static void RegisterServerWorldTypes()
+        {
+            foreach (var handler in HandlersByType.Values)
+                handler.RegisterServerWorldType();
+        }
+
+        internal static bool TryCreatePacket<TEvent>(
+            NetworkPeerId targetPeer,
+            in TEvent evt,
+            out NetworkEventPacket packet)
+            where TEvent : struct, IEvent
+        {
+            if (!HandlersByType.TryGetValue(typeof(TEvent), out var handler) || handler is not Handler<TEvent> typedHandler)
             {
-                eventTypeId = default;
-                payload = default;
-                delivery = default;
+                packet = default;
                 return false;
             }
 
-            eventTypeId = handler.EventTypeId;
-            payload = handler.WriteBoxed(evt);
-            delivery = handler.Delivery;
+            packet = new NetworkEventPacket(
+                NetworkRuntime.LocalPeerId,
+                targetPeer,
+                handler.EventTypeId,
+                handler.Delivery,
+                typedHandler.Write(evt));
             return true;
         }
 
-        public static bool TryRead<TEvent>(NetworkEventMessage message, out TEvent evt)
+        internal static bool TryApplyToServer(in NetworkEventPacket packet)
         {
-            if (message == null
-                || !HandlersById.TryGetValue(message.EventTypeId, out var handler)
-                || handler.EventType != typeof(TEvent)
-                || !handler.TryRead(message.Payload, out var boxed))
-            {
-                evt = default;
-                return false;
-            }
-
-            evt = (TEvent)boxed;
-            return true;
+            return HandlersById.TryGetValue(packet.EventTypeId, out var handler)
+                   && handler.TryApplyToServer(in packet);
         }
 
         private interface IHandler
@@ -74,11 +80,11 @@ namespace StaticMlp.Networking.Replication
             Type EventType { get; }
             ushort EventTypeId { get; }
             NetDelivery Delivery { get; }
-            byte[] WriteBoxed(object evt);
-            bool TryRead(byte[] payload, out object evt);
+            void RegisterServerWorldType();
+            bool TryApplyToServer(in NetworkEventPacket packet);
         }
 
-        private sealed class Handler<TEvent> : IHandler
+        private sealed class Handler<TEvent> : IHandler where TEvent : struct, IEvent
         {
             private readonly Writer<TEvent> _writer;
             private readonly Reader<TEvent> _reader;
@@ -100,22 +106,18 @@ namespace StaticMlp.Networking.Replication
             public ushort EventTypeId { get; }
             public NetDelivery Delivery { get; }
 
-            public byte[] WriteBoxed(object evt)
+            public byte[] Write(TEvent evt) => 
+                _writer(in evt);
+
+            public void RegisterServerWorldType()
             {
-                var typed = (TEvent)evt;
-                return _writer(in typed);
+                SW.Types().Event<NetworkEventFromClient<TEvent>>();
             }
 
-            public bool TryRead(byte[] payload, out object evt)
+            public bool TryApplyToServer(in NetworkEventPacket packet)
             {
-                if (_reader(payload, out var typed))
-                {
-                    evt = typed;
-                    return true;
-                }
-
-                evt = default;
-                return false;
+                return _reader(packet.Payload, out var typed)
+                       && SW.SendEvent(new NetworkEventFromClient<TEvent>(packet.SourcePeer, in typed));
             }
         }
     }

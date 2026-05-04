@@ -2,7 +2,6 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;
 using StaticMlp.Game.Systems.Server;
-using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Buildings
@@ -11,6 +10,7 @@ namespace StaticMlp.Features.Buildings
     {
         private readonly float _interactionRange;
         private readonly float _maxWorkPerRequest;
+        private EventReceiver<ServerWT, NetworkEventFromClient<BuildConstructionRequestEvent>> _requests;
 
         public ServerBuildConstructionSystem(float interactionRange = 4f, float maxWorkPerRequest = 5f)
         {
@@ -18,17 +18,29 @@ namespace StaticMlp.Features.Buildings
             _maxWorkPerRequest = maxWorkPerRequest;
         }
 
-        public void Update()
+        public void Init()
         {
-            NetworkEvents.ForEachServer<BuildConstructionRequestEvent>(Handle);
+            _requests = SW.RegisterEventReceiver<NetworkEventFromClient<BuildConstructionRequestEvent>>();
         }
 
-        private void Handle(NetworkPeerId sourcePeer, in BuildConstructionRequestEvent request)
+        public void Destroy()
         {
-            if (!ConstructionSiteQuery.TryGetServerBuildableSite(request.Site, out var site))
-                return;
+            SW.DeleteEventReceiver(ref _requests);
+        }
 
-            if (!NetworkEntityOwnership.IsOwnedBy(site, sourcePeer))
+        public void Update()
+        {
+            foreach (var evt in _requests)
+            {
+                var request = evt.Value;
+                Handle(in request);
+            }
+        }
+
+        private void Handle(in NetworkEventFromClient<BuildConstructionRequestEvent> request)
+        {
+            var sourcePeer = request.SourcePeer;
+            if (!ConstructionSiteQuery.TryGetBuildableSite(request.Value.Site, out var site))
                 return;
 
             var transform = site.Read<ConstructionTransform>();
@@ -42,7 +54,7 @@ namespace StaticMlp.Features.Buildings
                 ref state,
                 ref progress,
                 in resources,
-                request.WorkAmount,
+                request.Value.WorkAmount,
                 _maxWorkPerRequest);
         }
     }

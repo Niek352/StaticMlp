@@ -11,11 +11,6 @@ namespace StaticMlp.Features.Buildings
 {
     public sealed class BuildingsGameplayFeature : GameplayFeature
     {
-        public override void RegisterNetworkEvents()
-        {
-            ConstructionEventCodec.Register();
-        }
-
         public override void RegisterPrefabs()
         {
             for (var i = 0; i < StaticMlp.Features.BuildingCatalog.BuildingCatalog.All.Count; i++)
