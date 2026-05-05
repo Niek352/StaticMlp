@@ -18,6 +18,9 @@ namespace StaticMlp.Networking.Replication {
                     if (net.Owner != batch.SourcePeer)
                         continue;
 
+                    if (!ReplicationRegistry.IsOwnerAuthority(delta.ComponentTypeId))
+                        continue;
+
                     ReplicationRegistry.ApplyDelta(e, delta);
                     ServerRelayBuffer.Add(batch.SourcePeer, delta);
                 }

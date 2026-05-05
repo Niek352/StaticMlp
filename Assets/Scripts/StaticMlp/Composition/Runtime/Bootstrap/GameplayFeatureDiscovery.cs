@@ -39,6 +39,11 @@ namespace StaticMlp.Composition
             ReplicatedNetworkEventRegistry.RegisterNetworkEvents();
         }
 
+        public static void RegisterReplicationComponents()
+        {
+            ReplicatedComponentRegistration.RegisterReplicationComponents();
+        }
+
         public static void RegisterPrefabs()
         {
             NetArchetypeRegistry.Clear();

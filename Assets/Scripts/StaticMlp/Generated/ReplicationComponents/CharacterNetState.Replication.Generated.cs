@@ -10,6 +10,7 @@ namespace StaticMlp.Networking.Replication.Generated {
     public static class CharacterNetStateReplication {
         public const ushort TypeId = ReplicatedComponentIds.CharacterNetState;
         public const ReplicationAuthority Authority = ReplicationAuthority.Owner;
+        public const ReplicationAudience Audience = ReplicationAudience.All;
         public const NetDelivery Delivery = NetDelivery.UnreliableSequenced;
         public const ushort SendRate = 20;
         public const byte LayoutVersion = 1;

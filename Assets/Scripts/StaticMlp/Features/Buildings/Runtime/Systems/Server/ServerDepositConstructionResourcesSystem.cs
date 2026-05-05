@@ -1,9 +1,9 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
-using StaticMlp.Features.ResourcesInventoryMinimal;
 
 namespace StaticMlp.Features.Buildings
 {
@@ -50,7 +50,7 @@ namespace StaticMlp.Features.Buildings
                 || !player.Has<ResourcesInventory>())
                 return;
 
-            ref var inventory = ref player.Mut<ResourcesInventory>();
+            var inventory = player.Read<ResourcesInventory>();
             var currentState = site.Read<ConstructionSiteState>();
             var currentResources = site.Read<ConstructionResources>();
             if (!ConstructionRules.TryPlanResourceDeposit(
@@ -64,8 +64,9 @@ namespace StaticMlp.Features.Buildings
                     out var stone))
                 return;
 
-            var spentWood = inventory.SpendWood(wood);
-            var spentStone = inventory.SpendStone(stone);
+            ref var mutableInventory = ref ReplicationMut.Mut<ResourcesInventory>(player);
+            var spentWood = mutableInventory.SpendWood(wood);
+            var spentStone = mutableInventory.SpendStone(stone);
 
             ref var state = ref ReplicationMut.Mut<ConstructionSiteState>(site);
             ref var resources = ref ReplicationMut.Mut<ConstructionResources>(site);

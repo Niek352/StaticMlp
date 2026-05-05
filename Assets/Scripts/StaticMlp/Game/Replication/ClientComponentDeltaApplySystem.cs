@@ -16,7 +16,7 @@ namespace StaticMlp.Networking.Replication
                     if (!delta.Gid.TryUnpack<ClientCoreWT>(out var e))
                         continue;
 
-                    if (e.Has<LocalOwned>())
+                    if (e.Has<LocalOwned>() && !ReplicationRegistry.IsServerAuthority(delta.ComponentTypeId))
                         continue;
 
                     ReplicationRegistry.ApplyDelta(e, delta);

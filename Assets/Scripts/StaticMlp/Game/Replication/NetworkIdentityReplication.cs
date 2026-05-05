@@ -4,7 +4,7 @@ using StaticMlp.Networking;
 
 namespace StaticMlp.Networking.Replication {
     public static class NetworkIdentityReplication {
-        public const ushort TypeId = ReplicatedComponentIds.NetworkIdentity;
+        public const ushort TypeId = 2;
         public const ReplicationAuthority Authority = ReplicationAuthority.Server;
         public const NetDelivery Delivery = NetDelivery.ReliableSequenced;
         public const ushort SendRate = 0;

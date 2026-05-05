@@ -6,35 +6,36 @@ using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Networking.Replication.Generated {
-    public static class ConstructionProgressReplication {
-        public const ushort TypeId = ReplicatedComponentIds.ConstructionProgress;
+    public static class ConstructionResourcesReplication {
+        public const ushort TypeId = ReplicatedComponentIds.ConstructionResources;
         public const ReplicationAuthority Authority = ReplicationAuthority.Server;
+        public const ReplicationAudience Audience = ReplicationAudience.All;
         public const NetDelivery Delivery = NetDelivery.ReliableSequenced;
         public const ushort SendRate = 5;
         public const byte LayoutVersion = 1;
 
-        public static ComponentDelta CreateDelta(EntityGID gid, in ConstructionProgress state) {
+        public static ComponentDelta CreateDelta(EntityGID gid, in ConstructionResources state) {
             var writer = BinaryPackWriter.CreateFromPool(16);
-            writer.WriteFloat(Quantize001(state.BuildWorkRequired));
-            writer.WriteFloat(Quantize001(state.BuildWorkDone));
+            writer.WriteInt(state.WoodRequired);
+            writer.WriteInt(state.StoneRequired);
+            writer.WriteInt(state.WoodDelivered);
+            writer.WriteInt(state.StoneDelivered);
             var bytes = writer.CopyToBytes();
             writer.Dispose();
             return new ComponentDelta(gid, TypeId, bytes);
         }
 
-        public static ConstructionProgress Read(byte[] payload) {
+        public static ConstructionResources Read(byte[] payload) {
             if (payload == null || payload.Length == 0)
                 return default;
 
             var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
-            return new ConstructionProgress {
-                BuildWorkRequired = reader.ReadFloat(),
-                BuildWorkDone = reader.ReadFloat(),
+            return new ConstructionResources {
+                WoodRequired = reader.ReadInt(),
+                StoneRequired = reader.ReadInt(),
+                WoodDelivered = reader.ReadInt(),
+                StoneDelivered = reader.ReadInt(),
             };
-        }
-
-        private static float Quantize001(float value) {
-            return (float)Math.Round(value / 0.01f) * 0.01f;
         }
     }
 }

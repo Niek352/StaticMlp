@@ -93,6 +93,15 @@ MonoBehaviour:
       - className: ConstructionTransform
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
+    - guid: 943d0dd7-7080-4d28-8afc-44a649ac2c01
+      current:
+        className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -140,6 +149,15 @@ MonoBehaviour:
       - className: NetworkEventPacket
         namespaceName: StaticMlp.Networking.Replication
         assembly: Ecs.Networking
+    - guid: b4f0d6b3-14cf-4ab3-95f7-b50ca84df550
+      current:
+        className: ResourcesInventorySnapshotEvent
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcesInventorySnapshotEvent
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
     links: []
     linksList: []
     multi: []
@@ -223,6 +241,15 @@ MonoBehaviour:
       - className: ConstructionTransform
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
+    - guid: 943d0dd7-7080-4d28-8afc-44a649ac2c01
+      current:
+        className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -270,6 +297,15 @@ MonoBehaviour:
       - className: NetworkEventPacket
         namespaceName: StaticMlp.Networking.Replication
         assembly: Ecs.Networking
+    - guid: b4f0d6b3-14cf-4ab3-95f7-b50ca84df550
+      current:
+        className: ResourcesInventorySnapshotEvent
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcesInventorySnapshotEvent
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
     links: []
     linksList: []
     multi: []

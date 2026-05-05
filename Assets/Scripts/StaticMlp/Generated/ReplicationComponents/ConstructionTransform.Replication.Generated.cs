@@ -10,6 +10,7 @@ namespace StaticMlp.Networking.Replication.Generated {
     public static class ConstructionTransformReplication {
         public const ushort TypeId = ReplicatedComponentIds.ConstructionTransform;
         public const ReplicationAuthority Authority = ReplicationAuthority.Server;
+        public const ReplicationAudience Audience = ReplicationAudience.All;
         public const NetDelivery Delivery = NetDelivery.ReliableSequenced;
         public const ushort SendRate = 5;
         public const byte LayoutVersion = 1;

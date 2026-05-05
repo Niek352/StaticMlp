@@ -1,6 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.ResourcesInventoryMinimal
 {
@@ -24,6 +25,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
                     Wood = _startingWood,
                     Stone = _startingStone
                 });
+                ReplicationMut.MarkDataDirty(e);
             }
         }
     }

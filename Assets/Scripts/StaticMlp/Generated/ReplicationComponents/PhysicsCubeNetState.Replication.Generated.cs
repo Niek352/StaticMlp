@@ -10,6 +10,7 @@ namespace StaticMlp.Networking.Replication.Generated {
     public static class PhysicsCubeNetStateReplication {
         public const ushort TypeId = ReplicatedComponentIds.PhysicsCubeNetState;
         public const ReplicationAuthority Authority = ReplicationAuthority.Server;
+        public const ReplicationAudience Audience = ReplicationAudience.All;
         public const NetDelivery Delivery = NetDelivery.UnreliableSequenced;
         public const ushort SendRate = 20;
         public const byte LayoutVersion = 1;

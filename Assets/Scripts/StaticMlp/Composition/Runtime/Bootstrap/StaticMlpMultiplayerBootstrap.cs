@@ -89,6 +89,7 @@ namespace StaticMlp.Composition
 
             Log($"Starting multiplayer as {runMode} on port {port}");
             GameplayFeatureDiscovery.RegisterNetworkEvents();
+            GameplayFeatureDiscovery.RegisterReplicationComponents();
             GameplayFeatureDiscovery.RegisterPrefabs();
 
             if (runMode is RunMode.Server or RunMode.Host)

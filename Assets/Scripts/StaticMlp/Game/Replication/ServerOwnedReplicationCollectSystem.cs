@@ -6,7 +6,7 @@ namespace StaticMlp.Networking.Replication {
         public void Update() {
             ref var outbox = ref SW.GetResource<NetOutbox>();
 
-            ReplicationRegistry.CollectServerOwnedDirty(outbox, ServerPeerRegistry.Peers);
+            ReplicationRegistry.CollectServerAuthorityDirty(outbox, ServerPeerRegistry.Peers);
         }
     }
 }

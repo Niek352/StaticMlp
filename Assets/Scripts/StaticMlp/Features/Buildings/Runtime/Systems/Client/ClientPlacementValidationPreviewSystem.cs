@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Buildings
 {
@@ -7,7 +8,7 @@ namespace StaticMlp.Features.Buildings
     {
         public void Update()
         {
-            foreach (var e in StaticMlp.Networking.CW.Query<All<PlacementPreview, PlacementPreviewViewState>>().Entities())
+            foreach (var e in CW.Query<All<PlacementPreview, PlacementPreviewViewState>>().Entities())
             {
                 ref var preview = ref e.Mut<PlacementPreview>();
                 var id = new BuildingId(preview.BuildingId);

@@ -3,6 +3,7 @@
     "rootNamespace": "StaticMlp.Features.ResourcesInventoryMinimal",
     "references": [
         "FFS.StaticEcs",
+        "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core"
     ],

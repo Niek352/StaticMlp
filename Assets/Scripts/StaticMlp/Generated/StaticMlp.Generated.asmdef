@@ -6,7 +6,8 @@
         "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core",
-        "StaticMlp.Features.Buildings"
+        "StaticMlp.Features.Buildings",
+        "StaticMlp.Features.ResourcesInventoryMinimal"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

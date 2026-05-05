@@ -9,6 +9,7 @@ namespace StaticMlp.Networking.Replication.Generated {
     public static class ConstructionSiteStateReplication {
         public const ushort TypeId = ReplicatedComponentIds.ConstructionSiteState;
         public const ReplicationAuthority Authority = ReplicationAuthority.Server;
+        public const ReplicationAudience Audience = ReplicationAudience.All;
         public const NetDelivery Delivery = NetDelivery.ReliableSequenced;
         public const ushort SendRate = 5;
         public const byte LayoutVersion = 1;

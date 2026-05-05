@@ -8,11 +8,9 @@ namespace StaticMlp.Networking.Replication {
             if (!SW.IsWorldInitialized || !SW.HasResource<NetOutbox>())
                 return;
 
-            var spawn = CreateSpawn(entity);
-
             ref var outbox = ref SW.GetResource<NetOutbox>();
             foreach (var peer in ServerPeerRegistry.Peers)
-                outbox.Enqueue(peer, PacketCodec.EncodeSpawn(spawn), NetDelivery.ReliableSequenced);
+                outbox.Enqueue(peer, PacketCodec.EncodeSpawn(CreateSpawn(entity, peer)), NetDelivery.ReliableSequenced);
         }
 
         public static void SendExistingSpawns(NetworkPeerId peer) {
@@ -28,10 +26,10 @@ namespace StaticMlp.Networking.Replication {
                 return;
 
             ref var outbox = ref SW.GetResource<NetOutbox>();
-            outbox.Enqueue(peer, PacketCodec.EncodeSpawn(CreateSpawn(entity)), NetDelivery.ReliableSequenced);
+            outbox.Enqueue(peer, PacketCodec.EncodeSpawn(CreateSpawn(entity, peer)), NetDelivery.ReliableSequenced);
         }
 
-        private static SpawnMessage CreateSpawn(SW.Entity entity) {
+        private static SpawnMessage CreateSpawn(SW.Entity entity, NetworkPeerId targetPeer) {
             ref readonly var identity = ref entity.Read<NetworkIdentity>();
             var spawn = new SpawnMessage {
                 Gid = entity.GID,
@@ -42,7 +40,7 @@ namespace StaticMlp.Networking.Replication {
                 NetworkArchetypeId = identity.NetworkArchetypeId
             };
 
-            ReplicationRegistry.CollectInitialState(entity, spawn.Components);
+            ReplicationRegistry.CollectInitialState(entity, targetPeer, spawn.Components);
             return spawn;
         }
     }
