@@ -11,6 +11,26 @@ using StaticMlp.Networking.Replication.Generated;
 
 namespace StaticMlp.Networking.Replication {
     public static partial class ReplicationRegistry {
+        public static ushort GetNetworkSchemaVersion(byte entityType) {
+            return entityType switch {
+                1 => 1,
+                2 => 1,
+                3 => 1,
+                4 => 1,
+                _ => 0
+            };
+        }
+
+        public static ushort GetDefaultNetworkArchetypeId(byte entityType) {
+            return entityType switch {
+                1 => 1,
+                2 => 2,
+                3 => 100,
+                4 => 101,
+                _ => 0
+            };
+        }
+
         public static void ApplyDelta(CW.Entity e, ComponentDelta delta) {
             switch (delta.ComponentTypeId) {
                 case ReplicatedComponentIds.ConstructionProgress:
@@ -93,45 +113,199 @@ namespace StaticMlp.Networking.Replication {
                 outbox.EnqueueComponentDelta(peer, PhysicsCubeNetStateReplication.CreateDelta(e.GID, e.Read<PhysicsCubeNetState>()), PhysicsCubeNetStateReplication.Delivery);
         }
 
-        public static void CollectClientOwnedDirty(NetOutbox outbox, NetworkPeerId peer) {
-            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, ConstructionProgress>, AllChanged<ConstructionProgress>>().Entities())
-                outbox.EnqueueComponentDelta(peer, ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()), ConstructionProgressReplication.Delivery);
-            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, ConstructionResources>, AllChanged<ConstructionResources>>().Entities())
-                outbox.EnqueueComponentDelta(peer, ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()), ConstructionResourcesReplication.Delivery);
-            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, ConstructionSiteState>, AllChanged<ConstructionSiteState>>().Entities())
-                outbox.EnqueueComponentDelta(peer, ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()), ConstructionSiteStateReplication.Delivery);
-            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, ConstructionTransform>, AllChanged<ConstructionTransform>>().Entities())
-                outbox.EnqueueComponentDelta(peer, ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()), ConstructionTransformReplication.Delivery);
-            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, CharacterNetState>, AllChanged<CharacterNetState>>().Entities())
+        public static void CollectDirtyByEntityType(CW.Entity e, NetOutbox outbox, NetworkPeerId peer) {
+            switch (e.EntityType) {
+                case 1:
+                    CollectPlayerNetworkEntityDirty(e, outbox, peer);
+                    return;
+                case 2:
+                    CollectPhysicsCubeNetworkEntityDirty(e, outbox, peer);
+                    return;
+                case 3:
+                    CollectConstructionSiteNetworkEntityDirty(e, outbox, peer);
+                    return;
+                case 4:
+                    CollectFinishedBuildingNetworkEntityDirty(e, outbox, peer);
+                    return;
+            }
+
+            if (e.Has<NetworkIdentity>()) {
+                CollectDirtyByNetworkArchetype(e.Read<NetworkIdentity>().NetworkArchetypeId, e, outbox, peer);
+                return;
+            }
+
+            CollectDirty(e, outbox, peer);
+        }
+
+        private static void CollectDirtyByNetworkArchetype(ushort networkArchetypeId, CW.Entity e, NetOutbox outbox, NetworkPeerId peer) {
+            switch (networkArchetypeId) {
+                case 1:
+                    CollectPlayerNetworkEntityDirty(e, outbox, peer);
+                    return;
+                case 2:
+                    CollectPhysicsCubeNetworkEntityDirty(e, outbox, peer);
+                    return;
+                case 100:
+                    CollectConstructionSiteNetworkEntityDirty(e, outbox, peer);
+                    return;
+                case 101:
+                    CollectFinishedBuildingNetworkEntityDirty(e, outbox, peer);
+                    return;
+            }
+
+            CollectDirty(e, outbox, peer);
+        }
+
+        private static void CollectPlayerNetworkEntityDirty(CW.Entity e, NetOutbox outbox, NetworkPeerId peer) {
+            if (e.Has<CharacterNetState>() && e.HasChanged<CharacterNetState>())
                 outbox.EnqueueComponentDelta(peer, CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()), CharacterNetStateReplication.Delivery);
-            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, PhysicsCubeNetState>, AllChanged<PhysicsCubeNetState>>().Entities())
+        }
+
+        private static void CollectPhysicsCubeNetworkEntityDirty(CW.Entity e, NetOutbox outbox, NetworkPeerId peer) {
+            if (e.Has<PhysicsCubeNetState>() && e.HasChanged<PhysicsCubeNetState>())
                 outbox.EnqueueComponentDelta(peer, PhysicsCubeNetStateReplication.CreateDelta(e.GID, e.Read<PhysicsCubeNetState>()), PhysicsCubeNetStateReplication.Delivery);
         }
 
+        private static void CollectConstructionSiteNetworkEntityDirty(CW.Entity e, NetOutbox outbox, NetworkPeerId peer) {
+            if (e.Has<ConstructionSiteState>() && e.HasChanged<ConstructionSiteState>())
+                outbox.EnqueueComponentDelta(peer, ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()), ConstructionSiteStateReplication.Delivery);
+            if (e.Has<ConstructionTransform>() && e.HasChanged<ConstructionTransform>())
+                outbox.EnqueueComponentDelta(peer, ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()), ConstructionTransformReplication.Delivery);
+            if (e.Has<ConstructionResources>() && e.HasChanged<ConstructionResources>())
+                outbox.EnqueueComponentDelta(peer, ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()), ConstructionResourcesReplication.Delivery);
+            if (e.Has<ConstructionProgress>() && e.HasChanged<ConstructionProgress>())
+                outbox.EnqueueComponentDelta(peer, ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()), ConstructionProgressReplication.Delivery);
+        }
+
+        private static void CollectFinishedBuildingNetworkEntityDirty(CW.Entity e, NetOutbox outbox, NetworkPeerId peer) {
+            if (e.Has<ConstructionSiteState>() && e.HasChanged<ConstructionSiteState>())
+                outbox.EnqueueComponentDelta(peer, ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()), ConstructionSiteStateReplication.Delivery);
+            if (e.Has<ConstructionTransform>() && e.HasChanged<ConstructionTransform>())
+                outbox.EnqueueComponentDelta(peer, ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()), ConstructionTransformReplication.Delivery);
+            if (e.Has<ConstructionResources>() && e.HasChanged<ConstructionResources>())
+                outbox.EnqueueComponentDelta(peer, ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()), ConstructionResourcesReplication.Delivery);
+            if (e.Has<ConstructionProgress>() && e.HasChanged<ConstructionProgress>())
+                outbox.EnqueueComponentDelta(peer, ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()), ConstructionProgressReplication.Delivery);
+        }
+
+        public static void CollectDirtyByEntityType(SW.Entity e, NetOutbox outbox, IReadOnlyList<NetworkPeerId> peers) {
+            switch (e.EntityType) {
+                case 1:
+                    CollectPlayerNetworkEntityDirty(e, outbox, peers);
+                    return;
+                case 2:
+                    CollectPhysicsCubeNetworkEntityDirty(e, outbox, peers);
+                    return;
+                case 3:
+                    CollectConstructionSiteNetworkEntityDirty(e, outbox, peers);
+                    return;
+                case 4:
+                    CollectFinishedBuildingNetworkEntityDirty(e, outbox, peers);
+                    return;
+            }
+
+            if (e.Has<NetworkIdentity>()) {
+                CollectDirtyByNetworkArchetype(e.Read<NetworkIdentity>().NetworkArchetypeId, e, outbox, peers);
+                return;
+            }
+
+            for (var i = 0; i < peers.Count; i++)
+                CollectDirty(e, outbox, peers[i]);
+        }
+
+        private static void CollectDirtyByNetworkArchetype(ushort networkArchetypeId, SW.Entity e, NetOutbox outbox, IReadOnlyList<NetworkPeerId> peers) {
+            switch (networkArchetypeId) {
+                case 1:
+                    CollectPlayerNetworkEntityDirty(e, outbox, peers);
+                    return;
+                case 2:
+                    CollectPhysicsCubeNetworkEntityDirty(e, outbox, peers);
+                    return;
+                case 100:
+                    CollectConstructionSiteNetworkEntityDirty(e, outbox, peers);
+                    return;
+                case 101:
+                    CollectFinishedBuildingNetworkEntityDirty(e, outbox, peers);
+                    return;
+            }
+
+            for (var i = 0; i < peers.Count; i++)
+                CollectDirty(e, outbox, peers[i]);
+        }
+
+        private static void CollectPlayerNetworkEntityDirty(SW.Entity e, NetOutbox outbox, IReadOnlyList<NetworkPeerId> peers) {
+            if (e.Has<CharacterNetState>() && e.HasChanged<CharacterNetState>()) {
+                var delta = CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>());
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], delta, CharacterNetStateReplication.Delivery);
+            }
+        }
+
+        private static void CollectPhysicsCubeNetworkEntityDirty(SW.Entity e, NetOutbox outbox, IReadOnlyList<NetworkPeerId> peers) {
+            if (e.Has<PhysicsCubeNetState>() && e.HasChanged<PhysicsCubeNetState>()) {
+                var delta = PhysicsCubeNetStateReplication.CreateDelta(e.GID, e.Read<PhysicsCubeNetState>());
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], delta, PhysicsCubeNetStateReplication.Delivery);
+            }
+        }
+
+        private static void CollectConstructionSiteNetworkEntityDirty(SW.Entity e, NetOutbox outbox, IReadOnlyList<NetworkPeerId> peers) {
+            if (e.Has<ConstructionSiteState>() && e.HasChanged<ConstructionSiteState>()) {
+                var delta = ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>());
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], delta, ConstructionSiteStateReplication.Delivery);
+            }
+            if (e.Has<ConstructionTransform>() && e.HasChanged<ConstructionTransform>()) {
+                var delta = ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>());
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], delta, ConstructionTransformReplication.Delivery);
+            }
+            if (e.Has<ConstructionResources>() && e.HasChanged<ConstructionResources>()) {
+                var delta = ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>());
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], delta, ConstructionResourcesReplication.Delivery);
+            }
+            if (e.Has<ConstructionProgress>() && e.HasChanged<ConstructionProgress>()) {
+                var delta = ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>());
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], delta, ConstructionProgressReplication.Delivery);
+            }
+        }
+
+        private static void CollectFinishedBuildingNetworkEntityDirty(SW.Entity e, NetOutbox outbox, IReadOnlyList<NetworkPeerId> peers) {
+            if (e.Has<ConstructionSiteState>() && e.HasChanged<ConstructionSiteState>()) {
+                var delta = ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>());
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], delta, ConstructionSiteStateReplication.Delivery);
+            }
+            if (e.Has<ConstructionTransform>() && e.HasChanged<ConstructionTransform>()) {
+                var delta = ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>());
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], delta, ConstructionTransformReplication.Delivery);
+            }
+            if (e.Has<ConstructionResources>() && e.HasChanged<ConstructionResources>()) {
+                var delta = ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>());
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], delta, ConstructionResourcesReplication.Delivery);
+            }
+            if (e.Has<ConstructionProgress>() && e.HasChanged<ConstructionProgress>()) {
+                var delta = ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>());
+                for (var i = 0; i < peers.Count; i++)
+                    outbox.EnqueueComponentDelta(peers[i], delta, ConstructionProgressReplication.Delivery);
+            }
+        }
+
+        public static void CollectClientOwnedDirty(NetOutbox outbox, NetworkPeerId peer) {
+            foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, NetworkDirty, NetworkReplicationState>>().Entities()) {
+                CollectDirtyByEntityType(e, outbox, peer);
+                e.Delete<NetworkDirty>();
+            }
+        }
+
         public static void CollectServerOwnedDirty(NetOutbox outbox, IReadOnlyList<NetworkPeerId> peers) {
-            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, ConstructionProgress>, AllChanged<ConstructionProgress>>().Entities()) {
-                for (var i = 0; i < peers.Count; i++)
-                    outbox.EnqueueComponentDelta(peers[i], ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()), ConstructionProgressReplication.Delivery);
-            }
-            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, ConstructionResources>, AllChanged<ConstructionResources>>().Entities()) {
-                for (var i = 0; i < peers.Count; i++)
-                    outbox.EnqueueComponentDelta(peers[i], ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()), ConstructionResourcesReplication.Delivery);
-            }
-            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, ConstructionSiteState>, AllChanged<ConstructionSiteState>>().Entities()) {
-                for (var i = 0; i < peers.Count; i++)
-                    outbox.EnqueueComponentDelta(peers[i], ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()), ConstructionSiteStateReplication.Delivery);
-            }
-            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, ConstructionTransform>, AllChanged<ConstructionTransform>>().Entities()) {
-                for (var i = 0; i < peers.Count; i++)
-                    outbox.EnqueueComponentDelta(peers[i], ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()), ConstructionTransformReplication.Delivery);
-            }
-            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, CharacterNetState>, AllChanged<CharacterNetState>>().Entities()) {
-                for (var i = 0; i < peers.Count; i++)
-                    outbox.EnqueueComponentDelta(peers[i], CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()), CharacterNetStateReplication.Delivery);
-            }
-            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, PhysicsCubeNetState>, AllChanged<PhysicsCubeNetState>>().Entities()) {
-                for (var i = 0; i < peers.Count; i++)
-                    outbox.EnqueueComponentDelta(peers[i], PhysicsCubeNetStateReplication.CreateDelta(e.GID, e.Read<PhysicsCubeNetState>()), PhysicsCubeNetStateReplication.Delivery);
+            foreach (var e in SW.Query<All<ServerOwned, NetworkedTag, NetworkIdentity, NetworkDirty, NetworkReplicationState>>().Entities()) {
+                CollectDirtyByEntityType(e, outbox, peers);
+                e.Delete<NetworkDirty>();
             }
         }
 
@@ -139,6 +313,85 @@ namespace StaticMlp.Networking.Replication {
             if (e.Has<NetworkIdentity>())
                 components.Add(NetworkIdentityReplication.CreateDelta(e.GID, e.Read<NetworkIdentity>()));
 
+            CollectInitialStateByEntityType(e, components);
+        }
+
+        private static void CollectInitialStateByEntityType(SW.Entity e, List<ComponentDelta> components) {
+            switch (e.EntityType) {
+                case 1:
+                    CollectPlayerNetworkEntityInitialState(e, components);
+                    return;
+                case 2:
+                    CollectPhysicsCubeNetworkEntityInitialState(e, components);
+                    return;
+                case 3:
+                    CollectConstructionSiteNetworkEntityInitialState(e, components);
+                    return;
+                case 4:
+                    CollectFinishedBuildingNetworkEntityInitialState(e, components);
+                    return;
+            }
+
+            if (e.Has<NetworkIdentity>()) {
+                CollectInitialStateByNetworkArchetype(e.Read<NetworkIdentity>().NetworkArchetypeId, e, components);
+                return;
+            }
+
+            CollectInitialStateFallback(e, components);
+        }
+
+        private static void CollectInitialStateByNetworkArchetype(ushort networkArchetypeId, SW.Entity e, List<ComponentDelta> components) {
+            switch (networkArchetypeId) {
+                case 1:
+                    CollectPlayerNetworkEntityInitialState(e, components);
+                    return;
+                case 2:
+                    CollectPhysicsCubeNetworkEntityInitialState(e, components);
+                    return;
+                case 100:
+                    CollectConstructionSiteNetworkEntityInitialState(e, components);
+                    return;
+                case 101:
+                    CollectFinishedBuildingNetworkEntityInitialState(e, components);
+                    return;
+            }
+
+            CollectInitialStateFallback(e, components);
+        }
+
+        private static void CollectPlayerNetworkEntityInitialState(SW.Entity e, List<ComponentDelta> components) {
+            if (e.Has<CharacterNetState>())
+                components.Add(CharacterNetStateReplication.CreateDelta(e.GID, e.Read<CharacterNetState>()));
+        }
+
+        private static void CollectPhysicsCubeNetworkEntityInitialState(SW.Entity e, List<ComponentDelta> components) {
+            if (e.Has<PhysicsCubeNetState>())
+                components.Add(PhysicsCubeNetStateReplication.CreateDelta(e.GID, e.Read<PhysicsCubeNetState>()));
+        }
+
+        private static void CollectConstructionSiteNetworkEntityInitialState(SW.Entity e, List<ComponentDelta> components) {
+            if (e.Has<ConstructionSiteState>())
+                components.Add(ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()));
+            if (e.Has<ConstructionTransform>())
+                components.Add(ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()));
+            if (e.Has<ConstructionResources>())
+                components.Add(ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()));
+            if (e.Has<ConstructionProgress>())
+                components.Add(ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()));
+        }
+
+        private static void CollectFinishedBuildingNetworkEntityInitialState(SW.Entity e, List<ComponentDelta> components) {
+            if (e.Has<ConstructionSiteState>())
+                components.Add(ConstructionSiteStateReplication.CreateDelta(e.GID, e.Read<ConstructionSiteState>()));
+            if (e.Has<ConstructionTransform>())
+                components.Add(ConstructionTransformReplication.CreateDelta(e.GID, e.Read<ConstructionTransform>()));
+            if (e.Has<ConstructionResources>())
+                components.Add(ConstructionResourcesReplication.CreateDelta(e.GID, e.Read<ConstructionResources>()));
+            if (e.Has<ConstructionProgress>())
+                components.Add(ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()));
+        }
+
+        private static void CollectInitialStateFallback(SW.Entity e, List<ComponentDelta> components) {
             if (e.Has<ConstructionProgress>())
                 components.Add(ConstructionProgressReplication.CreateDelta(e.GID, e.Read<ConstructionProgress>()));
 

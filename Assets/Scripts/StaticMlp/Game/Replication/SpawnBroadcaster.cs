@@ -35,6 +35,8 @@ namespace StaticMlp.Networking.Replication {
             ref readonly var identity = ref entity.Read<NetworkIdentity>();
             var spawn = new SpawnMessage {
                 Gid = entity.GID,
+                EntityType = entity.EntityType,
+                NetworkSchemaVersion = ReplicationRegistry.GetNetworkSchemaVersion(entity.EntityType),
                 Owner = identity.Owner,
                 Authority = identity.Authority,
                 NetworkArchetypeId = identity.NetworkArchetypeId

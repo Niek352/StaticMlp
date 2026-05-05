@@ -56,6 +56,8 @@ namespace StaticMlp.Networking.Replication {
             foreach (var e in CW.Query<All<NetworkIdentity>>().Entities(clusters: clusters)) {
                 ref readonly var identity = ref e.Read<NetworkIdentity>();
                 e.Set<NetworkedTag>();
+                if (!e.Has<NetworkReplicationState>())
+                    e.Set(new NetworkReplicationState());
                 NetArchetypeRegistry.Apply(identity.NetworkArchetypeId, e);
                 OwnershipTags.ApplyForClient(e, identity.Owner, identity.Authority);
                 ReplicationRegistry.InitializeClientCoreInterpolatedState(e);

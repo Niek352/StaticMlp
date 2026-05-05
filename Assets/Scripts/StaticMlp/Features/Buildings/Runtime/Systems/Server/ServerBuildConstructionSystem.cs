@@ -47,9 +47,9 @@ namespace StaticMlp.Features.Buildings
             if (!ServerPeerPlayers.IsPlayerNear(sourcePeer, transform.Position, _interactionRange))
                 return;
 
-            ref var state = ref site.Mut<ConstructionSiteState>();
+            ref var state = ref ReplicationMut.Mut<ConstructionSiteState>(site);
             ref readonly var resources = ref site.Read<ConstructionResources>();
-            ref var progress = ref site.Mut<ConstructionProgress>();
+            ref var progress = ref ReplicationMut.Mut<ConstructionProgress>(site);
             ConstructionRules.ApplyBuildWork(
                 ref state,
                 ref progress,

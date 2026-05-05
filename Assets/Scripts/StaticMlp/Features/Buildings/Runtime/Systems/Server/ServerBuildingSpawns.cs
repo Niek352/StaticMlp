@@ -20,7 +20,7 @@ namespace StaticMlp.Features.Buildings
                 throw new InvalidOperationException($"Missing network catalog entry for building {definition.Id}.");
 
             var localDefinition = definition;
-            return NetworkEntitySpawner.SpawnServerEntity(
+            return NetworkEntitySpawner.SpawnServerEntity<ConstructionSiteNetworkEntity>(
                 owner,
                 NetworkAuthority.Server,
                 network.BlueprintArchetypeId,
@@ -37,7 +37,7 @@ namespace StaticMlp.Features.Buildings
 
             var localDefinition = definition;
             var localTransform = transform;
-            return NetworkEntitySpawner.SpawnServerEntity(
+            return NetworkEntitySpawner.SpawnServerEntity<FinishedBuildingNetworkEntity>(
                 owner,
                 NetworkAuthority.Server,
                 network.FinishedArchetypeId,

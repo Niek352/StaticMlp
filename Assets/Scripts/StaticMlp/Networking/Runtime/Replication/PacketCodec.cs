@@ -26,6 +26,8 @@ namespace StaticMlp.Networking.Replication {
             var writer = BinaryPackWriter.CreateFromPool();
             writer.WriteByte((byte)NetPacketType.Spawn);
             WriteGid(ref writer, spawn.Gid);
+            writer.WriteByte(spawn.EntityType);
+            writer.WriteUshort(spawn.NetworkSchemaVersion);
             writer.WriteUshort(spawn.Owner.Value);
             writer.WriteByte((byte)spawn.Authority);
             writer.WriteUshort(spawn.NetworkArchetypeId);
@@ -133,6 +135,8 @@ namespace StaticMlp.Networking.Replication {
         private static SpawnMessage ReadSpawn(ref BinaryPackReader reader) {
             var spawn = new SpawnMessage {
                 Gid = ReadGid(ref reader),
+                EntityType = reader.ReadByte(),
+                NetworkSchemaVersion = reader.ReadUshort(),
                 Owner = new NetworkPeerId(reader.ReadUshort()),
                 Authority = (NetworkAuthority)reader.ReadByte(),
                 NetworkArchetypeId = reader.ReadUshort()

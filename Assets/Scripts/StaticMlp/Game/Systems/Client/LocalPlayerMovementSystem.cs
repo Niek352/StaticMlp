@@ -2,6 +2,7 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
+using StaticMlp.Networking.Replication;
 using UnityEngine;
 
 namespace StaticMlp.Game.Systems.Client {
@@ -14,7 +15,7 @@ namespace StaticMlp.Game.Systems.Client {
 
         public void Update() {
             foreach (var e in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities()) {
-                ref var state = ref e.Mut<CharacterNetState>();
+                ref var state = ref ReplicationMut.Mut<CharacterNetState>(e);
 
                 var input = NetworkInput.MoveProvider();
                 var cameraYaw = Quaternion.Euler(0f, NetworkInput.CameraYawProvider(), 0f);

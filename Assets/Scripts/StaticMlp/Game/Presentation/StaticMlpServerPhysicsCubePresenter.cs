@@ -3,6 +3,7 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
+using StaticMlp.Networking.Replication;
 using UnityEngine;
 
 namespace StaticMlp.Game.Presentation
@@ -35,7 +36,7 @@ namespace StaticMlp.Game.Presentation
             foreach (var e in SW.Query<All<ServerOwned, CubeTag, PhysicsCubeNetState>>().Entities())
             {
                 var body = GetOrCreateBody(e);
-                ref var state = ref e.Mut<PhysicsCubeNetState>();
+                ref var state = ref ReplicationMut.Mut<PhysicsCubeNetState>(e);
 
                 state.Position = body.position;
                 state.Velocity = body.linearVelocity;

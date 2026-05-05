@@ -67,8 +67,8 @@ namespace StaticMlp.Features.Buildings
             var spentWood = inventory.SpendWood(wood);
             var spentStone = inventory.SpendStone(stone);
 
-            ref var state = ref site.Mut<ConstructionSiteState>();
-            ref var resources = ref site.Mut<ConstructionResources>();
+            ref var state = ref ReplicationMut.Mut<ConstructionSiteState>(site);
+            ref var resources = ref ReplicationMut.Mut<ConstructionResources>(site);
             ConstructionRules.ApplyResourceDeposit(
                 ref state,
                 ref resources,
