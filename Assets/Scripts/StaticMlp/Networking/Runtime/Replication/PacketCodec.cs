@@ -2,6 +2,7 @@ using System;
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Diagnostics;
 
 namespace StaticMlp.Networking.Replication {
     public static class PacketCodec {
@@ -98,6 +99,7 @@ namespace StaticMlp.Networking.Replication {
             if (payload == null || payload.Length == 0)
                 return false;
 
+            NetworkTrafficProfiler.RecordIncomingPacket(sourcePeer, payload);
             var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
             var type = (NetPacketType)reader.ReadByte();
 
@@ -106,7 +108,10 @@ namespace StaticMlp.Networking.Replication {
                     NetworkRuntime.LocalPeerId = new NetworkPeerId(reader.ReadUshort());
                     return true;
                 case NetPacketType.Spawn:
-                    inbox.Spawns.Add(ReadSpawn(ref reader));
+                    var spawn = ReadSpawn(ref reader);
+                    inbox.Spawns.Add(spawn);
+                    for (var i = 0; i < spawn.Components.Count; i++)
+                        NetworkTrafficProfiler.RecordIncomingComponentDelta(sourcePeer, spawn.Components[i], "Spawn");
                     return true;
                 case NetPacketType.Despawn:
                     inbox.Despawns.Add(new DespawnMessage(ReadGid(ref reader)));
@@ -122,7 +127,10 @@ namespace StaticMlp.Networking.Replication {
                     inbox.Snapshots.Add(ReadSnapshot(ref reader));
                     return true;
                 case NetPacketType.ComponentBatch:
-                    inbox.ComponentBatches.Add(ReadComponentBatch(ref reader, sourcePeer));
+                    var batch = ReadComponentBatch(ref reader, sourcePeer);
+                    inbox.ComponentBatches.Add(batch);
+                    for (var i = 0; i < batch.Deltas.Count; i++)
+                        NetworkTrafficProfiler.RecordIncomingComponentDelta(batch.SourcePeer, batch.Deltas[i], "ComponentBatch");
                     return true;
                 case NetPacketType.NetworkEvent:
                     inbox.Events.Add(ReadNetworkEvent(ref reader, sourcePeer));

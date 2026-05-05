@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking.Diagnostics;
 
 namespace StaticMlp.Networking.Replication {
     public sealed class NetOutbox : IResource {
@@ -11,6 +12,7 @@ namespace StaticMlp.Networking.Replication {
         private readonly List<PendingComponentBatch> _componentBatches = new();
 
         public void Enqueue(NetworkPeerId peer, byte[] payload, NetDelivery delivery) {
+            NetworkTrafficProfiler.RecordOutgoingPacket(peer, delivery, payload);
             Packets.Add(new OutgoingPacket {
                 Peer = peer,
                 Payload = payload,
@@ -19,6 +21,7 @@ namespace StaticMlp.Networking.Replication {
         }
 
         public void EnqueueComponentDelta(NetworkPeerId peer, ComponentDelta delta, NetDelivery delivery) {
+            NetworkTrafficProfiler.RecordOutgoingComponentDelta(peer, delivery, delta, "ComponentBatch");
             var batch = GetOrCreateComponentBatch(peer, delivery, EncodedDeltaSize(delta));
             batch.Batch.Deltas.Add(delta);
             batch.EncodedSize += EncodedDeltaSize(delta);

@@ -42,6 +42,13 @@ namespace StaticMlp.Networking.Replication
                 CW.Types().Event<NetworkEventPacket>();
         }
 
+        public static string GetEventDisplayName(ushort eventTypeId)
+        {
+            return HandlersById.TryGetValue(eventTypeId, out var handler)
+                ? handler.EventType.Name
+                : $"Event({eventTypeId})";
+        }
+
         public static void RegisterServerWorldTypes()
         {
             foreach (var handler in HandlersByType.Values)

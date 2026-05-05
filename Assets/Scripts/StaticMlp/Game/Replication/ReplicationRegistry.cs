@@ -2,12 +2,19 @@ using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Bootstrap;
+using StaticMlp.Networking.Diagnostics;
 using StaticMlp.Networking.Ownership;
 
 namespace StaticMlp.Networking.Replication
 {
     public static class ReplicationRegistry
     {
+        static ReplicationRegistry()
+        {
+            NetworkTrafficProfiler.ComponentNameResolver = GetComponentDisplayName;
+            NetworkTrafficProfiler.ComponentDeliveryResolver = GetComponentDelivery;
+        }
+
         public delegate ComponentDelta ComponentDeltaWriter<T>(EntityGID gid, in T state)
             where T : struct, IComponent, ITrackableChanged;
 
@@ -83,6 +90,26 @@ namespace StaticMlp.Networking.Replication
         {
             return ComponentHandlers.TryGetValue(componentTypeId, out var handler)
                    && handler.Authority == ReplicationAuthority.Owner;
+        }
+
+        public static string GetComponentDisplayName(ushort componentTypeId)
+        {
+            if (componentTypeId == NetworkIdentityReplication.TypeId)
+                return nameof(NetworkIdentity);
+
+            return ComponentHandlers.TryGetValue(componentTypeId, out var handler)
+                ? handler.ComponentDisplayName
+                : $"Component({componentTypeId})";
+        }
+
+        public static NetDelivery GetComponentDelivery(ushort componentTypeId)
+        {
+            if (componentTypeId == NetworkIdentityReplication.TypeId)
+                return NetDelivery.ReliableSequenced;
+
+            return ComponentHandlers.TryGetValue(componentTypeId, out var handler)
+                ? handler.Delivery
+                : NetDelivery.Unreliable;
         }
 
         public static void ApplyDelta(CW.Entity e, ComponentDelta delta)
@@ -211,6 +238,7 @@ namespace StaticMlp.Networking.Replication
 
         private interface IComponentHandler
         {
+            string ComponentDisplayName { get; }
             ReplicationAuthority Authority { get; }
             ReplicationAudience Audience { get; }
             NetDelivery Delivery { get; }
@@ -258,9 +286,11 @@ namespace StaticMlp.Networking.Replication
                 _registerClientTypes = registerClientTypes;
                 _registerClientSystems = registerClientSystems;
                 _initializeClientState = initializeClientState;
+                ComponentDisplayName = typeof(T).Name;
             }
 
             private ushort TypeId { get; }
+            public string ComponentDisplayName { get; }
             public ReplicationAuthority Authority { get; }
             public ReplicationAudience Audience { get; }
             public NetDelivery Delivery { get; }

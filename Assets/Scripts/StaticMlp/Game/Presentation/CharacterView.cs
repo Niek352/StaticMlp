@@ -43,7 +43,7 @@ namespace StaticMlp.Game.Presentation
 
             var primitive = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             primitive.transform.localScale = new Vector3(0.8f, 1f, 0.8f);
-            primitive.GetComponent<Renderer>().material.color = SelectFallbackColor(e);
+            primitive.GetComponent<Renderer>().sharedMaterial = RuntimeVisualMaterial.Create(SelectFallbackColor(e));
             Object.Destroy(primitive.GetComponent<Collider>());
             return primitive;
         }

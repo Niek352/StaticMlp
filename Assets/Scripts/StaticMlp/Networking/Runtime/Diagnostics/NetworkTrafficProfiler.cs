@@ -5,24 +5,49 @@ using StaticMlp.Networking.Replication;
 namespace StaticMlp.Networking.Diagnostics {
     public static class NetworkTrafficProfiler {
         private const int MaxSamples = 512;
+        private const int ComponentDeltaHeaderBytes = 14;
+
         private static readonly object Sync = new();
         private static readonly List<Sample> Samples = new(MaxSamples);
-        private static readonly Dictionary<Key, Aggregate> Aggregates = new();
+        private static readonly Dictionary<PacketKey, Aggregate> PacketAggregates = new();
+        private static readonly Dictionary<ComponentKey, Aggregate> ComponentAggregates = new();
 
-        public static bool Enabled = true;
+        public static bool Enabled;
+        public static Func<ushort, string> ComponentNameResolver;
+        public static Func<ushort, NetDelivery> ComponentDeliveryResolver;
 
-        public static void RecordSent(NetworkPeerId peer, NetDelivery delivery, byte[] payload, bool success) {
+        public static void RecordOutgoingPacket(NetworkPeerId peer, NetDelivery delivery, ReadOnlySpan<byte> payload, bool success = true) {
             if (!Enabled)
                 return;
 
-            Record(NetworkTrafficDirection.Sent, peer, delivery, payload, success);
+            RecordPacket(NetworkTrafficDirection.Sent, peer, delivery, payload, success);
         }
 
-        public static void RecordReceived(NetworkPeerId peer, byte[] payload) {
+        public static void RecordIncomingPacket(NetworkPeerId peer, ReadOnlySpan<byte> payload) {
             if (!Enabled)
                 return;
 
-            Record(NetworkTrafficDirection.Received, peer, NetDelivery.Unreliable, payload, true);
+            RecordPacket(NetworkTrafficDirection.Received, peer, NetDelivery.Unreliable, payload, true);
+        }
+
+        public static void RecordOutgoingComponentDelta(NetworkPeerId peer, NetDelivery delivery, ComponentDelta delta, string channel) {
+            if (!Enabled)
+                return;
+
+            RecordComponent(NetworkTrafficDirection.Sent, peer, delivery, delta.ComponentTypeId, EncodedDeltaSize(delta), channel);
+        }
+
+        public static void RecordIncomingComponentDelta(NetworkPeerId peer, ComponentDelta delta, string channel) {
+            if (!Enabled)
+                return;
+
+            RecordComponent(
+                NetworkTrafficDirection.Received,
+                peer,
+                ResolveComponentDelivery(delta.ComponentTypeId),
+                delta.ComponentTypeId,
+                EncodedDeltaSize(delta),
+                channel);
         }
 
         public static Snapshot GetSnapshot(double windowSeconds) {
@@ -30,6 +55,8 @@ namespace StaticMlp.Networking.Diagnostics {
                 var now = DateTime.UtcNow;
                 var windowStart = now.AddSeconds(-Math.Max(0.1d, windowSeconds));
                 var recent = new List<Sample>(Samples.Count);
+                var packetAggregates = new Dictionary<PacketKey, Aggregate>();
+                var componentAggregates = new Dictionary<ComponentKey, Aggregate>();
                 var sentBytes = 0;
                 var receivedBytes = 0;
                 var sentPackets = 0;
@@ -40,6 +67,29 @@ namespace StaticMlp.Networking.Diagnostics {
                         continue;
 
                     recent.Add(sample);
+                    if (!sample.IsPacketSample)
+                    {
+                        var componentKey = new ComponentKey(
+                            sample.Direction,
+                            sample.Peer,
+                            sample.Delivery,
+                            sample.ComponentTypeId,
+                            sample.Name,
+                            sample.Channel);
+
+                        if (!componentAggregates.TryGetValue(componentKey, out var componentAggregate))
+                            componentAggregate = new Aggregate();
+
+                        componentAggregate.Packets++;
+                        componentAggregate.Bytes += sample.Bytes;
+                        componentAggregate.LastUtcTime = sample.UtcTime;
+                        if (!sample.Success)
+                            componentAggregate.FailedPackets++;
+
+                        componentAggregates[componentKey] = componentAggregate;
+                        continue;
+                    }
+
                     if (sample.Direction == NetworkTrafficDirection.Sent) {
                         sentBytes += sample.Bytes;
                         sentPackets++;
@@ -47,16 +97,33 @@ namespace StaticMlp.Networking.Diagnostics {
                         receivedBytes += sample.Bytes;
                         receivedPackets++;
                     }
+
+                    var packetKey = new PacketKey(
+                        sample.Direction,
+                        sample.Peer,
+                        sample.Delivery,
+                        sample.Name);
+
+                    if (!packetAggregates.TryGetValue(packetKey, out var packetAggregate))
+                        packetAggregate = new Aggregate();
+
+                    packetAggregate.Packets++;
+                    packetAggregate.Bytes += sample.Bytes;
+                    packetAggregate.LastUtcTime = sample.UtcTime;
+                    if (!sample.Success)
+                        packetAggregate.FailedPackets++;
+
+                    packetAggregates[packetKey] = packetAggregate;
                 }
 
-                var aggregates = new List<AggregateRow>(Aggregates.Count);
-                foreach (var pair in Aggregates) {
+                var packetRows = new List<AggregateRow>(packetAggregates.Count);
+                foreach (var pair in packetAggregates) {
                     var aggregate = pair.Value;
-                    aggregates.Add(new AggregateRow(
+                    packetRows.Add(new AggregateRow(
                         pair.Key.Direction,
                         pair.Key.Peer,
                         pair.Key.Delivery,
-                        pair.Key.PacketType,
+                        pair.Key.Name,
                         aggregate.Packets,
                         aggregate.Bytes,
                         aggregate.FailedPackets,
@@ -64,7 +131,25 @@ namespace StaticMlp.Networking.Diagnostics {
                     ));
                 }
 
-                aggregates.Sort(CompareAggregateRows);
+                var componentRows = new List<ComponentAggregateRow>(componentAggregates.Count);
+                foreach (var pair in componentAggregates) {
+                    var aggregate = pair.Value;
+                    componentRows.Add(new ComponentAggregateRow(
+                        pair.Key.Direction,
+                        pair.Key.Peer,
+                        pair.Key.Delivery,
+                        pair.Key.ComponentTypeId,
+                        pair.Key.ComponentName,
+                        pair.Key.Channel,
+                        aggregate.Packets,
+                        aggregate.Bytes,
+                        aggregate.FailedPackets,
+                        aggregate.LastUtcTime
+                    ));
+                }
+
+                packetRows.Sort(CompareAggregateRows);
+                componentRows.Sort(CompareComponentAggregateRows);
                 recent.Sort(CompareSamplesDescending);
 
                 return new Snapshot(
@@ -75,7 +160,8 @@ namespace StaticMlp.Networking.Diagnostics {
                     sentPackets,
                     receivedPackets,
                     recent,
-                    aggregates
+                    packetRows,
+                    componentRows
                 );
             }
         }
@@ -83,23 +169,22 @@ namespace StaticMlp.Networking.Diagnostics {
         public static void Clear() {
             lock (Sync) {
                 Samples.Clear();
-                Aggregates.Clear();
+                PacketAggregates.Clear();
+                ComponentAggregates.Clear();
             }
         }
 
-        private static void Record(NetworkTrafficDirection direction, NetworkPeerId peer, NetDelivery delivery, byte[] payload, bool success) {
-            var bytes = payload?.Length ?? 0;
+        private static void RecordPacket(NetworkTrafficDirection direction, NetworkPeerId peer, NetDelivery delivery, ReadOnlySpan<byte> payload, bool success) {
+            var bytes = payload.Length;
             var packetType = PacketTypeName(payload);
-            var sample = new Sample(DateTime.UtcNow, direction, peer, delivery, packetType, bytes, success);
+            var sample = new Sample(DateTime.UtcNow, direction, peer, delivery, packetType, bytes, success, string.Empty, 0);
 
             lock (Sync) {
-                if (Samples.Count == MaxSamples)
-                    Samples.RemoveAt(0);
-
+                TrimSamplesIfNeeded();
                 Samples.Add(sample);
 
-                var key = new Key(direction, peer, delivery, packetType);
-                if (!Aggregates.TryGetValue(key, out var aggregate))
+                var key = new PacketKey(direction, peer, delivery, packetType);
+                if (!PacketAggregates.TryGetValue(key, out var aggregate))
                     aggregate = new Aggregate();
 
                 aggregate.Packets++;
@@ -108,12 +193,58 @@ namespace StaticMlp.Networking.Diagnostics {
                 if (!success)
                     aggregate.FailedPackets++;
 
-                Aggregates[key] = aggregate;
+                PacketAggregates[key] = aggregate;
             }
         }
 
-        private static string PacketTypeName(byte[] payload) {
-            if (payload == null || payload.Length == 0)
+        private static void RecordComponent(
+            NetworkTrafficDirection direction,
+            NetworkPeerId peer,
+            NetDelivery delivery,
+            ushort componentTypeId,
+            int bytes,
+            string channel) {
+            var componentName = ResolveComponentName(componentTypeId);
+            var sample = new Sample(DateTime.UtcNow, direction, peer, delivery, componentName, bytes, true, channel, componentTypeId);
+
+            lock (Sync) {
+                TrimSamplesIfNeeded();
+                Samples.Add(sample);
+
+                var key = new ComponentKey(direction, peer, delivery, componentTypeId, componentName, channel);
+                if (!ComponentAggregates.TryGetValue(key, out var aggregate))
+                    aggregate = new Aggregate();
+
+                aggregate.Packets++;
+                aggregate.Bytes += bytes;
+                aggregate.LastUtcTime = sample.UtcTime;
+                ComponentAggregates[key] = aggregate;
+            }
+        }
+
+        private static void TrimSamplesIfNeeded() {
+            if (Samples.Count == MaxSamples)
+                Samples.RemoveAt(0);
+        }
+
+        private static int EncodedDeltaSize(ComponentDelta delta) {
+            return ComponentDeltaHeaderBytes + (delta.Payload?.Length ?? 0);
+        }
+
+        private static string ResolveComponentName(ushort componentTypeId) {
+            return ComponentNameResolver != null
+                ? ComponentNameResolver(componentTypeId)
+                : $"Component({componentTypeId})";
+        }
+
+        private static NetDelivery ResolveComponentDelivery(ushort componentTypeId) {
+            return ComponentDeliveryResolver != null
+                ? ComponentDeliveryResolver(componentTypeId)
+                : NetDelivery.Unreliable;
+        }
+
+        private static string PacketTypeName(ReadOnlySpan<byte> payload) {
+            if (payload.Length == 0)
                 return "Empty";
 
             var value = payload[0];
@@ -127,32 +258,37 @@ namespace StaticMlp.Networking.Diagnostics {
             return bytes != 0 ? bytes : right.Packets.CompareTo(left.Packets);
         }
 
+        private static int CompareComponentAggregateRows(ComponentAggregateRow left, ComponentAggregateRow right) {
+            var bytes = right.Bytes.CompareTo(left.Bytes);
+            return bytes != 0 ? bytes : right.Packets.CompareTo(left.Packets);
+        }
+
         private static int CompareSamplesDescending(Sample left, Sample right) {
             return right.UtcTime.CompareTo(left.UtcTime);
         }
 
-        private readonly struct Key : IEquatable<Key> {
+        private readonly struct PacketKey : IEquatable<PacketKey> {
             public readonly NetworkTrafficDirection Direction;
             public readonly NetworkPeerId Peer;
             public readonly NetDelivery Delivery;
-            public readonly string PacketType;
+            public readonly string Name;
 
-            public Key(NetworkTrafficDirection direction, NetworkPeerId peer, NetDelivery delivery, string packetType) {
+            public PacketKey(NetworkTrafficDirection direction, NetworkPeerId peer, NetDelivery delivery, string name) {
                 Direction = direction;
                 Peer = peer;
                 Delivery = delivery;
-                PacketType = packetType;
+                Name = name;
             }
 
-            public bool Equals(Key other) {
+            public bool Equals(PacketKey other) {
                 return Direction == other.Direction &&
                        Peer == other.Peer &&
                        Delivery == other.Delivery &&
-                       PacketType == other.PacketType;
+                       Name == other.Name;
             }
 
             public override bool Equals(object obj) {
-                return obj is Key other && Equals(other);
+                return obj is PacketKey other && Equals(other);
             }
 
             public override int GetHashCode() {
@@ -160,7 +296,50 @@ namespace StaticMlp.Networking.Diagnostics {
                     var hash = (int)Direction;
                     hash = (hash * 397) ^ Peer.GetHashCode();
                     hash = (hash * 397) ^ (int)Delivery;
-                    hash = (hash * 397) ^ PacketType.GetHashCode();
+                    hash = (hash * 397) ^ Name.GetHashCode();
+                    return hash;
+                }
+            }
+        }
+
+        private readonly struct ComponentKey : IEquatable<ComponentKey> {
+            public readonly NetworkTrafficDirection Direction;
+            public readonly NetworkPeerId Peer;
+            public readonly NetDelivery Delivery;
+            public readonly ushort ComponentTypeId;
+            public readonly string ComponentName;
+            public readonly string Channel;
+
+            public ComponentKey(NetworkTrafficDirection direction, NetworkPeerId peer, NetDelivery delivery, ushort componentTypeId, string componentName, string channel) {
+                Direction = direction;
+                Peer = peer;
+                Delivery = delivery;
+                ComponentTypeId = componentTypeId;
+                ComponentName = componentName;
+                Channel = channel;
+            }
+
+            public bool Equals(ComponentKey other) {
+                return Direction == other.Direction &&
+                       Peer == other.Peer &&
+                       Delivery == other.Delivery &&
+                       ComponentTypeId == other.ComponentTypeId &&
+                       ComponentName == other.ComponentName &&
+                       Channel == other.Channel;
+            }
+
+            public override bool Equals(object obj) {
+                return obj is ComponentKey other && Equals(other);
+            }
+
+            public override int GetHashCode() {
+                unchecked {
+                    var hash = (int)Direction;
+                    hash = (hash * 397) ^ Peer.GetHashCode();
+                    hash = (hash * 397) ^ (int)Delivery;
+                    hash = (hash * 397) ^ ComponentTypeId.GetHashCode();
+                    hash = (hash * 397) ^ ComponentName.GetHashCode();
+                    hash = (hash * 397) ^ Channel.GetHashCode();
                     return hash;
                 }
             }
@@ -177,17 +356,43 @@ namespace StaticMlp.Networking.Diagnostics {
             public readonly NetworkTrafficDirection Direction;
             public readonly NetworkPeerId Peer;
             public readonly NetDelivery Delivery;
-            public readonly string PacketType;
+            public readonly string Name;
             public readonly int Packets;
             public readonly int Bytes;
             public readonly int FailedPackets;
             public readonly DateTime LastUtcTime;
 
-            public AggregateRow(NetworkTrafficDirection direction, NetworkPeerId peer, NetDelivery delivery, string packetType, int packets, int bytes, int failedPackets, DateTime lastUtcTime) {
+            public AggregateRow(NetworkTrafficDirection direction, NetworkPeerId peer, NetDelivery delivery, string name, int packets, int bytes, int failedPackets, DateTime lastUtcTime) {
                 Direction = direction;
                 Peer = peer;
                 Delivery = delivery;
-                PacketType = packetType;
+                Name = name;
+                Packets = packets;
+                Bytes = bytes;
+                FailedPackets = failedPackets;
+                LastUtcTime = lastUtcTime;
+            }
+        }
+
+        public readonly struct ComponentAggregateRow {
+            public readonly NetworkTrafficDirection Direction;
+            public readonly NetworkPeerId Peer;
+            public readonly NetDelivery Delivery;
+            public readonly ushort ComponentTypeId;
+            public readonly string ComponentName;
+            public readonly string Channel;
+            public readonly int Packets;
+            public readonly int Bytes;
+            public readonly int FailedPackets;
+            public readonly DateTime LastUtcTime;
+
+            public ComponentAggregateRow(NetworkTrafficDirection direction, NetworkPeerId peer, NetDelivery delivery, ushort componentTypeId, string componentName, string channel, int packets, int bytes, int failedPackets, DateTime lastUtcTime) {
+                Direction = direction;
+                Peer = peer;
+                Delivery = delivery;
+                ComponentTypeId = componentTypeId;
+                ComponentName = componentName;
+                Channel = channel;
                 Packets = packets;
                 Bytes = bytes;
                 FailedPackets = failedPackets;
@@ -200,18 +405,24 @@ namespace StaticMlp.Networking.Diagnostics {
             public readonly NetworkTrafficDirection Direction;
             public readonly NetworkPeerId Peer;
             public readonly NetDelivery Delivery;
-            public readonly string PacketType;
+            public readonly string Name;
             public readonly int Bytes;
             public readonly bool Success;
+            public readonly string Channel;
+            public readonly ushort ComponentTypeId;
+            public readonly bool IsPacketSample;
 
-            public Sample(DateTime utcTime, NetworkTrafficDirection direction, NetworkPeerId peer, NetDelivery delivery, string packetType, int bytes, bool success) {
+            public Sample(DateTime utcTime, NetworkTrafficDirection direction, NetworkPeerId peer, NetDelivery delivery, string name, int bytes, bool success, string channel, ushort componentTypeId) {
                 UtcTime = utcTime;
                 Direction = direction;
                 Peer = peer;
                 Delivery = delivery;
-                PacketType = packetType;
+                Name = name;
                 Bytes = bytes;
                 Success = success;
+                Channel = channel;
+                ComponentTypeId = componentTypeId;
+                IsPacketSample = string.IsNullOrEmpty(channel);
             }
         }
 
@@ -223,9 +434,10 @@ namespace StaticMlp.Networking.Diagnostics {
             public readonly int SentPacketsInWindow;
             public readonly int ReceivedPacketsInWindow;
             public readonly List<Sample> RecentSamples;
-            public readonly List<AggregateRow> Aggregates;
+            public readonly List<AggregateRow> PacketAggregates;
+            public readonly List<ComponentAggregateRow> ComponentAggregates;
 
-            public Snapshot(bool enabled, double windowSeconds, int sentBytesInWindow, int receivedBytesInWindow, int sentPacketsInWindow, int receivedPacketsInWindow, List<Sample> recentSamples, List<AggregateRow> aggregates) {
+            public Snapshot(bool enabled, double windowSeconds, int sentBytesInWindow, int receivedBytesInWindow, int sentPacketsInWindow, int receivedPacketsInWindow, List<Sample> recentSamples, List<AggregateRow> packetAggregates, List<ComponentAggregateRow> componentAggregates) {
                 Enabled = enabled;
                 WindowSeconds = windowSeconds;
                 SentBytesInWindow = sentBytesInWindow;
@@ -233,7 +445,8 @@ namespace StaticMlp.Networking.Diagnostics {
                 SentPacketsInWindow = sentPacketsInWindow;
                 ReceivedPacketsInWindow = receivedPacketsInWindow;
                 RecentSamples = recentSamples;
-                Aggregates = aggregates;
+                PacketAggregates = packetAggregates;
+                ComponentAggregates = componentAggregates;
             }
         }
     }

@@ -16,7 +16,7 @@ namespace StaticMlp.Game.Presentation.Views
             visual.transform.SetParent(transform, worldPositionStays: false);
             visual.transform.localScale = scale;
 
-            visual.GetComponent<Renderer>().material.color = color;
+            visual.GetComponent<Renderer>().sharedMaterial = RuntimeVisualMaterial.Create(color);
             visual.AddComponent<Rigidbody>();
         }
 

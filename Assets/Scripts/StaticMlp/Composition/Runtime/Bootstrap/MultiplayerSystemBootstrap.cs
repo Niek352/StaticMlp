@@ -9,29 +9,49 @@ namespace StaticMlp.Composition
 {
     public static class MultiplayerSystemBootstrap
     {
-        public static void CreateServerSystems()
+        public static void CreateServerSystems(TransportBackend backend)
         {
             ServerSys.Create();
-            ServerSys.Add(new ServerTransportCompleteSystem(), order: -1000);
-            ServerSys.Add(new ServerRawInboxDrainSystem(), order: -900);
-            ServerSys.Add(new ServerConnectionLifecycleSystem(), order: -850);
+
+            if (backend == TransportBackend.Steam) {
+                ServerSys.Add(new ServerSteamTransportPollSystem(), order: -1000);
+                ServerSys.Add(new ServerSteamRawInboxDrainSystem(), order: -900);
+            } else {
+                ServerSys.Add(new ServerTransportCompleteSystem(), order: -1000);
+                ServerSys.Add(new ServerRawInboxDrainSystem(), order: -900);
+                ServerSys.Add(new ServerConnectionLifecycleSystem(), order: -850);
+            }
+
             ServerSys.Add(new ServerReceiveClientOwnedStateSystem(), order: -780);
             ServerSys.Add(new ServerNetworkEventApplySystem(), order: -770);
             GameplayFeatureDiscovery.RegisterServerSystems(new ServerSystemsBuilder());
             ServerSys.Add(new ServerOwnedReplicationCollectSystem(), order: 500);
             ServerSys.Add(new ServerRelayClientOwnedStateSystem(), order: 550);
-            ServerSys.Add(new ServerTransportSendSystem(), order: 700);
-            ServerSys.Add(new ServerTransportScheduleSystem(), order: 1000);
+
+            if (backend == TransportBackend.Steam) {
+                ServerSys.Add(new ServerSteamTransportSendSystem(), order: 700);
+            } else {
+                ServerSys.Add(new ServerTransportSendSystem(), order: 700);
+                ServerSys.Add(new ServerTransportScheduleSystem(), order: 1000);
+            }
+
             EcsDebug<ServerWT>.AddWorld<ServerSystemsT>();
             ServerSys.Initialize();
         }
 
-        public static void CreateClientCoreSystems()
+        public static void CreateClientCoreSystems(TransportBackend backend)
         {
             ClientCoreSys.Create();
             var viewFactory = new ResourcesEntityViewFactory(ViewRootProvider.Root);
-            ClientCoreSys.Add(new ClientTransportCompleteSystem(), order: -1000);
-            ClientCoreSys.Add(new ClientRawInboxDrainSystem(), order: -900);
+
+            if (backend == TransportBackend.Steam) {
+                ClientCoreSys.Add(new ClientSteamTransportPollSystem(), order: -1000);
+                ClientCoreSys.Add(new ClientSteamRawInboxDrainSystem(), order: -900);
+            } else {
+                ClientCoreSys.Add(new ClientTransportCompleteSystem(), order: -1000);
+                ClientCoreSys.Add(new ClientRawInboxDrainSystem(), order: -900);
+            }
+
             ClientCoreSys.Add(new ClientSnapshotApplySystem(), order: -810);
             ClientCoreSys.Add(new ClientSpawnApplySystem(), order: -800);
             ClientCoreSys.Add(new ClientDespawnApplySystem(), order: -790);
@@ -45,8 +65,14 @@ namespace StaticMlp.Composition
             systemsBuilder.Add(new DestroyEntityViewSystem(viewFactory), ViewSystemOrder.DestroyViews);
             ClientCoreSys.Add(new ClientNetworkEventSendSystem(), order: 490);
             ClientCoreSys.Add(new ClientReplicationCollectSystem(), order: 500);
-            ClientCoreSys.Add(new ClientTransportSendSystem(), order: 700);
-            ClientCoreSys.Add(new ClientTransportScheduleSystem(), order: 1000);
+
+            if (backend == TransportBackend.Steam) {
+                ClientCoreSys.Add(new ClientSteamTransportSendSystem(), order: 700);
+            } else {
+                ClientCoreSys.Add(new ClientTransportSendSystem(), order: 700);
+                ClientCoreSys.Add(new ClientTransportScheduleSystem(), order: 1000);
+            }
+
             EcsDebug<ClientCoreWT>.AddWorld<ClientCoreSystemsT>();
 
             ClientCoreSys.Initialize();

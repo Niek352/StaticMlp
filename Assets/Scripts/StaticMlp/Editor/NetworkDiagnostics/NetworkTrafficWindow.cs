@@ -43,7 +43,9 @@ namespace StaticMlp.Editor.NetworkDiagnostics {
             EditorGUILayout.Space(8f);
 
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
-            DrawAggregates(snapshot);
+            DrawPacketAggregates(snapshot);
+            EditorGUILayout.Space(8f);
+            DrawComponentAggregates(snapshot);
             EditorGUILayout.Space(8f);
             DrawRecentSamples(snapshot);
             EditorGUILayout.EndScrollView();
@@ -86,19 +88,38 @@ namespace StaticMlp.Editor.NetworkDiagnostics {
             EditorGUILayout.EndVertical();
         }
 
-        private static void DrawAggregates(NetworkTrafficProfiler.Snapshot snapshot) {
+        private static void DrawPacketAggregates(NetworkTrafficProfiler.Snapshot snapshot) {
             EditorGUILayout.LabelField("By packet type", EditorStyles.boldLabel);
             DrawAggregateHeader();
 
-            foreach (var row in snapshot.Aggregates) {
+            foreach (var row in snapshot.PacketAggregates) {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField(row.Direction.ToString(), GUILayout.Width(76f));
                 EditorGUILayout.LabelField(row.Peer.ToString(), GUILayout.Width(48f));
                 EditorGUILayout.LabelField(DeliveryLabel(row.Direction, row.Delivery), GUILayout.Width(140f));
-                EditorGUILayout.LabelField(row.PacketType, GUILayout.Width(150f));
+                EditorGUILayout.LabelField(row.Name, GUILayout.Width(150f));
                 EditorGUILayout.LabelField(row.Packets.ToString(), GUILayout.Width(64f));
                 EditorGUILayout.LabelField(FormatBytes(row.Bytes), GUILayout.Width(92f));
                 EditorGUILayout.LabelField(row.FailedPackets.ToString(), GUILayout.Width(56f));
+                EditorGUILayout.LabelField(FormatLocalTime(row.LastUtcTime), GUILayout.Width(88f));
+                EditorGUILayout.EndHorizontal();
+            }
+        }
+
+        private static void DrawComponentAggregates(NetworkTrafficProfiler.Snapshot snapshot) {
+            EditorGUILayout.LabelField("By component", EditorStyles.boldLabel);
+            DrawComponentAggregateHeader();
+
+            foreach (var row in snapshot.ComponentAggregates) {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(row.Direction.ToString(), GUILayout.Width(76f));
+                EditorGUILayout.LabelField(row.Peer.ToString(), GUILayout.Width(48f));
+                EditorGUILayout.LabelField(DeliveryLabel(row.Direction, row.Delivery), GUILayout.Width(140f));
+                EditorGUILayout.LabelField(row.Channel, GUILayout.Width(110f));
+                EditorGUILayout.LabelField(row.ComponentName, GUILayout.Width(170f));
+                EditorGUILayout.LabelField(row.ComponentTypeId.ToString(), GUILayout.Width(56f));
+                EditorGUILayout.LabelField(row.Packets.ToString(), GUILayout.Width(64f));
+                EditorGUILayout.LabelField(FormatBytes(row.Bytes), GUILayout.Width(92f));
                 EditorGUILayout.LabelField(FormatLocalTime(row.LastUtcTime), GUILayout.Width(88f));
                 EditorGUILayout.EndHorizontal();
             }
@@ -117,6 +138,20 @@ namespace StaticMlp.Editor.NetworkDiagnostics {
             EditorGUILayout.EndHorizontal();
         }
 
+        private static void DrawComponentAggregateHeader() {
+            EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Dir", EditorStyles.boldLabel, GUILayout.Width(76f));
+            EditorGUILayout.LabelField("Peer", EditorStyles.boldLabel, GUILayout.Width(48f));
+            EditorGUILayout.LabelField("Delivery", EditorStyles.boldLabel, GUILayout.Width(140f));
+            EditorGUILayout.LabelField("Channel", EditorStyles.boldLabel, GUILayout.Width(110f));
+            EditorGUILayout.LabelField("Component", EditorStyles.boldLabel, GUILayout.Width(170f));
+            EditorGUILayout.LabelField("Type", EditorStyles.boldLabel, GUILayout.Width(56f));
+            EditorGUILayout.LabelField("Count", EditorStyles.boldLabel, GUILayout.Width(64f));
+            EditorGUILayout.LabelField("Bytes", EditorStyles.boldLabel, GUILayout.Width(92f));
+            EditorGUILayout.LabelField("Last", EditorStyles.boldLabel, GUILayout.Width(88f));
+            EditorGUILayout.EndHorizontal();
+        }
+
         private static void DrawRecentSamples(NetworkTrafficProfiler.Snapshot snapshot) {
             EditorGUILayout.LabelField("Recent packets", EditorStyles.boldLabel);
             DrawSampleHeader();
@@ -127,7 +162,8 @@ namespace StaticMlp.Editor.NetworkDiagnostics {
                 EditorGUILayout.LabelField(sample.Direction.ToString(), GUILayout.Width(76f));
                 EditorGUILayout.LabelField(sample.Peer.ToString(), GUILayout.Width(48f));
                 EditorGUILayout.LabelField(DeliveryLabel(sample.Direction, sample.Delivery), GUILayout.Width(140f));
-                EditorGUILayout.LabelField(sample.PacketType, GUILayout.Width(150f));
+                EditorGUILayout.LabelField(sample.Channel, GUILayout.Width(110f));
+                EditorGUILayout.LabelField(sample.Name, GUILayout.Width(150f));
                 EditorGUILayout.LabelField(FormatBytes(sample.Bytes), GUILayout.Width(92f));
                 EditorGUILayout.LabelField(sample.Success ? "ok" : "failed", GUILayout.Width(64f));
                 EditorGUILayout.EndHorizontal();
@@ -140,7 +176,8 @@ namespace StaticMlp.Editor.NetworkDiagnostics {
             EditorGUILayout.LabelField("Dir", EditorStyles.boldLabel, GUILayout.Width(76f));
             EditorGUILayout.LabelField("Peer", EditorStyles.boldLabel, GUILayout.Width(48f));
             EditorGUILayout.LabelField("Delivery", EditorStyles.boldLabel, GUILayout.Width(140f));
-            EditorGUILayout.LabelField("Packet", EditorStyles.boldLabel, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("Channel", EditorStyles.boldLabel, GUILayout.Width(110f));
+            EditorGUILayout.LabelField("Name", EditorStyles.boldLabel, GUILayout.Width(150f));
             EditorGUILayout.LabelField("Bytes", EditorStyles.boldLabel, GUILayout.Width(92f));
             EditorGUILayout.LabelField("Status", EditorStyles.boldLabel, GUILayout.Width(64f));
             EditorGUILayout.EndHorizontal();

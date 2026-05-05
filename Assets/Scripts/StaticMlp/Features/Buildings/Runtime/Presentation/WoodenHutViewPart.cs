@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using StaticMlp.Features.EcsViews;
+using StaticMlp.Game.Presentation;
 using UnityEngine;
 
 namespace StaticMlp.Features.Buildings
@@ -63,7 +64,7 @@ namespace StaticMlp.Features.Buildings
             var width = _progressFillFullScale.x * progress;
             _progressFill.localScale = new Vector3(width, _progressFillFullScale.y, _progressFillFullScale.z);
             _progressFill.localPosition = new Vector3(-_progressFillFullScale.x * 0.5f + width * 0.5f, 1.8f, -2.68f);
-            _progressRenderer.material.color = component.WoodDelivered >= component.WoodRequired
+            _progressRenderer.sharedMaterial.color = component.WoodDelivered >= component.WoodRequired
                                                && component.StoneDelivered >= component.StoneRequired
                 ? progressColor
                 : missingResourcesColor;
@@ -133,7 +134,7 @@ namespace StaticMlp.Features.Buildings
             Object.Destroy(cube.GetComponent<Collider>());
 
             var renderer = cube.GetComponent<Renderer>();
-            renderer.material.color = color;
+            renderer.sharedMaterial = RuntimeVisualMaterial.Create(color, transparent: color.a < 0.999f);
             if (paintWithState)
                 _paintedRenderers.Add(renderer);
 
@@ -143,7 +144,7 @@ namespace StaticMlp.Features.Buildings
         private void PaintAll(Color color)
         {
             for (var i = 0; i < _paintedRenderers.Count; i++)
-                _paintedRenderers[i].material.color = color;
+                _paintedRenderers[i].sharedMaterial.color = color;
         }
     }
 }

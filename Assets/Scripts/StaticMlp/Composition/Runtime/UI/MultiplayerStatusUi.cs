@@ -10,6 +10,11 @@ namespace StaticMlp.Composition
         [SerializeField] private Button hostButton;
         [SerializeField] private Button serverButton;
         [SerializeField] private Button clientButton;
+        [SerializeField] private Button inviteButton;
+        [SerializeField] private Button copySteamIdButton;
+        [SerializeField] private Button pasteSteamIdButton;
+        [SerializeField] private Button connectSteamButton;
+        [SerializeField] private TMP_InputField steamIdInput;
         [SerializeField] private Button disconnectButton;
 
         private StaticMlpMultiplayerBootstrap _bootstrap;
@@ -30,6 +35,16 @@ namespace StaticMlp.Composition
                 throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(serverButton)}.");
             if (clientButton == null)
                 throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(clientButton)}.");
+            if (inviteButton == null)
+                throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(inviteButton)}.");
+            if (copySteamIdButton == null)
+                throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(copySteamIdButton)}.");
+            if (pasteSteamIdButton == null)
+                throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(pasteSteamIdButton)}.");
+            if (connectSteamButton == null)
+                throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(connectSteamButton)}.");
+            if (steamIdInput == null)
+                throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(steamIdInput)}.");
             if (disconnectButton == null)
                 throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(disconnectButton)}.");
         }
@@ -39,6 +54,11 @@ namespace StaticMlp.Composition
             hostButton.onClick.AddListener(StartHost);
             serverButton.onClick.AddListener(StartServer);
             clientButton.onClick.AddListener(StartClient);
+            inviteButton.onClick.AddListener(InviteFriend);
+            copySteamIdButton.onClick.AddListener(CopySteamId);
+            pasteSteamIdButton.onClick.AddListener(PasteSteamId);
+            connectSteamButton.onClick.AddListener(ConnectSteam);
+            steamIdInput.onValueChanged.AddListener(OnSteamIdChanged);
             disconnectButton.onClick.AddListener(Disconnect);
         }
 
@@ -47,6 +67,11 @@ namespace StaticMlp.Composition
             hostButton.onClick.RemoveListener(StartHost);
             serverButton.onClick.RemoveListener(StartServer);
             clientButton.onClick.RemoveListener(StartClient);
+            inviteButton.onClick.RemoveListener(InviteFriend);
+            copySteamIdButton.onClick.RemoveListener(CopySteamId);
+            pasteSteamIdButton.onClick.RemoveListener(PasteSteamId);
+            connectSteamButton.onClick.RemoveListener(ConnectSteam);
+            steamIdInput.onValueChanged.RemoveListener(OnSteamIdChanged);
             disconnectButton.onClick.RemoveListener(Disconnect);
         }
 
@@ -75,6 +100,35 @@ namespace StaticMlp.Composition
             _bootstrap.Disconnect();
         }
 
+        private void InviteFriend()
+        {
+            _bootstrap.InviteFriend();
+        }
+
+        private void CopySteamId()
+        {
+            var steamId = _bootstrap.LocalSteamId;
+            if (steamId == 0)
+                return;
+
+            GUIUtility.systemCopyBuffer = steamId.ToString();
+        }
+
+        private void PasteSteamId()
+        {
+            steamIdInput.text = GUIUtility.systemCopyBuffer?.Trim() ?? string.Empty;
+        }
+
+        private void ConnectSteam()
+        {
+            _bootstrap.ConnectSteamById();
+        }
+
+        private void OnSteamIdChanged(string value)
+        {
+            _bootstrap.SetConnectSteamId(value);
+        }
+
         private void Refresh()
         {
             if (_bootstrap == null)
@@ -84,8 +138,27 @@ namespace StaticMlp.Composition
             var server = _bootstrap.IsServerStarted ? "on" : "off";
             var client = _bootstrap.IsClientStarted ? "on" : "off";
             var peer = _bootstrap.LocalPeerId.Value == 0 ? "-" : _bootstrap.LocalPeerId.Value.ToString();
+            var transport = _bootstrap.CurrentTransportBackend.ToString();
+            var status = $"Transport: {transport}\nMultiplayer: {mode}\nServer: {server}  Client: {client}\nPeer: {peer}";
 
-            statusText.text = $"Multiplayer: {mode}\nServer: {server}  Client: {client}\nPeer: {peer}  Port: {_bootstrap.Port}";
+            if (_bootstrap.UsesSteamTransport) {
+                var steamId = _bootstrap.LocalSteamId == 0 ? "-" : _bootstrap.LocalSteamId.ToString();
+                var lobbyId = _bootstrap.ActiveSteamLobbyId == 0 ? "-" : _bootstrap.ActiveSteamLobbyId.ToString();
+                status += $"\nSteam: {_bootstrap.LocalSteamName} ({steamId})\nLobby: {lobbyId}";
+            } else {
+                status += $"  Port: {_bootstrap.Port}";
+            }
+
+            statusText.text = status;
+            if (steamIdInput.text != _bootstrap.ConnectSteamId)
+                steamIdInput.SetTextWithoutNotify(_bootstrap.ConnectSteamId);
+
+            clientButton.interactable = _bootstrap.CanStartClientManually;
+            inviteButton.interactable = _bootstrap.CanInviteFriend;
+            copySteamIdButton.interactable = _bootstrap.UsesSteamTransport && _bootstrap.LocalSteamId != 0;
+            pasteSteamIdButton.interactable = _bootstrap.UsesSteamTransport;
+            connectSteamButton.interactable = _bootstrap.UsesSteamTransport && _bootstrap.CanStartClientManually;
+            steamIdInput.interactable = _bootstrap.UsesSteamTransport;
             disconnectButton.interactable = _bootstrap.IsRunning;
         }
     }

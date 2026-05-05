@@ -938,8 +938,13 @@ MonoBehaviour:
   startOnAwake: 1
   dontDestroyOnLoad: 1
   enableLogs: 1
+  transportBackend: 0
   connectHost: 127.0.0.1
   port: 7777
+  steamAppId: 480
+  steamVirtualPort: 0
+  connectSteamId: 
+  steamLobbyMaxMembers: 4
   showMultiplayerUi: 1
   multiplayerUiResourcePath: Views/MultiplayerStatusUi
   bindDefaultMoveInput: 1

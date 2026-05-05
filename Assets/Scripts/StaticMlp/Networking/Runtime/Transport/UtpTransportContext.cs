@@ -5,7 +5,6 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Networking.Transport;
 using UnityEngine;
-using StaticMlp.Networking.Diagnostics;
 
 namespace StaticMlp.Networking.Transport {
     public sealed class UtpTransportContext : IDisposable, INetworkTransport, IResource {
@@ -27,10 +26,7 @@ namespace StaticMlp.Networking.Transport {
         public ushort NextPeerId = 1;
 
         public void Send(NetworkPeerId peer, ReadOnlySpan<byte> payload, NetDelivery delivery) {
-            byte[] payloadBytes = null;
             if (!TryGetConnection(peer, out var connection) || !connection.IsCreated) {
-                payloadBytes = payload.ToArray();
-                NetworkTrafficProfiler.RecordSent(peer, delivery, payloadBytes, false);
                 LogWarning($"Send skipped: no connection for peer {peer}, bytes={payload.Length}, delivery={delivery}");
                 return;
             }
@@ -38,16 +34,13 @@ namespace StaticMlp.Networking.Transport {
             var pipeline = PipelineFor(delivery);
             var begin = Driver.BeginSend(pipeline, connection, out var writer, payload.Length);
             if (begin != 0) {
-                payloadBytes = payload.ToArray();
-                NetworkTrafficProfiler.RecordSent(peer, delivery, payloadBytes, false);
                 LogWarning($"BeginSend failed: peer={peer}, bytes={payload.Length}, delivery={delivery}, code={begin}");
                 return;
             }
 
-            payloadBytes = payload.ToArray();
+            var payloadBytes = payload.ToArray();
             writer.WriteBytes(payloadBytes.AsSpan());
             var end = Driver.EndSend(writer);
-            NetworkTrafficProfiler.RecordSent(peer, delivery, payloadBytes, end >= 0);
             if (end < 0)
                 LogWarning($"EndSend failed: peer={peer}, bytes={payload.Length}, delivery={delivery}, code={end}");
         }
