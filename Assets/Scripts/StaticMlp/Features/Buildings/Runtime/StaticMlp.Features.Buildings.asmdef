@@ -6,10 +6,12 @@
         "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core",
+        "Code.EcsUi.Mvc",
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.BuildingCatalog",
         "StaticMlp.Features.Player",
         "StaticMlp.Features.ResourcesInventoryMinimal",
+        "UniTask",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "UnityEngine.UI"

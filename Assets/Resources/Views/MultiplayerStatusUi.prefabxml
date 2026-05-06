@@ -115,7 +115,7 @@
 
             <GameObject name="SteamButtonsRow">
                 <RectTransform m_SizeDelta="0, 34" />
-                <HorizontalLayoutGroup m_Spacing="8" m_ChildControlWidth="true" m_ChildControlHeight="true" m_ChildForceExpandWidth="true" m_ChildForceExpandHeight="false" />
+                <HorizontalLayoutGroup m_Spacing="8" m_ChildControlWidth="true" m_ChildForceExpandWidth="true" m_ChildForceExpandHeight="false" />
                 <LayoutElement m_PreferredHeight="34" />
 
                 <GameObject name="PasteSteamIdButton" id="PasteSteamIdButton">

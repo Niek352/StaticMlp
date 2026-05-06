@@ -7,7 +7,7 @@ namespace StaticMlp.Features.BuildingCatalog
         private static readonly BuildingNetworkDefinition[] Definitions =
         {
             new(
-                BuildingCatalog.WoodenHutId,
+                BuildingCatalogData.WoodenHutId,
                 BuildingNetworkArchetypeIds.WoodenHutBlueprint,
                 BuildingNetworkArchetypeIds.WoodenHutFinished)
         };

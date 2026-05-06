@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -42,6 +43,7 @@ namespace StaticMlp.Composition
 
         private System.IDisposable _serverTransport;
         private System.IDisposable _clientTransport;
+        private IMvcManager _clientMvcManager;
         private MultiplayerStatusUi _multiplayerStatusUi;
         private GameObject _multiplayerStatusUiInstance;
         private bool _serverStarted;
@@ -231,6 +233,8 @@ namespace StaticMlp.Composition
                 _clientTransport = UtpTransportStartup.StartClient(connectHost, port);
             }
 
+            _clientMvcManager = new MvcManager(new WindowStackManager());
+            CW.SetResource(new MvcManagerResource(_clientMvcManager));
             MultiplayerSystemBootstrap.CreateClientCoreSystems(transportBackend);
             _clientStarted = true;
             Log("Client systems initialized");
@@ -276,6 +280,9 @@ namespace StaticMlp.Composition
 
                 if (ClientCoreSys.IsInitialized)
                     ClientCoreSys.Destroy();
+
+                _clientMvcManager?.Dispose();
+                _clientMvcManager = null;
 
                 if (CW.Status != WorldStatus.NotCreated)
                     CW.Destroy();

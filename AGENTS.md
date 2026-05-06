@@ -45,6 +45,8 @@ Gameplay systems should only:
 - Do not cross module boundaries with hidden dependencies or direct calls when an event/component boundary belongs there.
 - Do not store `Entity` across frames; use `EntityGID` for persistent references.
 - Do not create `static class` types to store mutable runtime data, commands, or state.
+- Private fields use `_camelCase` naming, for example `_mvcManager`.
+- `const` members use `CAPS_UNDER` naming.
 - Do not extract logic into a `static class` by default. Use a static class only when its role is explicit and obvious from the call site; otherwise keep the logic in the owning system/module so readers do not need to open hidden helpers to understand behavior.
 - Allowed extracted-logic intent: `Domain/Rules` for shared domain rules that stay generic and can be tested separately from presentation/transport.
 - Allowed extracted-logic intent: `Spawner` for explicit entity spawn abstractions whose purpose is visible from the call site.
@@ -60,6 +62,9 @@ Gameplay systems should only:
 - When using PrefabXML, serialize enum values as numbers.
 - Null UI references are bugs. Fail fast instead of using defensive `if (x != null)` guards.
 - Do not write `ValidateReferences` or helper methods that search the scene/hierarchy instead of explicit inspector wiring.
+- Unity `MonoBehaviour` classes used by gameplay features should stay view-only: inspector references, Unity callbacks, passive rendering, and forwarding UI intent. Do not let them become bootstrap, composition root, MVC host, ECS host, or gameplay/presentation orchestrator. Feature UI composition and MVC lifecycle must be owned by ECS/bootstrap systems, not by feature `MonoBehaviour` classes.
+- Do not store feature-specific Unity objects, controllers, or bridge systems inside ordinary gameplay/resources by default. If a project-wide composition service such as a shared UI manager must be exposed to systems, provide it explicitly as a composition-owned resource with a clear contract.
+- Do not hide missing required runtime state behind silent early `return` paths. If a client world, resource, controller binding, catalog entry, or required dependency is mandatory for the code path, fail fast with an explicit exception that explains what is missing and why it should exist.
 - All `.md` files must stay UTF-8 without BOM. Do not convert them to CP1251/ANSI.
 
 ## Ownership

@@ -12,10 +12,8 @@ namespace StaticMlp.Features.Buildings
             {
                 ref var preview = ref e.Mut<PlacementPreview>();
                 var id = new BuildingId(preview.BuildingId);
-
-                var validation = StaticMlp.Features.BuildingCatalog.BuildingCatalog.TryGetDefinition(id, out var definition)
-                    ? ConstructionPlacementValidator.ValidateClient(definition, preview.Position, preview.Rotation)
-                    : PlacementValidationResult.Invalid(PlacementInvalidReason.UnknownBuilding);
+                var definition = StaticMlp.Features.BuildingCatalog.BuildingCatalogData.GetDefinition(id);
+                var validation = ConstructionPlacementValidator.ValidateClient(definition, preview.Position, preview.Rotation);
 
                 preview.IsValid = validation.IsValid;
                 preview.InvalidReason = validation.Reason;

@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace StaticMlp.Features.BuildingCatalog
 {
-    public static class BuildingCatalog
+    public static class BuildingCatalogData
     {
         public static readonly BuildingId WoodenHutId = new(1);
 
@@ -20,19 +21,17 @@ namespace StaticMlp.Features.BuildingCatalog
 
         public static IReadOnlyList<BuildingDefinition> All => Definitions;
 
-        public static bool TryGetDefinition(BuildingId id, out BuildingDefinition definition)
+        public static BuildingDefinition GetDefinition(BuildingId id)
         {
             for (var i = 0; i < Definitions.Length; i++)
             {
                 if (Definitions[i].Id != id)
                     continue;
 
-                definition = Definitions[i];
-                return true;
+                return Definitions[i];
             }
 
-            definition = default;
-            return false;
+            throw new InvalidOperationException($"Missing {nameof(BuildingDefinition)} for building id {id.Value} in {nameof(BuildingCatalogData)}.");
         }
     }
 }

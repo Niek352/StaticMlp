@@ -1,12 +1,12 @@
-using StaticMlp.Features.BuildingCatalog;
-using StaticMlp.Networking;
+using System;
+using Code.EcsUi.Mvc;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace StaticMlp.Features.Buildings
 {
-    public sealed class BuildingMenuView : MonoBehaviour
+    public sealed class BuildingMenuView : PrefabViewBase
     {
         [Header("Hierarchy")]
         [SerializeField] private GameObject panelRoot;
@@ -19,8 +19,13 @@ namespace StaticMlp.Features.Buildings
         [SerializeField] private TextMeshProUGUI selectedBuildingLabel;
         [SerializeField] private TextMeshProUGUI costLabel;
 
-        private void Awake()
+        private Action onWoodenHutClicked;
+        private Action onCloseClicked;
+
+        protected override void Awake()
         {
+            base.Awake();
+
             if (panelRoot == null)
                 throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires {nameof(panelRoot)}.");
             if (woodenHutButton == null)
@@ -31,67 +36,52 @@ namespace StaticMlp.Features.Buildings
                 throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires {nameof(selectedBuildingLabel)}.");
             if (costLabel == null)
                 throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires {nameof(costLabel)}.");
+
+            panelRoot.SetActive(false);
         }
 
         private void OnEnable()
         {
-            woodenHutButton.onClick.AddListener(SelectWoodenHut);
-            closeButton.onClick.AddListener(Close);
+            woodenHutButton.onClick.AddListener(HandleWoodenHutClicked);
+            closeButton.onClick.AddListener(HandleCloseClicked);
         }
 
         private void OnDisable()
         {
-            woodenHutButton.onClick.RemoveListener(SelectWoodenHut);
-            closeButton.onClick.RemoveListener(Close);
+            woodenHutButton.onClick.RemoveListener(HandleWoodenHutClicked);
+            closeButton.onClick.RemoveListener(HandleCloseClicked);
         }
 
-        private void Update()
+        public void Bind(Action woodenHutClicked, Action closeClicked)
         {
-            if (!CW.HasResource<BuildingMenuState>())
-            {
-                panelRoot.SetActive(false);
-                return;
-            }
+            if (onWoodenHutClicked != null || onCloseClicked != null)
+                throw new InvalidOperationException($"{nameof(BuildingMenuView)} is already bound to a controller.");
 
-            var state = CW.GetResource<BuildingMenuState>();
-            panelRoot.SetActive(state.IsOpen);
-
-            if (state.HasSelection
-                && StaticMlp.Features.BuildingCatalog.BuildingCatalog.TryGetDefinition(
-                    new BuildingId(state.SelectedBuildingId),
-                    out var selected))
-            {
-                selectedBuildingLabel.text = selected.DisplayName;
-                costLabel.text = $"Wood {selected.CostWood}  Stone {selected.CostStone}";
-                return;
-            }
-
-            if (StaticMlp.Features.BuildingCatalog.BuildingCatalog.TryGetDefinition(
-                    StaticMlp.Features.BuildingCatalog.BuildingCatalog.WoodenHutId,
-                    out var woodenHut))
-            {
-                selectedBuildingLabel.text = woodenHut.DisplayName;
-                costLabel.text = $"Wood {woodenHut.CostWood}  Stone {woodenHut.CostStone}";
-            }
+            onWoodenHutClicked = woodenHutClicked ?? throw new ArgumentNullException(nameof(woodenHutClicked));
+            onCloseClicked = closeClicked ?? throw new ArgumentNullException(nameof(closeClicked));
         }
 
-        public void Open()
+        public void Unbind()
         {
-            ref var state = ref CW.GetResource<BuildingMenuState>();
-            state.IsOpen = true;
+            onWoodenHutClicked = null;
+            onCloseClicked = null;
         }
 
-        public void Close()
+        public void Render(in BuildingMenuPresentation presentation)
         {
-            ref var state = ref CW.GetResource<BuildingMenuState>();
-            state.IsOpen = false;
-            state.ClearSelection();
+            panelRoot.SetActive(presentation.IsOpen);
+            selectedBuildingLabel.text = presentation.SelectedBuildingName;
+            costLabel.text = $"Wood {presentation.CostWood}  Stone {presentation.CostStone}";
         }
 
-        public void SelectWoodenHut()
+        private void HandleWoodenHutClicked()
         {
-            ref var state = ref CW.GetResource<BuildingMenuState>();
-            state.Select(StaticMlp.Features.BuildingCatalog.BuildingCatalog.WoodenHutId.Value, Time.frameCount);
+            onWoodenHutClicked.Invoke();
+        }
+
+        private void HandleCloseClicked()
+        {
+            onCloseClicked.Invoke();
         }
     }
 }

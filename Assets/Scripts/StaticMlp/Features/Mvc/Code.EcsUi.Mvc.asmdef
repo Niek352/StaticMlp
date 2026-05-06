@@ -1,0 +1,17 @@
+{
+    "name": "Code.EcsUi.Mvc",
+    "rootNamespace": "Code.EcsUi.Mvc",
+    "references": [
+        "FFS.StaticEcs",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

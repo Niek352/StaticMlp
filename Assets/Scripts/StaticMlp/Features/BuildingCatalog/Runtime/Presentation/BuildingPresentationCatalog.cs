@@ -7,7 +7,7 @@ namespace StaticMlp.Features.BuildingCatalog
         private static readonly BuildingPresentationDefinition[] Definitions =
         {
             new(
-                BuildingCatalog.WoodenHutId,
+                BuildingCatalogData.WoodenHutId,
                 ghostPreviewViewPath: "Views/Buildings/WoodenHutGhostPreview",
                 blueprintViewPath: "Views/Buildings/WoodenHutBlueprint",
                 finishedViewPath: "Views/Buildings/WoodenHut")

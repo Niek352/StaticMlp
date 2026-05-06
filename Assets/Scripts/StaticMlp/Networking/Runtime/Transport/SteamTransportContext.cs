@@ -19,8 +19,8 @@ namespace StaticMlp.Networking.Transport {
 
         public bool IsServer { get; set; }
         public NetworkPeerId LocalPeerId;
-        public SteamRelaySocketManager ServerSocketManager;
-        public SteamRelayConnectionManager ClientConnectionManager;
+        public SocketManager ServerSocketManager;
+        public ConnectionManager ClientConnectionManager;
         public ushort NextPeerId = 1;
         public int VirtualPort;
 

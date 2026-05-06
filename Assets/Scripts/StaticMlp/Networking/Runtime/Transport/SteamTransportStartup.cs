@@ -10,8 +10,12 @@ namespace StaticMlp.Networking.Transport {
                 VirtualPort = virtualPort
             };
 
-            var socketManager = SteamNetworkingSockets.CreateRelaySocket<SteamRelaySocketManager>(virtualPort);
-            socketManager.Context = ctx;
+            // Relay sockets use the interface callback path to avoid missing OnMessage
+            // callbacks that have been reported with derived SocketManager handlers.
+            var socketManager = SteamNetworkingSockets.CreateRelaySocket<SocketManager>(virtualPort);
+            socketManager.Interface = new SteamRelaySocketManager {
+                Context = ctx
+            };
             ctx.ServerSocketManager = socketManager;
 
             NetworkRuntime.LocalPeerId = ctx.LocalPeerId;
@@ -32,8 +36,10 @@ namespace StaticMlp.Networking.Transport {
                 VirtualPort = virtualPort
             };
 
-            var connectionManager = SteamNetworkingSockets.ConnectRelay<SteamRelayConnectionManager>(hostSteamId, virtualPort);
-            connectionManager.Context = ctx;
+            var connectionManager = SteamNetworkingSockets.ConnectRelay<ConnectionManager>(hostSteamId, virtualPort);
+            connectionManager.Interface = new SteamRelayConnectionManager {
+                Context = ctx
+            };
             ctx.ClientConnectionManager = connectionManager;
 
             CW.SetResource(ctx);

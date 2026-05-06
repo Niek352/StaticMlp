@@ -13,9 +13,9 @@ namespace StaticMlp.Features.Buildings
     {
         public override void RegisterPrefabs()
         {
-            for (var i = 0; i < StaticMlp.Features.BuildingCatalog.BuildingCatalog.All.Count; i++)
+            for (var i = 0; i < BuildingCatalogData.All.Count; i++)
             {
-                var definition = StaticMlp.Features.BuildingCatalog.BuildingCatalog.All[i];
+                var definition = BuildingCatalogData.All[i];
                 RegisterBuilding(definition);
             }
         }
@@ -31,6 +31,7 @@ namespace StaticMlp.Features.Buildings
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
             systems.Add(new ClientBuildingMenuSystem(), GameplaySystemOrder.Gameplay - 90);
+            systems.Add(new ClientBuildingMenuMvcSystem(), GameplaySystemOrder.ClientPresentation + 10);
             systems.Add(new ClientPlacementInputSystem(), GameplaySystemOrder.Gameplay - 80);
             systems.Add(new ClientPlacementValidationPreviewSystem(), GameplaySystemOrder.Gameplay - 70);
             systems.Add(new ClientPlacementConfirmSystem(), GameplaySystemOrder.Gameplay - 60);

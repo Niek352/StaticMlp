@@ -10,7 +10,8 @@
         "StaticMlp.Features.EcsViews",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Code.EcsUi.Mvc"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

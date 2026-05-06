@@ -37,9 +37,7 @@ namespace StaticMlp.Features.Buildings
 
             var state = site.Read<ConstructionSiteState>();
             var transform = site.Read<ConstructionTransform>();
-
-            if (!StaticMlp.Features.BuildingCatalog.BuildingCatalog.TryGetDefinition(new BuildingId(state.BuildingId), out var definition))
-                return;
+            var definition = StaticMlp.Features.BuildingCatalog.BuildingCatalogData.GetDefinition(new BuildingId(state.BuildingId));
 
             ServerBuildingSpawns.SpawnFinishedBuilding(owner, definition, transform);
             NetworkEntityDespawner.DespawnAndDestroy(site);
