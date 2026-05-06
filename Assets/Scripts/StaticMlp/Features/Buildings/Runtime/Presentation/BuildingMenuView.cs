@@ -1,4 +1,5 @@
 using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Networking;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,22 +36,29 @@ namespace StaticMlp.Features.Buildings
         private void OnEnable()
         {
             woodenHutButton.onClick.AddListener(SelectWoodenHut);
-            closeButton.onClick.AddListener(BuildingMenuCommands.Close);
+            closeButton.onClick.AddListener(Close);
         }
 
         private void OnDisable()
         {
             woodenHutButton.onClick.RemoveListener(SelectWoodenHut);
-            closeButton.onClick.RemoveListener(BuildingMenuCommands.Close);
+            closeButton.onClick.RemoveListener(Close);
         }
 
         private void Update()
         {
-            panelRoot.SetActive(BuildingMenuRuntime.IsOpen);
+            if (!CW.HasResource<BuildingMenuState>())
+            {
+                panelRoot.SetActive(false);
+                return;
+            }
 
-            if (BuildingMenuRuntime.HasSelection
+            var state = CW.GetResource<BuildingMenuState>();
+            panelRoot.SetActive(state.IsOpen);
+
+            if (state.HasSelection
                 && StaticMlp.Features.BuildingCatalog.BuildingCatalog.TryGetDefinition(
-                    new BuildingId(BuildingMenuRuntime.SelectedBuildingId),
+                    new BuildingId(state.SelectedBuildingId),
                     out var selected))
             {
                 selectedBuildingLabel.text = selected.DisplayName;
@@ -69,17 +77,21 @@ namespace StaticMlp.Features.Buildings
 
         public void Open()
         {
-            BuildingMenuCommands.Open();
+            ref var state = ref CW.GetResource<BuildingMenuState>();
+            state.IsOpen = true;
         }
 
         public void Close()
         {
-            BuildingMenuCommands.Close();
+            ref var state = ref CW.GetResource<BuildingMenuState>();
+            state.IsOpen = false;
+            state.ClearSelection();
         }
 
         public void SelectWoodenHut()
         {
-            BuildingMenuCommands.Select(StaticMlp.Features.BuildingCatalog.BuildingCatalog.WoodenHutId.Value);
+            ref var state = ref CW.GetResource<BuildingMenuState>();
+            state.Select(StaticMlp.Features.BuildingCatalog.BuildingCatalog.WoodenHutId.Value, Time.frameCount);
         }
     }
 }

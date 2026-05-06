@@ -9,6 +9,7 @@ Short operational rules for this Unity project. Keep this file small; put detail
 - [Networked gameplay feature recipes](ai/networked_feature_recipes.md)
 - [Gameplay systems memo](ai/gameplay_systems_memo.md)
 - [StaticEcs quick reference](ai/static_ecs_reference.md)
+- [Input feature guide](ai/input_feature.md)
 - [Prefab XML skill](ai/prefabxml)
 - [Original multiplayer implementation plan](ai/static_ecs_unity_transport_multiplayer_plan.md)
 - Full StaticEcs documentation is available at [static-ecs FULL.txt](ai/static-ecs%20FULL.txt) when deeper API/reference details are needed.
@@ -43,6 +44,11 @@ Gameplay systems should only:
 - Write code inside explicit modules with clear boundaries. Treat modules as separate packages.
 - Do not cross module boundaries with hidden dependencies or direct calls when an event/component boundary belongs there.
 - Do not store `Entity` across frames; use `EntityGID` for persistent references.
+- Do not create `static class` types to store mutable runtime data, commands, or state.
+- Do not extract logic into a `static class` by default. Use a static class only when its role is explicit and obvious from the call site; otherwise keep the logic in the owning system/module so readers do not need to open hidden helpers to understand behavior.
+- Allowed extracted-logic intent: `Domain/Rules` for shared domain rules that stay generic and can be tested separately from presentation/transport.
+- Allowed extracted-logic intent: `Spawner` for explicit entity spawn abstractions whose purpose is visible from the call site.
+- Do not introduce vague extraction buckets such as `Helper`, `Utility`, or generic static orchestration classes when the name does not clearly communicate the feature intent.
 
 ## Unity Authoring
 
@@ -100,6 +106,7 @@ Then derive local tags through `OwnershipTags.ApplyForClient` or `OwnershipTags.
 - Server gameplay queries `ServerOwned` or validated `ClientOwned`.
 - Client-to-server interactions that are not owned state changes should be replicated events.
 - Camera, UI, selection, and local UX state are not replicated core state.
+- Unexpected runtime states are bugs. Fail fast with exceptions instead of silently skipping missing required resources, configuration, or references. If a system should not run in some context, do not register that system in that context.
 
 Frame order:
 

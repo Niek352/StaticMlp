@@ -1,7 +1,8 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Features.Player;
+using StaticMlp.Game.Input;
 using StaticMlp.Game.Presentation;
-using StaticMlp.Game.Systems.Client;
 using StaticMlp.Networking;
 using UnityEngine;
 
@@ -18,16 +19,25 @@ namespace StaticMlp.Features.Buildings
 
         public void Update()
         {
-            if (!BuildingMenuStateUtility.TryGet(out var menuEntity, out var menuState)
-                || !menuState.HasSelection)
+            var inputState = CW.GetResource<ClientInputState>();
+
+            if (!CW.HasResource<BuildingMenuState>())
             {
                 PlacementPreviewEntityUtility.DestroyAll();
                 return;
             }
 
-            if (BuildingPlacementInput.CancelPlacementWasPressedProvider())
+            ref var menuState = ref CW.GetResource<BuildingMenuState>();
+            if (!menuState.HasSelection)
             {
-                ClearSelection(menuEntity);
+                PlacementPreviewEntityUtility.DestroyAll();
+                return;
+            }
+
+            if (inputState.WasPressed(CoreInputActions.Cancel)
+                || inputState.WasPressed(CoreInputActions.Secondary))
+            {
+                ClearSelection();
                 PlacementPreviewEntityUtility.DestroyAll();
                 return;
             }
@@ -35,7 +45,7 @@ namespace StaticMlp.Features.Buildings
             var id = new BuildingId(menuState.SelectedBuildingId);
             if (!StaticMlp.Features.BuildingCatalog.BuildingCatalog.TryGetDefinition(id, out var definition))
             {
-                ClearSelection(menuEntity);
+                ClearSelection();
                 PlacementPreviewEntityUtility.DestroyAll();
                 return;
             }
@@ -43,10 +53,10 @@ namespace StaticMlp.Features.Buildings
             var previewEntity = PlacementPreviewEntityUtility.GetOrCreate(definition);
             var preview = previewEntity.Read<PlacementPreview>();
 
-            if (BuildingPlacementInput.RotatePlacementWasPressedProvider())
+            if (inputState.WasPressed(BuildingsInputActions.PlacementRotate))
                 preview.Rotation = Quaternion.Euler(0f, preview.Rotation.eulerAngles.y + 90f, 0f);
 
-            preview.Position = ReadPlacementPosition();
+            preview.Position = ReadPlacementPosition(inputState);
             preview.BuildingId = menuState.SelectedBuildingId;
 
             ref var previewRef = ref previewEntity.Mut<PlacementPreview>();
@@ -57,9 +67,9 @@ namespace StaticMlp.Features.Buildings
             viewTransform.RenderRotation = preview.Rotation;
         }
 
-        private Vector3 ReadPlacementPosition()
+        private Vector3 ReadPlacementPosition(ClientInputState inputState)
         {
-            if (BuildingPlacementInput.AimRayProvider(out var ray))
+            if (inputState.TryGetAimRay(out var ray))
             {
                 if (Physics.Raycast(ray, out var hit, 500f))
                     return hit.point;
@@ -71,18 +81,18 @@ namespace StaticMlp.Features.Buildings
 
             if (ClientLocalPlayer.TryGetPosition(out var playerPosition))
             {
-                var cameraYaw = Quaternion.Euler(0f, NetworkInput.CameraYawProvider(), 0f);
+                var cameraState = CW.GetResource<ClientCameraState>();
+                var cameraYaw = Quaternion.Euler(0f, cameraState.Yaw, 0f);
                 return playerPosition + cameraYaw * Vector3.forward * _fallbackPlacementDistance;
             }
 
             return Vector3.zero;
         }
 
-        private static void ClearSelection(CW.Entity menuEntity)
+        private static void ClearSelection()
         {
-            ref var state = ref menuEntity.Mut<BuildingMenuState>();
+            ref var state = ref CW.GetResource<BuildingMenuState>();
             state.ClearSelection();
-            BuildingMenuRuntime.Publish(in state);
         }
     }
 }

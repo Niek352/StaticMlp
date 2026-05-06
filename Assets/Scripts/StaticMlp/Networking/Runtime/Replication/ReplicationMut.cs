@@ -35,16 +35,10 @@ namespace StaticMlp.Networking.Replication {
         }
 
         private static ref NetworkReplicationState EnsureState(SW.Entity entity) {
-            if (entity.Has<NetworkReplicationState>())
-                return ref entity.Ref<NetworkReplicationState>();
-
             return ref entity.Add<NetworkReplicationState>();
         }
 
         private static ref NetworkReplicationState EnsureState(CW.Entity entity) {
-            if (entity.Has<NetworkReplicationState>())
-                return ref entity.Ref<NetworkReplicationState>();
-
             return ref entity.Add<NetworkReplicationState>();
         }
     }

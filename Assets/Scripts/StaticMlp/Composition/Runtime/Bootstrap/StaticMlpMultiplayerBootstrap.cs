@@ -2,15 +2,12 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Game.Systems.Client;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
 using Steamworks;
 using Steamworks.Data;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.InputSystem;
 
 namespace StaticMlp.Composition
 {
@@ -42,9 +39,6 @@ namespace StaticMlp.Composition
 
         [Header("UI")] [SerializeField] private bool showMultiplayerUi = true;
         [SerializeField] private string multiplayerUiResourcePath = "Views/MultiplayerStatusUi";
-
-        [Header("Input")] [FormerlySerializedAs("bindLegacyInputAxes")] [SerializeField]
-        private bool bindDefaultMoveInput = true;
 
         private System.IDisposable _serverTransport;
         private System.IDisposable _clientTransport;
@@ -227,13 +221,6 @@ namespace StaticMlp.Composition
             MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig(),
                 RegisterClientCoreGeneratedTypes, ecsTypeAssemblies: GameplayAssemblies());
 
-            if (bindDefaultMoveInput)
-            {
-                NetworkInput.MoveProvider = ReadMoveInput;
-                NetworkInput.SpawnCubeWasPressedProvider = ReadSpawnCubeInput;
-                Log("Bound default move input");
-            }
-
             if (transportBackend == TransportBackend.Steam) {
                 EnsureSteamInitialized();
                 var hostSteamId = ResolveSteamHostId();
@@ -256,31 +243,6 @@ namespace StaticMlp.Composition
 
             if (_clientStarted)
                 MultiplayerSystemBootstrap.UpdateClientCoreFrame();
-        }
-
-        private static Vector2 ReadMoveInput()
-        {
-            var keyboard = Keyboard.current;
-            if (keyboard == null)
-                return Vector2.zero;
-            var move = Vector2.zero;
-
-            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
-                move.x -= 1f;
-            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
-                move.x += 1f;
-            if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
-                move.y -= 1f;
-            if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
-                move.y += 1f;
-
-            return move != Vector2.zero ? move : Vector2.zero;
-        }
-
-        private static bool ReadSpawnCubeInput()
-        {
-            var keyboard = Keyboard.current;
-            return keyboard != null && keyboard.cKey.wasPressedThisFrame;
         }
 
         private static WorldConfig DefaultWorldConfig()

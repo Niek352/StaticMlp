@@ -158,6 +158,24 @@ MonoBehaviour:
       - className: ResourcesInventorySnapshotEvent
         namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
         assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: 2f724a92-c50a-49e6-a020-b69eea5148e7
+      current:
+        className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 51c3b5fd-fc92-4e07-9f3d-87d56666d845
+      current:
+        className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
     links: []
     linksList: []
     multi: []
@@ -306,6 +324,24 @@ MonoBehaviour:
       - className: ResourcesInventorySnapshotEvent
         namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
         assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: 2f724a92-c50a-49e6-a020-b69eea5148e7
+      current:
+        className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 51c3b5fd-fc92-4e07-9f3d-87d56666d845
+      current:
+        className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
     links: []
     linksList: []
     multi: []

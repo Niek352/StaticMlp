@@ -8,6 +8,7 @@
         "Game.Core",
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.BuildingCatalog",
+        "StaticMlp.Features.Player",
         "StaticMlp.Features.ResourcesInventoryMinimal",
         "Unity.InputSystem",
         "Unity.TextMeshPro",

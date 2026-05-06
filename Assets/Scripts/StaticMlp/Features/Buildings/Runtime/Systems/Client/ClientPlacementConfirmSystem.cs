@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game.Input;
 using StaticMlp.Networking;
 using UnityEngine;
 
@@ -8,10 +9,15 @@ namespace StaticMlp.Features.Buildings
     {
         public void Update()
         {
-            if (!BuildingPlacementInput.ConfirmPlacementWasPressedProvider())
+            var inputState = CW.GetResource<ClientInputState>();
+            if (!inputState.WasPressed(CoreInputActions.Primary))
                 return;
 
-            if (BuildingMenuRuntime.SelectionFrame == Time.frameCount)
+            if (!CW.HasResource<BuildingMenuState>())
+                return;
+
+            ref var menuState = ref CW.GetResource<BuildingMenuState>();
+            if (menuState.SelectionFrame == Time.frameCount)
                 return;
 
             if (!PlacementPreviewEntityUtility.TryGet(out var previewEntity)
@@ -30,12 +36,7 @@ namespace StaticMlp.Features.Buildings
             if (!CW.SendToServerEvent(in request))
                 return;
 
-            if (BuildingMenuStateUtility.TryGet(out var menuEntity, out _))
-            {
-                ref var state = ref menuEntity.Mut<BuildingMenuState>();
-                state.ClearSelection();
-                BuildingMenuRuntime.Publish(in state);
-            }
+            menuState.ClearSelection();
 
             PlacementPreviewEntityUtility.DestroyAll();
         }

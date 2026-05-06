@@ -1,6 +1,7 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Player;
 using StaticMlp.Game.Components.Buildings;
-using StaticMlp.Game.Systems.Client;
+using StaticMlp.Game.Input;
 using StaticMlp.Networking;
 using UnityEngine;
 
@@ -19,16 +20,18 @@ namespace StaticMlp.Features.Buildings
 
         public void Update()
         {
+            var inputState = CW.GetResource<ClientInputState>();
+
             if (!ClientLocalPlayer.TryGetPosition(out var playerPosition))
                 return;
 
             if (!TryFindNearestSite(playerPosition, out var site))
                 return;
 
-            if (BuildingPlacementInput.DepositResourcesWasPressedProvider())
+            if (inputState.WasPressed(CoreInputActions.Interact))
                 SendDeposit(site);
 
-            if (BuildingPlacementInput.BuildConstructionIsPressedProvider())
+            if (inputState.IsPressed(BuildingsInputActions.BuildConstruction))
                 SendBuild(site);
         }
 
