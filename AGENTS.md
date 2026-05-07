@@ -10,8 +10,11 @@ Short operational rules for this Unity project. Keep this file small; put detail
 - [Gameplay systems memo](ai/gameplay_systems_memo.md)
 - [StaticEcs quick reference](ai/static_ecs_reference.md)
 - [Input feature guide](ai/input_feature.md)
+- [MVC usage guidelines](ai/mvc_usage_guidelines.md)
+- [MVC package review](ai/mvc_package_review.md)
+- [ECS feature architecture layout](ai/ECS_Feature_Architecture_Layout_StaticEcs.md)
+- [Replication codegen notes](ai/replication_codegen_notes.md)
 - [Prefab XML skill](ai/prefabxml)
-- [Original multiplayer implementation plan](ai/static_ecs_unity_transport_multiplayer_plan.md)
 - Full StaticEcs documentation is available at [static-ecs FULL.txt](ai/static-ecs%20FULL.txt) when deeper API/reference details are needed.
 
 ## Core Model
