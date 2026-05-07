@@ -9,6 +9,7 @@ namespace StaticMlp.Networking.Replication {
         private const int COMPONENT_DELTA_HEADER_BYTES = 14;
 
         public readonly List<OutgoingPacket> Packets = new();
+        public readonly List<OutgoingPacket> NetworkEventPackets = new();
         private readonly List<PendingComponentBatch> _componentBatches = new();
 
         public void Enqueue(NetworkPeerId peer, byte[] payload, NetDelivery delivery) {
@@ -28,11 +29,11 @@ namespace StaticMlp.Networking.Replication {
         }
 
         public void EnqueueNetworkEvent(NetworkPeerId peer, ushort eventTypeId, byte[] payload, NetDelivery delivery) {
-            Enqueue(peer, PacketCodec.EncodeNetworkEvent(eventTypeId, payload), delivery);
+            EnqueueNetworkEventPacket(peer, PacketCodec.EncodeNetworkEvent(eventTypeId, payload), delivery);
         }
 
         internal void EnqueueNetworkEvent(in NetworkEventPacket packet) {
-            Enqueue(
+            EnqueueNetworkEventPacket(
                 packet.TargetPeer,
                 PacketCodec.EncodeNetworkEvent(packet.EventTypeId, packet.Payload),
                 packet.Delivery);
@@ -47,7 +48,17 @@ namespace StaticMlp.Networking.Replication {
 
         public void Clear() {
             Packets.Clear();
+            NetworkEventPackets.Clear();
             _componentBatches.Clear();
+        }
+
+        private void EnqueueNetworkEventPacket(NetworkPeerId peer, byte[] payload, NetDelivery delivery) {
+            NetworkTrafficProfiler.RecordOutgoingPacket(peer, delivery, payload);
+            NetworkEventPackets.Add(new OutgoingPacket {
+                Peer = peer,
+                Payload = payload,
+                Delivery = delivery
+            });
         }
 
         private PendingComponentBatch GetOrCreateComponentBatch(NetworkPeerId peer, NetDelivery delivery, int nextDeltaSize) {

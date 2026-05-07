@@ -1,9 +1,12 @@
 using System;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.EcsViews;
+using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Game.Presentation;
+using StaticMlp.Networking;
+using StaticMlp.Networking.Requests;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 
@@ -11,6 +14,33 @@ namespace StaticMlp.Features.Buildings
 {
     public sealed class BuildingsGameplayFeature : GameplayFeature
     {
+        public override void RegisterNetworkEvents()
+        {
+            NetworkEventRegistry.Register<BuildConstructionResultEvent>(
+                BuildConstructionResultEvent.NETWORK_EVENT_ID,
+                NetDelivery.ReliableSequenced,
+                BuildConstructionResultEvent.Write,
+                BuildConstructionResultEvent.TryRead);
+            NetworkEventRegistry.Register<DepositConstructionResourcesResultEvent>(
+                DepositConstructionResourcesResultEvent.NETWORK_EVENT_ID,
+                NetDelivery.ReliableSequenced,
+                DepositConstructionResourcesResultEvent.Write,
+                DepositConstructionResourcesResultEvent.TryRead);
+
+            ProjectionRegistry.Register<ResourcesInventory>();
+            ProjectionRegistry.Register<ConstructionResources>();
+            ProjectionRegistry.Register<ConstructionSiteState>();
+            ProjectionRegistry.Register<ConstructionProgress>();
+            RequestRegistry.Register<BuildConstructionRequestEvent, BuildConstructionResultEvent>(
+                new BuildConstructionHandler(),
+                new BuildConstructionProjector(),
+                GameplaySystemOrder.Gameplay - 60);
+            RequestRegistry.Register<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(
+                new DepositConstructionResourcesHandler(),
+                new DepositConstructionResourcesProjector(),
+                GameplaySystemOrder.Gameplay - 70);
+        }
+
         public override void RegisterPrefabs()
         {
             for (var i = 0; i < BuildingCatalogData.All.Count; i++)
@@ -23,8 +53,6 @@ namespace StaticMlp.Features.Buildings
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
             systems.Add(new ServerPlaceBuildingRequestSystem(), GameplaySystemOrder.Gameplay - 80);
-            systems.Add(new ServerDepositConstructionResourcesSystem(), GameplaySystemOrder.Gameplay - 70);
-            systems.Add(new ServerBuildConstructionSystem(), GameplaySystemOrder.Gameplay - 60);
             systems.Add(new ServerCompleteConstructionSystem(), GameplaySystemOrder.Gameplay - 50);
         }
 

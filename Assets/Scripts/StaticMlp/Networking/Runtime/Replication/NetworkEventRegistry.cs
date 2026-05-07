@@ -40,6 +40,9 @@ namespace StaticMlp.Networking.Replication
         {
             if (!CW.Handle.TryGetEventsHandle(typeof(NetworkEventPacket), out _))
                 CW.Types().Event<NetworkEventPacket>();
+
+            foreach (var handler in HandlersByType.Values)
+                handler.RegisterClientWorldType();
         }
 
         public static string GetEventDisplayName(ushort eventTypeId)
@@ -82,12 +85,20 @@ namespace StaticMlp.Networking.Replication
                    && handler.TryApplyToServer(in packet);
         }
 
+        internal static bool TryApplyToClient(in NetworkEventPacket packet)
+        {
+            return HandlersById.TryGetValue(packet.EventTypeId, out var handler)
+                   && handler.TryApplyToClient(in packet);
+        }
+
         private interface IHandler
         {
             Type EventType { get; }
             ushort EventTypeId { get; }
             NetDelivery Delivery { get; }
+            void RegisterClientWorldType();
             void RegisterServerWorldType();
+            bool TryApplyToClient(in NetworkEventPacket packet);
             bool TryApplyToServer(in NetworkEventPacket packet);
         }
 
@@ -116,9 +127,20 @@ namespace StaticMlp.Networking.Replication
             public byte[] Write(TEvent evt) => 
                 _writer(in evt);
 
+            public void RegisterClientWorldType()
+            {
+                CW.Types().Event<NetworkEventFromServer<TEvent>>();
+            }
+
             public void RegisterServerWorldType()
             {
                 SW.Types().Event<NetworkEventFromClient<TEvent>>();
+            }
+
+            public bool TryApplyToClient(in NetworkEventPacket packet)
+            {
+                return _reader(packet.Payload, out var typed)
+                       && CW.SendEvent(new NetworkEventFromServer<TEvent>(packet.SourcePeer, in typed));
             }
 
             public bool TryApplyToServer(in NetworkEventPacket packet)

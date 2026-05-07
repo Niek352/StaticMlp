@@ -3,6 +3,7 @@ using StaticMlp.Features.Player;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Game.Input;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Requests;
 using UnityEngine;
 
 namespace StaticMlp.Features.Buildings
@@ -40,7 +41,7 @@ namespace StaticMlp.Features.Buildings
             if (!site.Has<ConstructionResources>())
                 return;
 
-            var resources = site.Read<ConstructionResources>();
+            ref readonly var resources = ref ClientProjection.Read<ConstructionResources>(site);
             if (resources.IsComplete)
                 return;
 
@@ -49,7 +50,7 @@ namespace StaticMlp.Features.Buildings
                 resources.RemainingWood,
                 resources.RemainingStone);
 
-            CW.SendToServerEvent(in request);
+            RequestApi.Send(request);
         }
 
         private void SendBuild(CW.Entity site)
@@ -57,8 +58,8 @@ namespace StaticMlp.Features.Buildings
             if (!site.Has<ConstructionSiteState>() || !site.Has<ConstructionResources>())
                 return;
 
-            var state = site.Read<ConstructionSiteState>();
-            var resources = site.Read<ConstructionResources>();
+            ref readonly var state = ref ClientProjection.Read<ConstructionSiteState>(site);
+            ref readonly var resources = ref ClientProjection.Read<ConstructionResources>(site);
             if (!resources.IsComplete
                 || (state.Phase != ConstructionPhase.ReadyToBuild
                     && state.Phase != ConstructionPhase.BuildingInProgress))
@@ -68,7 +69,7 @@ namespace StaticMlp.Features.Buildings
                 site.GID,
                 _buildWorkPerSecond * Time.deltaTime);
 
-            CW.SendToServerEvent(in request);
+            RequestApi.Send(request);
         }
 
         private bool TryFindNearestSite(Vector3 playerPosition, out CW.Entity site)
@@ -79,7 +80,7 @@ namespace StaticMlp.Features.Buildings
 
             foreach (var e in CW.Query<All<ConstructionSiteTag, ConstructionTransform, ConstructionSiteState>>().Entities())
             {
-                var state = e.Read<ConstructionSiteState>();
+                ref readonly var state = ref ClientProjection.Read<ConstructionSiteState>(e);
                 if (state.Phase == ConstructionPhase.Completed)
                     continue;
 

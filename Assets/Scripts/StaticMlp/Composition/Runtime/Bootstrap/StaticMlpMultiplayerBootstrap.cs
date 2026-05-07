@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Requests;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
 using Steamworks;
@@ -49,6 +50,7 @@ namespace StaticMlp.Composition
         private bool _serverStarted;
         private bool _clientStarted;
         private bool _steamInitialized;
+        private string _steamInitializationFailure = string.Empty;
         private ulong _pendingSteamLobbyId;
         private ulong _pendingSteamHostSteamId;
         private Lobby? _activeSteamLobby;
@@ -69,14 +71,14 @@ namespace StaticMlp.Composition
         public string LocalSteamName => _steamInitialized ? SteamClient.Name : "-";
         public ulong LocalSteamId => _steamInitialized ? (ulong)SteamClient.SteamId : 0;
         public ulong ActiveSteamLobbyId => _activeSteamLobby.HasValue ? (ulong)_activeSteamLobby.Value.Id : 0;
+        public string SteamInitializationFailure => _steamInitializationFailure;
 
         private void Awake()
         {
             if (dontDestroyOnLoad)
                 DontDestroyOnLoad(gameObject);
 
-            if (UsesSteamTransport) {
-                EnsureSteamInitialized();
+            if (UsesSteamTransport && EnsureSteamInitialized()) {
                 SteamClient.RunCallbacks();
             }
 
@@ -172,6 +174,20 @@ namespace StaticMlp.Composition
             StartClient();
         }
 
+        public void SetTransportBackend(TransportBackend backend)
+        {
+            if (IsRunning)
+                throw new InvalidOperationException("Cannot change transport while multiplayer is running. Disconnect first.");
+
+            transportBackend = backend;
+
+            if (backend == TransportBackend.Steam) {
+                EnsureSteamInitialized();
+            } else {
+                ShutdownSteam();
+            }
+        }
+
         private void RestartAs(RunMode nextRunMode)
         {
             if (IsRunning)
@@ -189,13 +205,15 @@ namespace StaticMlp.Composition
                 return;
             }
 
+            if (transportBackend == TransportBackend.Steam && !EnsureSteamInitialized())
+                return;
+
             Log("Creating server world");
             MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(),
                 NetworkEventRegistry.RegisterServerWorldTypes,
                 ecsTypeAssemblies: GameplayAssemblies());
 
             if (transportBackend == TransportBackend.Steam) {
-                EnsureSteamInitialized();
                 Log($"Starting Steam server transport as steamId={LocalSteamId} on virtual port {steamVirtualPort}");
                 _serverTransport = SteamTransportStartup.StartServer(steamVirtualPort);
             } else {
@@ -219,12 +237,14 @@ namespace StaticMlp.Composition
                 return;
             }
 
+            if (transportBackend == TransportBackend.Steam && !EnsureSteamInitialized())
+                return;
+
             Log("Creating client world");
             MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig(),
                 RegisterClientCoreGeneratedTypes, ecsTypeAssemblies: GameplayAssemblies());
 
             if (transportBackend == TransportBackend.Steam) {
-                EnsureSteamInitialized();
                 var hostSteamId = ResolveSteamHostId();
                 Log($"Starting Steam client transport to steamId={hostSteamId} on virtual port {steamVirtualPort}");
                 _clientTransport = SteamTransportStartup.StartClient((SteamId)hostSteamId, steamVirtualPort);
@@ -267,6 +287,7 @@ namespace StaticMlp.Composition
         {
             ReplicationRegistry.RegisterClientCoreGeneratedTypes();
             NetworkEventRegistry.RegisterClientWorldTypes();
+            ProjectionRegistry.RegisterClientWorldTypes();
         }
 
         public void Shutdown()
@@ -357,19 +378,35 @@ namespace StaticMlp.Composition
             Log($"Opened Steam invite overlay for lobby {(ulong)_activeSteamLobby.Value.Id}");
         }
 
-        private void EnsureSteamInitialized()
+        private bool EnsureSteamInitialized()
         {
             if (_steamInitialized)
-                return;
+                return true;
 
-            SteamClient.Init(steamAppId, asyncCallbacks: false);
+            _steamInitializationFailure = string.Empty;
+
+            try
+            {
+                SteamClient.Init(steamAppId, asyncCallbacks: false);
+            }
+            catch (Exception e)
+            {
+                _steamInitializationFailure = BuildSteamInitializationFailureMessage(e);
+                Debug.LogWarning($"[StaticMlpBootstrap] {_steamInitializationFailure}", this);
+                return false;
+            }
+
             SteamFriends.OnGameLobbyJoinRequested += HandleSteamLobbyJoinRequested;
             _steamInitialized = true;
+            _steamInitializationFailure = string.Empty;
             Log($"Steam initialized as {SteamClient.Name} ({(ulong)SteamClient.SteamId})");
+            return true;
         }
 
         private void ShutdownSteam()
         {
+            _steamInitializationFailure = string.Empty;
+
             if (!_steamInitialized)
                 return;
 
@@ -435,7 +472,8 @@ namespace StaticMlp.Composition
 
         private async Task JoinSteamLobbyAndStartClientAsync(ulong lobbyIdValue)
         {
-            EnsureSteamInitialized();
+            if (!EnsureSteamInitialized())
+                throw new InvalidOperationException(_steamInitializationFailure);
 
             var lobbyResult = await SteamMatchmaking.JoinLobbyAsync((SteamId)lobbyIdValue);
             if (!lobbyResult.HasValue)
@@ -487,6 +525,25 @@ namespace StaticMlp.Composition
 
             _activeSteamLobby.Value.Leave();
             _activeSteamLobby = null;
+        }
+
+        private string BuildSteamInitializationFailureMessage(Exception exception)
+        {
+            if (exception is null)
+                return "Steam initialization failed.";
+
+            var message = exception.Message?.Trim();
+            if (string.IsNullOrEmpty(message))
+                return "Steam initialization failed.";
+
+            var lowerMessage = message.ToLowerInvariant();
+            if (lowerMessage.Contains("steam") &&
+                (lowerMessage.Contains("not running") || lowerMessage.Contains("no connection")))
+            {
+                return "Steam transport selected, but Steam is not running. Start Steam and retry, or switch transport to UTP.";
+            }
+
+            return $"Steam initialization failed: {message}";
         }
     }
 }

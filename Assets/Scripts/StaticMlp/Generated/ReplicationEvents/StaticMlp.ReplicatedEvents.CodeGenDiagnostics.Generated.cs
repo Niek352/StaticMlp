@@ -2,3 +2,4 @@
 namespace StaticMlp.Networking.Replication.Generated {
     public static class ReplicatedEventsCodeGenDiagnostics { }
 }
+

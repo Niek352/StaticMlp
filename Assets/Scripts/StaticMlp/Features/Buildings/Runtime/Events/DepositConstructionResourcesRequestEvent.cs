@@ -2,18 +2,21 @@ using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
+using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Buildings
 {
     [ReplicatedEvent(NetDelivery.ReliableSequenced)]
-    public struct DepositConstructionResourcesRequestEvent : IEvent, IEventConfig<DepositConstructionResourcesRequestEvent>
+    public struct DepositConstructionResourcesRequestEvent : IEvent, IRequest<DepositConstructionResourcesResultEvent>, IEventConfig<DepositConstructionResourcesRequestEvent>
     {
-        public EntityGID Site;
-        public int Wood;
-        public int Stone;
+        public RequestId RequestId { get; set; }
+        public EntityGID Site { get; set; }
+        public int Wood { get; set; }
+        public int Stone { get; set; }
 
         public DepositConstructionResourcesRequestEvent(EntityGID site, int wood, int stone)
         {
+            RequestId = default;
             Site = site;
             Wood = wood;
             Stone = stone;

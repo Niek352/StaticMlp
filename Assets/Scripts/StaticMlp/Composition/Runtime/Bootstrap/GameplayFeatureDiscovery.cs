@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Game.Bootstrap;
+using StaticMlp.Game.Requests;
+using StaticMlp.Networking.Requests;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Replication.Generated;
 
@@ -36,7 +38,12 @@ namespace StaticMlp.Composition
         public static void RegisterNetworkEvents()
         {
             NetworkEventRegistry.Clear();
+            RequestRegistry.Clear();
+            ProjectionRegistry.Clear();
             ReplicatedNetworkEventRegistry.RegisterNetworkEvents();
+
+            foreach (var feature in GetFeatures())
+                feature.RegisterNetworkEvents();
         }
 
         public static void RegisterReplicationComponents()
@@ -56,12 +63,16 @@ namespace StaticMlp.Composition
         {
             foreach (var feature in GetFeatures())
                 feature.RegisterServerSystems(systems);
+
+            RequestRuntimeBootstrap.RegisterServerSystems(systems);
         }
 
         public static void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
             foreach (var feature in GetFeatures())
                 feature.RegisterClientCoreSystems(systems);
+
+            RequestRuntimeBootstrap.RegisterClientCoreSystems(systems);
         }
 
         public static void RegisterClientViewSync(ViewSyncBuilder views)

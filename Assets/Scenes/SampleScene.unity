@@ -629,12 +629,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dee233abf08929540b59fc7c8e3f4571, type: 3}
   m_Name: 
   m_EditorClassIdentifier: StaticMlp.Composition::StaticMlp.Composition.StaticMlpMultiplayerBootstrap
-  runMode: 2
+  runMode: 1
   useMultiplayerPlayModeTags: 1
   startOnAwake: 0
   dontDestroyOnLoad: 1
   enableLogs: 1
-  transportBackend: 0
+  transportBackend: 1
   connectHost: 127.0.0.1
   port: 7777
   steamAppId: 480

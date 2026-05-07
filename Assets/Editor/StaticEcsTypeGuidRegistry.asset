@@ -176,6 +176,24 @@ MonoBehaviour:
       - className: InputActionReleasedEvent
         namespaceName: StaticMlp.Game.Input
         assembly: Game.Core
+    - guid: f5910f59-cf18-4370-bfad-7251af0cb3d4
+      current:
+        className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+      history:
+      - className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+    - guid: 998f596e-433b-4b10-b557-03b292444df2
+      current:
+        className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+      history:
+      - className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
     links: []
     linksList: []
     multi: []
@@ -342,6 +360,24 @@ MonoBehaviour:
       - className: InputActionReleasedEvent
         namespaceName: StaticMlp.Game.Input
         assembly: Game.Core
+    - guid: f5910f59-cf18-4370-bfad-7251af0cb3d4
+      current:
+        className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+      history:
+      - className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+    - guid: 998f596e-433b-4b10-b557-03b292444df2
+      current:
+        className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
+      history:
+      - className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings
     links: []
     linksList: []
     multi: []

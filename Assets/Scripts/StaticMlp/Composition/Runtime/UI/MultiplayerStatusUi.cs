@@ -1,4 +1,5 @@
 using TMPro;
+using StaticMlp.Networking.Transport;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,8 @@ namespace StaticMlp.Composition
         [SerializeField] private Button hostButton;
         [SerializeField] private Button serverButton;
         [SerializeField] private Button clientButton;
+        [SerializeField] private Button utpTransportButton;
+        [SerializeField] private Button steamTransportButton;
         [SerializeField] private Button inviteButton;
         [SerializeField] private Button copySteamIdButton;
         [SerializeField] private Button pasteSteamIdButton;
@@ -35,6 +38,10 @@ namespace StaticMlp.Composition
                 throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(serverButton)}.");
             if (clientButton == null)
                 throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(clientButton)}.");
+            if (utpTransportButton == null)
+                throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(utpTransportButton)}.");
+            if (steamTransportButton == null)
+                throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(steamTransportButton)}.");
             if (inviteButton == null)
                 throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(inviteButton)}.");
             if (copySteamIdButton == null)
@@ -54,6 +61,8 @@ namespace StaticMlp.Composition
             hostButton.onClick.AddListener(StartHost);
             serverButton.onClick.AddListener(StartServer);
             clientButton.onClick.AddListener(StartClient);
+            utpTransportButton.onClick.AddListener(UseUtpTransport);
+            steamTransportButton.onClick.AddListener(UseSteamTransport);
             inviteButton.onClick.AddListener(InviteFriend);
             copySteamIdButton.onClick.AddListener(CopySteamId);
             pasteSteamIdButton.onClick.AddListener(PasteSteamId);
@@ -67,6 +76,8 @@ namespace StaticMlp.Composition
             hostButton.onClick.RemoveListener(StartHost);
             serverButton.onClick.RemoveListener(StartServer);
             clientButton.onClick.RemoveListener(StartClient);
+            utpTransportButton.onClick.RemoveListener(UseUtpTransport);
+            steamTransportButton.onClick.RemoveListener(UseSteamTransport);
             inviteButton.onClick.RemoveListener(InviteFriend);
             copySteamIdButton.onClick.RemoveListener(CopySteamId);
             pasteSteamIdButton.onClick.RemoveListener(PasteSteamId);
@@ -93,6 +104,16 @@ namespace StaticMlp.Composition
         private void StartClient()
         {
             _bootstrap.StartClient();
+        }
+
+        private void UseUtpTransport()
+        {
+            _bootstrap.SetTransportBackend(TransportBackend.Utp);
+        }
+
+        private void UseSteamTransport()
+        {
+            _bootstrap.SetTransportBackend(TransportBackend.Steam);
         }
 
         private void Disconnect()
@@ -145,6 +166,9 @@ namespace StaticMlp.Composition
                 var steamId = _bootstrap.LocalSteamId == 0 ? "-" : _bootstrap.LocalSteamId.ToString();
                 var lobbyId = _bootstrap.ActiveSteamLobbyId == 0 ? "-" : _bootstrap.ActiveSteamLobbyId.ToString();
                 status += $"\nSteam: {_bootstrap.LocalSteamName} ({steamId})\nLobby: {lobbyId}";
+
+                if (!string.IsNullOrEmpty(_bootstrap.SteamInitializationFailure))
+                    status += $"\nSteam status: {_bootstrap.SteamInitializationFailure}";
             } else {
                 status += $"  Port: {_bootstrap.Port}";
             }
@@ -154,6 +178,9 @@ namespace StaticMlp.Composition
                 steamIdInput.SetTextWithoutNotify(_bootstrap.ConnectSteamId);
 
             clientButton.interactable = _bootstrap.CanStartClientManually;
+            var canChangeTransport = !_bootstrap.IsRunning;
+            utpTransportButton.interactable = canChangeTransport;
+            steamTransportButton.interactable = canChangeTransport;
             inviteButton.interactable = _bootstrap.CanInviteFriend;
             copySteamIdButton.interactable = _bootstrap.UsesSteamTransport && _bootstrap.LocalSteamId != 0;
             pasteSteamIdButton.interactable = _bootstrap.UsesSteamTransport;

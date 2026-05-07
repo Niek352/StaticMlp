@@ -1,20 +1,46 @@
 <UnityPrefab>
-    <GameObject name="MultiplayerStatusUi">
+    <GameObject name="MultiplayerStatus UI">
         <RectTransform m_AnchorMin="0, 0" m_AnchorMax="0, 0" m_Pivot="0, 0" m_SizeDelta="0, 0" />
         <Canvas m_RenderMode="0" m_SortingOrder="100" />
         <CanvasScaler m_UiScaleMode="1" m_ReferenceResolution="1920, 1080" m_ScreenMatchMode="0" m_MatchWidthOrHeight="0.5" />
         <GraphicRaycaster />
-        <MultiplayerStatusUi statusText="#StatusText" hostButton="#HostButton" serverButton="#ServerButton" clientButton="#ClientButton" inviteButton="#InviteButton" copySteamIdButton="#CopySteamIdButton" pasteSteamIdButton="#PasteSteamIdButton" connectSteamButton="#ConnectSteamButton" steamIdInput="#SteamIdInput" disconnectButton="#DisconnectButton" />
+        <MultiplayerStatusUi statusText="#StatusText" hostButton="#HostButton" serverButton="#ServerButton" clientButton="#ClientButton" utpTransportButton="#UtpTransportButton" steamTransportButton="#SteamTransportButton" inviteButton="#InviteButton" copySteamIdButton="#CopySteamIdButton" pasteSteamIdButton="#PasteSteamIdButton" connectSteamButton="#ConnectSteamButton" steamIdInput="#SteamIdInput" disconnectButton="#DisconnectButton" />
 
         <GameObject name="Panel">
-            <RectTransform m_AnchorMin="0, 1" m_AnchorMax="0, 1" m_Pivot="0, 1" m_SizeDelta="360, 388" m_AnchoredPosition="18, -18" />
+            <RectTransform m_AnchorMin="0, 1" m_AnchorMax="0, 1" m_Pivot="0, 1" m_SizeDelta="360, 438" m_AnchoredPosition="18, -18" />
             <Image m_Color="#16202BE6" m_RaycastTarget="true" />
             <VerticalLayoutGroup m_Padding.m_Left="14" m_Padding.m_Right="14" m_Padding.m_Top="12" m_Padding.m_Bottom="12" m_Spacing="10" m_ChildControlWidth="true" m_ChildControlHeight="true" m_ChildForceExpandWidth="true" m_ChildForceExpandHeight="false" />
 
             <GameObject name="StatusText" id="StatusText">
-                <RectTransform m_SizeDelta="0, 108" />
+                <RectTransform m_SizeDelta="0, 136" />
                 <TextMeshProUGUI m_text="Multiplayer: Disconnected" m_fontSize="18" m_fontColor="#F2F7FB" m_HorizontalAlignment="1" m_VerticalAlignment="512" m_TextWrappingMode="1" m_overflowMode="1" m_RaycastTarget="false" />
-                <LayoutElement m_PreferredHeight="108" />
+                <LayoutElement m_PreferredHeight="136" />
+            </GameObject>
+
+            <GameObject name="TransportRow">
+                <RectTransform m_SizeDelta="0, 34" />
+                <HorizontalLayoutGroup m_Spacing="8" m_ChildControlWidth="true" m_ChildForceExpandWidth="true" m_ChildForceExpandHeight="false" />
+                <LayoutElement m_PreferredHeight="34" />
+
+                <GameObject name="UtpTransportButton" id="UtpTransportButton">
+                    <RectTransform m_SizeDelta="120, 34" />
+                    <Image m_Color="#546A9A" m_RaycastTarget="true" />
+                    <Button m_Interactable="true" m_Transition="1" m_Colors.m_NormalColor="#FFFFFF" m_Colors.m_HighlightedColor="#E5EBFF" m_Colors.m_PressedColor="#CAD8FF" m_Colors.m_SelectedColor="#FFFFFF" m_Colors.m_DisabledColor="#6A7585AA" m_Colors.m_ColorMultiplier="1" m_Colors.m_FadeDuration="0.08" />
+                    <GameObject name="Label">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+                        <TextMeshProUGUI m_text="Use UTP" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_TextWrappingMode="0" m_overflowMode="1" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+
+                <GameObject name="SteamTransportButton" id="SteamTransportButton">
+                    <RectTransform m_SizeDelta="120, 34" />
+                    <Image m_Color="#2B7DE9" m_RaycastTarget="true" />
+                    <Button m_Interactable="true" m_Transition="1" m_Colors.m_NormalColor="#FFFFFF" m_Colors.m_HighlightedColor="#DDEBFF" m_Colors.m_PressedColor="#B6D4FF" m_Colors.m_SelectedColor="#FFFFFF" m_Colors.m_DisabledColor="#6A7585AA" m_Colors.m_ColorMultiplier="1" m_Colors.m_FadeDuration="0.08" />
+                    <GameObject name="Label">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+                        <TextMeshProUGUI m_text="Use Steam" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_TextWrappingMode="0" m_overflowMode="1" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
             </GameObject>
 
             <GameObject name="ButtonsRow">
@@ -94,7 +120,7 @@
             <GameObject name="SteamIdInput" id="SteamIdInput">
                 <RectTransform m_SizeDelta="0, 38" />
                 <Image m_Color="#0F1620" m_RaycastTarget="true" />
-                <TMP_InputField m_CharacterValidation="1" m_ContentType="0" m_LineType="0" m_CharacterLimit="20" m_ShouldHideMobileInput="true" m_RichText="false" m_ResetOnDeActivation="false" m_RestoreOriginalTextOnEscape="false" m_OnFocusSelectAll="false">
+                <TMP_InputField m_CharacterValidation="1" m_ContentType="0" m_LineType="0" m_CharacterLimit="20" m_RichText="false" m_ResetOnDeActivation="false" m_RestoreOriginalTextOnEscape="false" m_OnFocusSelectAll="false">
                     <textViewport>
                         <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_OffsetMin="10, 6" m_OffsetMax="-10, -6" />
                         <RectMask2D />

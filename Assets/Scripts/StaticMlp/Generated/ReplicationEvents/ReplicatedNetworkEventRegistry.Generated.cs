@@ -3,6 +3,7 @@ using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
+using StaticMlp.Networking.Requests;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Game.Systems;
 using UnityEngine;
@@ -33,7 +34,8 @@ namespace StaticMlp.Networking.Replication.Generated {
         }
 
         private static byte[] WriteBuildConstructionRequestEvent(in BuildConstructionRequestEvent evt) {
-            var writer = BinaryPackWriter.CreateFromPool(16);
+            var writer = BinaryPackWriter.CreateFromPool(20);
+            writer.WriteUint(evt.RequestId.Value);
             writer.WriteUlong(evt.Site.Raw);
             writer.WriteFloat(evt.WorkAmount);
             var bytes = writer.CopyToBytes();
@@ -50,6 +52,7 @@ namespace StaticMlp.Networking.Replication.Generated {
 
                 var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
                 evt = new BuildConstructionRequestEvent {
+                    RequestId = new RequestId(reader.ReadUint()),
                     Site = new EntityGID(reader.ReadUlong()),
                     WorkAmount = reader.ReadFloat(),
                 };
@@ -61,7 +64,8 @@ namespace StaticMlp.Networking.Replication.Generated {
         }
 
         private static byte[] WriteDepositConstructionResourcesRequestEvent(in DepositConstructionResourcesRequestEvent evt) {
-            var writer = BinaryPackWriter.CreateFromPool(16);
+            var writer = BinaryPackWriter.CreateFromPool(20);
+            writer.WriteUint(evt.RequestId.Value);
             writer.WriteUlong(evt.Site.Raw);
             writer.WriteInt(evt.Wood);
             writer.WriteInt(evt.Stone);
@@ -79,6 +83,7 @@ namespace StaticMlp.Networking.Replication.Generated {
 
                 var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
                 evt = new DepositConstructionResourcesRequestEvent {
+                    RequestId = new RequestId(reader.ReadUint()),
                     Site = new EntityGID(reader.ReadUlong()),
                     Wood = reader.ReadInt(),
                     Stone = reader.ReadInt(),

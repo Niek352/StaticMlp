@@ -12,6 +12,9 @@ namespace StaticMlp.Networking.Transport {
             foreach (var packet in outbox.Packets)
                 ctx.Send(packet.Peer, packet.Payload, packet.Delivery);
 
+            foreach (var packet in outbox.NetworkEventPackets)
+                ctx.Send(packet.Peer, packet.Payload, packet.Delivery);
+
             outbox.Clear();
         }
     }

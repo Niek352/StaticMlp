@@ -2,6 +2,7 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Buildings
 {
@@ -19,11 +20,11 @@ namespace StaticMlp.Features.Buildings
 
             foreach (var e in CW.Query<All<ConstructionSiteState, ConstructionResources, ConstructionProgress, ConstructionViewState>>().Entities())
             {
-                ref readonly var resources = ref e.Read<ConstructionResources>();
-                ref readonly var progress = ref e.Read<ConstructionProgress>();
+                ref readonly var resources = ref ClientProjection.Read<ConstructionResources>(e);
+                ref readonly var progress = ref ClientProjection.Read<ConstructionProgress>(e);
                 var next = new ConstructionViewState
                 {
-                    Phase = e.Read<ConstructionSiteState>().Phase,
+                    Phase = ClientProjection.Read<ConstructionSiteState>(e).Phase,
                     WoodRequired = resources.WoodRequired,
                     StoneRequired = resources.StoneRequired,
                     WoodDelivered = resources.WoodDelivered,
