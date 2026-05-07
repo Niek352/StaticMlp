@@ -155,7 +155,7 @@ namespace StaticMlp.Networking.Replication
         {
             foreach (var e in SW.Query<All<NetworkedTag, NetworkIdentity, NetworkDirty, NetworkReplicationState>>().Entities())
             {
-                CollectDirty(e, outbox, peers, ReplicationAuthority.Server);
+                CollectDirty(e, outbox, peers);
                 e.Delete<NetworkDirty>();
             }
         }
@@ -210,12 +210,11 @@ namespace StaticMlp.Networking.Replication
         private static void CollectDirty(
             SW.Entity e,
             NetOutbox outbox,
-            IReadOnlyList<NetworkPeerId> peers,
-            ReplicationAuthority authority)
+            IReadOnlyList<NetworkPeerId> peers)
         {
             foreach (var handler in ComponentHandlers.Values)
             {
-                if (handler.Authority != authority || !handler.HasChanged(e))
+                if (!CanCollectDirtyOnServer(e, handler) || !handler.HasChanged(e))
                     continue;
 
                 var delta = handler.CreateDelta(e);
@@ -228,6 +227,15 @@ namespace StaticMlp.Networking.Replication
                     outbox.EnqueueComponentDelta(peer, delta, handler.Delivery);
                 }
             }
+        }
+
+        private static bool CanCollectDirtyOnServer(SW.Entity e, IComponentHandler handler)
+        {
+            if (handler.Authority == ReplicationAuthority.Server)
+                return true;
+
+            // Server-owned NPCs can reuse owner-authoritative replicated components such as CharacterNetState.
+            return handler.Authority == ReplicationAuthority.Owner && e.Has<ServerOwned>();
         }
 
         private static bool CanSendToPeer(SW.Entity e, NetworkPeerId peer, ReplicationAudience audience)

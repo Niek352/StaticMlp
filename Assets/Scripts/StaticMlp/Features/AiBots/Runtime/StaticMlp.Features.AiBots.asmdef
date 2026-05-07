@@ -1,19 +1,14 @@
 {
-    "name": "StaticMlp.Composition",
-    "rootNamespace": "StaticMlp.Composition",
+    "name": "StaticMlp.Features.AiBots",
+    "rootNamespace": "StaticMlp.Features.AiBots",
     "references": [
         "FFS.StaticEcs",
-        "FFS.StaticEcs.Unity",
+        "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core",
-        "StaticMlp.Generated",
-        "StaticMlp.Features.AiBots",
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.EcsViews",
-        "Unity.InputSystem",
-        "Unity.TextMeshPro",
-        "UnityEngine.UI",
-        "Code.EcsUi.Mvc"
+        "FFS.StaticEcs.Unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

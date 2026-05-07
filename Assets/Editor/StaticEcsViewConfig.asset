@@ -15,15 +15,14 @@ MonoBehaviour:
   worlds:
   - worldTypeFullName: StaticMlp.Networking.ServerWT
     main:
-      selectedTabName: 
+      selectedTabName: Entities
       drawRate: 0.5
       drawFrames: 2
     entities:
       componentColumns:
       - StaticMlp/Networking/NetworkIdentity
+      - StaticMlp/Features/AiBots/AiTaskState
       tagColumns:
-      - StaticMlp/Networking/Ownership/LocalOwned
-      - StaticMlp/Networking/Ownership/RemoteOwned
       - StaticMlp/Networking/Ownership/ServerOwned
       - StaticMlp/Networking/Ownership/ClientOwned
       - StaticMlp/Networking/Ownership/NetworkedTag

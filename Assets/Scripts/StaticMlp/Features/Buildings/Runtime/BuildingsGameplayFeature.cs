@@ -52,6 +52,7 @@ namespace StaticMlp.Features.Buildings
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
+            systems.Add(new ServerInitialConstructionSiteSpawnSystem(), GameplaySystemOrder.ServerConnectionGameplay + 20);
             systems.Add(new ServerPlaceBuildingRequestSystem(), GameplaySystemOrder.Gameplay - 80);
             systems.Add(new ServerCompleteConstructionSystem(), GameplaySystemOrder.Gameplay - 50);
         }

@@ -1,0 +1,12 @@
+<UnityPrefab>
+    <GameObject name="BotCharacterView">
+        <EntityView />
+        <TransformViewComponent />
+        <BotViewPart 
+            bodyColor="#B24030"
+            accentColor="#E4C76F"
+            bodyScale="0.85, 1.1, 0.85"
+            headLocalPosition="0, 0.95, 0"
+            headScale="0.45, 0.45, 0.45" />
+    </GameObject>
+</UnityPrefab>

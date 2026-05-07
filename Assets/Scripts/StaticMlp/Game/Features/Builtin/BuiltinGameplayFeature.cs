@@ -31,7 +31,6 @@ namespace StaticMlp.Game.Features.Builtin
         {
             systems.Add(new ServerPeerDisconnectCleanupSystem(), GameplaySystemOrder.ServerConnectionGameplay - 1);
             systems.Add(new ServerSpawnCubeRequestSystem(), GameplaySystemOrder.Gameplay - 50);
-            systems.Add(new ServerAiSystem(), GameplaySystemOrder.Gameplay);
         }
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)

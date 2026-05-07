@@ -102,6 +102,15 @@ MonoBehaviour:
       - className: ResourcesInventory
         namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
         assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: f84abac5-9978-4f04-85e7-3f91c43d8192
+      current:
+        className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+      history:
+      - className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -286,6 +295,15 @@ MonoBehaviour:
       - className: ResourcesInventory
         namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
         assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: f84abac5-9978-4f04-85e7-3f91c43d8192
+      current:
+        className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+      history:
+      - className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47

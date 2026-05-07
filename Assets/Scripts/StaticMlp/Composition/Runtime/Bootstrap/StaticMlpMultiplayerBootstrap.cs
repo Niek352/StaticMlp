@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Buildings;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
 using StaticMlp.Networking.Replication;
@@ -41,6 +43,24 @@ namespace StaticMlp.Composition
 
         [Header("UI")] [SerializeField] private bool showMultiplayerUi = true;
         [SerializeField] private string multiplayerUiResourcePath = "Views/MultiplayerStatusUi";
+
+        [Header("Initial Bots")] [SerializeField]
+        private InitialBotSpawnDefinition[] initialBotSpawns = {
+            new() { Position = new Vector3(0f, 0f, 8f), BehaviorId = AiBehaviorCatalogDefaults.PeacefulBuilderBehaviorId, Health01 = 1f, Hunger = 0.1f, Fear = 0.05f, LeaderIndex = -1 },
+            new() { Position = new Vector3(-2.5f, 0f, 10f), BehaviorId = AiBehaviorCatalogDefaults.PeacefulBuilderBehaviorId, Health01 = 1f, Hunger = 0.15f, Fear = 0.05f, LeaderIndex = 0 },
+            new() { Position = new Vector3(2.5f, 0f, 10f), BehaviorId = AiBehaviorCatalogDefaults.PeacefulBuilderBehaviorId, Health01 = 0.35f, Hunger = 0.1f, Fear = 0.55f, LeaderIndex = 0 }
+        };
+
+        [Header("Initial Construction Sites")] [SerializeField]
+        private InitialConstructionSiteDefinition[] initialConstructionSites = {
+            new() {
+                BuildingId = 1,
+                Position = new Vector3(0f, 0f, 16f),
+                Rotation = new Quaternion(0f, 0f, 0f, 1f),
+                StartReadyToBuild = true,
+                InitialBuildWork = 0f
+            }
+        };
 
         private System.IDisposable _serverTransport;
         private System.IDisposable _clientTransport;
@@ -212,6 +232,8 @@ namespace StaticMlp.Composition
             MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(),
                 NetworkEventRegistry.RegisterServerWorldTypes,
                 ecsTypeAssemblies: GameplayAssemblies());
+            SW.SetResource(new InitialBotSpawningResource(initialBotSpawns));
+            SW.SetResource(new InitialConstructionSiteSpawningResource(initialConstructionSites));
 
             if (transportBackend == TransportBackend.Steam) {
                 Log($"Starting Steam server transport as steamId={LocalSteamId} on virtual port {steamVirtualPort}");
