@@ -47,7 +47,7 @@ namespace StaticMlp.Features.AiBots
             systems.Add(new ServerAiWorkTargetSystem(), GameplaySystemOrder.Gameplay - 60);
             systems.Add(new ServerAiUtilityDecisionSystem(), GameplaySystemOrder.Gameplay - 50);
             systems.Add(new ServerAiTaskExecutionSystem(), GameplaySystemOrder.Gameplay - 40);
-            systems.Add(new ServerAiMovementSystem(), GameplaySystemOrder.Gameplay - 30);
+            systems.Add(new ServerAiNavigationSystem(), GameplaySystemOrder.Gameplay - 30);
             systems.Add(new ServerAiNetStateSystem(), GameplaySystemOrder.CollectReplication - 10);
         }
     }

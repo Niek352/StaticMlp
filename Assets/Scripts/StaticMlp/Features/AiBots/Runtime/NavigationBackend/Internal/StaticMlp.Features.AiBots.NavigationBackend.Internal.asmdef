@@ -1,0 +1,23 @@
+{
+    "name": "StaticMlp.Features.AiBots.NavigationBackend.Internal",
+    "rootNamespace": "StaticMlp.Features.AiBots",
+    "references": [
+        "StaticMlp.Features.AiBots",
+        "ProjectDawn.Navigation",
+        "ProjectDawn.Navigation.Hybrid",
+        "Unity.Collections",
+        "Unity.Entities",
+        "Unity.Mathematics",
+        "FFS.StaticEcs",
+        "Unity.Transforms"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

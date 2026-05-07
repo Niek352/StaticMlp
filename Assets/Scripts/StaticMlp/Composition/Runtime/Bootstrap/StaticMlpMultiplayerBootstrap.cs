@@ -344,6 +344,12 @@ namespace StaticMlp.Composition
                 if (ServerSys.IsInitialized)
                     ServerSys.Destroy();
 
+                if (SW.Status != WorldStatus.NotCreated && SW.HasResource<AiNavigationRuntime>())
+                {
+                    var navigationRuntime = SW.GetResource<AiNavigationRuntime>();
+                    navigationRuntime?.Dispose();
+                }
+
                 if (SW.Status != WorldStatus.NotCreated)
                     SW.Destroy();
 

@@ -8,6 +8,7 @@ namespace StaticMlp.Features.AiBots
     {
         [SerializeField] private Color bodyColor = new(0.72f, 0.24f, 0.18f);
         [SerializeField] private Color accentColor = new(0.9f, 0.78f, 0.42f);
+        [SerializeField] private Vector3 visualRootLocalPosition = new(0f, 1.1f, 0f);
         [SerializeField] private Vector3 bodyScale = new(0.85f, 1.1f, 0.85f);
         [SerializeField] private Vector3 headLocalPosition = new(0f, 0.95f, 0f);
         [SerializeField] private Vector3 headScale = new(0.45f, 0.45f, 0.45f);
@@ -19,6 +20,7 @@ namespace StaticMlp.Features.AiBots
             DestroyVisual();
             _visualRoot = new GameObject("Bot Visual");
             _visualRoot.transform.SetParent(transform, worldPositionStays: false);
+            _visualRoot.transform.localPosition = visualRootLocalPosition;
 
             var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             body.name = "Body";

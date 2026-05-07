@@ -5,8 +5,10 @@
         <BotViewPart 
             bodyColor="#B24030"
             accentColor="#E4C76F"
+            visualRootLocalPosition="0, 1.1, 0"
             bodyScale="0.85, 1.1, 0.85"
-            headLocalPosition="0, 0.95, 0"
+            headLocalPosition="0, 0.75, .3"
             headScale="0.45, 0.45, 0.45" />
+        <BotNavigationGizmoPart />
     </GameObject>
 </UnityPrefab>

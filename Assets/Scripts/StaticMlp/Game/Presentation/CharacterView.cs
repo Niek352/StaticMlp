@@ -14,6 +14,7 @@ namespace StaticMlp.Game.Presentation
         [SerializeField] private GameObject remotePlayerPrefab;
         [SerializeField] private GameObject monsterPrefab;
         [SerializeField] private bool createPrimitiveFallback = true;
+        [SerializeField] private Vector3 visualRootLocalPosition = new(0f, 1f, 0f);
 
         [Header("Fallback Colors")] [SerializeField]
         private Color localPlayerColor = new(0.1f, 0.55f, 1f);
@@ -29,6 +30,7 @@ namespace StaticMlp.Game.Presentation
             _visual = CreateViewObject(view.Entity);
             _visual.name = CreateViewName(view.Entity);
             _visual.transform.SetParent(transform, worldPositionStays: false);
+            _visual.transform.localPosition = visualRootLocalPosition;
         }
 
         private GameObject CreateViewObject(CW.Entity e)

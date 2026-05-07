@@ -2,6 +2,6 @@
     <GameObject name="CharacterView">
         <EntityView />
         <TransformViewComponent />
-        <CharacterView />
+        <CharacterView visualRootLocalPosition="0, 1, 0" />
     </GameObject>
 </UnityPrefab>
