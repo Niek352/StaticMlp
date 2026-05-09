@@ -9,13 +9,12 @@ namespace StaticMlp.Features.AiBots
 {
     public sealed class ServerAiPerceptionSystem : ISystem
     {
-        private const float DetectionDistance = 25f;
+        private const float DETECTION_DISTANCE = 25f;
 
         public void Update()
         {
-            foreach (var bot in SW.Query<All<ServerOwned, AiAgentTag, AiBlackboard, CharacterNetState>>().Entities())
+            foreach (var bot in SW.Query<All<ServerOwned, AiAgentTag, SW.Multi<AiBlackboardEntry>, CharacterNetState>>().Entities())
             {
-                ref var blackboard = ref bot.Mut<AiBlackboard>();
                 ref readonly var botState = ref bot.Read<CharacterNetState>();
 
                 EntityGID nearestEnemy = default;
@@ -34,17 +33,20 @@ namespace StaticMlp.Features.AiBots
                     nearestPosition = playerState.Position;
                 }
 
-                if (nearestDistance <= DetectionDistance)
+                if (nearestDistance <= DETECTION_DISTANCE)
                 {
-                    blackboard.Enemy = nearestEnemy;
-                    blackboard.EnemyDistance = nearestDistance;
-                    blackboard.LastKnownEnemyPosition = nearestPosition;
-                    blackboard.Fear = MathF.Min(1f, blackboard.Fear + Time.deltaTime * 0.35f);
+                    AiBlackboardAccess.SetEntity(bot, AiCoreVariableIds.Enemy, nearestEnemy);
+                    AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.EnemyDistance, nearestDistance);
+                    AiBlackboardAccess.SetVector(bot, AiCoreVariableIds.LastKnownEnemyPosition, nearestPosition);
+                    AiBlackboardAccess.SetFloat(
+                        bot,
+                        AiCoreVariableIds.Fear,
+                        MathF.Min(1f, AiBlackboardAccess.GetFloat(bot, AiCoreVariableIds.Fear) + Time.deltaTime * 0.35f));
                     continue;
                 }
 
-                blackboard.Enemy = default;
-                blackboard.EnemyDistance = 999f;
+                AiBlackboardAccess.Remove(bot, AiCoreVariableIds.Enemy);
+                AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.EnemyDistance, 999f);
             }
         }
     }

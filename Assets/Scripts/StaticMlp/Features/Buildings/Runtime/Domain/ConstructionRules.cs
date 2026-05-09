@@ -7,8 +7,7 @@ namespace StaticMlp.Features.Buildings
     {
         public static bool CanDepositResources(in ConstructionSiteState state)
         {
-            return state.Phase == ConstructionPhase.WaitingForResources
-                   || state.Phase == ConstructionPhase.ReadyToBuild;
+            return state.Phase is ConstructionPhase.WaitingForResources;
         }
 
         public static bool TryPlanResourceDeposit(
@@ -53,9 +52,7 @@ namespace StaticMlp.Features.Buildings
 
         public static bool CanBuild(in ConstructionSiteState state, in ConstructionResources resources)
         {
-            return resources.IsComplete
-                   && (state.Phase == ConstructionPhase.ReadyToBuild
-                       || state.Phase == ConstructionPhase.BuildingInProgress);
+            return resources.IsComplete && state.Phase is ConstructionPhase.ReadyToBuild or ConstructionPhase.BuildingInProgress;
         }
 
         public static bool ApplyBuildWork(

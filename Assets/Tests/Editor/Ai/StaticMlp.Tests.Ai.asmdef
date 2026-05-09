@@ -1,0 +1,27 @@
+{
+    "name": "StaticMlp.Tests.Ai",
+    "rootNamespace": "StaticMlp.Tests.Ai",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Editor.Ai",
+        "StaticMlp.Features.AiBots",
+        "StaticMlp.Features.AiActions",
+        "StaticMlp.Features.Buildings"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

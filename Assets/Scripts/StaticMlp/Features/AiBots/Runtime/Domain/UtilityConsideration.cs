@@ -2,7 +2,7 @@ namespace StaticMlp.Features.AiBots
 {
     public struct UtilityConsideration
     {
-        public AiBlackboardKey Key;
+        public ushort VariableId;
         public UtilityCurveType Curve;
         public float Weight;
     }

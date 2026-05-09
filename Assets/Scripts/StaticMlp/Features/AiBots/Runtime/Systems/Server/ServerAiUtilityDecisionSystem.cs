@@ -8,27 +8,21 @@ namespace StaticMlp.Features.AiBots
 {
     public sealed class ServerAiUtilityDecisionSystem : ISystem
     {
-        private const float DecisionInterval = 0.25f;
+        private const float DECISION_INTERVAL = 0.25f;
 
         public void Update()
         {
-            if (!SW.HasResource<AiBehaviorCatalog>())
-                throw new InvalidOperationException("AI behavior catalog resource is missing.");
+            var catalog = SW.GetResource<AiActionCatalog>();
 
-            var catalog = SW.GetResource<AiBehaviorCatalog>();
-            if (catalog == null)
-                throw new InvalidOperationException("AI behavior catalog resource is null.");
-
-            foreach (var entity in SW.Query<All<ServerOwned, AiAgentTag, AiBrain, AiBlackboard>>().Entities())
+            foreach (var entity in SW.Query<All<ServerOwned, AiAgentTag, AiBrain, AiTaskState, SW.Multi<AiBlackboardEntry>>>().Entities())
             {
                 ref var brain = ref entity.Mut<AiBrain>();
-                ref readonly var blackboard = ref entity.Read<AiBlackboard>();
 
                 brain.DecisionCooldown -= Time.deltaTime;
                 if (brain.DecisionCooldown > 0f)
                     continue;
 
-                brain.DecisionCooldown = DecisionInterval;
+                brain.DecisionCooldown = DECISION_INTERVAL;
 
                 if (!catalog.TryGetBehavior(brain.BehaviorId, out var behavior))
                 {
@@ -36,17 +30,15 @@ namespace StaticMlp.Features.AiBots
                         $"AI behavior id {brain.BehaviorId} was not found in the runtime catalog.");
                 }
 
-                var selectedTask = AiUtilityEvaluator.SelectBestTask(in blackboard, in behavior);
+                var selectedTask = AiUtilityEvaluator.SelectBestTask(entity, catalog, in behavior);
                 if (brain.CurrentTask == selectedTask)
                     continue;
 
                 brain.CurrentTask = selectedTask;
-                entity.Set(new AiTaskState
-                {
-                    Task = selectedTask,
-                    Step = 0,
-                    Timer = 0f
-                });
+                ref var task = ref entity.Mut<AiTaskState>();
+                task.Task = selectedTask;
+                task.Step = 0;
+                task.Timer = 0f;
             }
         }
     }

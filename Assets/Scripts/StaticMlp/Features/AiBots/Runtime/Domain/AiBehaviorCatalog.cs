@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using FFS.Libraries.StaticEcs;
 
 namespace StaticMlp.Features.AiBots
 {
-    public sealed class AiBehaviorCatalog : IResource
+    public sealed class AiBehaviorCatalog
     {
         private readonly Dictionary<ushort, AiBehaviorDefinition> _behaviorsById;
 

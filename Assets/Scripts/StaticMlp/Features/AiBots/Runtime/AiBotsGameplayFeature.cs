@@ -10,7 +10,7 @@ namespace StaticMlp.Features.AiBots
     public sealed class AiBotsGameplayFeature : GameplayFeature
     {
         public const ushort BOT = 200;
-        private const string CharacterViewPath = "Views/BotCharacterView";
+        private const string CHARACTER_VIEW_PATH = "Views/BotCharacterView";
 
         public override void RegisterNetworkEvents()
         {
@@ -23,7 +23,7 @@ namespace StaticMlp.Features.AiBots
             {
                 e.Set<MonsterTag>();
                 e.Set<AiAgentTag>();
-                e.Set(new ViewPath(CharacterViewPath));
+                e.Set(new ViewPath(CHARACTER_VIEW_PATH));
                 e.Set(new ViewTransform
                 {
                     RenderRotation = Quaternion.identity
@@ -44,9 +44,8 @@ namespace StaticMlp.Features.AiBots
             systems.Add(new ServerCommandBotRequestSystem(), GameplaySystemOrder.Gameplay - 120);
             systems.Add(new ServerAiNeedsSystem(), GameplaySystemOrder.Gameplay - 80);
             systems.Add(new ServerAiPerceptionSystem(), GameplaySystemOrder.Gameplay - 70);
-            systems.Add(new ServerAiWorkTargetSystem(), GameplaySystemOrder.Gameplay - 60);
+            systems.Add(new ServerAiActionVariablesCollectSystem(), GameplaySystemOrder.Gameplay - 60);
             systems.Add(new ServerAiUtilityDecisionSystem(), GameplaySystemOrder.Gameplay - 50);
-            systems.Add(new ServerAiTaskExecutionSystem(), GameplaySystemOrder.Gameplay - 40);
             systems.Add(new ServerAiNavigationSystem(), GameplaySystemOrder.Gameplay - 30);
             systems.Add(new ServerAiNetStateSystem(), GameplaySystemOrder.CollectReplication - 10);
         }

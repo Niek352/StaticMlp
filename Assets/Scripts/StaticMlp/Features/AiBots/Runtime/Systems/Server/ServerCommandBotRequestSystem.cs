@@ -1,3 +1,4 @@
+using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Systems.Server;
@@ -31,67 +32,41 @@ namespace StaticMlp.Features.AiBots
             if (!request.Bot.TryUnpack<ServerWT>(out var bot)
                 || !bot.Has<AiAgentTag>()
                 || !bot.Has<AiBrain>()
-                || !bot.Has<AiBlackboard>()
+                || !bot.Has<AiTaskState>()
+                || !bot.Has<SW.Multi<AiBlackboardEntry>>()
                 || !bot.Has<CharacterNetState>())
             {
                 return;
             }
 
+            if (!SW.HasResource<AiActionCatalog>())
+                throw new InvalidOperationException("AI action catalog resource is missing.");
+
+            var catalog = SW.GetResource<AiActionCatalog>();
+            if (catalog == null)
+                throw new InvalidOperationException("AI action catalog resource is null.");
+
             var commandedTask = (AiTaskType)request.CommandType;
-            if (!IsSupportedCommand(commandedTask) || !CanCommandBot(sourcePeer, bot))
+            if (!catalog.SupportsManualCommand(commandedTask) || !CanCommandBot(sourcePeer, bot))
                 return;
 
-            ApplyCommandTarget(bot, commandedTask, request.Target);
+            if (!catalog.TryBindManualCommand(commandedTask, bot, request.Target))
+                return;
 
             ref var brain = ref bot.Mut<AiBrain>();
             brain.CurrentTask = commandedTask;
             brain.DecisionCooldown = 0.5f;
 
-            bot.Set(new AiTaskState
-            {
-                Task = commandedTask,
-                Step = 0,
-                Timer = 0f
-            });
-        }
-
-        private static void ApplyCommandTarget(SW.Entity bot, AiTaskType task, EntityGID target)
-        {
-            ref var blackboard = ref bot.Mut<AiBlackboard>();
-
-            if (task == AiTaskType.FollowLeader)
-            {
-                if (target.TryUnpack<ServerWT>(out _))
-                    blackboard.Leader = target;
-
-                return;
-            }
-
-            if (task != AiTaskType.AttackEnemy && task != AiTaskType.Flee)
-                return;
-
-            if (!target.TryUnpack<ServerWT>(out var targetEntity) || !targetEntity.Has<CharacterNetState>())
-                return;
-
-            blackboard.Enemy = target;
-            ref readonly var targetState = ref targetEntity.Read<CharacterNetState>();
-            ref readonly var botState = ref bot.Read<CharacterNetState>();
-            blackboard.LastKnownEnemyPosition = targetState.Position;
-            blackboard.EnemyDistance = (targetState.Position - botState.Position).magnitude;
+            ref var task = ref bot.Mut<AiTaskState>();
+            task.Task = commandedTask;
+            task.Step = 0;
+            task.Timer = 0f;
         }
 
         private static bool CanCommandBot(NetworkPeerId sourcePeer, SW.Entity bot)
         {
             ref readonly var botState = ref bot.Read<CharacterNetState>();
             return ServerPeerPlayers.IsPlayerNear(sourcePeer, botState.Position, 20f);
-        }
-
-        private static bool IsSupportedCommand(AiTaskType task)
-        {
-            return task == AiTaskType.Idle
-                   || task == AiTaskType.FollowLeader
-                   || task == AiTaskType.AttackEnemy
-                   || task == AiTaskType.Flee;
         }
     }
 }

@@ -8,6 +8,7 @@ namespace StaticMlp.Features.AiBots
         AttackEnemy = 3,
         Flee = 4,
         FollowLeader = 5,
-        BuildConstruction = 6
+        BuildConstruction = 6,
+        DeliveryResourceToBuilding = 7
     }
 }

@@ -36,19 +36,19 @@ namespace StaticMlp.Features.AiBots
                         CurrentTask = AiTaskType.Idle,
                         DecisionCooldown = 0f
                     });
-                    entity.Set(new AiBlackboard
-                    {
-                        Hunger = hunger,
-                        Health01 = health01,
-                        Fear = fear,
-                        EnemyDistance = 999f,
-                        WoodStorage01 = 1f,
-                        Leader = leader,
-                        LastKnownEnemyPosition = spawnPosition
-                    });
+                    entity.Add<SW.Multi<AiBlackboardEntry>>();
+                    AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Hunger, hunger);
+                    AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Health01, health01);
+                    AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Fear, fear);
+                    AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.EnemyDistance, 999f);
+                    AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.WoodStorage01, 1f);
+                    AiBlackboardAccess.SetEntity(entity, AiCoreVariableIds.Leader, leader);
+                    AiBlackboardAccess.SetVector(entity, AiCoreVariableIds.LastKnownEnemyPosition, spawnPosition);
                     entity.Set(new AiTaskState
                     {
                         Task = AiTaskType.Idle,
+                        ActiveTask = AiTaskType.Idle,
+                        HasActiveTask = false,
                         Step = 0,
                         Timer = 0f
                     });

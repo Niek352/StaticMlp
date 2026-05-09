@@ -9,21 +9,21 @@ namespace StaticMlp.Features.AiBots
     {
         public void Update()
         {
-            EnsureBehaviorCatalog();
+            EnsureActionCatalog();
             EnsureNavigationRuntime();
         }
 
-        private static void EnsureBehaviorCatalog()
+        private static void EnsureActionCatalog()
         {
-            if (!SW.HasResource<AiBehaviorCatalog>())
+            if (!SW.HasResource<AiActionCatalog>())
             {
-                SW.SetResource(AiBehaviorCatalogDefaults.Create());
+                SW.SetResource(AiActionCatalog.Discover(new AiTaskExecutionTransitions()));
                 return;
             }
 
-            var existingCatalog = SW.GetResource<AiBehaviorCatalog>();
+            var existingCatalog = SW.GetResource<AiActionCatalog>();
             if (existingCatalog == null)
-                throw new InvalidOperationException("AI behavior catalog resource exists but is null.");
+                throw new InvalidOperationException("AI action catalog resource exists but is null.");
         }
 
         private static void EnsureNavigationRuntime()
