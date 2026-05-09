@@ -4,6 +4,7 @@ using StaticMlp.Features.Combat;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
+using StaticMlp.Networking.Replication;
 using UnityEngine;
 
 namespace StaticMlp.Tests.Combat
@@ -15,22 +16,30 @@ namespace StaticMlp.Tests.Combat
             if (CW.Status != WorldStatus.NotCreated)
                 CW.Destroy();
 
+            NetworkEventRegistry.Clear();
+            new CombatFeature().RegisterNetworkEvents();
             CW.Create(WorldConfig.Default());
             CW.Types().RegisterAll(
                 typeof(ClientCoreWT).Assembly,
                 typeof(CombatFeature).Assembly,
                 typeof(CharacterNetState).Assembly);
+            NetworkEventRegistry.RegisterClientWorldTypes();
             CW.Initialize();
             CW.SetResource(new CombatAutoAttackConfig());
         }
 
         public CombatAutoAttackConfig Config => CW.GetResource<CombatAutoAttackConfig>();
 
-        public CW.Entity CreateLocalPlayer(Vector3 position)
+        public CW.Entity CreateLocalPlayer(Vector3 position, float currentHealth = 100f, float maxHealth = 100f)
         {
             var player = CW.NewEntity<Default>();
             player.Set<LocalOwned>();
             player.Set<PlayerTag>();
+            player.Set(new Health
+            {
+                Current = currentHealth,
+                Max = maxHealth
+            });
             player.Set(new CharacterNetState
             {
                 Position = position,

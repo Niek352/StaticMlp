@@ -9,6 +9,8 @@ namespace StaticMlp.Features.Player
 {
     public static class PlayerSpawns
     {
+        private const float DEFAULT_MAX_HEALTH = 100f;
+
         public static EntityGID SpawnPlayer(NetworkPeerId owner, Vector3 spawnPosition)
         {
             return NetworkEntitySpawner.SpawnServerEntity<PlayerNetworkEntity>(
@@ -19,6 +21,11 @@ namespace StaticMlp.Features.Player
                 {
                     entity.Set<PlayerTag>();
                     entity.Set(new ServerCombatAttackState());
+                    entity.Set(new Health
+                    {
+                        Current = DEFAULT_MAX_HEALTH,
+                        Max = DEFAULT_MAX_HEALTH
+                    });
                     entity.Set(new CharacterNetState
                     {
                         Position = spawnPosition,

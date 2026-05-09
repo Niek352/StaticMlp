@@ -120,6 +120,33 @@ MonoBehaviour:
       - className: Health
         namespaceName: StaticMlp.Features.Combat
         assembly: StaticMlp.Features.Combat
+    - guid: f8410204-2e3d-4b6f-bc6e-bcb96c2be65e
+      current:
+        className: BurningStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+      history:
+      - className: BurningStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+    - guid: 12cc7e66-6608-4daf-9af8-db2707060807
+      current:
+        className: OiledStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+      history:
+      - className: OiledStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+    - guid: ff09138f-bfb8-4a58-8d29-bc065c1b9451
+      current:
+        className: PoisonStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+      history:
+      - className: PoisonStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -320,6 +347,33 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Combat
       history:
       - className: Health
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+    - guid: f8410204-2e3d-4b6f-bc6e-bcb96c2be65e
+      current:
+        className: BurningStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+      history:
+      - className: BurningStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+    - guid: 12cc7e66-6608-4daf-9af8-db2707060807
+      current:
+        className: OiledStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+      history:
+      - className: OiledStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+    - guid: ff09138f-bfb8-4a58-8d29-bc065c1b9451
+      current:
+        className: PoisonStatus
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+      history:
+      - className: PoisonStatus
         namespaceName: StaticMlp.Features.Combat
         assembly: StaticMlp.Features.Combat
     tags: []

@@ -5,5 +5,6 @@ namespace StaticMlp.Features.Combat
         Physical = 0,
         Fire = 1,
         Poison = 2,
+        Explosion = 3,
     }
 }

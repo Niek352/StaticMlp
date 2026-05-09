@@ -46,9 +46,25 @@ namespace StaticMlp.Features.Combat
 
             ref var state = ref player.Mut<PassiveAutoAttackState>();
             var previousTarget = state.CurrentTarget;
-            state.CurrentTarget = FindNearestTarget(player, config.Radius);
+            var abilityId = player.Has<PlayerCombatAbilityState>()
+                ? player.Read<PlayerCombatAbilityState>().SelectedAbility
+                : CombatAbilityId.BasicMeleeAuto;
+            state.CurrentTarget = FindNearestTarget(player, GetRange(abilityId, config));
             if (previousTarget.Raw != 0ul && state.CurrentTarget.Raw == 0ul)
                 state.NextFireAt = now;
+        }
+
+        private static float GetRange(CombatAbilityId abilityId, CombatAutoAttackConfig config)
+        {
+            switch (abilityId)
+            {
+                case CombatAbilityId.PoisonArrow:
+                    return config.PoisonArrowRange;
+                case CombatAbilityId.FireFlask:
+                    return config.FireFlaskRange;
+                default:
+                    return config.Radius;
+            }
         }
 
         private static EntityGID FindNearestTarget(CW.Entity player, float radius)

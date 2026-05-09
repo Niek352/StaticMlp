@@ -16,7 +16,10 @@ namespace StaticMlp.Features.Combat
                 if (intent.ShotSequence <= state.LastSentShotSequence)
                     continue;
 
-                var request = new PassiveAutoAttackRequestEvent(intent.Target, intent.ShotSequence);
+                var request = new UseAbilityCommand(
+                    intent.AbilityId,
+                    intent.Target,
+                    intent.ShotSequence);
                 if (!CW.SendToServerEvent(in request))
                     continue;
 

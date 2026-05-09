@@ -9,8 +9,18 @@ namespace StaticMlp.Tests.Combat
 {
     public sealed class ServerAiAttackRequestSystemTests
     {
+        private static void RunCombatPipeline(float now)
+        {
+            new ServerValidateCombatCommandsSystem(() => now).Update();
+            new ServerAbilityCastSystem().Update();
+            new ServerHitToEffectSystem().Update();
+            new ServerEffectPreprocessSystem().Update();
+            new ServerDamageApplySystem().Update();
+            new ServerEffectCleanupSystem().Update();
+        }
+
         [Test]
-        public void Update_FromAiAttackRequest_CreatesDamageAndReducesTargetHealth()
+        public void Update_FromAiAttackRequest_CreatesSharedCombatRequest_AndReducesTargetHealth()
         {
             using var scope = new CombatTestServerWorldScope();
             const float now = 5f;
@@ -34,12 +44,11 @@ namespace StaticMlp.Tests.Combat
             {
                 Target = target.GID
             });
+            attacker.Set(new ServerCombatAttackState());
 
-            var requestSystem = new ServerAiAttackRequestSystem(() => now);
-            var applySystem = new ServerDamageApplySystem();
-
+            var requestSystem = new ServerAiAttackRequestSystem();
             requestSystem.Update();
-            applySystem.Update();
+            RunCombatPipeline(now);
 
             Assert.That(target.Read<Health>().Current, Is.EqualTo(90f));
         }
@@ -69,16 +78,15 @@ namespace StaticMlp.Tests.Combat
             {
                 Target = target.GID
             });
+            attacker.Set(new ServerCombatAttackState());
 
-            var requestSystem = new ServerAiAttackRequestSystem(() => now);
-            var applySystem = new ServerDamageApplySystem();
-
+            var requestSystem = new ServerAiAttackRequestSystem();
             requestSystem.Update();
-            applySystem.Update();
+            RunCombatPipeline(now);
 
             now += 0.1f;
             requestSystem.Update();
-            applySystem.Update();
+            RunCombatPipeline(now);
 
             Assert.That(target.Read<Health>().Current, Is.EqualTo(90f));
         }

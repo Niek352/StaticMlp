@@ -7,7 +7,9 @@
         "Ecs.Networking",
         "Game.Core",
         "StaticMlp.Features.Buildings",
-        "StaticMlp.Features.ResourcesInventoryMinimal"
+        "StaticMlp.Features.ResourcesInventoryMinimal",
+        "StaticMlp.Features.AiBots",
+        "StaticMlp.Features.Combat"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

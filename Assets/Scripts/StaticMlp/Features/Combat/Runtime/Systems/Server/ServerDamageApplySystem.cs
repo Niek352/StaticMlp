@@ -14,7 +14,7 @@ namespace StaticMlp.Features.Combat
         {
             _pendingEffects.Clear();
 
-            foreach (var effect in SW.Query<All<EffectTag, DamageEffectTag, EffectTarget, EffectValue, DamageData>, None<EffectProcessedTag>>().Entities())
+            foreach (var effect in SW.Query<All<EffectTag, DamageEffectTag, EffectSource, EffectTarget, EffectValue, DamageData, EffectRequestId>, None<EffectProcessedTag, EffectRejectedTag>>().Entities())
                 _pendingEffects.Add(effect.GID);
 
             for (var i = 0; i < _pendingEffects.Count; i++)
@@ -30,8 +30,10 @@ namespace StaticMlp.Features.Combat
         private static void Apply(SW.Entity effect)
         {
             ref readonly var targetRef = ref effect.Read<EffectTarget>();
+            ref readonly var sourceRef = ref effect.Read<EffectSource>();
             ref readonly var valueRef = ref effect.Read<EffectValue>();
             ref readonly var damageRef = ref effect.Read<DamageData>();
+            ref readonly var requestRef = ref effect.Read<EffectRequestId>();
 
             if (!targetRef.Value.TryUnpack<ServerWT>(out var target))
             {
@@ -60,6 +62,48 @@ namespace StaticMlp.Features.Combat
 
             CombatDebugLogBufferAccess.GetOrCreate().Append(
                 $"apply damage target={target.GID} type={damageRef.Type} previous={previous} current={health.Current}");
+
+            TrySendDamageNumber(sourceRef.Value, target.GID, requestRef.Value, damage, damageRef.Type);
+            if (previous > 0f && health.Current <= 0f)
+                TrySendDeathEvent(sourceRef.Value, target.GID, requestRef.Value);
+        }
+
+        private static void TrySendDamageNumber(EntityGID sourceGid, EntityGID targetGid, uint requestId, float damage, DamageType damageType)
+        {
+            if (requestId == 0
+                || !sourceGid.TryUnpack<ServerWT>(out var source)
+                || !source.Has<NetworkIdentity>())
+            {
+                return;
+            }
+
+            var evt = new DamageNumberEvent
+            {
+                Source = sourceGid,
+                Target = targetGid,
+                ClientCommandId = requestId,
+                Value = damage,
+                DamageType = damageType,
+            };
+            SW.SendToPeerEvent(source.Read<NetworkIdentity>().Owner, in evt);
+        }
+
+        private static void TrySendDeathEvent(EntityGID sourceGid, EntityGID targetGid, uint requestId)
+        {
+            if (requestId == 0
+                || !sourceGid.TryUnpack<ServerWT>(out var source)
+                || !source.Has<NetworkIdentity>())
+            {
+                return;
+            }
+
+            var evt = new DeathEvent
+            {
+                Source = sourceGid,
+                Target = targetGid,
+                ClientCommandId = requestId,
+            };
+            SW.SendToPeerEvent(source.Read<NetworkIdentity>().Owner, in evt);
         }
     }
 }

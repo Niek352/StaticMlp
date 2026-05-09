@@ -1,0 +1,6 @@
+<UnityPrefab>
+    <GameObject name="CombatProjectileView">
+        <EntityView />
+        <CombatProjectileViewPart />
+    </GameObject>
+</UnityPrefab>

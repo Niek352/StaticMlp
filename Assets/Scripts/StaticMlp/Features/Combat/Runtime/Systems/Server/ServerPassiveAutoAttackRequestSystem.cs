@@ -1,21 +1,13 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Game.Components;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
-using UnityEngine;
 
 namespace StaticMlp.Features.Combat
 {
     public sealed class ServerPassiveAutoAttackRequestSystem : ISystem
     {
-        private readonly System.Func<float> _timeProvider;
         private EventReceiver<ServerWT, NetworkEventFromClient<PassiveAutoAttackRequestEvent>> _requests;
-
-        public ServerPassiveAutoAttackRequestSystem(System.Func<float> timeProvider = null)
-        {
-            _timeProvider = timeProvider ?? (() => Time.time);
-        }
 
         public void Init()
         {
@@ -29,51 +21,19 @@ namespace StaticMlp.Features.Combat
 
         public void Update()
         {
-            var config = SW.GetResource<CombatAutoAttackConfig>();
-            var now = _timeProvider();
-
             foreach (var evt in _requests)
-                Handle(in evt.Value, config, now);
+                Handle(in evt.Value);
         }
 
-        private static void Handle(
-            in NetworkEventFromClient<PassiveAutoAttackRequestEvent> request,
-            CombatAutoAttackConfig config,
-            float now)
+        private static void Handle(in NetworkEventFromClient<PassiveAutoAttackRequestEvent> request)
         {
-            if (!ServerPeerPlayers.TryGetPlayer(request.SourcePeer, out var player)
-                || !player.Has<CharacterNetState>())
+            if (!ServerPeerPlayers.TryGetPlayer(request.SourcePeer, out var player))
                 return;
 
-            if (!request.Value.Target.TryUnpack<ServerWT>(out var target)
-                || !target.Has<MonsterTag>()
-                || !target.Has<CharacterNetState>()
-                || !target.Has<Health>())
-                return;
-
-            if (target.Read<Health>().Current <= 0f)
-                return;
-
-            var playerPosition = player.Read<CharacterNetState>().Position;
-            var targetPosition = target.Read<CharacterNetState>().Position;
-            if ((playerPosition - targetPosition).sqrMagnitude > config.Radius * config.Radius)
-                return;
-
-            ref var attackState = ref player.Mut<ServerCombatAttackState>();
-            if (request.Value.ShotSequence <= attackState.LastAcceptedShotSequence)
-                return;
-
-            if (now < attackState.NextAttackAt)
-                return;
-
-            attackState.LastAcceptedShotSequence = request.Value.ShotSequence;
-            attackState.NextAttackAt = now + Mathf.Max(0f, config.FireInterval);
-
-            EffectCommands.CreateDamage(
+            ServerReceiveCombatCommandsSystem.CreateRequest(
                 player.GID,
-                target.GID,
-                config.DamageValue,
-                DamageType.Physical,
+                CombatAbilityId.BasicMeleeAuto,
+                request.Value.Target,
                 request.Value.ShotSequence);
         }
     }

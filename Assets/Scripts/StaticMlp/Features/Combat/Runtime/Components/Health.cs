@@ -6,6 +6,10 @@ using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Combat
 {
+    /// <summary>
+    /// Server-authoritative replicated combat state.
+    /// Presence: server world and replicated client actor entities.
+    /// </summary>
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,

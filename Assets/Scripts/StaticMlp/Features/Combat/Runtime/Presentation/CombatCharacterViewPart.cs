@@ -5,6 +5,7 @@ using UnityEngine;
 namespace StaticMlp.Features.Combat
 {
     public sealed class CombatCharacterViewPart : MonoBehaviour,
+        IEntityViewPart<CombatViewState>,
         IEntityViewPart<PassiveAutoAttackViewState>,
         IEntityViewPart<PassiveAutoAttackTargetViewState>,
         IEntityViewPart<DamageFeedbackViewState>
@@ -12,11 +13,16 @@ namespace StaticMlp.Features.Combat
         [SerializeField] private Color _tracerColor = new(1f, 0.35f, 0.15f, 0.95f);
         [SerializeField] private Color _highlightColor = new(1f, 0.75f, 0.2f, 0.45f);
         [SerializeField] private Color _damageFlashColor = new(1f, 0.15f, 0.15f, 0.75f);
+        [SerializeField] private Color _poisonAuraColor = new(0.25f, 0.8f, 0.25f, 0.45f);
+        [SerializeField] private Color _burningAuraColor = new(1f, 0.45f, 0.15f, 0.55f);
+        [SerializeField] private Color _oiledAuraColor = new(0.15f, 0.15f, 0.15f, 0.5f);
         [SerializeField] private float _tracerWidth = 0.08f;
         [SerializeField] private Vector3 _highlightLocalPosition = new(0f, 0.1f, 0f);
         [SerializeField] private Vector3 _highlightBaseScale = new(1.5f, 0.04f, 1.5f);
         [SerializeField] private Vector3 _damageFlashLocalPosition = new(0f, 1f, 0f);
         [SerializeField] private Vector3 _damageFlashBaseScale = new(1.1f, 1.1f, 1.1f);
+        [SerializeField] private Vector3 _statusAuraLocalPosition = new(0f, 0.35f, 0f);
+        [SerializeField] private Vector3 _statusAuraBaseScale = new(1.25f, 1.25f, 1.25f);
 
         private GameObject _tracerObject;
         private LineRenderer _tracer;
@@ -27,6 +33,9 @@ namespace StaticMlp.Features.Combat
         private GameObject _damageFlashObject;
         private Renderer _damageFlashRenderer;
         private Material _damageFlashMaterial;
+        private GameObject _statusAuraObject;
+        private Renderer _statusAuraRenderer;
+        private Material _statusAuraMaterial;
 
         public void OnBind(IEntityView view)
         {
@@ -61,6 +70,16 @@ namespace StaticMlp.Features.Combat
             {
                 HideDamageFlash();
             }
+
+            if (view.Entity.Has<CombatViewState>())
+            {
+                ref readonly var combatState = ref view.Entity.Read<CombatViewState>();
+                Apply(in combatState);
+            }
+            else
+            {
+                HideStatusAura();
+            }
         }
 
         public void OnUnbind()
@@ -68,6 +87,29 @@ namespace StaticMlp.Features.Combat
             HideTracer();
             HideHighlight();
             HideDamageFlash();
+            HideStatusAura();
+        }
+
+        public void Apply(in CombatViewState component)
+        {
+            EnsureVisuals();
+            if (component.StatusFlags == StatusVisualFlags.None)
+            {
+                HideStatusAura();
+                return;
+            }
+
+            var color = ResolveStatusColor(component.StatusFlags);
+            if (component.IsDead)
+                color.a *= 0.2f;
+
+            _statusAuraMaterial.color = color;
+            _statusAuraObject.SetActive(true);
+            _statusAuraObject.transform.localPosition = _statusAuraLocalPosition;
+            _statusAuraObject.transform.localScale = Vector3.Lerp(
+                _statusAuraBaseScale * 0.9f,
+                _statusAuraBaseScale * 1.15f,
+                1f - Mathf.Clamp01(component.HealthNormalized));
         }
 
         public void Apply(in PassiveAutoAttackViewState component)
@@ -136,6 +178,9 @@ namespace StaticMlp.Features.Combat
 
             if (_damageFlashObject == null)
                 CreateDamageFlash();
+
+            if (_statusAuraObject == null)
+                CreateStatusAura();
         }
 
         private void CreateTracer()
@@ -187,6 +232,23 @@ namespace StaticMlp.Features.Combat
             HideDamageFlash();
         }
 
+        private void CreateStatusAura()
+        {
+            _statusAuraObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            _statusAuraObject.name = "Combat Status Aura";
+            _statusAuraObject.transform.SetParent(transform, worldPositionStays: false);
+            _statusAuraObject.transform.localPosition = _statusAuraLocalPosition;
+            _statusAuraObject.transform.localScale = _statusAuraBaseScale;
+            var collider = _statusAuraObject.GetComponent<Collider>();
+            if (collider != null)
+                Destroy(collider);
+
+            _statusAuraRenderer = _statusAuraObject.GetComponent<Renderer>();
+            _statusAuraMaterial = RuntimeVisualMaterial.Create(_poisonAuraColor, transparent: true);
+            _statusAuraRenderer.sharedMaterial = _statusAuraMaterial;
+            HideStatusAura();
+        }
+
         private void HideTracer()
         {
             if (_tracerObject == null)
@@ -213,6 +275,25 @@ namespace StaticMlp.Features.Combat
             _damageFlashObject.SetActive(false);
         }
 
+        private void HideStatusAura()
+        {
+            if (_statusAuraObject == null)
+                return;
+
+            _statusAuraObject.SetActive(false);
+        }
+
+        private Color ResolveStatusColor(StatusVisualFlags flags)
+        {
+            if ((flags & StatusVisualFlags.Burning) != 0)
+                return _burningAuraColor;
+
+            if ((flags & StatusVisualFlags.Poison) != 0)
+                return _poisonAuraColor;
+
+            return _oiledAuraColor;
+        }
+
         private void OnDestroy()
         {
             if (_tracerMaterial != null)
@@ -223,6 +304,9 @@ namespace StaticMlp.Features.Combat
 
             if (_damageFlashMaterial != null)
                 Destroy(_damageFlashMaterial);
+
+            if (_statusAuraMaterial != null)
+                Destroy(_statusAuraMaterial);
         }
     }
 }

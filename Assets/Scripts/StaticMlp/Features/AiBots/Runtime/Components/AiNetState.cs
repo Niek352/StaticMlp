@@ -6,6 +6,10 @@ using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.AiBots
 {
+    /// <summary>
+    /// Server-authoritative replicated AI presentation state.
+    /// Presence: server world and replicated client AI entities.
+    /// </summary>
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.UnreliableSequenced,

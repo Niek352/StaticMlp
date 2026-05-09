@@ -48,14 +48,37 @@ namespace StaticMlp.Features.Combat
                 return;
 
             state.LastShotSequence++;
-            state.NextFireAt = now + Mathf.Max(0f, config.FireInterval);
+            var abilityId = player.Has<PlayerCombatAbilityState>()
+                ? player.Read<PlayerCombatAbilityState>().SelectedAbility
+                : CombatAbilityId.BasicMeleeAuto;
+            state.NextFireAt = now + Mathf.Max(0f, GetCooldown(abilityId, config));
 
             player.Set(new PassiveAutoAttackIntent
             {
+                AbilityId = abilityId,
                 Target = state.CurrentTarget,
                 ShotSequence = state.LastShotSequence,
                 LocalFireTime = now
             });
+
+            if (!player.Has<LocalCombatPredictionState>())
+                player.Set(new LocalCombatPredictionState());
+
+            ref var prediction = ref player.Mut<LocalCombatPredictionState>();
+            prediction.LastPredictedCommandId = state.LastShotSequence;
+        }
+
+        private static float GetCooldown(CombatAbilityId abilityId, CombatAutoAttackConfig config)
+        {
+            switch (abilityId)
+            {
+                case CombatAbilityId.PoisonArrow:
+                    return config.PoisonArrowCooldown;
+                case CombatAbilityId.FireFlask:
+                    return config.FireFlaskCooldown;
+                default:
+                    return config.FireInterval;
+            }
         }
     }
 }

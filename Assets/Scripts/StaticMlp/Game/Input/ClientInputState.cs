@@ -116,24 +116,22 @@ namespace StaticMlp.Game.Input
 
         public Vector2 ReadVector2(InputActionName action)
         {
-            return TryGetIndex(action, out var index)
-                ? _vector2Values[index]
-                : Vector2.zero;
+            return _vector2Values[GetIndex(action)];
         }
 
         public bool IsPressed(InputActionName action)
         {
-            return TryGetIndex(action, out var index) && _pressed[index];
+            return _pressed[GetIndex(action)];
         }
 
         public bool WasPressed(InputActionName action)
         {
-            return TryGetIndex(action, out var index) && _wasPressed[index];
+            return _wasPressed[GetIndex(action)];
         }
 
         public bool WasReleased(InputActionName action)
         {
-            return TryGetIndex(action, out var index) && _wasReleased[index];
+            return _wasReleased[GetIndex(action)];
         }
 
         public bool TryGetAimRay(out Ray ray)
@@ -163,14 +161,7 @@ namespace StaticMlp.Game.Input
         {
             return (uint)index < (uint)_wasReleased.Length && _wasReleased[index];
         }
-
-        private bool TryGetIndex(InputActionName action, out int index)
-        {
-            if (!action.IsEmpty)
-                return _indices.TryGetValue(action.Value, out index);
-
-            index = -1;
-            return false;
-        }
+        private int GetIndex(in InputActionName action) =>
+            _indices[action.Value];
     }
 }

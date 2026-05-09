@@ -21,7 +21,8 @@ namespace StaticMlp.Tests.Combat
             SW.Types().RegisterAll(
                 typeof(ServerWT).Assembly,
                 typeof(CombatFeature).Assembly,
-                typeof(CharacterNetState).Assembly);
+                typeof(CharacterNetState).Assembly,
+                typeof(StaticMlp.Features.AiBots.AiAgentTag).Assembly);
             NetworkEventRegistry.RegisterServerWorldTypes();
             SW.Initialize();
             SW.SetResource(new CombatDebugLogBuffer());
@@ -61,6 +62,12 @@ namespace StaticMlp.Tests.Combat
                 Position = position,
                 Rotation = Quaternion.identity
             });
+            entity.Set(new ServerCombatAttackState());
+            entity.Set(new Health
+            {
+                Current = 100f,
+                Max = 100f
+            });
             return entity;
         }
 
@@ -73,6 +80,7 @@ namespace StaticMlp.Tests.Combat
                 Position = position,
                 Rotation = Quaternion.identity
             });
+            entity.Set(new ServerCombatAttackState());
             entity.Set(new Health
             {
                 Current = current,
