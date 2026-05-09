@@ -111,6 +111,15 @@ MonoBehaviour:
       - className: AiNetState
         namespaceName: StaticMlp.Features.AiBots
         assembly: StaticMlp.Features.AiBots
+    - guid: 0a82e952-f0ee-4dca-9f7d-0eb3217b6a31
+      current:
+        className: Health
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+      history:
+      - className: Health
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -304,6 +313,15 @@ MonoBehaviour:
       - className: AiNetState
         namespaceName: StaticMlp.Features.AiBots
         assembly: StaticMlp.Features.AiBots
+    - guid: 0a82e952-f0ee-4dca-9f7d-0eb3217b6a31
+      current:
+        className: Health
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
+      history:
+      - className: Health
+        namespaceName: StaticMlp.Features.Combat
+        assembly: StaticMlp.Features.Combat
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47

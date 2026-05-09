@@ -8,7 +8,8 @@
         "StaticMlp.Editor.Ai",
         "StaticMlp.Features.AiBots",
         "StaticMlp.Features.AiActions",
-        "StaticMlp.Features.Buildings"
+        "StaticMlp.Features.Buildings",
+        "StaticMlp.Features.Combat"
     ],
     "includePlatforms": [
         "Editor"

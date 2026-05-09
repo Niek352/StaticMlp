@@ -8,7 +8,8 @@
         "Game.Core",
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.EcsViews",
-        "FFS.StaticEcs.Unity"
+        "FFS.StaticEcs.Unity",
+        "StaticMlp.Features.Combat"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

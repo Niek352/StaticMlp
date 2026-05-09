@@ -12,7 +12,7 @@ namespace StaticMlp.Tests.Ai
         public void Snapshot_MatchesRuntimeUtilityScoresAndFlags()
         {
             using var scope = new AiTestServerWorldScope();
-            var bot = scope.CreateBot(Vector3.zero, AiBehaviorIds.Default);
+            var bot = scope.CreateBot(Vector3.zero, AiBehaviorIds.Monster);
             var enemy = scope.CreateBot(new Vector3(2f, 0f, 0f));
 
             AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.Health01, 1f);
@@ -25,7 +25,7 @@ namespace StaticMlp.Tests.Ai
             taskState.ActiveTask = AiTaskType.AttackEnemy;
             taskState.HasActiveTask = true;
 
-            Assert.That(scope.Catalog.TryGetBehavior(AiBehaviorIds.Default, out var behavior), Is.True);
+            Assert.That(scope.Catalog.TryGetBehavior(AiBehaviorIds.Monster, out var behavior), Is.True);
             var brain = bot.Read<AiBrain>();
             var snapshot = AiEditorDebugCalculator.BuildSnapshot(bot, scope.Catalog, behavior, brain, taskState);
 

@@ -46,6 +46,7 @@ namespace StaticMlp.Composition
 
         [Header("Initial Bots")] [SerializeField]
         private InitialBotSpawnDefinition[] initialBotSpawns = {
+            new() { Position = new Vector3(0f, 0f, 6f), BehaviorId = AiBehaviorIds.Monster, Health01 = 1f, Hunger = 0.05f, Fear = 0.1f, LeaderIndex = -1 },
             new() { Position = new Vector3(0f, 0f, 8f), BehaviorId = AiBehaviorIds.PeacefulBuilder, Health01 = 1f, Hunger = 0.1f, Fear = 0.05f, LeaderIndex = -1 },
             new() { Position = new Vector3(-2.5f, 0f, 10f), BehaviorId = AiBehaviorIds.PeacefulBuilder, Health01 = 1f, Hunger = 0.15f, Fear = 0.05f, LeaderIndex = 0 },
             new() { Position = new Vector3(2.5f, 0f, 10f), BehaviorId = AiBehaviorIds.PeacefulBuilder, Health01 = 0.35f, Hunger = 0.1f, Fear = 0.55f, LeaderIndex = 0 }

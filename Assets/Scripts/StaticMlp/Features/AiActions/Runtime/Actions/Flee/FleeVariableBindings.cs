@@ -23,12 +23,7 @@ namespace StaticMlp.Features.AiActions
         {
             new()
             {
-                BehaviorId = AiBehaviorIds.Default,
-                Considerations = CreateCommonConsiderations(0.8f, 0.8f)
-            },
-            new()
-            {
-                BehaviorId = AiBehaviorIds.PeacefulBuilder,
+                BehaviorId = AiBehaviorIds.Monster,
                 Considerations = CreateCommonConsiderations(0.85f, 0.85f)
             }
         };

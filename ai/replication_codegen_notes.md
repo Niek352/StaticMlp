@@ -65,7 +65,7 @@ Rules:
 - It must expose a stable StaticEcs GUID through `IComponentConfig<T>`.
 - It must implement `ITrackableChanged` if deltas should be collected.
 - Replicated fields must use supported primitive, enum, `Vector2`, `Vector3`, or `Quaternion` types.
-- Gameplay systems must mutate replicated state through `Mut<T>()`.
+- Gameplay systems must mutate replicated state through `ReplicationMut.Mut<T>()` so dirty replication metadata is updated.
 
 ## Interpolated Replicated Fields
 

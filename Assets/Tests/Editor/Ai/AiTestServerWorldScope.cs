@@ -3,6 +3,7 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiActions;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Buildings;
+using StaticMlp.Features.Combat;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;
@@ -33,11 +34,17 @@ namespace StaticMlp.Tests.Ai
 
         public AiActionCatalog Catalog { get; }
 
-        public SW.Entity CreateBot(Vector3 position, ushort behaviorId = AiBehaviorIds.Default)
+        public SW.Entity CreateBot(Vector3 position, ushort behaviorId = AiBehaviorIds.Monster)
         {
+            const float maxHealth = 100f;
             var entity = SW.NewEntity<Default>();
             entity.Set<ServerOwned>();
             entity.Set<AiAgentTag>();
+            entity.Set(new Health
+            {
+                Current = maxHealth,
+                Max = maxHealth
+            });
             entity.Set(new AiBrain
             {
                 BehaviorId = behaviorId,

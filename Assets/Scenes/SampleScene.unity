@@ -662,45 +662,9 @@ MonoBehaviour:
     Hunger: 0.1
     Fear: 0.55
     LeaderIndex: -1
-  - Position: {x: 2.5, y: 0, z: 5}
-    BehaviorId: 2
-    Health01: 0.35
-    Hunger: 0.1
-    Fear: 0.55
-    LeaderIndex: -1
-  - Position: {x: 2.5, y: 0, z: 2}
-    BehaviorId: 2
-    Health01: 0.35
-    Hunger: 0.1
-    Fear: 0.55
-    LeaderIndex: -1
-  - Position: {x: 2.5, y: 0, z: 3}
-    BehaviorId: 2
-    Health01: 0.35
-    Hunger: 0.1
-    Fear: 0.55
-    LeaderIndex: -1
-  - Position: {x: 2.5, y: 0, z: 4}
-    BehaviorId: 2
-    Health01: 0.35
-    Hunger: 0.1
-    Fear: 0.55
-    LeaderIndex: -1
-  - Position: {x: 2.5, y: 0, z: 5}
-    BehaviorId: 2
-    Health01: 0.35
-    Hunger: 0.1
-    Fear: 0.55
-    LeaderIndex: -1
-  - Position: {x: 2.5, y: 0, z: 6}
-    BehaviorId: 2
-    Health01: 0.35
-    Hunger: 0.1
-    Fear: 0.55
-    LeaderIndex: -1
-  - Position: {x: 2.5, y: 0, z: 12}
-    BehaviorId: 2
-    Health01: 0.35
+  - Position: {x: 2.5, y: 0, z: 10}
+    BehaviorId: 1
+    Health01: 1
     Hunger: 0.1
     Fear: 0.55
     LeaderIndex: -1

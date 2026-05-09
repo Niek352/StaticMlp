@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Combat;
 using UnityEngine;
 
 namespace StaticMlp.Tests.Ai
@@ -26,6 +27,17 @@ namespace StaticMlp.Tests.Ai
             Assert.That(scope.Catalog.TryBindManualCommand(AiTaskType.AttackEnemy, bot, enemy.GID), Is.True);
             Assert.That(AiBlackboardAccess.TryGetEntity(bot, AiCoreVariableIds.Enemy, out var enemyValue), Is.True);
             Assert.That(enemyValue, Is.EqualTo(enemy.GID));
+        }
+
+        [Test]
+        public void CreateBot_AddsHealthComponent()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var bot = scope.CreateBot(Vector3.zero);
+
+            Assert.That(bot.Has<Health>(), Is.True);
+            Assert.That(bot.Read<Health>().Current, Is.EqualTo(100f));
+            Assert.That(bot.Read<Health>().Max, Is.EqualTo(100f));
         }
     }
 }

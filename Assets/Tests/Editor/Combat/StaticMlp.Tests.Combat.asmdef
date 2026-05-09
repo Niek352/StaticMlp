@@ -1,0 +1,25 @@
+{
+    "name": "StaticMlp.Tests.Combat",
+    "rootNamespace": "StaticMlp.Tests.Combat",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.Combat",
+        "StaticMlp.Features.EcsViews"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

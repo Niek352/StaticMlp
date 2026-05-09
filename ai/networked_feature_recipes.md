@@ -127,7 +127,7 @@ Correct:
 public sealed class LocalPlayerMovementSystem : ISystem {
     public void Update() {
         foreach (var e in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities()) {
-            ref var state = ref e.Mut<CharacterNetState>();
+            ref var state = ref ReplicationMut.Mut<CharacterNetState>(e);
 
             var input = Input.ReadMove();
             state.Position += new Vector3(input.X, 0f, input.Y) * 5f * Time.deltaTime;
@@ -151,7 +151,7 @@ ref var state = ref e.Ref<CharacterNetState>();
 state.Position += delta;
 ```
 
-Use `Mut<T>()` for replicated changes.
+Use `ReplicationMut.Mut<T>()` for replicated changes. Reserve direct `entity.Mut<T>()` for generated/apply/bootstrap code with an explicit reason.
 
 ## Remote Visual System
 
@@ -315,7 +315,7 @@ private static void HandleUseDoor(NetworkPeerId sourcePeer, in UseDoorEvent evt)
         return;
 
     if (CanUseDoor(sourcePeer, door)) {
-        ref var state = ref door.Mut<DoorState>();
+        ref var state = ref ReplicationMut.Mut<DoorState>(door);
         state.IsOpen = !state.IsOpen;
     }
 }
@@ -329,7 +329,7 @@ Feature gameplay systems should not scan `NetInbox.Events`, compare raw event ty
 2. Mark it `[ReplicatedComponent(authority: Owner, delivery: UnreliableSequenced)]`.
 3. Enable `trackChanged`.
 4. Add `PlayerTag`.
-5. Server spawns player with `NetworkIdentity.Owner = peer`.
+5. Server spawns player through `NetworkEntitySpawner`, which creates `NetworkIdentity` and applies ownership tags.
 6. Client receives spawn using `NewEntityByGID`.
 7. Client applies ownership tags.
 8. `LocalPlayerMovementSystem` queries `LocalOwned`.

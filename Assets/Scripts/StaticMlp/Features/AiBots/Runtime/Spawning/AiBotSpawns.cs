@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Combat;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -8,6 +9,8 @@ namespace StaticMlp.Features.AiBots
 {
     public static class AiBotSpawns
     {
+        private const float DEFAULT_MAX_HEALTH = 100f;
+
         public static EntityGID SpawnBot(
             Vector3 spawnPosition,
             EntityGID leader,
@@ -22,8 +25,14 @@ namespace StaticMlp.Features.AiBots
                 AiBotsGameplayFeature.BOT,
                 entity =>
                 {
+                    var clampedHealth01 = Mathf.Clamp01(health01);
                     entity.Set<MonsterTag>();
                     entity.Set<AiAgentTag>();
+                    entity.Set(new Health
+                    {
+                        Current = DEFAULT_MAX_HEALTH * clampedHealth01,
+                        Max = DEFAULT_MAX_HEALTH
+                    });
                     entity.Set(new CharacterNetState
                     {
                         Position = spawnPosition,
@@ -38,7 +47,7 @@ namespace StaticMlp.Features.AiBots
                     });
                     entity.Add<SW.Multi<AiBlackboardEntry>>();
                     AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Hunger, hunger);
-                    AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Health01, health01);
+                    AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Health01, clampedHealth01);
                     AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Fear, fear);
                     AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.EnemyDistance, 999f);
                     AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.WoodStorage01, 1f);

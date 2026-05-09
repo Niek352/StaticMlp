@@ -77,7 +77,7 @@ The bootstrap discovers this class automatically. Do not edit `MultiplayerSystem
 - Client view state implements `IViewComponent`, is changed through `Mut<T>()`, and is not replicated.
 - `ViewPath` and `View` are client-only. Never add them in server prefab recipes.
 - Server gameplay queries `ServerOwned`; it accepts `ClientOwned` only through explicit validation.
-- Mutate replicated components through `Mut<T>()`.
+- Mutate replicated components through `ReplicationMut.Mut<T>()`.
 - Read through `Read<T>()` when no mutation is intended.
 - Do not store `Entity` across frames. Store `EntityGID`.
 - Do not modify filtered component/tag types on other entities while iterating a strict query.
@@ -89,7 +89,7 @@ The bootstrap discovers this class automatically. Do not edit `MultiplayerSystem
 public sealed class FeatureAClientMoveSystem : ISystem {
     public void Update() {
         foreach (var e in CW.Query<All<LocalOwned, FeatureAActorTag, FeatureAState>>().Entities()) {
-            ref var state = ref e.Mut<FeatureAState>();
+            ref var state = ref ReplicationMut.Mut<FeatureAState>(e);
             state.Position += ReadMove() * UnityEngine.Time.deltaTime;
         }
     }
@@ -116,7 +116,7 @@ public sealed class FeatureARemoteViewSystem : ISystem {
 public sealed class FeatureAServerSystem : ISystem {
     public void Update() {
         foreach (var e in SW.Query<All<ServerOwned, FeatureAState>>().Entities()) {
-            ref var state = ref e.Mut<FeatureAState>();
+            ref var state = ref ReplicationMut.Mut<FeatureAState>(e);
             state.ServerTimer += UnityEngine.Time.deltaTime;
         }
     }
@@ -129,6 +129,7 @@ public sealed class FeatureAServerSystem : ISystem {
 - A feature gameplay system reads `NetInbox`, writes `NetOutbox`, or hardcodes `new NetworkPeerId(0)`.
 - A feature creates `NetworkIdentity`, applies `OwnershipTags`, or calls spawn/despawn broadcasters directly.
 - A gameplay system checks network authority manually instead of querying ownership tags.
+- A gameplay system changes replicated state with direct `entity.Mut<T>()` instead of `ReplicationMut.Mut<T>()`.
 - A replicated component is changed via `Ref<T>()`.
 - A remote client system writes authoritative gameplay state.
 - A replicated component implements `IViewComponent`.

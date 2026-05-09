@@ -6,7 +6,8 @@
         "Ecs.Networking",
         "Game.Core",
         "StaticMlp.Features.Input",
-        "StaticMlp.Features.EcsViews"
+        "StaticMlp.Features.EcsViews",
+        "StaticMlp.Features.Combat"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

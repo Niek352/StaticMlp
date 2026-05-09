@@ -31,7 +31,7 @@ namespace StaticMlp.Features.AiBots
                 var definition = definitions[i];
                 var leader = ResolveLeader(definition.LeaderIndex, spawnedBots);
                 var behaviorId = definition.BehaviorId == 0
-                    ? AiBehaviorIds.PeacefulBuilder
+                    ? AiBehaviorIds.Monster
                     : definition.BehaviorId;
                 spawnedBots[i] = AiBotSpawns.SpawnBot(
                     definition.Position,

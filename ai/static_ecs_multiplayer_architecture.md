@@ -128,6 +128,7 @@ Feature systems should talk in typed gameplay commands and replicated state, not
 - Register typed commands in `GameplayFeature.RegisterNetworkEvents()` with `NetworkEventRegistry`.
 - Send client-to-server commands with `NetworkEvents.TrySendToServer(...)`.
 - Receive server commands with `NetworkEvents.ForEachServer<TCommand>(...)`.
+- Mutate replicated gameplay state through `ReplicationMut.Mut<T>()`.
 - Spawn server-owned entities with `NetworkEntitySpawner.SpawnServerEntity(...)`.
 - Despawn networked server entities with `NetworkEntityDespawner.DespawnAndDestroy(...)`.
 - Create client-only ECS entities with `ClientOnlyEntities.New(...)` when a feature needs local UX state.

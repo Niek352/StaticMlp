@@ -1,10 +1,11 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components;
+using StaticMlp.Features.Combat;
 using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Player
 {
-    [NetworkEntityManifest(typeof(CharacterNetState))]
+    [NetworkEntityManifest(typeof(CharacterNetState), typeof(Health))]
     public struct PlayerNetworkEntity : INetworkEntityType
     {
         public byte Id() => 1;
