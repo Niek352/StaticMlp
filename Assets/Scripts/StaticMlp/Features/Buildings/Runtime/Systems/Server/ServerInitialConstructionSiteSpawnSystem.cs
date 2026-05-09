@@ -18,16 +18,7 @@ namespace StaticMlp.Features.Buildings
                 return;
             }
 
-            if (!SW.HasResource<InitialConstructionSiteSpawningResource>())
-            {
-                _spawned = true;
-                return;
-            }
-
             var resource = SW.GetResource<InitialConstructionSiteSpawningResource>();
-            if (resource == null)
-                throw new System.InvalidOperationException("Initial construction site spawning resource exists but is null.");
-
             var sites = resource.Sites;
             for (var i = 0; i < sites.Length; i++)
                 SpawnInitialSite(sites[i]);
@@ -56,7 +47,7 @@ namespace StaticMlp.Features.Buildings
                 siteState.Phase = ConstructionPhase.ReadyToBuild;
             }
 
-            if (definition.InitialBuildWork <= 0f || !site.Has<ConstructionProgress>())
+            if (definition.InitialBuildWork <= 0f)
                 return;
 
             ref var buildState = ref ReplicationMut.Mut<ConstructionSiteState>(site);

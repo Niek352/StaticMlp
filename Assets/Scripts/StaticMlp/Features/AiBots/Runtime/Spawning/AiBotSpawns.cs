@@ -28,6 +28,7 @@ namespace StaticMlp.Features.AiBots
                     var clampedHealth01 = Mathf.Clamp01(health01);
                     entity.Set<MonsterTag>();
                     entity.Set<AiAgentTag>();
+                    entity.Set(new ServerCombatAttackState());
                     entity.Set(new Health
                     {
                         Current = DEFAULT_MAX_HEALTH * clampedHealth01,

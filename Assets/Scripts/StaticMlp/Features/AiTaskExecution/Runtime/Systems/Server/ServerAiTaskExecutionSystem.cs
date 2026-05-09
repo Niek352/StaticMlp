@@ -3,7 +3,6 @@ using StaticMlp.Features.AiBots;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
-using System;
 
 namespace StaticMlp.Features.AiTaskExecution
 {
@@ -11,12 +10,7 @@ namespace StaticMlp.Features.AiTaskExecution
     {
         public void Update()
         {
-            if (!SW.HasResource<AiActionCatalog>())
-                throw new InvalidOperationException("AI action catalog resource is missing.");
-
             var catalog = SW.GetResource<AiActionCatalog>();
-            if (catalog == null)
-                throw new InvalidOperationException("AI action catalog resource is null.");
 
             foreach (var entity in SW.Query<All<ServerOwned, AiAgentTag, AiBrain, AiTaskState, SW.Multi<AiBlackboardEntry>, CharacterNetState>>().Entities())
             {

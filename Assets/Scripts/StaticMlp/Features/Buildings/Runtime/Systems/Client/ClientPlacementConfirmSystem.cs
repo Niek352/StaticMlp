@@ -13,9 +13,6 @@ namespace StaticMlp.Features.Buildings
             if (!inputState.WasPressed(CoreInputActions.Primary))
                 return;
 
-            if (!CW.HasResource<BuildingMenuState>())
-                return;
-
             ref var menuState = ref CW.GetResource<BuildingMenuState>();
             if (menuState.SelectionFrame == Time.frameCount)
                 return;

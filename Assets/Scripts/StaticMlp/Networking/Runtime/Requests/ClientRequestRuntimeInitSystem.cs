@@ -6,8 +6,7 @@ namespace StaticMlp.Networking.Requests
     {
         public void Init()
         {
-            if (!CW.HasResource<ClientPendingRequests>())
-                CW.SetResource(new ClientPendingRequests());
+            CW.SetResource(new ClientPendingRequests());
         }
     }
 }

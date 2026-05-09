@@ -7,10 +7,7 @@ namespace StaticMlp.Features.Combat
     {
         public void Init()
         {
-            if (!CW.HasResource<CombatAutoAttackConfig>())
-            {
-                CW.SetResource(new CombatAutoAttackConfig());
-            }
+            CW.SetResource(new CombatAutoAttackConfig());
         }
     }
 }

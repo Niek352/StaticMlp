@@ -1,4 +1,3 @@
-using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
@@ -16,12 +15,7 @@ namespace StaticMlp.Features.AiBots
 
         public void Update()
         {
-            if (!SW.HasResource<AiNavigationRuntime>())
-                throw new InvalidOperationException("AI navigation runtime resource is missing in server world.");
-
             var runtime = SW.GetResource<AiNavigationRuntime>();
-            if (runtime == null)
-                throw new InvalidOperationException("AI navigation runtime resource exists but is null.");
 
             runtime.BeginFrame();
 

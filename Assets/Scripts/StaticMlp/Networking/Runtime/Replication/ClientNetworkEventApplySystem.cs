@@ -6,9 +6,6 @@ namespace StaticMlp.Networking.Replication
     {
         public void Update()
         {
-            if (!CW.HasResource<NetInbox>())
-                return;
-
             ref var inbox = ref CW.GetResource<NetInbox>();
             for (var i = 0; i < inbox.Events.Count; i++)
             {

@@ -7,37 +7,11 @@ namespace StaticMlp.Features.AiBots
 {
     public sealed class ServerAiRuntimeInitSystem : ISystem
     {
-        public void Update()
+        public void Init()
         {
-            EnsureActionCatalog();
-            EnsureNavigationRuntime();
-        }
-
-        private static void EnsureActionCatalog()
-        {
-            if (!SW.HasResource<AiActionCatalog>())
-            {
-                SW.SetResource(AiActionCatalog.Discover(new AiTaskExecutionTransitions()));
-                return;
-            }
-
-            var existingCatalog = SW.GetResource<AiActionCatalog>();
-            if (existingCatalog == null)
-                throw new InvalidOperationException("AI action catalog resource exists but is null.");
-        }
-
-        private static void EnsureNavigationRuntime()
-        {
-            if (!SW.HasResource<AiNavigationRuntime>())
-            {
-                ValidateNavigationEnvironment();
-                SW.SetResource(AiNavigationRuntime.CreateDefault());
-                return;
-            }
-
-            var runtime = SW.GetResource<AiNavigationRuntime>();
-            if (runtime == null)
-                throw new InvalidOperationException("AI navigation runtime resource exists but is null.");
+            SW.SetResource(AiActionCatalog.Discover(new AiTaskExecutionTransitions()));
+            ValidateNavigationEnvironment();
+            SW.SetResource(AiNavigationRuntime.CreateDefault());
         }
 
         private static void ValidateNavigationEnvironment()

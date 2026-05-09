@@ -1,5 +1,6 @@
 using StaticMlp.Networking.Replication;
 using Steamworks;
+using UnityEngine;
 
 namespace StaticMlp.Networking.Transport {
     public static class SteamTransportStartup {
@@ -47,6 +48,14 @@ namespace StaticMlp.Networking.Transport {
             CW.SetResource(new NetOutbox());
             SteamTransportContext.Log($"Steam client transport connecting to steamId={(ulong)hostSteamId} on virtual port {virtualPort}");
             return ctx;
+        }
+
+        public static void ConfigureDebugPingLatency(int pingLatencyMs) {
+            var clampedPingLatencyMs = Mathf.Max(0, pingLatencyMs);
+            var outboundDelayMs = clampedPingLatencyMs / 2;
+            SteamNetworkingUtils.FakeSendPacketLag = outboundDelayMs;
+            SteamNetworkingUtils.FakeRecvPacketLag = 0;
+            SteamTransportContext.Log($"Configured Steam debug ping latency: rtt={clampedPingLatencyMs}ms, outboundDelay={outboundDelayMs}ms");
         }
     }
 }

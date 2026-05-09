@@ -8,9 +8,6 @@ namespace StaticMlp.Features.Buildings
     {
         public void Init()
         {
-            if (CW.HasResource<BuildingMenuState>())
-                return;
-
             CW.SetResource(new BuildingMenuState
             {
                 SelectionFrame = -1,

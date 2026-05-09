@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Combat;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -17,6 +18,7 @@ namespace StaticMlp.Features.Player
                 entity =>
                 {
                     entity.Set<PlayerTag>();
+                    entity.Set(new ServerCombatAttackState());
                     entity.Set(new CharacterNetState
                     {
                         Position = spawnPosition,

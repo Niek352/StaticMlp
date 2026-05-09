@@ -40,6 +40,7 @@ namespace StaticMlp.Composition
         [SerializeField] private int steamVirtualPort = 0;
         [SerializeField] private string connectSteamId = string.Empty;
         [SerializeField] private int steamLobbyMaxMembers = 4;
+        [Header("Debug Network")] [Min(0)] [SerializeField] private int debugPingLatencyMs;
 
         [Header("UI")] [SerializeField] private bool showMultiplayerUi = true;
         [SerializeField] private string multiplayerUiResourcePath = "Views/MultiplayerStatusUi";
@@ -75,6 +76,7 @@ namespace StaticMlp.Composition
         private ulong _pendingSteamLobbyId;
         private ulong _pendingSteamHostSteamId;
         private Lobby? _activeSteamLobby;
+        private int _appliedDebugPingLatencyMs = -1;
 
         public RunMode CurrentRunMode => runMode;
         public TransportBackend CurrentTransportBackend => transportBackend;
@@ -89,6 +91,7 @@ namespace StaticMlp.Composition
         public bool CanStartClientManually => !UsesSteamTransport || _pendingSteamLobbyId != 0 ||
                                               _pendingSteamHostSteamId != 0 || ulong.TryParse(connectSteamId, out _);
         public string ConnectSteamId => connectSteamId;
+        public int DebugPingLatencyMs => debugPingLatencyMs;
         public string LocalSteamName => _steamInitialized ? SteamClient.Name : "-";
         public ulong LocalSteamId => _steamInitialized ? (ulong)SteamClient.SteamId : 0;
         public ulong ActiveSteamLobbyId => _activeSteamLobby.HasValue ? (ulong)_activeSteamLobby.Value.Id : 0;
@@ -207,6 +210,14 @@ namespace StaticMlp.Composition
             } else {
                 ShutdownSteam();
             }
+
+            ApplyRuntimeDebugPingLatency(force: true);
+        }
+
+        public void SetDebugPingLatency(int pingLatencyMs)
+        {
+            debugPingLatencyMs = Mathf.Max(0, pingLatencyMs);
+            ApplyRuntimeDebugPingLatency(force: true);
         }
 
         private void RestartAs(RunMode nextRunMode)
@@ -241,7 +252,7 @@ namespace StaticMlp.Composition
                 _serverTransport = SteamTransportStartup.StartServer(steamVirtualPort);
             } else {
                 Log($"Starting server transport on 0.0.0.0:{port}");
-                _serverTransport = UtpTransportStartup.StartServer(port);
+                _serverTransport = UtpTransportStartup.StartServer(port, debugPingLatencyMs);
             }
 
             MultiplayerSystemBootstrap.CreateServerSystems(transportBackend);
@@ -273,7 +284,7 @@ namespace StaticMlp.Composition
                 _clientTransport = SteamTransportStartup.StartClient((SteamId)hostSteamId, steamVirtualPort);
             } else {
                 Log($"Starting client transport to {connectHost}:{port}");
-                _clientTransport = UtpTransportStartup.StartClient(connectHost, port);
+                _clientTransport = UtpTransportStartup.StartClient(connectHost, port, debugPingLatencyMs);
             }
 
             _clientMvcManager = new MvcManager(new WindowStackManager());
@@ -285,6 +296,8 @@ namespace StaticMlp.Composition
 
         private void Update()
         {
+            ApplyRuntimeDebugPingLatency();
+
             if (_serverStarted)
                 MultiplayerSystemBootstrap.UpdateServerFrame();
 
@@ -398,6 +411,26 @@ namespace StaticMlp.Composition
                 Debug.Log($"[StaticMlpBootstrap] {message}", this);
         }
 
+        private void ApplyRuntimeDebugPingLatency(bool force = false)
+        {
+            debugPingLatencyMs = Mathf.Max(0, debugPingLatencyMs);
+            if (!force && _appliedDebugPingLatencyMs == debugPingLatencyMs)
+                return;
+
+            if (transportBackend == TransportBackend.Steam) {
+                if (_steamInitialized)
+                    SteamTransportStartup.ConfigureDebugPingLatency(debugPingLatencyMs);
+            } else {
+                if (_serverStarted)
+                    SW.GetResource<UtpTransportContext>().ConfigureDebugPingLatency(debugPingLatencyMs);
+
+                if (_clientStarted)
+                    CW.GetResource<UtpTransportContext>().ConfigureDebugPingLatency(debugPingLatencyMs);
+            }
+
+            _appliedDebugPingLatencyMs = debugPingLatencyMs;
+        }
+
         public void InviteFriend()
         {
             if (!CanInviteFriend)
@@ -428,6 +461,7 @@ namespace StaticMlp.Composition
             SteamFriends.OnGameLobbyJoinRequested += HandleSteamLobbyJoinRequested;
             _steamInitialized = true;
             _steamInitializationFailure = string.Empty;
+            SteamTransportStartup.ConfigureDebugPingLatency(debugPingLatencyMs);
             Log($"Steam initialized as {SteamClient.Name} ({(ulong)SteamClient.SteamId})");
             return true;
         }
@@ -439,6 +473,7 @@ namespace StaticMlp.Composition
             if (!_steamInitialized)
                 return;
 
+            SteamTransportStartup.ConfigureDebugPingLatency(0);
             LeaveActiveSteamLobby();
             SteamFriends.OnGameLobbyJoinRequested -= HandleSteamLobbyJoinRequested;
             SteamClient.Shutdown();

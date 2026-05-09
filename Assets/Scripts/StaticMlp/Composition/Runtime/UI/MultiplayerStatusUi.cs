@@ -160,7 +160,8 @@ namespace StaticMlp.Composition
             var client = _bootstrap.IsClientStarted ? "on" : "off";
             var peer = _bootstrap.LocalPeerId.Value == 0 ? "-" : _bootstrap.LocalPeerId.Value.ToString();
             var transport = _bootstrap.CurrentTransportBackend.ToString();
-            var status = $"Transport: {transport}\nMultiplayer: {mode}\nServer: {server}  Client: {client}\nPeer: {peer}";
+            var debugPing = _bootstrap.DebugPingLatencyMs <= 0 ? "off" : $"{_bootstrap.DebugPingLatencyMs} ms RTT";
+            var status = $"Transport: {transport}\nMultiplayer: {mode}\nServer: {server}  Client: {client}\nPeer: {peer}\nDebug ping: {debugPing}";
 
             if (_bootstrap.UsesSteamTransport) {
                 var steamId = _bootstrap.LocalSteamId == 0 ? "-" : _bootstrap.LocalSteamId.ToString();

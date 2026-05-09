@@ -20,13 +20,6 @@ namespace StaticMlp.Features.Buildings
         public void Update()
         {
             var inputState = CW.GetResource<ClientInputState>();
-
-            if (!CW.HasResource<BuildingMenuState>())
-            {
-                PlacementPreviewEntityUtility.DestroyAll();
-                return;
-            }
-
             ref var menuState = ref CW.GetResource<BuildingMenuState>();
             if (!menuState.HasSelection)
             {

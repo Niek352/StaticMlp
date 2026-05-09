@@ -1,4 +1,3 @@
-using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Systems.Server;
@@ -39,12 +38,7 @@ namespace StaticMlp.Features.AiBots
                 return;
             }
 
-            if (!SW.HasResource<AiActionCatalog>())
-                throw new InvalidOperationException("AI action catalog resource is missing.");
-
             var catalog = SW.GetResource<AiActionCatalog>();
-            if (catalog == null)
-                throw new InvalidOperationException("AI action catalog resource is null.");
 
             var commandedTask = (AiTaskType)request.CommandType;
             if (!catalog.SupportsManualCommand(commandedTask) || !CanCommandBot(sourcePeer, bot))

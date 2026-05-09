@@ -29,7 +29,7 @@ namespace StaticMlp.Features.Combat
 
         public void Update()
         {
-            var config = RequireConfig();
+            var config = SW.GetResource<CombatAutoAttackConfig>();
             var now = _timeProvider();
 
             foreach (var evt in _requests)
@@ -59,7 +59,7 @@ namespace StaticMlp.Features.Combat
             if ((playerPosition - targetPosition).sqrMagnitude > config.Radius * config.Radius)
                 return;
 
-            ref var attackState = ref EnsureAttackState(player);
+            ref var attackState = ref player.Mut<ServerCombatAttackState>();
             if (request.Value.ShotSequence <= attackState.LastAcceptedShotSequence)
                 return;
 
@@ -75,26 +75,6 @@ namespace StaticMlp.Features.Combat
                 config.DamageValue,
                 DamageType.Physical,
                 request.Value.ShotSequence);
-        }
-
-        private static ref ServerCombatAttackState EnsureAttackState(SW.Entity attacker)
-        {
-            if (!attacker.Has<ServerCombatAttackState>())
-                attacker.Set(new ServerCombatAttackState());
-
-            return ref attacker.Mut<ServerCombatAttackState>();
-        }
-
-        private static CombatAutoAttackConfig RequireConfig()
-        {
-            if (!SW.HasResource<CombatAutoAttackConfig>())
-                throw new System.InvalidOperationException("Combat auto attack config resource is missing.");
-
-            var config = SW.GetResource<CombatAutoAttackConfig>();
-            if (config == null)
-                throw new System.InvalidOperationException("Combat auto attack config resource is null.");
-
-            return config;
         }
     }
 }

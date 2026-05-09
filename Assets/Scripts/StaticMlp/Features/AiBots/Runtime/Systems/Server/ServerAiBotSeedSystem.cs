@@ -1,6 +1,5 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
-using System;
 
 namespace StaticMlp.Features.AiBots
 {
@@ -16,13 +15,7 @@ namespace StaticMlp.Features.AiBots
                 return;
             }
 
-            if (!SW.HasResource<InitialBotSpawningResource>())
-                throw new InvalidOperationException("Initial bot spawning resource is missing in server world.");
-
             var resource = SW.GetResource<InitialBotSpawningResource>();
-            if (resource == null)
-                throw new InvalidOperationException("Initial bot spawning resource is null.");
-
             var definitions = resource.Spawns;
             var spawnedBots = new EntityGID[definitions.Length];
 
