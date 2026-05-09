@@ -25,6 +25,7 @@ namespace StaticMlp.Tests.Combat
             NetworkEventRegistry.RegisterServerWorldTypes();
             SW.Initialize();
             SW.SetResource(new CombatDebugLogBuffer());
+            SW.SetResource(new CombatAutoAttackConfig());
         }
 
         public CombatDebugLogBuffer DebugLog => SW.GetResource<CombatDebugLogBuffer>();

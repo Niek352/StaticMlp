@@ -36,7 +36,7 @@ namespace StaticMlp.Features.Combat
             if (!targetRef.Value.TryUnpack<ServerWT>(out var target))
             {
                 effect.Set<EffectProcessedTag>();
-                GetOrCreateDebugLogBuffer().Append(
+                CombatDebugLogBufferAccess.GetOrCreate().Append(
                     $"discard damage target={targetRef.Value} type={damageRef.Type} reason=missing_target");
                 return;
             }
@@ -58,23 +58,8 @@ namespace StaticMlp.Features.Combat
             health.Current = next;
             effect.Set<EffectProcessedTag>();
 
-            GetOrCreateDebugLogBuffer().Append(
+            CombatDebugLogBufferAccess.GetOrCreate().Append(
                 $"apply damage target={target.GID} type={damageRef.Type} previous={previous} current={health.Current}");
-        }
-
-        private static CombatDebugLogBuffer GetOrCreateDebugLogBuffer()
-        {
-            if (!SW.HasResource<CombatDebugLogBuffer>())
-            {
-                SW.SetResource(new CombatDebugLogBuffer());
-                return SW.GetResource<CombatDebugLogBuffer>();
-            }
-
-            var buffer = SW.GetResource<CombatDebugLogBuffer>();
-            if (buffer == null)
-                throw new InvalidOperationException("Combat debug log buffer resource exists but is null.");
-
-            return buffer;
         }
     }
 }

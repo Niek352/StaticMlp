@@ -1,5 +1,6 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Combat;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 using UnityEngine;
@@ -10,11 +11,14 @@ namespace StaticMlp.Features.AiBots
     {
         public void Update()
         {
-            foreach (var entity in SW.Query<All<ServerOwned, AiAgentTag, SW.Multi<AiBlackboardEntry>>>().Entities())
+            foreach (var entity in SW.Query<All<ServerOwned, AiAgentTag, Health, SW.Multi<AiBlackboardEntry>>>().Entities())
             {
                 var hunger = MathF.Min(1f, AiBlackboardAccess.GetFloat(entity, AiCoreVariableIds.Hunger) + Time.deltaTime * 0.015f);
                 var fear = MathF.Max(0f, AiBlackboardAccess.GetFloat(entity, AiCoreVariableIds.Fear) - Time.deltaTime * 0.04f);
-                var health01 = MathF.Max(0f, MathF.Min(1f, AiBlackboardAccess.GetFloat(entity, AiCoreVariableIds.Health01)));
+                ref readonly var health = ref entity.Read<Health>();
+                var health01 = health.Max <= 0f
+                    ? 0f
+                    : MathF.Max(0f, MathF.Min(1f, health.Current / health.Max));
                 var woodStorage01 = MathF.Max(0f, MathF.Min(1f, AiBlackboardAccess.GetFloat(entity, AiCoreVariableIds.WoodStorage01)));
 
                 AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Hunger, hunger);

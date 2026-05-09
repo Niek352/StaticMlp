@@ -25,6 +25,7 @@ namespace StaticMlp.Tests.Ai
                 typeof(AiActionCatalog).Assembly,
                 typeof(AiActionsGameplayFeature).Assembly,
                 typeof(ConstructionRules).Assembly,
+                typeof(Health).Assembly,
                 typeof(CharacterNetState).Assembly);
             SW.Initialize();
 

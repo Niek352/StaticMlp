@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
+using UnityEngine;
 
 namespace StaticMlp.Features.Combat
 {
@@ -19,29 +20,14 @@ namespace StaticMlp.Features.Combat
             effect.Set(new EffectSource { Value = source });
             effect.Set(new EffectTarget { Value = target });
             effect.Set(new EffectValue { Value = value });
-            effect.Set(new EffectCreatedTick { Tick = 0 });
+            effect.Set(new EffectCreatedTick { Tick = (uint)Time.frameCount });
             effect.Set(new EffectRequestId { Value = requestId });
             effect.Set(new DamageData { Type = type });
 
-            GetOrCreateDebugLogBuffer().Append(
+            CombatDebugLogBufferAccess.GetOrCreate().Append(
                 $"create damage source={source} target={target} value={value} type={type} request={requestId}");
 
             return effect;
-        }
-
-        private static CombatDebugLogBuffer GetOrCreateDebugLogBuffer()
-        {
-            if (!SW.HasResource<CombatDebugLogBuffer>())
-            {
-                SW.SetResource(new CombatDebugLogBuffer());
-                return SW.GetResource<CombatDebugLogBuffer>();
-            }
-
-            var buffer = SW.GetResource<CombatDebugLogBuffer>();
-            if (buffer == null)
-                throw new System.InvalidOperationException("Combat debug log buffer resource exists but is null.");
-
-            return buffer;
         }
     }
 }

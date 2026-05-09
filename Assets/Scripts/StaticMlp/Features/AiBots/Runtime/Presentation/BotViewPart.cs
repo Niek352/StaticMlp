@@ -7,12 +7,12 @@ namespace StaticMlp.Features.AiBots
 {
     public sealed class BotViewPart : MonoBehaviour, IEntityViewPart
     {
-        [FormerlySerializedAs("bodyColor")] [SerializeField] private Color _bodyColor = new(0.72f, 0.24f, 0.18f);
-        [FormerlySerializedAs("accentColor")] [SerializeField] private Color _accentColor = new(0.9f, 0.78f, 0.42f);
-        [FormerlySerializedAs("visualRootLocalPosition")] [SerializeField] private Vector3 _visualRootLocalPosition = new(0f, 1.1f, 0f);
-        [FormerlySerializedAs("bodyScale")] [SerializeField] private Vector3 _bodyScale = new(0.85f, 1.1f, 0.85f);
-        [FormerlySerializedAs("headLocalPosition")] [SerializeField] private Vector3 _headLocalPosition = new(0f, 0.95f, 0f);
-        [FormerlySerializedAs("headScale")] [SerializeField] private Vector3 _headScale = new(0.45f, 0.45f, 0.45f);
+        [SerializeField] private Color _bodyColor = new(0.72f, 0.24f, 0.18f);
+        [SerializeField] private Color _accentColor = new(0.9f, 0.78f, 0.42f);
+        [SerializeField] private Vector3 _visualRootLocalPosition = new(0f, 1.1f, 0f);
+        [SerializeField] private Vector3 _bodyScale = new(0.85f, 1.1f, 0.85f);
+        [SerializeField] private Vector3 _headLocalPosition = new(0f, 0.95f, 0f);
+        [SerializeField] private Vector3 _headScale = new(0.45f, 0.45f, 0.45f);
 
         private GameObject _visualRoot;
 

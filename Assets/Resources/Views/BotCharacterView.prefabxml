@@ -3,12 +3,13 @@
         <EntityView />
         <TransformViewComponent />
         <BotViewPart 
-            bodyColor="#B24030"
-            accentColor="#E4C76F"
-            visualRootLocalPosition="0, 1.1, 0"
-            bodyScale="0.85, 1.1, 0.85"
-            headLocalPosition="0, 0.75, .3"
-            headScale="0.45, 0.45, 0.45" />
+            _bodyColor="#B24030"
+            _accentColor="#E4C76F"
+            _visualRootLocalPosition="0, 1.1, 0"
+            _bodyScale="0.85, 1.1, 0.85"
+            _headLocalPosition="0, 0.75, .3"
+            _headScale="0.45, 0.45, 0.45" />
         <BotNavigationGizmoPart />
+        <CombatCharacterViewPart />
     </GameObject>
 </UnityPrefab>

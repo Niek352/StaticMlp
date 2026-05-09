@@ -6,13 +6,17 @@ namespace StaticMlp.Features.Combat
 {
     public sealed class CombatCharacterViewPart : MonoBehaviour,
         IEntityViewPart<PassiveAutoAttackViewState>,
-        IEntityViewPart<PassiveAutoAttackTargetViewState>
+        IEntityViewPart<PassiveAutoAttackTargetViewState>,
+        IEntityViewPart<DamageFeedbackViewState>
     {
         [SerializeField] private Color _tracerColor = new(1f, 0.35f, 0.15f, 0.95f);
         [SerializeField] private Color _highlightColor = new(1f, 0.75f, 0.2f, 0.45f);
+        [SerializeField] private Color _damageFlashColor = new(1f, 0.15f, 0.15f, 0.75f);
         [SerializeField] private float _tracerWidth = 0.08f;
         [SerializeField] private Vector3 _highlightLocalPosition = new(0f, 0.1f, 0f);
         [SerializeField] private Vector3 _highlightBaseScale = new(1.5f, 0.04f, 1.5f);
+        [SerializeField] private Vector3 _damageFlashLocalPosition = new(0f, 1f, 0f);
+        [SerializeField] private Vector3 _damageFlashBaseScale = new(1.1f, 1.1f, 1.1f);
 
         private GameObject _tracerObject;
         private LineRenderer _tracer;
@@ -20,6 +24,9 @@ namespace StaticMlp.Features.Combat
         private GameObject _highlightObject;
         private Renderer _highlightRenderer;
         private Material _highlightMaterial;
+        private GameObject _damageFlashObject;
+        private Renderer _damageFlashRenderer;
+        private Material _damageFlashMaterial;
 
         public void OnBind(IEntityView view)
         {
@@ -44,12 +51,23 @@ namespace StaticMlp.Features.Combat
             {
                 HideHighlight();
             }
+
+            if (view.Entity.Has<DamageFeedbackViewState>())
+            {
+                ref readonly var damageState = ref view.Entity.Read<DamageFeedbackViewState>();
+                Apply(in damageState);
+            }
+            else
+            {
+                HideDamageFlash();
+            }
         }
 
         public void OnUnbind()
         {
             HideTracer();
             HideHighlight();
+            HideDamageFlash();
         }
 
         public void Apply(in PassiveAutoAttackViewState component)
@@ -88,6 +106,26 @@ namespace StaticMlp.Features.Combat
             _highlightObject.transform.localScale = _highlightBaseScale;
         }
 
+        public void Apply(in DamageFeedbackViewState component)
+        {
+            EnsureVisuals();
+            if (!component.IsActive || component.Intensity <= 0f)
+            {
+                HideDamageFlash();
+                return;
+            }
+
+            var color = _damageFlashColor;
+            color.a *= Mathf.Clamp01(component.Intensity);
+            _damageFlashMaterial.color = color;
+            _damageFlashObject.SetActive(true);
+            _damageFlashObject.transform.localPosition = _damageFlashLocalPosition;
+            _damageFlashObject.transform.localScale = Vector3.Lerp(
+                _damageFlashBaseScale * 1.45f,
+                _damageFlashBaseScale,
+                Mathf.Clamp01(component.Intensity));
+        }
+
         private void EnsureVisuals()
         {
             if (_tracer == null)
@@ -95,6 +133,9 @@ namespace StaticMlp.Features.Combat
 
             if (_highlightObject == null)
                 CreateHighlight();
+
+            if (_damageFlashObject == null)
+                CreateDamageFlash();
         }
 
         private void CreateTracer()
@@ -129,6 +170,23 @@ namespace StaticMlp.Features.Combat
             HideHighlight();
         }
 
+        private void CreateDamageFlash()
+        {
+            _damageFlashObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            _damageFlashObject.name = "Combat Damage Flash";
+            _damageFlashObject.transform.SetParent(transform, worldPositionStays: false);
+            _damageFlashObject.transform.localPosition = _damageFlashLocalPosition;
+            _damageFlashObject.transform.localScale = _damageFlashBaseScale;
+            var collider = _damageFlashObject.GetComponent<Collider>();
+            if (collider != null)
+                Destroy(collider);
+
+            _damageFlashRenderer = _damageFlashObject.GetComponent<Renderer>();
+            _damageFlashMaterial = RuntimeVisualMaterial.Create(_damageFlashColor, transparent: true);
+            _damageFlashRenderer.sharedMaterial = _damageFlashMaterial;
+            HideDamageFlash();
+        }
+
         private void HideTracer()
         {
             if (_tracerObject == null)
@@ -147,6 +205,14 @@ namespace StaticMlp.Features.Combat
             _highlightObject.SetActive(false);
         }
 
+        private void HideDamageFlash()
+        {
+            if (_damageFlashObject == null)
+                return;
+
+            _damageFlashObject.SetActive(false);
+        }
+
         private void OnDestroy()
         {
             if (_tracerMaterial != null)
@@ -154,6 +220,9 @@ namespace StaticMlp.Features.Combat
 
             if (_highlightMaterial != null)
                 Destroy(_highlightMaterial);
+
+            if (_damageFlashMaterial != null)
+                Destroy(_damageFlashMaterial);
         }
     }
 }

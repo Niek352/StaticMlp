@@ -115,6 +115,13 @@ Then derive local tags through `OwnershipTags.ApplyForClient` or `OwnershipTags.
 - Client-to-server interactions that are not owned state changes should be replicated events.
 - Camera, UI, selection, and local UX state are not replicated core state.
 - Unexpected runtime states are bugs. Fail fast with exceptions instead of silently skipping missing required resources, configuration, or references. If a system should not run in some context, do not register that system in that context.
+- Do not add defensive `Has`, null, or resource existence checks by default.
+- Do not write `Ensure*`, `Require*`, or similar helpers that probe with `Has<T>()`/`HasResource<T>()`, lazily create missing state, or manually re-check required resources/components for null/existence before access.
+- Prefer fail-fast code. Use direct `Get`, `Read`, `GetResource`, and `Unpack` when the entity, resource, or event is guaranteed by the architecture.
+- For required mutable component state, use direct `Mut<T>()`; do not hide architecture bugs behind `Ensure` methods that silently `Set(...)` missing components.
+- If you see existing `Ensure`/`Require`/`Has`-guarded access of this kind, rewrite it to normal direct access through `Get`, `Mut`, `Read`, `GetResource`, or `Unpack`.
+- Validate data only at trust boundaries: client network requests, user input, external files/configs, optional gameplay states, and actual gameplay rules.
+- Invalid ECS architecture state must crash loudly instead of being silently ignored.
 
 Frame order:
 

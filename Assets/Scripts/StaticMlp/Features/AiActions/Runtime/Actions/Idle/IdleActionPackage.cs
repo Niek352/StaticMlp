@@ -7,11 +7,10 @@ namespace StaticMlp.Features.AiActions
 {
     public sealed class IdleActionPackage : IAiActionPackage
     {
-        private static readonly IdleCollectVariables Collector = new();
         private static readonly IdleCommandTargetBinder CommandBinder = new();
 
         public AiTaskType TaskType => AiTaskType.Idle;
-        public IAiActionVariableCollector VariableCollector => Collector;
+        public IAiActionVariableCollector VariableCollector => null;
         public IAiActionCommandTargetBinder ManualCommandTargetBinder => CommandBinder;
         public IReadOnlyList<AiBlackboardFloatBinding> UtilityBindings => IdleVariableBindings.Bindings;
         public IReadOnlyList<AiBehaviorTaskContribution> UtilityTaskContributions => IdleVariableBindings.UtilityTaskContributions;

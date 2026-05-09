@@ -7,11 +7,10 @@ namespace StaticMlp.Features.AiActions
 {
     public sealed class FollowLeaderActionPackage : IAiActionPackage
     {
-        private static readonly FollowLeaderCollectVariables Collector = new();
         private static readonly FollowLeaderCommandTargetBinder CommandBinder = new();
 
         public AiTaskType TaskType => AiTaskType.FollowLeader;
-        public IAiActionVariableCollector VariableCollector => Collector;
+        public IAiActionVariableCollector VariableCollector => null;
         public IAiActionCommandTargetBinder ManualCommandTargetBinder => CommandBinder;
         public IReadOnlyList<AiBlackboardFloatBinding> UtilityBindings => FollowLeaderVariableBindings.Bindings;
         public IReadOnlyList<AiBehaviorTaskContribution> UtilityTaskContributions => FollowLeaderVariableBindings.UtilityTaskContributions;

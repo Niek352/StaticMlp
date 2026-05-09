@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using StaticMlp.Features.Combat;
+using UnityEngine;
 
 namespace StaticMlp.Tests.Combat
 {
@@ -21,7 +22,7 @@ namespace StaticMlp.Tests.Combat
             Assert.That(effect.Read<EffectSource>().Value, Is.EqualTo(source.GID));
             Assert.That(effect.Read<EffectTarget>().Value, Is.EqualTo(target.GID));
             Assert.That(effect.Read<EffectValue>().Value, Is.EqualTo(25f));
-            Assert.That(effect.Read<EffectCreatedTick>().Tick, Is.EqualTo(0u));
+            Assert.That(effect.Read<EffectCreatedTick>().Tick, Is.EqualTo((uint)Time.frameCount));
             Assert.That(effect.Read<EffectRequestId>().Value, Is.EqualTo(7u));
             Assert.That(effect.Read<DamageData>().Type, Is.EqualTo(DamageType.Fire));
         }

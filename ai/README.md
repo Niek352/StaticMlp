@@ -14,6 +14,7 @@ Curated documentation for agents and contributors working in this repository.
 - `gameplay_systems_memo.md`: gameplay-system boundaries and design reminders.
 - `input_feature.md`: input feature structure and intent flow.
 - `static_ecs_view_feature.md`: client-side view/presentation feature guidance.
+- `ai_combat_feature_research_2026-05-09.md`: research on the new `Ai` and `Combat` features, including architectural issues, undocumented semantics, and system-by-system simplification notes.
 
 ## UI and MVC
 
