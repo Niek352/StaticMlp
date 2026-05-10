@@ -35,8 +35,7 @@ namespace StaticMlp.Features.Buildings
                 return;
             }
 
-            var id = new BuildingId(menuState.SelectedBuildingId);
-            var definition = StaticMlp.Features.BuildingCatalog.BuildingCatalogData.GetDefinition(id);
+            var definition = StaticMlp.Features.BuildingCatalog.BuildingCatalogData.Get(menuState.SelectedBuildingId);
 
             var previewEntity = PlacementPreviewEntityUtility.GetOrCreate(definition);
             var preview = previewEntity.Read<PlacementPreview>();

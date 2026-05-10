@@ -8,6 +8,7 @@
         "Game.Core",
         "StaticMlp.Generated",
         "StaticMlp.Features.AiBots",
+        "StaticMlp.Features.BuildingCatalog",
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.EcsViews",
         "Unity.InputSystem",

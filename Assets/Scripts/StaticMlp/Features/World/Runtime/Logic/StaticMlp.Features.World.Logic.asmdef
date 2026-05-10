@@ -1,0 +1,14 @@
+{
+    "name": "StaticMlp.Features.World.Logic",
+    "rootNamespace": "StaticMlp.Features.World",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

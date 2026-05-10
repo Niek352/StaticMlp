@@ -1,6 +1,7 @@
 using System;
 using Code.EcsUi.Mvc;
 using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 using UnityEngine;
 
@@ -48,14 +49,15 @@ namespace StaticMlp.Features.Buildings
         private static BuildingMenuPresentation BuildPresentation(in BuildingMenuState state)
         {
             var definition = state.HasSelection
-                ? BuildingCatalogData.GetDefinition(new BuildingId(state.SelectedBuildingId))
-                : BuildingCatalogData.GetDefinition(BuildingCatalogData.WoodenHutId);
+                ? BuildingCatalogData.Get(state.SelectedBuildingId)
+                : BuildingCatalogData.Get(BuildingCatalogData.WoodenHutId);
+            var presentation = BuildingPresentationCatalog.Get(definition.Id);
 
             return new BuildingMenuPresentation(
                 state.IsOpen,
-                definition.DisplayName,
-                definition.CostWood,
-                definition.CostStone);
+                presentation.DisplayName,
+                definition.GetConstructionCost(ResourceCatalog.WoodId),
+                definition.GetConstructionCost(ResourceCatalog.StoneId));
         }
 
         private static void CloseMenu()
@@ -68,7 +70,7 @@ namespace StaticMlp.Features.Buildings
         private static void SelectWoodenHut()
         {
             ref var state = ref CW.GetResource<BuildingMenuState>();
-            state.Select(BuildingCatalogData.WoodenHutId.Value, Time.frameCount);
+            state.Select(BuildingCatalogData.WoodenHutId, Time.frameCount);
         }
     }
 }

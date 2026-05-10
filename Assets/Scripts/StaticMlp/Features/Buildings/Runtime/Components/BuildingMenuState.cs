@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.BuildingCatalog;
 
 namespace StaticMlp.Features.Buildings
 {
@@ -6,10 +7,10 @@ namespace StaticMlp.Features.Buildings
     {
         public bool IsOpen;
         public bool HasSelection;
-        public ushort SelectedBuildingId;
+        public BuildingId SelectedBuildingId;
         public int SelectionFrame;
 
-        public void Select(ushort buildingId, int selectionFrame)
+        public void Select(BuildingId buildingId, int selectionFrame)
         {
             IsOpen = false;
             HasSelection = true;
@@ -20,7 +21,7 @@ namespace StaticMlp.Features.Buildings
         public void ClearSelection()
         {
             HasSelection = false;
-            SelectedBuildingId = 0;
+            SelectedBuildingId = default;
             SelectionFrame = -1;
         }
     }

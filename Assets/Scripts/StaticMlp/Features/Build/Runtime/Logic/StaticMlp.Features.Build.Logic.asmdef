@@ -1,0 +1,16 @@
+{
+    "name": "StaticMlp.Features.Build.Logic",
+    "rootNamespace": "StaticMlp.Features.Build",
+    "references": [
+        "StaticMlp.Features.Combat.Logic"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,16 @@
+{
+    "name": "StaticMlp.Features.Progression.Logic",
+    "rootNamespace": "StaticMlp.Features.Progression",
+    "references": [
+        "StaticMlp.Features.Settlement.Logic"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

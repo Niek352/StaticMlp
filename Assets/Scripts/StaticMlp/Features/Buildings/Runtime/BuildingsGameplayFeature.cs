@@ -2,6 +2,7 @@ using System;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Features.ResourcesInventoryMinimal;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Game.Presentation;
@@ -76,11 +77,14 @@ namespace StaticMlp.Features.Buildings
 
         private static void RegisterBuilding(BuildingDefinition definition)
         {
-            if (!BuildingNetworkCatalog.TryGetDefinition(definition.Id, out var network))
+            if (!BuildingNetworkCatalog.TryGet(definition.Id, out var network))
                 throw new InvalidOperationException($"Missing network catalog entry for building {definition.Id}.");
 
-            if (!BuildingPresentationCatalog.TryGetDefinition(definition.Id, out var presentation))
+            if (!BuildingPresentationCatalog.TryGet(definition.Id, out var presentation))
                 throw new InvalidOperationException($"Missing presentation catalog entry for building {definition.Id}.");
+
+            var woodCost = definition.GetConstructionCost(ResourceCatalog.WoodId);
+            var stoneCost = definition.GetConstructionCost(ResourceCatalog.StoneId);
 
             NetArchetypeRegistry.RegisterClient(network.BlueprintArchetypeId, e =>
             {
@@ -111,10 +115,10 @@ namespace StaticMlp.Features.Buildings
                 e.Set(new ConstructionViewState
                 {
                     Phase = ConstructionPhase.Completed,
-                    WoodRequired = definition.CostWood,
-                    StoneRequired = definition.CostStone,
-                    WoodDelivered = definition.CostWood,
-                    StoneDelivered = definition.CostStone,
+                    WoodRequired = woodCost,
+                    StoneRequired = stoneCost,
+                    WoodDelivered = woodCost,
+                    StoneDelivered = stoneCost,
                     Progress01 = 1f
                 });
                 e.Set(new ViewPath(presentation.FinishedViewPath));

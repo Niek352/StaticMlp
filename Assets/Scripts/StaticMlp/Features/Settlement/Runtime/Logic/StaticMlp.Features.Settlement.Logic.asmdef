@@ -1,0 +1,14 @@
+{
+    "name": "StaticMlp.Features.Settlement.Logic",
+    "rootNamespace": "StaticMlp.Features.Settlement",
+    "references": ["GUID:a84b84de04e11b9429a8ea22effe7302"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

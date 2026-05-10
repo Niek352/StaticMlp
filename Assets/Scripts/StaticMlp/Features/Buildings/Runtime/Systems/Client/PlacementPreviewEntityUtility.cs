@@ -18,20 +18,20 @@ namespace StaticMlp.Features.Buildings
             if (TryGet(out var existing))
             {
                 if (existing.Has<PlacementPreview>()
-                    && existing.Read<PlacementPreview>().BuildingId == definition.Id.Value)
+                    && existing.Read<PlacementPreview>().BuildingId == definition.Id)
                     return existing;
 
                 DestroyAll();
             }
 
-            if (!BuildingPresentationCatalog.TryGetDefinition(definition.Id, out var presentation))
+            if (!BuildingPresentationCatalog.TryGet(definition.Id, out var presentation))
                 throw new InvalidOperationException($"Missing presentation catalog entry for building {definition.Id}.");
 
             var created = ClientOnlyEntities.New(ClientBuildingClusters.ClientOnly, ClientBuildingClusters.ClientOnlyChunk);
             created.Set<PlacementPreviewTag>();
             created.Set(new PlacementPreview
             {
-                BuildingId = definition.Id.Value,
+                BuildingId = definition.Id,
                 Rotation = Quaternion.identity,
                 InvalidReason = PlacementInvalidReason.OffGround
             });

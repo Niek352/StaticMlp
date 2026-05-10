@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using StaticMlp.Features.Settlement;
+using Unity.Mathematics;
 
 namespace StaticMlp.Features.BuildingCatalog
 {
@@ -11,27 +13,38 @@ namespace StaticMlp.Features.BuildingCatalog
         {
             new(
                 WoodenHutId,
-                "Wooden Hut",
-                costWood: 10,
-                costStone: 4,
-                footprintWidth: 4,
-                footprintLength: 5,
+                new[]
+                {
+                    new ResourceAmount(ResourceCatalog.WoodId, 10),
+                    new ResourceAmount(ResourceCatalog.StoneId, 4)
+                },
+                new int2(4, 5),
                 buildWorkRequired: 100f)
         };
 
         public static IReadOnlyList<BuildingDefinition> All => Definitions;
 
-        public static BuildingDefinition GetDefinition(BuildingId id)
+        public static BuildingDefinition Get(BuildingId id)
+        {
+            if (TryGet(id, out var definition))
+                return definition;
+
+            throw new InvalidOperationException($"Missing {nameof(BuildingDefinition)} for building id {id.Value} in {nameof(BuildingCatalogData)}.");
+        }
+
+        public static bool TryGet(BuildingId id, out BuildingDefinition definition)
         {
             for (var i = 0; i < Definitions.Length; i++)
             {
                 if (Definitions[i].Id != id)
                     continue;
 
-                return Definitions[i];
+                definition = Definitions[i];
+                return true;
             }
 
-            throw new InvalidOperationException($"Missing {nameof(BuildingDefinition)} for building id {id.Value} in {nameof(BuildingCatalogData)}.");
+            definition = default;
+            return false;
         }
     }
 }

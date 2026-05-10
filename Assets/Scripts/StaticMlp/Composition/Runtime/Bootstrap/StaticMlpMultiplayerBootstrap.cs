@@ -59,7 +59,7 @@ namespace StaticMlp.Composition
         [Header("Initial Construction Sites")] [SerializeField]
         private InitialConstructionSiteDefinition[] initialConstructionSites = {
             new() {
-                BuildingId = 1,
+                BuildingId = StaticMlp.Features.BuildingCatalog.BuildingCatalogData.WoodenHutId.Value,
                 Position = new Vector3(0f, 0f, 16f),
                 Rotation = new Quaternion(0f, 0f, 0f, 1f),
                 StartReadyToBuild = true,

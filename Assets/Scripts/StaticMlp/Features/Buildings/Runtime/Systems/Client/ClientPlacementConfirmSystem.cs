@@ -26,7 +26,7 @@ namespace StaticMlp.Features.Buildings
                 return;
 
             var request = new PlaceBuildingRequestEvent(
-                preview.BuildingId,
+                preview.BuildingId.Value,
                 preview.Position,
                 preview.Rotation);
 

@@ -2,7 +2,9 @@
     "name": "StaticMlp.Features.BuildingCatalog",
     "rootNamespace": "StaticMlp.Features.BuildingCatalog",
     "references": [
-        "Game.Core"
+        "Game.Core",
+        "StaticMlp.Features.Settlement.Logic",
+        "Unity.Mathematics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

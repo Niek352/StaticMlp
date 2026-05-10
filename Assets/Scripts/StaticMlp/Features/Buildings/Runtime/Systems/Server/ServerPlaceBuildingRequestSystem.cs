@@ -36,7 +36,7 @@ namespace StaticMlp.Features.Buildings
                 return;
 
             var id = new BuildingId(request.Value.BuildingId);
-            var definition = StaticMlp.Features.BuildingCatalog.BuildingCatalogData.GetDefinition(id);
+            var definition = StaticMlp.Features.BuildingCatalog.BuildingCatalogData.Get(id);
 
             var validation = ConstructionPlacementValidator.ValidateAuthoritative(
                 definition,

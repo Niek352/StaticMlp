@@ -1,6 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -16,7 +17,7 @@ namespace StaticMlp.Features.Buildings
             Vector3 position,
             Quaternion rotation)
         {
-            if (!BuildingNetworkCatalog.TryGetDefinition(definition.Id, out var network))
+            if (!BuildingNetworkCatalog.TryGet(definition.Id, out var network))
                 throw new InvalidOperationException($"Missing network catalog entry for building {definition.Id}.");
 
             var localDefinition = definition;
@@ -32,7 +33,7 @@ namespace StaticMlp.Features.Buildings
             in BuildingDefinition definition,
             in ConstructionTransform transform)
         {
-            if (!BuildingNetworkCatalog.TryGetDefinition(definition.Id, out var network))
+            if (!BuildingNetworkCatalog.TryGet(definition.Id, out var network))
                 throw new InvalidOperationException($"Missing network catalog entry for building {definition.Id}.");
 
             var localDefinition = definition;
@@ -50,6 +51,9 @@ namespace StaticMlp.Features.Buildings
             Vector3 position,
             Quaternion rotation)
         {
+            var woodCost = definition.GetConstructionCost(ResourceCatalog.WoodId);
+            var stoneCost = definition.GetConstructionCost(ResourceCatalog.StoneId);
+
             entity.Set<ConstructionSiteTag>();
             entity.Set(new ConstructionSiteState
             {
@@ -63,8 +67,8 @@ namespace StaticMlp.Features.Buildings
             });
             entity.Set(new ConstructionResources
             {
-                WoodRequired = definition.CostWood,
-                StoneRequired = definition.CostStone
+                WoodRequired = woodCost,
+                StoneRequired = stoneCost
             });
             entity.Set(new ConstructionProgress
             {
@@ -78,6 +82,9 @@ namespace StaticMlp.Features.Buildings
             in BuildingDefinition definition,
             in ConstructionTransform transform)
         {
+            var woodCost = definition.GetConstructionCost(ResourceCatalog.WoodId);
+            var stoneCost = definition.GetConstructionCost(ResourceCatalog.StoneId);
+
             entity.Set<FinishedBuildingTag>();
             entity.Set(new ConstructionSiteState
             {
@@ -87,10 +94,10 @@ namespace StaticMlp.Features.Buildings
             entity.Set(transform);
             entity.Set(new ConstructionResources
             {
-                WoodRequired = definition.CostWood,
-                StoneRequired = definition.CostStone,
-                WoodDelivered = definition.CostWood,
-                StoneDelivered = definition.CostStone
+                WoodRequired = woodCost,
+                StoneRequired = stoneCost,
+                WoodDelivered = woodCost,
+                StoneDelivered = stoneCost
             });
             entity.Set(new ConstructionProgress
             {

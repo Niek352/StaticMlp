@@ -28,7 +28,7 @@ namespace StaticMlp.Features.Buildings
 
         private static void SpawnInitialSite(InitialConstructionSiteDefinition definition)
         {
-            var buildingDefinition = BuildingCatalogData.GetDefinition(new BuildingId(definition.BuildingId));
+            var buildingDefinition = BuildingCatalogData.Get(new BuildingId(definition.BuildingId));
             var siteGid = ServerBuildingSpawns.SpawnConstructionSite(
                 new NetworkPeerId(0),
                 buildingDefinition,

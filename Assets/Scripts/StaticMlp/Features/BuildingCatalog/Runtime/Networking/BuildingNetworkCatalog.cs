@@ -14,7 +14,15 @@ namespace StaticMlp.Features.BuildingCatalog
 
         public static IReadOnlyList<BuildingNetworkDefinition> All => Definitions;
 
-        public static bool TryGetDefinition(BuildingId id, out BuildingNetworkDefinition definition)
+        public static BuildingNetworkDefinition Get(BuildingId id)
+        {
+            if (TryGet(id, out var definition))
+                return definition;
+
+            throw new System.InvalidOperationException($"Missing {nameof(BuildingNetworkDefinition)} for building id {id.Value} in {nameof(BuildingNetworkCatalog)}.");
+        }
+
+        public static bool TryGet(BuildingId id, out BuildingNetworkDefinition definition)
         {
             for (var i = 0; i < Definitions.Length; i++)
             {

@@ -9,12 +9,14 @@
         "Code.EcsUi.Mvc",
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.BuildingCatalog",
+        "StaticMlp.Features.Settlement.Logic",
         "StaticMlp.Features.Player",
         "StaticMlp.Features.ResourcesInventoryMinimal",
         "UniTask",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "StaticMlp.Features.Settlement.Logic"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
