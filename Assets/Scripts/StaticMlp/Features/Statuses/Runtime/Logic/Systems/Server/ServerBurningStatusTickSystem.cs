@@ -1,6 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Effects;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using UnityEngine;
@@ -9,16 +10,9 @@ namespace StaticMlp.Features.Statuses
 {
     public sealed class ServerBurningStatusTickSystem : ISystem
     {
-        private readonly Func<float> _deltaTimeProvider;
-
-        public ServerBurningStatusTickSystem(Func<float> deltaTimeProvider = null)
-        {
-            _deltaTimeProvider = deltaTimeProvider ?? (() => Time.deltaTime);
-        }
-
         public void Update()
         {
-            var deltaTime = Mathf.Max(0f, _deltaTimeProvider());
+            var deltaTime = Mathf.Max(0f, SW.GetResource<GameTime>().DeltaTime);
 
             foreach (var statusEntity in SW.Query<All<BurningStatus, LifeTime, StatusTarget, StatusStrength, StatusTickState, StatusContext>, None<IsDestroyed>>().Entities())
             {

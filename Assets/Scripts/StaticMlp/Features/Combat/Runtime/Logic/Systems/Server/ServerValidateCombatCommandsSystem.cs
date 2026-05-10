@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Features.Shared;
@@ -10,13 +10,7 @@ namespace StaticMlp.Features.Combat
 {
     public sealed class ServerValidateCombatCommandsSystem : ISystem
     {
-        private readonly Func<float> _timeProvider;
         private readonly List<EntityGID> _requests = new();
-
-        public ServerValidateCombatCommandsSystem(Func<float> timeProvider = null)
-        {
-            _timeProvider = timeProvider ?? (() => Time.time);
-        }
 
         public void Update()
         {
@@ -24,7 +18,7 @@ namespace StaticMlp.Features.Combat
             foreach (var request in SW.Query<All<CombatAbilityRequest>, None<CombatAbilityValidatedTag>>().Entities())
                 _requests.Add(request.GID);
 
-            var now = _timeProvider();
+            var now = SW.GetResource<GameTime>().Time;
             var config = SW.GetResource<CombatConfig>();
             for (var i = 0; i < _requests.Count; i++)
             {

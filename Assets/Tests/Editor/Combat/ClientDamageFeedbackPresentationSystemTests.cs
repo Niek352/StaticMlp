@@ -16,7 +16,8 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestClientWorldScope();
             var target = scope.CreateMonster(new Vector3(2f, 0f, 0f), health: 100f);
-            var system = new ClientDamageFeedbackPresentationSystem(() => 0f);
+            scope.SetGameTime(0f, 0f);
+            var system = new ClientDamageFeedbackPresentationSystem();
 
             system.Update();
 
@@ -36,7 +37,8 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestClientWorldScope();
             scope.CreateMonster(new Vector3(2f, 0f, 0f), health: 100f);
-            var system = new ClientDamageFeedbackPresentationSystem(() => 0f);
+            scope.SetGameTime(0f, 0f);
+            var system = new ClientDamageFeedbackPresentationSystem();
 
             system.Update();
             system.Update();
@@ -50,13 +52,16 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestClientWorldScope();
             var target = scope.CreateMonster(new Vector3(2f, 0f, 0f), health: 100f);
-            var system = new ClientDamageFeedbackPresentationSystem(() => scope.PresentationConfig.DamageFlashLifetime);
+            var system = new ClientDamageFeedbackPresentationSystem();
 
+            scope.SetGameTime(0f, scope.PresentationConfig.DamageFlashLifetime);
             system.Update();
 
             ref var health = ref target.Mut<Health>();
             health.Current = 90f;
+            scope.SetGameTime(0f, scope.PresentationConfig.DamageFlashLifetime);
             system.Update();
+            scope.SetGameTime(0f, scope.PresentationConfig.DamageFlashLifetime);
             system.Update();
 
             var feedback = target.Read<DamageFeedbackViewState>();

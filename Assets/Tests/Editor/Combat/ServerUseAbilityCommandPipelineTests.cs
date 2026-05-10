@@ -18,6 +18,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             const float now = 4f;
+            scope.SetGameTime(now);
             var sourcePeer = new NetworkPeerId(21);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
@@ -29,7 +30,7 @@ namespace StaticMlp.Tests.Combat
                 new UseAbilityCommand(CombatAbilityId.BasicMeleeAuto, target.GID, 11u)));
 
             receive.Update();
-            new ServerValidateCombatCommandsSystem(() => now).Update();
+            new ServerValidateCombatCommandsSystem().Update();
             new ServerAbilityCastSystem().Update();
             new ServerHitToEffectSystem().Update();
             new ServerEffectPreprocessSystem().Update();
@@ -44,6 +45,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             const float now = 4f;
+            scope.SetGameTime(now);
             var sourcePeer = new NetworkPeerId(22);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
@@ -55,7 +57,7 @@ namespace StaticMlp.Tests.Combat
                 new UseAbilityCommand(CombatAbilityId.PoisonArrow, target.GID, 12u)));
 
             receive.Update();
-            new ServerValidateCombatCommandsSystem(() => now).Update();
+            new ServerValidateCombatCommandsSystem().Update();
             new ServerAbilityCastSystem().Update();
             new ServerHitToEffectSystem().Update();
             new ServerEffectPreprocessSystem().Update();
@@ -67,7 +69,8 @@ namespace StaticMlp.Tests.Combat
             Assert.That(StatusEntityLookup.TryFind<PoisonStatus>(target.GID, out _), Is.True);
             Assert.That(target.Read<Health>().Current, Is.EqualTo(92f));
 
-            new ServerPoisonStatusTickSystem(() => 1f).Update();
+            scope.SetGameTime(now, 1f);
+            new ServerPoisonStatusTickSystem().Update();
             new ServerEffectPreprocessSystem().Update();
             new ServerDamageApplySystem().Update();
             receive.Destroy();
@@ -80,6 +83,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             const float now = 4f;
+            scope.SetGameTime(now);
             var sourcePeer = new NetworkPeerId(23);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
@@ -103,7 +107,7 @@ namespace StaticMlp.Tests.Combat
                 new UseAbilityCommand(CombatAbilityId.FireFlask, target.GID, 13u)));
 
             receive.Update();
-            new ServerValidateCombatCommandsSystem(() => now).Update();
+            new ServerValidateCombatCommandsSystem().Update();
             new ServerAbilityCastSystem().Update();
             new ServerHitToEffectSystem().Update();
             new ServerEffectPreprocessSystem().Update();
@@ -116,7 +120,8 @@ namespace StaticMlp.Tests.Combat
             Assert.That(StatusEntityLookup.TryFind<BurningStatus>(target.GID, out _), Is.True);
             Assert.That(StatusEntityLookup.TryFind<OiledStatus>(target.GID, out _), Is.False);
 
-            new ServerAreaEffectTickSystem(() => 1f).Update();
+            scope.SetGameTime(now, 1f);
+            new ServerAreaEffectTickSystem().Update();
             new ServerEffectPreprocessSystem().Update();
             new ServerDamageApplySystem().Update();
             receive.Destroy();

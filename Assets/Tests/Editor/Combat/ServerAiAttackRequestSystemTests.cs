@@ -4,7 +4,9 @@ using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Statuses;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
+using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 using UnityEngine;
 
@@ -14,7 +16,9 @@ namespace StaticMlp.Tests.Combat
     {
         private static void RunCombatPipeline(float now)
         {
-            new ServerValidateCombatCommandsSystem(() => now).Update();
+            var gameTime = SW.GetResource<GameTime>();
+            gameTime.Time = now;
+            new ServerValidateCombatCommandsSystem().Update();
             new ServerAbilityCastSystem().Update();
             new ServerHitToEffectSystem().Update();
             new ServerEffectPreprocessSystem().Update();
@@ -27,6 +31,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             const float now = 5f;
+            scope.SetGameTime(now);
             var attacker = scope.CreateEntity();
             attacker.Set<ServerOwned>();
             attacker.Set<AiAgentTag>();
@@ -61,6 +66,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             var now = 8f;
+            scope.SetGameTime(now);
             var attacker = scope.CreateEntity();
             attacker.Set<ServerOwned>();
             attacker.Set<AiAgentTag>();

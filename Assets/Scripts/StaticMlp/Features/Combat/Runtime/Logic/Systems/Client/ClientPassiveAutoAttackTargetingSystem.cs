@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
@@ -11,18 +11,12 @@ namespace StaticMlp.Features.Combat
 {
     public sealed class ClientPassiveAutoAttackTargetingSystem : ISystem
     {
-        private readonly Func<float> _timeProvider;
         private readonly List<EntityGID> _players = new();
-
-        public ClientPassiveAutoAttackTargetingSystem(Func<float> timeProvider = null)
-        {
-            _timeProvider = timeProvider ?? (() => Time.time);
-        }
 
         public void Update()
         {
             var config = CW.GetResource<CombatConfig>();
-            var now = _timeProvider();
+            var now = CW.GetResource<GameTime>().Time;
             _players.Clear();
 
             foreach (var player in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities())

@@ -29,12 +29,14 @@ namespace StaticMlp.Game.Features.Builtin
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
+            systems.Add(new ServerGameTimeSystem(), (short)(GameplaySystemOrder.ServerConnectionGameplay - 10));
             systems.Add(new ServerPeerDisconnectCleanupSystem(), GameplaySystemOrder.ServerConnectionGameplay - 1);
             systems.Add(new ServerSpawnCubeRequestSystem(), GameplaySystemOrder.Gameplay - 50);
         }
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
+            systems.Add(new ClientGameTimeSystem(), (short)(GameplaySystemOrder.ClientApplyNetworkState - 10));
             systems.Add(new CubeSpawnInputSystem(), GameplaySystemOrder.Gameplay - 50);
             ReplicationRegistry.RegisterClientCoreInterpolationSystems(systems);
             systems.Add(new LocalViewSyncSystem(), GameplaySystemOrder.ClientPresentation);

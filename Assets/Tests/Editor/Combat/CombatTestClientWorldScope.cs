@@ -4,6 +4,7 @@ using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Statuses;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
@@ -34,6 +35,7 @@ namespace StaticMlp.Tests.Combat
                 typeof(CharacterNetState).Assembly);
             NetworkEventRegistry.RegisterClientWorldTypes();
             CW.Initialize();
+            CW.SetResource(new GameTime());
             CW.SetResource(new CombatConfig());
             CW.SetResource(new StatusesConfig());
             CW.SetResource(new CombatPresentationConfig());
@@ -41,6 +43,14 @@ namespace StaticMlp.Tests.Combat
 
         public CombatConfig Config => CW.GetResource<CombatConfig>();
         public CombatPresentationConfig PresentationConfig => CW.GetResource<CombatPresentationConfig>();
+        public GameTime Time => CW.GetResource<GameTime>();
+
+        public void SetGameTime(float time, float deltaTime = 0f)
+        {
+            var gameTime = Time;
+            gameTime.Time = time;
+            gameTime.DeltaTime = deltaTime;
+        }
 
         public CW.Entity CreateLocalPlayer(Vector3 position, float currentHealth = 100f, float maxHealth = 100f)
         {

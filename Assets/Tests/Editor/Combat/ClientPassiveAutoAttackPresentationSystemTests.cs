@@ -16,9 +16,10 @@ namespace StaticMlp.Tests.Combat
             var now = 30f;
             var player = scope.CreateLocalPlayer(Vector3.zero);
             var target = scope.CreateMonster(new Vector3(2f, 0f, 0f));
-            var targeting = new ClientPassiveAutoAttackTargetingSystem(() => now);
-            var intent = new ClientPassiveAutoAttackIntentSystem(() => now);
-            var presentation = new ClientPassiveAutoAttackPresentationSystem(() => 0f);
+            scope.SetGameTime(now, 0f);
+            var targeting = new ClientPassiveAutoAttackTargetingSystem();
+            var intent = new ClientPassiveAutoAttackIntentSystem();
+            var presentation = new ClientPassiveAutoAttackPresentationSystem();
 
             targeting.Update();
             intent.Update();
@@ -44,9 +45,10 @@ namespace StaticMlp.Tests.Combat
             var player = scope.CreateLocalPlayer(Vector3.zero);
             var first = scope.CreateMonster(new Vector3(2f, 0f, 0f));
             var second = scope.CreateMonster(new Vector3(4f, 0f, 0f));
-            var targeting = new ClientPassiveAutoAttackTargetingSystem(() => now);
-            var intent = new ClientPassiveAutoAttackIntentSystem(() => now);
-            var presentation = new ClientPassiveAutoAttackPresentationSystem(() => scope.PresentationConfig.HighlightFadeOut);
+            scope.SetGameTime(now, scope.PresentationConfig.HighlightFadeOut);
+            var targeting = new ClientPassiveAutoAttackTargetingSystem();
+            var intent = new ClientPassiveAutoAttackIntentSystem();
+            var presentation = new ClientPassiveAutoAttackPresentationSystem();
 
             targeting.Update();
             intent.Update();
@@ -56,6 +58,7 @@ namespace StaticMlp.Tests.Combat
             firstState.Position = new Vector3(30f, 0f, 0f);
             now += scope.Config.FireInterval;
 
+            scope.SetGameTime(now, scope.PresentationConfig.HighlightFadeOut);
             targeting.Update();
             intent.Update();
             presentation.Update();

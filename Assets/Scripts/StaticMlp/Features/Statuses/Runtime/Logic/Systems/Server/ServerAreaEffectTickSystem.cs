@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using UnityEngine;
@@ -11,13 +11,7 @@ namespace StaticMlp.Features.Statuses
 {
     public sealed class ServerAreaEffectTickSystem : ISystem
     {
-        private readonly Func<float> _deltaTimeProvider;
         private readonly List<EntityGID> _areas = new();
-
-        public ServerAreaEffectTickSystem(Func<float> deltaTimeProvider = null)
-        {
-            _deltaTimeProvider = deltaTimeProvider ?? (() => Time.deltaTime);
-        }
 
         public void Update()
         {
@@ -25,7 +19,7 @@ namespace StaticMlp.Features.Statuses
             foreach (var area in SW.Query<All<AreaEffectTag, AreaEffectState, LifeTime>, None<IsDestroyed>>().Entities())
                 _areas.Add(area.GID);
 
-            var deltaTime = Mathf.Max(0f, _deltaTimeProvider());
+            var deltaTime = Mathf.Max(0f, SW.GetResource<GameTime>().DeltaTime);
             for (var i = 0; i < _areas.Count; i++)
             {
                 if (!_areas[i].TryUnpack<ServerWT>(out var area))

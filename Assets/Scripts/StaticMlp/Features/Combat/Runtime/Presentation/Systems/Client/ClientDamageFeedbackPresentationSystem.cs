@@ -1,5 +1,5 @@
-using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Features.Shared;
@@ -9,17 +9,10 @@ namespace StaticMlp.Features.Combat
 {
     public sealed class ClientDamageFeedbackPresentationSystem : ISystem
     {
-        private readonly Func<float> _deltaTimeProvider;
-
-        public ClientDamageFeedbackPresentationSystem(Func<float> deltaTimeProvider = null)
-        {
-            _deltaTimeProvider = deltaTimeProvider ?? (() => Time.deltaTime);
-        }
-
         public void Update()
         {
             var config = CW.GetResource<CombatPresentationConfig>();
-            DecayExistingFeedback(config, _deltaTimeProvider());
+            DecayExistingFeedback(config, CW.GetResource<GameTime>().DeltaTime);
             ApplyNewFeedback(config);
         }
 

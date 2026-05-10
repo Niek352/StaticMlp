@@ -3,6 +3,7 @@ using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Statuses;
+using StaticMlp.Game;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
@@ -13,7 +14,9 @@ namespace StaticMlp.Tests.Combat
     {
         private static void RunCombatPipeline(float now)
         {
-            new ServerValidateCombatCommandsSystem(() => now).Update();
+            var gameTime = SW.GetResource<GameTime>();
+            gameTime.Time = now;
+            new ServerValidateCombatCommandsSystem().Update();
             new ServerAbilityCastSystem().Update();
             new ServerHitToEffectSystem().Update();
             new ServerEffectPreprocessSystem().Update();
@@ -30,6 +33,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             const float now = 10f;
+            scope.SetGameTime(now);
             var sourcePeer = new NetworkPeerId(7);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f), current: 100f, max: 100f);
@@ -52,6 +56,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             const float now = 15f;
+            scope.SetGameTime(now);
             var sourcePeer = new NetworkPeerId(8);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f), current: 100f, max: 100f);
@@ -79,6 +84,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             var now = 20f;
+            scope.SetGameTime(now);
             var sourcePeer = new NetworkPeerId(9);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f), current: 100f, max: 100f);

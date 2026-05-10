@@ -4,6 +4,7 @@ using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Statuses;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -33,12 +34,21 @@ namespace StaticMlp.Tests.Combat
                 typeof(StaticMlp.Features.AiBots.AiAgentTag).Assembly);
             NetworkEventRegistry.RegisterServerWorldTypes();
             SW.Initialize();
+            SW.SetResource(new GameTime());
             SW.SetResource(new CombatDebugLogBuffer());
             SW.SetResource(new CombatConfig());
             SW.SetResource(new StatusesConfig());
         }
 
         public CombatDebugLogBuffer DebugLog => SW.GetResource<CombatDebugLogBuffer>();
+        public GameTime Time => SW.GetResource<GameTime>();
+
+        public void SetGameTime(float time, float deltaTime = 0f)
+        {
+            var gameTime = Time;
+            gameTime.Time = time;
+            gameTime.DeltaTime = deltaTime;
+        }
 
         public SW.Entity CreateEntity()
         {

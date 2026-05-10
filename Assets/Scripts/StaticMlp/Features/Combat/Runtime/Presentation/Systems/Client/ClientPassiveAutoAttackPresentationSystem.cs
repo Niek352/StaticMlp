@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
@@ -10,21 +10,15 @@ namespace StaticMlp.Features.Combat
 {
     public sealed class ClientPassiveAutoAttackPresentationSystem : ISystem
     {
-        private readonly Func<float> _deltaTimeProvider;
         private readonly List<EntityGID> _players = new();
         private readonly List<EntityGID> _currentTargets = new();
         private readonly HashSet<ulong> _currentTargetRaws = new();
         private readonly List<ShotSnapshot> _shots = new();
 
-        public ClientPassiveAutoAttackPresentationSystem(Func<float> deltaTimeProvider = null)
-        {
-            _deltaTimeProvider = deltaTimeProvider ?? (() => Time.deltaTime);
-        }
-
         public void Update()
         {
             var config = CW.GetResource<CombatPresentationConfig>();
-            var deltaTime = _deltaTimeProvider();
+            var deltaTime = CW.GetResource<GameTime>().DeltaTime;
 
             CollectCurrentPlayersAndTargets();
             DecayTracers(deltaTime);

@@ -16,8 +16,9 @@ namespace StaticMlp.Tests.Combat
             var now = 10f;
             var player = scope.CreateLocalPlayer(Vector3.zero);
             var target = scope.CreateMonster(new Vector3(2f, 0f, 0f));
-            var targeting = new ClientPassiveAutoAttackTargetingSystem(() => now);
-            var intent = new ClientPassiveAutoAttackIntentSystem(() => now);
+            scope.SetGameTime(now);
+            var targeting = new ClientPassiveAutoAttackTargetingSystem();
+            var intent = new ClientPassiveAutoAttackIntentSystem();
 
             targeting.Update();
             intent.Update();
@@ -26,10 +27,12 @@ namespace StaticMlp.Tests.Combat
             Assert.That(player.Read<PassiveAutoAttackIntent>().Target, Is.EqualTo(target.GID));
             Assert.That(player.Read<PassiveAutoAttackIntent>().ShotSequence, Is.EqualTo(1u));
 
+            scope.SetGameTime(now);
             intent.Update();
             Assert.That(player.Read<PassiveAutoAttackIntent>().ShotSequence, Is.EqualTo(1u));
 
             now += scope.Config.FireInterval;
+            scope.SetGameTime(now);
             intent.Update();
             Assert.That(player.Read<PassiveAutoAttackIntent>().ShotSequence, Is.EqualTo(2u));
             Assert.That(player.Read<PassiveAutoAttackState>().LastShotSequence, Is.EqualTo(2u));
@@ -42,8 +45,9 @@ namespace StaticMlp.Tests.Combat
             var now = 20f;
             var player = scope.CreateLocalPlayer(Vector3.zero);
             var target = scope.CreateMonster(new Vector3(2f, 0f, 0f));
-            var targeting = new ClientPassiveAutoAttackTargetingSystem(() => now);
-            var intent = new ClientPassiveAutoAttackIntentSystem(() => now);
+            scope.SetGameTime(now);
+            var targeting = new ClientPassiveAutoAttackTargetingSystem();
+            var intent = new ClientPassiveAutoAttackIntentSystem();
 
             targeting.Update();
             intent.Update();
@@ -53,6 +57,7 @@ namespace StaticMlp.Tests.Combat
             targetState.Position = new Vector3(30f, 0f, 0f);
 
             now += 0.1f;
+            scope.SetGameTime(now);
             targeting.Update();
             intent.Update();
 
