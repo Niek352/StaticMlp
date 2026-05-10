@@ -2,7 +2,9 @@
     "name": "StaticMlp.Features.Progression.Logic",
     "rootNamespace": "StaticMlp.Features.Progression",
     "references": [
-        "StaticMlp.Features.Settlement.Logic"
+        "FFS.StaticEcs",
+        "StaticMlp.Features.Settlement.Logic",
+        "StaticMlp.Features.Build.Logic"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

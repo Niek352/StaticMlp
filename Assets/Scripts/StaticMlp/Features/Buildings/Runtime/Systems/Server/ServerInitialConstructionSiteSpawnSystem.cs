@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -18,15 +19,15 @@ namespace StaticMlp.Features.Buildings
                 return;
             }
 
-            var resource = SW.GetResource<InitialConstructionSiteSpawningResource>();
-            var sites = resource.Sites;
+            var resource = SW.GetResource<Stage1SettlementSeed>();
+            var sites = resource.InitialConstructionSites;
             for (var i = 0; i < sites.Length; i++)
                 SpawnInitialSite(sites[i]);
 
             _spawned = true;
         }
 
-        private static void SpawnInitialSite(InitialConstructionSiteDefinition definition)
+        private static void SpawnInitialSite(Stage1ConstructionSiteSeed definition)
         {
             var buildingDefinition = BuildingCatalogData.Get(new BuildingId(definition.BuildingId));
             var siteGid = ServerBuildingSpawns.SpawnConstructionSite(

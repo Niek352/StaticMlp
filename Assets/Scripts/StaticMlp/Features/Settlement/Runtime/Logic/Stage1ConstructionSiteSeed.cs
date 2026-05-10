@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-namespace StaticMlp.Features.Buildings
+namespace StaticMlp.Features.Settlement
 {
     [Serializable]
-    public struct InitialConstructionSiteDefinition
+    public struct Stage1ConstructionSiteSeed
     {
         public ushort BuildingId;
         public Vector3 Position;

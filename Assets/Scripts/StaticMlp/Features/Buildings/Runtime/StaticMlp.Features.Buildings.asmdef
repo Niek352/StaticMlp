@@ -9,7 +9,6 @@
         "Code.EcsUi.Mvc",
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.BuildingCatalog",
-        "StaticMlp.Features.Settlement.Logic",
         "StaticMlp.Features.Player",
         "StaticMlp.Features.ResourcesInventoryMinimal",
         "UniTask",

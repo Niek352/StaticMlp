@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-namespace StaticMlp.Features.AiBots
+namespace StaticMlp.Features.World
 {
     [Serializable]
-    public struct InitialBotSpawnDefinition
+    public struct Stage1BotSpawnSeed
     {
         public Vector3 Position;
         public ushort BehaviorId;

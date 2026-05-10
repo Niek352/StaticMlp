@@ -1,7 +1,9 @@
 {
     "name": "StaticMlp.Features.World.Logic",
     "rootNamespace": "StaticMlp.Features.World",
-    "references": [],
+    "references": [
+        "FFS.StaticEcs"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
