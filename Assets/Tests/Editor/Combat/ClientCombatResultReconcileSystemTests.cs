@@ -1,5 +1,7 @@
 using NUnit.Framework;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Effects;
+using StaticMlp.Features.Statuses;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;

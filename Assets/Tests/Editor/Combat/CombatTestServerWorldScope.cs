@@ -1,9 +1,13 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
+using StaticMlp.Features.Effects;
+using StaticMlp.Features.Statuses;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
+using StaticMlp.Networking.Transport;
 using UnityEngine;
 
 namespace StaticMlp.Tests.Combat
@@ -15,18 +19,23 @@ namespace StaticMlp.Tests.Combat
             if (SW.Status != WorldStatus.NotCreated)
                 SW.Destroy();
 
+            ServerPeerRegistry.Clear();
             NetworkEventRegistry.Clear();
-            new CombatFeature().RegisterNetworkEvents();
+            new CombatLogicFeature().RegisterNetworkEvents();
             SW.Create(WorldConfig.Default());
             SW.Types().RegisterAll(
                 typeof(ServerWT).Assembly,
-                typeof(CombatFeature).Assembly,
+                typeof(CombatLogicFeature).Assembly,
+                typeof(EffectsLogicFeature).Assembly,
+                typeof(Health).Assembly,
+                typeof(StatusesLogicFeature).Assembly,
                 typeof(CharacterNetState).Assembly,
                 typeof(StaticMlp.Features.AiBots.AiAgentTag).Assembly);
             NetworkEventRegistry.RegisterServerWorldTypes();
             SW.Initialize();
             SW.SetResource(new CombatDebugLogBuffer());
-            SW.SetResource(new CombatAutoAttackConfig());
+            SW.SetResource(new CombatConfig());
+            SW.SetResource(new StatusesConfig());
         }
 
         public CombatDebugLogBuffer DebugLog => SW.GetResource<CombatDebugLogBuffer>();
@@ -91,6 +100,7 @@ namespace StaticMlp.Tests.Combat
 
         public void Dispose()
         {
+            ServerPeerRegistry.Clear();
             if (SW.Status != WorldStatus.NotCreated)
                 SW.Destroy();
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
@@ -36,12 +37,17 @@ namespace StaticMlp.Composition {
         private static AssemblyList BuildAssemblies(Type worldType, Assembly[] ecsTypeAssemblies) {
             var assemblies = new List<Assembly>();
             var seen = new HashSet<Assembly>();
+            var loadedAssemblies = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .Where(x => x != null)
+                .GroupBy(x => x.GetName().Name, StringComparer.Ordinal)
+                .ToDictionary(x => x.Key, x => x.First(), StringComparer.Ordinal);
 
-            AddAssembly(worldType.Assembly, assemblies, seen);
+            AddAssembly(worldType.Assembly, assemblies, seen, loadedAssemblies);
 
             if (ecsTypeAssemblies != null)
                 for (var i = 0; i < ecsTypeAssemblies.Length; i++)
-                    AddAssembly(ecsTypeAssemblies[i], assemblies, seen);
+                    AddAssembly(ecsTypeAssemblies[i], assemblies, seen, loadedAssemblies);
 
             var rest = new Assembly[assemblies.Count - 1];
             for (var i = 1; i < assemblies.Count; i++)
@@ -50,11 +56,33 @@ namespace StaticMlp.Composition {
             return new AssemblyList(assemblies[0], rest);
         }
 
-        private static void AddAssembly(Assembly assembly, List<Assembly> assemblies, HashSet<Assembly> seen) {
+        private static void AddAssembly(
+            Assembly assembly,
+            List<Assembly> assemblies,
+            HashSet<Assembly> seen,
+            Dictionary<string, Assembly> loadedAssemblies) {
             if (assembly == null || !seen.Add(assembly))
                 return;
 
             assemblies.Add(assembly);
+
+            var references = assembly.GetReferencedAssemblies();
+            for (var i = 0; i < references.Length; i++) {
+                var referenceName = references[i].Name;
+                if (!ShouldIncludeReferencedAssembly(referenceName))
+                    continue;
+
+                if (loadedAssemblies.TryGetValue(referenceName, out var referencedAssembly))
+                    AddAssembly(referencedAssembly, assemblies, seen, loadedAssemblies);
+            }
+        }
+
+        private static bool ShouldIncludeReferencedAssembly(string assemblyName) {
+            return assemblyName.StartsWith("StaticMlp.", StringComparison.Ordinal)
+                   || assemblyName.StartsWith("Game.Core", StringComparison.Ordinal)
+                   || assemblyName.StartsWith("Ecs.Networking", StringComparison.Ordinal)
+                   || assemblyName.StartsWith("FFS.StaticEcs", StringComparison.Ordinal)
+                   || assemblyName.StartsWith("FFS.StaticPack", StringComparison.Ordinal);
         }
 
         private readonly struct AssemblyList {

@@ -16,7 +16,7 @@ namespace StaticMlp.Tests.Ai
             {
                 var part = root.AddComponent<StaticMlp.Features.AiBots.BotViewPart>();
                 part.OnBind(new TestEntityView());
-                part.Apply(new CombatViewState
+                part.Apply(new CombatHealthViewState
                 {
                     HealthNormalized = 0.5f,
                     IsDead = false
@@ -42,7 +42,7 @@ namespace StaticMlp.Tests.Ai
             {
                 var part = root.AddComponent<StaticMlp.Features.AiBots.BotViewPart>();
                 part.OnBind(new TestEntityView());
-                part.Apply(new CombatViewState
+                part.Apply(new CombatHealthViewState
                 {
                     HealthNormalized = 0f,
                     IsDead = true

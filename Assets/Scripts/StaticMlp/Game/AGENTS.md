@@ -14,6 +14,7 @@ Use it for stable core data shapes and reusable gameplay abstractions, not as a 
 - Shared requests, events, and network entity type definitions.
 - Reusable bootstrap-facing feature registration contracts.
 - Shared presentation contracts that are genuinely cross-feature.
+- Shared entity-reference contracts should use `EntityGID` directly; raw ids are allowed only inside explicit packet/codegen serialization boundaries.
 
 ## What Does Not Belong Here
 
@@ -28,6 +29,9 @@ Use it for stable core data shapes and reusable gameplay abstractions, not as a 
 - `Features` implement ordinary gameplay modules on top of those contracts.
 - `Networking` delivers and replicates the state.
 - `Composition` wires worlds, services, and Unity-facing runtime setup.
+- Feature-local gameplay and replication belong in `Features/*/Runtime/Logic`.
+- Feature-local client visuals and view-state assembly belong in `Features/*/Runtime/Presentation`.
+- `Game.Core` may be referenced by both layers, but it must not collapse their responsibilities back together.
 
 ## Editing Rules
 

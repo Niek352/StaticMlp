@@ -1,6 +1,9 @@
 using NUnit.Framework;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
+using StaticMlp.Features.Effects;
+using StaticMlp.Features.Statuses;
 using StaticMlp.Networking;
 using UnityEngine;
 
@@ -47,7 +50,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestClientWorldScope();
             var target = scope.CreateMonster(new Vector3(2f, 0f, 0f), health: 100f);
-            var system = new ClientDamageFeedbackPresentationSystem(() => scope.Config.DamageFlashLifetime);
+            var system = new ClientDamageFeedbackPresentationSystem(() => scope.PresentationConfig.DamageFlashLifetime);
 
             system.Update();
 

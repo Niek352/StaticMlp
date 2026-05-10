@@ -114,39 +114,78 @@ MonoBehaviour:
     - guid: 0a82e952-f0ee-4dca-9f7d-0eb3217b6a31
       current:
         className: Health
-        namespaceName: StaticMlp.Features.Combat
-        assembly: StaticMlp.Features.Combat
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
       history:
       - className: Health
         namespaceName: StaticMlp.Features.Combat
         assembly: StaticMlp.Features.Combat
+      - className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
     - guid: f8410204-2e3d-4b6f-bc6e-bcb96c2be65e
       current:
         className: BurningStatus
-        namespaceName: StaticMlp.Features.Combat
-        assembly: StaticMlp.Features.Combat
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
       history:
       - className: BurningStatus
         namespaceName: StaticMlp.Features.Combat
         assembly: StaticMlp.Features.Combat
+      - className: BurningStatus
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
     - guid: 12cc7e66-6608-4daf-9af8-db2707060807
       current:
         className: OiledStatus
-        namespaceName: StaticMlp.Features.Combat
-        assembly: StaticMlp.Features.Combat
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
       history:
       - className: OiledStatus
         namespaceName: StaticMlp.Features.Combat
         assembly: StaticMlp.Features.Combat
+      - className: OiledStatus
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
     - guid: ff09138f-bfb8-4a58-8d29-bc065c1b9451
       current:
         className: PoisonStatus
-        namespaceName: StaticMlp.Features.Combat
-        assembly: StaticMlp.Features.Combat
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
       history:
       - className: PoisonStatus
         namespaceName: StaticMlp.Features.Combat
         assembly: StaticMlp.Features.Combat
+      - className: PoisonStatus
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 0e2fb7fd-8e3c-45fc-a42b-5e197de8d603
+      current:
+        className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 1435a86b-0f3d-4a6f-8868-d4a3d49e6102
+      current:
+        className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 5f83b1cd-ae0a-4d1a-a6f7-2a7f4a984101
+      current:
+        className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -343,39 +382,78 @@ MonoBehaviour:
     - guid: 0a82e952-f0ee-4dca-9f7d-0eb3217b6a31
       current:
         className: Health
-        namespaceName: StaticMlp.Features.Combat
-        assembly: StaticMlp.Features.Combat
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
       history:
       - className: Health
         namespaceName: StaticMlp.Features.Combat
         assembly: StaticMlp.Features.Combat
+      - className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
     - guid: f8410204-2e3d-4b6f-bc6e-bcb96c2be65e
       current:
         className: BurningStatus
-        namespaceName: StaticMlp.Features.Combat
-        assembly: StaticMlp.Features.Combat
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
       history:
       - className: BurningStatus
         namespaceName: StaticMlp.Features.Combat
         assembly: StaticMlp.Features.Combat
+      - className: BurningStatus
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
     - guid: 12cc7e66-6608-4daf-9af8-db2707060807
       current:
         className: OiledStatus
-        namespaceName: StaticMlp.Features.Combat
-        assembly: StaticMlp.Features.Combat
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
       history:
       - className: OiledStatus
         namespaceName: StaticMlp.Features.Combat
         assembly: StaticMlp.Features.Combat
+      - className: OiledStatus
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
     - guid: ff09138f-bfb8-4a58-8d29-bc065c1b9451
       current:
         className: PoisonStatus
-        namespaceName: StaticMlp.Features.Combat
-        assembly: StaticMlp.Features.Combat
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
       history:
       - className: PoisonStatus
         namespaceName: StaticMlp.Features.Combat
         assembly: StaticMlp.Features.Combat
+      - className: PoisonStatus
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 0e2fb7fd-8e3c-45fc-a42b-5e197de8d603
+      current:
+        className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 1435a86b-0f3d-4a6f-8868-d4a3d49e6102
+      current:
+        className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 5f83b1cd-ae0a-4d1a-a6f7-2a7f4a984101
+      current:
+        className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47

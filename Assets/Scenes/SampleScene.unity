@@ -636,7 +636,7 @@ MonoBehaviour:
   enableLogs: 1
   transportBackend: 0
   connectHost: 127.0.0.1
-  port: 7777
+  port: 8888
   steamAppId: 480
   steamVirtualPort: 0
   connectSteamId: 76561198873497439

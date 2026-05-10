@@ -4,6 +4,7 @@ using StaticMlp.Features.AiActions;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;

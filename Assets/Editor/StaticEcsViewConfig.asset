@@ -60,7 +60,7 @@ MonoBehaviour:
       drawLevel: 10
   - worldTypeFullName: StaticMlp.Networking.ClientCoreWT
     main:
-      selectedTabName: Entities
+      selectedTabName: 
       drawRate: 0.5
       drawFrames: 2
     entities:

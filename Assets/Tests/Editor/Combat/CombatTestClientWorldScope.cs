@@ -1,6 +1,9 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
+using StaticMlp.Features.Effects;
+using StaticMlp.Features.Statuses;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
@@ -17,18 +20,27 @@ namespace StaticMlp.Tests.Combat
                 CW.Destroy();
 
             NetworkEventRegistry.Clear();
-            new CombatFeature().RegisterNetworkEvents();
+            new CombatLogicFeature().RegisterNetworkEvents();
             CW.Create(WorldConfig.Default());
             CW.Types().RegisterAll(
                 typeof(ClientCoreWT).Assembly,
-                typeof(CombatFeature).Assembly,
+                typeof(CombatLogicFeature).Assembly,
+                typeof(CombatPresentationFeature).Assembly,
+                typeof(EffectsLogicFeature).Assembly,
+                typeof(EffectsPresentationFeature).Assembly,
+                typeof(Health).Assembly,
+                typeof(StatusesLogicFeature).Assembly,
+                typeof(StatusesPresentationFeature).Assembly,
                 typeof(CharacterNetState).Assembly);
             NetworkEventRegistry.RegisterClientWorldTypes();
             CW.Initialize();
-            CW.SetResource(new CombatAutoAttackConfig());
+            CW.SetResource(new CombatConfig());
+            CW.SetResource(new StatusesConfig());
+            CW.SetResource(new CombatPresentationConfig());
         }
 
-        public CombatAutoAttackConfig Config => CW.GetResource<CombatAutoAttackConfig>();
+        public CombatConfig Config => CW.GetResource<CombatConfig>();
+        public CombatPresentationConfig PresentationConfig => CW.GetResource<CombatPresentationConfig>();
 
         public CW.Entity CreateLocalPlayer(Vector3 position, float currentHealth = 100f, float maxHealth = 100f)
         {

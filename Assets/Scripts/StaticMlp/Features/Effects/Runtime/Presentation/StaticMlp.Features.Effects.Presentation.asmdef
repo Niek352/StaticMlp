@@ -1,0 +1,22 @@
+{
+    "name": "StaticMlp.Features.Effects.Presentation",
+    "rootNamespace": "StaticMlp.Features.Effects",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.Combat.Logic",
+        "StaticMlp.Features.Effects.Logic",
+        "StaticMlp.Features.EcsViews",
+        "StaticMlp.Features.Statuses.Logic"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

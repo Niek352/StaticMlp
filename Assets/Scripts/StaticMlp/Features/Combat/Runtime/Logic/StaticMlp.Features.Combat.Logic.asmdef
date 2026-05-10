@@ -1,0 +1,22 @@
+{
+    "name": "StaticMlp.Features.Combat.Logic",
+    "rootNamespace": "StaticMlp.Features.Combat",
+    "references": [
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.Shared.Logic",
+        "StaticMlp.Features.Effects.Logic",
+        "StaticMlp.Features.Statuses.Logic"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

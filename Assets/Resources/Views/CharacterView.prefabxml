@@ -3,6 +3,8 @@
         <EntityView />
         <TransformViewComponent />
         <CharacterView visualRootLocalPosition="0, 1, 0" />
-        <CombatCharacterViewPart />
+        <CombatHealthViewPart />
+        <PassiveAutoAttackViewPart />
+        <StatusAuraViewPart />
     </GameObject>
 </UnityPrefab>

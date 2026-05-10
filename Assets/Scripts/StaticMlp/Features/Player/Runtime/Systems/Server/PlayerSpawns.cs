@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;

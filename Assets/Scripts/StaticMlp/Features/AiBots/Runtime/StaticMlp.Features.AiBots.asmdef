@@ -9,7 +9,9 @@
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.EcsViews",
         "FFS.StaticEcs.Unity",
-        "StaticMlp.Features.Combat"
+        "StaticMlp.Features.Combat.Logic",
+        "StaticMlp.Features.Combat.Presentation",
+        "StaticMlp.Features.Shared.Logic"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

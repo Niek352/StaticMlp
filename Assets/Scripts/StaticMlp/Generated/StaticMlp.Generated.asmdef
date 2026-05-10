@@ -9,7 +9,8 @@
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.ResourcesInventoryMinimal",
         "StaticMlp.Features.AiBots",
-        "StaticMlp.Features.Combat"
+        "StaticMlp.Features.Shared.Logic",
+        "StaticMlp.Features.Statuses.Logic"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

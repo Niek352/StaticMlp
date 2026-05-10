@@ -5,7 +5,8 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 using StaticMlp.Features.AiBots;
-using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
+using StaticMlp.Features.Statuses;
 using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Components.Buildings;
@@ -23,14 +24,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 AiNetStateReplication.CreateDelta,
                 AiNetStateReplication.Read);
 
-            ReplicationRegistry.RegisterComponent<BurningStatus>(
-                ReplicatedComponentIds.BurningStatus,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                BurningStatusReplication.CreateDelta,
-                BurningStatusReplication.Read);
-
             ReplicationRegistry.RegisterComponent<Health>(
                 ReplicatedComponentIds.Health,
                 ReplicationAuthority.Server,
@@ -39,22 +32,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 HealthReplication.CreateDelta,
                 HealthReplication.Read);
 
-            ReplicationRegistry.RegisterComponent<OiledStatus>(
-                ReplicatedComponentIds.OiledStatus,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                OiledStatusReplication.CreateDelta,
-                OiledStatusReplication.Read);
-
-            ReplicationRegistry.RegisterComponent<PoisonStatus>(
-                ReplicatedComponentIds.PoisonStatus,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                PoisonStatusReplication.CreateDelta,
-                PoisonStatusReplication.Read);
-
             ReplicationRegistry.RegisterComponent<ResourcesInventory>(
                 ReplicatedComponentIds.ResourcesInventory,
                 ReplicationAuthority.Server,
@@ -62,6 +39,30 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 ResourcesInventoryReplication.CreateDelta,
                 ResourcesInventoryReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<StatusContext>(
+                ReplicatedComponentIds.StatusContext,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                StatusContextReplication.CreateDelta,
+                StatusContextReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<StatusStrength>(
+                ReplicatedComponentIds.StatusStrength,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                StatusStrengthReplication.CreateDelta,
+                StatusStrengthReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<StatusTarget>(
+                ReplicatedComponentIds.StatusTarget,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                StatusTargetReplication.CreateDelta,
+                StatusTargetReplication.Read);
 
             ReplicationRegistry.RegisterComponent<ConstructionProgress>(
                 ReplicatedComponentIds.ConstructionProgress,
@@ -124,6 +125,7 @@ namespace StaticMlp.Networking.Replication.Generated {
             ReplicationRegistry.RegisterNetworkEntity(1, 1, 1);
             ReplicationRegistry.RegisterNetworkEntity(2, 1, 2);
             ReplicationRegistry.RegisterNetworkEntity(5, 1, 200);
+            ReplicationRegistry.RegisterNetworkEntity(6, 1, 0);
         }
 
         private static void RegisterCharacterNetStateClientTypes() {

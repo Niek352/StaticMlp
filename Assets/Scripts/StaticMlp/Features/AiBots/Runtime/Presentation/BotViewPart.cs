@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace StaticMlp.Features.AiBots
 {
-    public sealed class BotViewPart : MonoBehaviour, IEntityViewPart, IEntityViewPart<CombatViewState>
+    public sealed class BotViewPart : MonoBehaviour, IEntityViewPart, IEntityViewPart<CombatHealthViewState>
     {
         [SerializeField] private Color _bodyColor = new(0.72f, 0.24f, 0.18f);
         [SerializeField] private Color _accentColor = new(0.9f, 0.78f, 0.42f);
@@ -61,7 +61,7 @@ namespace StaticMlp.Features.AiBots
             DestroyVisual();
         }
 
-        public void Apply(in CombatViewState component)
+        public void Apply(in CombatHealthViewState component)
         {
             EnsureHealthBar();
             ApplyHealthBar(component.HealthNormalized, component.IsDead);

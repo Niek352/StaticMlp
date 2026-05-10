@@ -1,5 +1,8 @@
 using NUnit.Framework;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
+using StaticMlp.Features.Effects;
+using StaticMlp.Features.Statuses;
 using StaticMlp.Features.Player;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;

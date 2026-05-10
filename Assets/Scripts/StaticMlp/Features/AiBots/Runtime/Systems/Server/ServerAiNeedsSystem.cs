@@ -1,6 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 using UnityEngine;

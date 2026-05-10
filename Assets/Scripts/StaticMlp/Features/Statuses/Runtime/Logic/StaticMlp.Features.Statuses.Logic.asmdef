@@ -1,0 +1,21 @@
+{
+    "name": "StaticMlp.Features.Statuses.Logic",
+    "rootNamespace": "StaticMlp.Features.Statuses",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.Shared.Logic",
+        "StaticMlp.Features.Effects.Logic",
+        "FFS.StaticPack"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

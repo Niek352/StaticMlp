@@ -1,6 +1,8 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Effects;
+using StaticMlp.Features.Statuses;
 using StaticMlp.Game.Components;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Networking;

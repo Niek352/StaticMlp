@@ -1,6 +1,9 @@
 using System.Linq;
 using NUnit.Framework;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
+using StaticMlp.Features.Effects;
+using StaticMlp.Features.Statuses;
 using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Tests.Combat

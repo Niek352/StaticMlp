@@ -509,6 +509,9 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 case "Quaternion":
                     builder.AppendLine($"            writer.WriteFloat({MaybeQuantize(q, $"{source}.x")}, {MaybeQuantize(q, $"{source}.y")}, {MaybeQuantize(q, $"{source}.z")}, {MaybeQuantize(q, $"{source}.w")});");
                     break;
+                case "EntityGID":
+                    builder.AppendLine($"            writer.WriteUlong({source}.Raw);");
+                    break;
                 case "EnumByte":
                     builder.AppendLine($"            writer.WriteByte((byte){source});");
                     break;
@@ -537,6 +540,9 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                     break;
                 case "Quaternion":
                     builder.AppendLine($"                {name} = new Quaternion(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat()){comma}");
+                    break;
+                case "EntityGID":
+                    builder.AppendLine($"                {name} = new EntityGID(reader.ReadUlong()){comma}");
                     break;
                 case "EnumByte":
                     builder.AppendLine($"                {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadByte(){comma}");
@@ -625,6 +631,7 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             if (type == typeof(long)) return "long";
             if (type == typeof(ulong)) return "ulong";
             if (type == typeof(float)) return "float";
+            if (type == typeof(EntityGID)) return "EntityGID";
             return type.Name;
         }
 
@@ -724,6 +731,7 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 if (type == typeof(long)) return new FieldKind("Long", "WriteLong", "ReadLong", 8);
                 if (type == typeof(ulong)) return new FieldKind("Ulong", "WriteUlong", "ReadUlong", 8);
                 if (type == typeof(float)) return new FieldKind("Float", "WriteFloat", "ReadFloat", 4, canQuantize: true, canInterpolate: true);
+                if (type == typeof(EntityGID)) return new FieldKind("EntityGID", null, null, 8);
                 if (type == typeof(Vector2)) return new FieldKind("Vector2", null, null, 8, canQuantize: true, canInterpolate: true, needsUnityEngine: true);
                 if (type == typeof(Vector3)) return new FieldKind("Vector3", null, null, 12, canQuantize: true, canInterpolate: true, needsUnityEngine: true);
                 if (type == typeof(Quaternion)) return new FieldKind("Quaternion", null, null, 16, canQuantize: true, canInterpolate: true, needsUnityEngine: true);

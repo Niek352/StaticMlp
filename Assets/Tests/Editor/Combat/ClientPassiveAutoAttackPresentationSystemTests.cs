@@ -1,5 +1,7 @@
 using NUnit.Framework;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Effects;
+using StaticMlp.Features.Statuses;
 using StaticMlp.Game.Components;
 using UnityEngine;
 
@@ -44,7 +46,7 @@ namespace StaticMlp.Tests.Combat
             var second = scope.CreateMonster(new Vector3(4f, 0f, 0f));
             var targeting = new ClientPassiveAutoAttackTargetingSystem(() => now);
             var intent = new ClientPassiveAutoAttackIntentSystem(() => now);
-            var presentation = new ClientPassiveAutoAttackPresentationSystem(() => scope.Config.HighlightFadeOut);
+            var presentation = new ClientPassiveAutoAttackPresentationSystem(() => scope.PresentationConfig.HighlightFadeOut);
 
             targeting.Update();
             intent.Update();

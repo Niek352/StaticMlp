@@ -2,11 +2,11 @@
 namespace StaticMlp.Networking.Replication {
     public static class ReplicatedComponentIds {
         public const ushort AiNetState = 19454;
-        public const ushort BurningStatus = 20476;
         public const ushort Health = 5648;
-        public const ushort OiledStatus = 57188;
-        public const ushort PoisonStatus = 11948;
         public const ushort ResourcesInventory = 44055;
+        public const ushort StatusContext = 13786;
+        public const ushort StatusStrength = 41076;
+        public const ushort StatusTarget = 19072;
         public const ushort ConstructionProgress = 15866;
         public const ushort ConstructionResources = 8723;
         public const ushort ConstructionSiteState = 23961;

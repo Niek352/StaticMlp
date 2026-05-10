@@ -40,6 +40,11 @@ Gameplay systems should only:
 - File name must match the top-level type name.
 - Do not collect many unrelated classes in one file.
 - Keep gameplay, replication, transport, ownership, and presentation code in separate folders/modules.
+- Split feature modules into `Runtime/Logic` and `Runtime/Presentation` when both concerns exist.
+- `Runtime/Logic` owns gameplay state, replicated contracts, simulation, validation, and server/client-core systems.
+- `Runtime/Presentation` owns client-only view state, view sync, visual systems, and Unity-facing presentation code.
+- Do not place Unity presentation code, view components, or client-only visuals in `Runtime/Logic`.
+- Do not place gameplay rules, replicated state mutation, or server authority logic in `Runtime/Presentation`.
 - Keep domain definitions/rules free from network ids, prefab/view paths, transport state, and concrete UI concerns.
 - Put shared gameplay/bootstrap contracts in `Game.Core`; put ordinary gameplay features in their own `StaticMlp.Features.FeatureX` asmdef.
 - Add feature systems through `GameplayFeature`, not by editing `MultiplayerSystemBootstrap`.
@@ -47,6 +52,7 @@ Gameplay systems should only:
 - Write code inside explicit modules with clear boundaries. Treat modules as separate packages.
 - Do not cross module boundaries with hidden dependencies or direct calls when an event/component boundary belongs there.
 - Do not store `Entity` across frames; use `EntityGID` for persistent references.
+- Do not expose entity references as raw `ulong`, `*Raw`, or similar surrogate fields in gameplay/replication contracts. Use `EntityGID` directly, and only touch `.Raw` at explicit serialization/codegen boundaries.
 - Do not create `static class` types to store mutable runtime data, commands, or state.
 - Private fields use `_camelCase` naming, for example `_mvcManager`.
 - `const` members use `CAPS_UNDER` naming.

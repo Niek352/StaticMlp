@@ -1,5 +1,8 @@
 using NUnit.Framework;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
+using StaticMlp.Features.Effects;
+using StaticMlp.Features.Statuses;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
@@ -15,7 +18,9 @@ namespace StaticMlp.Tests.Combat
             new ServerHitToEffectSystem().Update();
             new ServerEffectPreprocessSystem().Update();
             new ServerSynergyTriggerSystem().Update();
-            new ServerAddStatusApplySystem().Update();
+            new ServerApplyPoisonStatusSystem().Update();
+            new ServerApplyBurningStatusSystem().Update();
+            new ServerApplyOiledStatusSystem().Update();
             new ServerDamageApplySystem().Update();
             new ServerEffectCleanupSystem().Update();
         }

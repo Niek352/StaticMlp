@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Shared;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 
