@@ -79,7 +79,7 @@ namespace StaticMlp.Composition
             ClientCoreSys.Initialize();
         }
 
-        public static void UpdateServerFrame()
+        public static void UpdateServerStep()
         {
             ServerSys.Update();
             SW.Tick();

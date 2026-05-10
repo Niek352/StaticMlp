@@ -36,7 +36,7 @@ namespace StaticMlp.Features.AiActions
                 Destination = state.Position + away * 8f,
                 StopDistance = 0.5f
             });
-            task.Timer += Time.deltaTime;
+            task.ElapsedTicks++;
         }
     }
 }

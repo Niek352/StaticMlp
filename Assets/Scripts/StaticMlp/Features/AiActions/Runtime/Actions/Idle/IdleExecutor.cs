@@ -1,6 +1,5 @@
 using StaticMlp.Features.AiBots;
 using StaticMlp.Networking;
-using UnityEngine;
 
 namespace StaticMlp.Features.AiActions
 {
@@ -22,7 +21,7 @@ namespace StaticMlp.Features.AiActions
 
         public override void Execute(SW.Entity entity, ref AiTaskState task)
         {
-            task.Timer += Time.deltaTime;
+            task.ElapsedTicks++;
         }
     }
 }

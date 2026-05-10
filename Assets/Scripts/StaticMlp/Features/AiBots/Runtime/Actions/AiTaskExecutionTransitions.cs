@@ -18,7 +18,7 @@ namespace StaticMlp.Features.AiBots
             brain.CurrentTask = nextTask;
             task.Task = nextTask;
             task.Step = 0;
-            task.Timer = 0f;
+            task.ElapsedTicks = 0;
         }
 
         public void StopMovement(SW.Entity entity)

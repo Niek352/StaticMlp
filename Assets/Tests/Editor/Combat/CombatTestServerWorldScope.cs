@@ -15,6 +15,8 @@ namespace StaticMlp.Tests.Combat
 {
     public sealed class CombatTestServerWorldScope : IDisposable
     {
+        public const float DEFAULT_FIXED_STEP_SECONDS = 1f / 30f;
+
         public CombatTestServerWorldScope()
         {
             if (SW.Status != WorldStatus.NotCreated)
@@ -35,6 +37,10 @@ namespace StaticMlp.Tests.Combat
             NetworkEventRegistry.RegisterServerWorldTypes();
             SW.Initialize();
             SW.SetResource(new GameTime());
+            SW.SetResource(new SimulationTime
+            {
+                FixedStepSeconds = DEFAULT_FIXED_STEP_SECONDS,
+            });
             SW.SetResource(new CombatDebugLogBuffer());
             SW.SetResource(new CombatConfig());
             SW.SetResource(new StatusesConfig());
@@ -42,12 +48,38 @@ namespace StaticMlp.Tests.Combat
 
         public CombatDebugLogBuffer DebugLog => SW.GetResource<CombatDebugLogBuffer>();
         public GameTime Time => SW.GetResource<GameTime>();
+        public SimulationTime SimulationTime => SW.GetResource<SimulationTime>();
 
         public void SetGameTime(float time, float deltaTime = 0f)
         {
             var gameTime = Time;
             gameTime.Time = time;
             gameTime.DeltaTime = deltaTime;
+        }
+
+        public void SetSimulationTime(uint serverTick, float fixedStepSeconds = DEFAULT_FIXED_STEP_SECONDS, double? elapsedSeconds = null)
+        {
+            var simulationTime = SimulationTime;
+            simulationTime.ServerTick = serverTick;
+            simulationTime.FixedStepSeconds = fixedStepSeconds;
+            simulationTime.ElapsedSeconds = elapsedSeconds ?? serverTick * fixedStepSeconds;
+        }
+
+        public void AdvanceSimulationTicks(uint ticks)
+        {
+            var simulationTime = SimulationTime;
+            simulationTime.ServerTick += ticks;
+            simulationTime.ElapsedSeconds += ticks * simulationTime.FixedStepSeconds;
+        }
+
+        public void AdvanceSimulationSeconds(float seconds)
+        {
+            AdvanceSimulationTicks(SecondsToTicks(seconds));
+        }
+
+        public uint SecondsToTicks(float seconds)
+        {
+            return SimulationTime.SecondsToTicks(seconds);
         }
 
         public SW.Entity CreateEntity()

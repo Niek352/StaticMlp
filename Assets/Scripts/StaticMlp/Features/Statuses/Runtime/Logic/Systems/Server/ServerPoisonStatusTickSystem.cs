@@ -4,7 +4,6 @@ using StaticMlp.Features.Effects;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
-using UnityEngine;
 
 namespace StaticMlp.Features.Statuses
 {
@@ -12,13 +11,12 @@ namespace StaticMlp.Features.Statuses
     {
         public void Update()
         {
-            var deltaTime = Mathf.Max(0f, SW.GetResource<GameTime>().DeltaTime);
+            var currentTick = SW.GetResource<SimulationTime>().ServerTick;
 
             foreach (var statusEntity in SW.Query<All<PoisonStatus, LifeTime, StatusTarget, StatusStrength, StatusTickState, StatusContext>, None<IsDestroyed>>().Entities())
             {
-                ref var lifeTime = ref statusEntity.Mut<LifeTime>();
-                lifeTime.RemainingTime -= deltaTime;
-                if (lifeTime.RemainingTime <= 0f)
+                ref readonly var lifeTime = ref statusEntity.Read<LifeTime>();
+                if (currentTick >= lifeTime.EndTick)
                     continue;
 
                 var target = statusEntity.Read<StatusTarget>().Value;
@@ -29,15 +27,14 @@ namespace StaticMlp.Features.Statuses
                 }
 
                 ref var tick = ref statusEntity.Mut<StatusTickState>();
-                tick.Timer += deltaTime;
-                if (tick.Interval <= 0f)
+                if (tick.IntervalTicks == 0)
                     continue;
 
                 ref readonly var strength = ref statusEntity.Read<StatusStrength>();
                 ref readonly var context = ref statusEntity.Read<StatusContext>();
-                while (tick.Timer >= tick.Interval)
+                while (currentTick >= tick.NextTick && currentTick < lifeTime.EndTick)
                 {
-                    tick.Timer -= tick.Interval;
+                    tick.NextTick += tick.IntervalTicks;
                     EffectCommands.CreateDamage(
                         context.Source,
                         target,

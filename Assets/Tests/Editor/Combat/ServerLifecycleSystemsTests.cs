@@ -28,7 +28,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             var entity = scope.CreateEntity();
-            entity.Set(new LifeTime { RemainingTime = 0f });
+            entity.Set(new LifeTime { EndTick = 0 });
 
             new ServerLifeTimeExpireMarkSystem().Update();
 

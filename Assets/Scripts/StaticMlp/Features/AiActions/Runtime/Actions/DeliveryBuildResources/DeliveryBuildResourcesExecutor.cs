@@ -47,7 +47,7 @@ namespace StaticMlp.Features.AiActions
                     Destination = siteTransform.Position,
                     StopDistance = InteractionRange - 0.5f
                 });
-                task.Timer += Time.deltaTime;
+                task.ElapsedTicks++;
                 return;
             }
             
@@ -60,7 +60,7 @@ namespace StaticMlp.Features.AiActions
                 return;
             }
 
-            task.Timer += Time.deltaTime;
+            task.ElapsedTicks++;
             if (resources.IsComplete)
                 _transitions.SwitchToIdle(entity, ref task);
         }

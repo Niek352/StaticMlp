@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 
@@ -8,9 +9,10 @@ namespace StaticMlp.Game.Systems.Server
     {
         public void Update()
         {
+            var currentTick = SW.GetResource<SimulationTime>().ServerTick;
             foreach (var entity in SW.Query<All<LifeTime>, None<IsDestroyed>>().Entities())
             {
-                if (entity.Read<LifeTime>().RemainingTime <= 0f)
+                if (currentTick >= entity.Read<LifeTime>().EndTick)
                     entity.Set<IsDestroyed>();
             }
         }

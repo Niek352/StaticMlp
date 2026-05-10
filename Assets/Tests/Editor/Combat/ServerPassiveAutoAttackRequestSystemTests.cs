@@ -3,7 +3,6 @@ using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Statuses;
-using StaticMlp.Game;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
@@ -12,10 +11,8 @@ namespace StaticMlp.Tests.Combat
 {
     public sealed class ServerPassiveAutoAttackRequestSystemTests
     {
-        private static void RunCombatPipeline(float now)
+        private static void RunCombatPipeline()
         {
-            var gameTime = SW.GetResource<GameTime>();
-            gameTime.Time = now;
             new ServerValidateCombatCommandsSystem().Update();
             new ServerAbilityCastSystem().Update();
             new ServerHitToEffectSystem().Update();
@@ -32,8 +29,7 @@ namespace StaticMlp.Tests.Combat
         public void Update_FromPlayerAutoAttackEvent_CreatesRequest_AndSharedPipelineReducesMonsterHealth()
         {
             using var scope = new CombatTestServerWorldScope();
-            const float now = 10f;
-            scope.SetGameTime(now);
+            scope.SetSimulationTime(300);
             var sourcePeer = new NetworkPeerId(7);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f), current: 100f, max: 100f);
@@ -45,7 +41,7 @@ namespace StaticMlp.Tests.Combat
                 new PassiveAutoAttackRequestEvent(target.GID, 42u)));
 
             requestSystem.Update();
-            RunCombatPipeline(now);
+            RunCombatPipeline();
             requestSystem.Destroy();
 
             Assert.That(target.Read<Health>().Current, Is.EqualTo(90f));
@@ -55,8 +51,7 @@ namespace StaticMlp.Tests.Combat
         public void Update_RejectsDuplicateShotSequence()
         {
             using var scope = new CombatTestServerWorldScope();
-            const float now = 15f;
-            scope.SetGameTime(now);
+            scope.SetSimulationTime(450);
             var sourcePeer = new NetworkPeerId(8);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f), current: 100f, max: 100f);
@@ -67,13 +62,13 @@ namespace StaticMlp.Tests.Combat
                 sourcePeer,
                 new PassiveAutoAttackRequestEvent(target.GID, 7u)));
             requestSystem.Update();
-            RunCombatPipeline(now);
+            RunCombatPipeline();
 
             SW.SendEvent(new NetworkEventFromClient<PassiveAutoAttackRequestEvent>(
                 sourcePeer,
                 new PassiveAutoAttackRequestEvent(target.GID, 7u)));
             requestSystem.Update();
-            RunCombatPipeline(now);
+            RunCombatPipeline();
             requestSystem.Destroy();
 
             Assert.That(target.Read<Health>().Current, Is.EqualTo(90f));
@@ -83,8 +78,7 @@ namespace StaticMlp.Tests.Combat
         public void Update_RejectsAttackBeforeServerFireInterval()
         {
             using var scope = new CombatTestServerWorldScope();
-            var now = 20f;
-            scope.SetGameTime(now);
+            scope.SetSimulationTime(600);
             var sourcePeer = new NetworkPeerId(9);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f), current: 100f, max: 100f);
@@ -95,14 +89,14 @@ namespace StaticMlp.Tests.Combat
                 sourcePeer,
                 new PassiveAutoAttackRequestEvent(target.GID, 1u)));
             requestSystem.Update();
-            RunCombatPipeline(now);
+            RunCombatPipeline();
 
-            now += 0.1f;
+            scope.AdvanceSimulationSeconds(0.1f);
             SW.SendEvent(new NetworkEventFromClient<PassiveAutoAttackRequestEvent>(
                 sourcePeer,
                 new PassiveAutoAttackRequestEvent(target.GID, 2u)));
             requestSystem.Update();
-            RunCombatPipeline(now);
+            RunCombatPipeline();
             requestSystem.Destroy();
 
             Assert.That(target.Read<Health>().Current, Is.EqualTo(90f));

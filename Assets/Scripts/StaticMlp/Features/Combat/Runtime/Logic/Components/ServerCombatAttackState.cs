@@ -4,7 +4,7 @@ namespace StaticMlp.Features.Combat
 {
     public struct ServerCombatAttackState : IComponent
     {
-        public float NextAttackAt;
+        public uint NextAttackTick;
         public uint LastAcceptedShotSequence;
     }
 }

@@ -8,6 +8,6 @@ namespace StaticMlp.Features.AiBots
         public AiTaskType ActiveTask;
         public bool HasActiveTask;
         public byte Step;
-        public float Timer;
+        public uint ElapsedTicks;
     }
 }

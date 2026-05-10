@@ -1,5 +1,6 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
@@ -13,6 +14,7 @@ namespace StaticMlp.Features.AiBots
 
         public void Update()
         {
+            var deltaTime = SW.GetResource<SimulationTime>().FixedStepSeconds;
             foreach (var bot in SW.Query<All<ServerOwned, AiAgentTag, SW.Multi<AiBlackboardEntry>, CharacterNetState>>().Entities())
             {
                 ref readonly var botState = ref bot.Read<CharacterNetState>();
@@ -41,7 +43,7 @@ namespace StaticMlp.Features.AiBots
                     AiBlackboardAccess.SetFloat(
                         bot,
                         AiCoreVariableIds.Fear,
-                        MathF.Min(1f, AiBlackboardAccess.GetFloat(bot, AiCoreVariableIds.Fear) + Time.deltaTime * 0.35f));
+                        MathF.Min(1f, AiBlackboardAccess.GetFloat(bot, AiCoreVariableIds.Fear) + deltaTime * 0.35f));
                     continue;
                 }
 

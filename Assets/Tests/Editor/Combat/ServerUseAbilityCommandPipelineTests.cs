@@ -17,8 +17,7 @@ namespace StaticMlp.Tests.Combat
         public void Update_FromUseAbilityCommand_BasicMeleeAuto_ReducesTargetHealth()
         {
             using var scope = new CombatTestServerWorldScope();
-            const float now = 4f;
-            scope.SetGameTime(now);
+            scope.SetSimulationTime(120);
             var sourcePeer = new NetworkPeerId(21);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
@@ -44,8 +43,7 @@ namespace StaticMlp.Tests.Combat
         public void Update_PoisonArrow_AddsPoisonStatus_AndTickCreatesDamage()
         {
             using var scope = new CombatTestServerWorldScope();
-            const float now = 4f;
-            scope.SetGameTime(now);
+            scope.SetSimulationTime(120);
             var sourcePeer = new NetworkPeerId(22);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
@@ -69,7 +67,7 @@ namespace StaticMlp.Tests.Combat
             Assert.That(StatusEntityLookup.TryFind<PoisonStatus>(target.GID, out _), Is.True);
             Assert.That(target.Read<Health>().Current, Is.EqualTo(92f));
 
-            scope.SetGameTime(now, 1f);
+            scope.AdvanceSimulationSeconds(1f);
             new ServerPoisonStatusTickSystem().Update();
             new ServerEffectPreprocessSystem().Update();
             new ServerDamageApplySystem().Update();
@@ -79,11 +77,42 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
+        public void Update_PoisonArrow_CatchUpTicks_ApplyAccumulatedDamage()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            scope.SetSimulationTime(120);
+            var sourcePeer = new NetworkPeerId(24);
+            scope.CreatePlayer(sourcePeer, Vector3.zero);
+            var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
+            var receive = new ServerReceiveCombatCommandsSystem();
+
+            receive.Init();
+            SW.SendEvent(new NetworkEventFromClient<UseAbilityCommand>(
+                sourcePeer,
+                new UseAbilityCommand(CombatAbilityId.PoisonArrow, target.GID, 14u)));
+
+            receive.Update();
+            new ServerValidateCombatCommandsSystem().Update();
+            new ServerAbilityCastSystem().Update();
+            new ServerHitToEffectSystem().Update();
+            new ServerEffectPreprocessSystem().Update();
+            new ServerApplyPoisonStatusSystem().Update();
+            new ServerDamageApplySystem().Update();
+
+            scope.AdvanceSimulationSeconds(3f);
+            new ServerPoisonStatusTickSystem().Update();
+            new ServerEffectPreprocessSystem().Update();
+            new ServerDamageApplySystem().Update();
+            receive.Destroy();
+
+            Assert.That(target.Read<Health>().Current, Is.EqualTo(83f));
+        }
+
+        [Test]
         public void Update_FireFlaskAgainstOiledTarget_TriggersBurningAndBurningPool()
         {
             using var scope = new CombatTestServerWorldScope();
-            const float now = 4f;
-            scope.SetGameTime(now);
+            scope.SetSimulationTime(120);
             var sourcePeer = new NetworkPeerId(23);
             scope.CreatePlayer(sourcePeer, Vector3.zero);
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
@@ -98,7 +127,7 @@ namespace StaticMlp.Tests.Combat
                 RootEffectId = 1,
                 Depth = 0,
                 MaxDepth = 4,
-            });
+            }, scope.SimulationTime);
 
             var receive = new ServerReceiveCombatCommandsSystem();
             receive.Init();
@@ -120,7 +149,7 @@ namespace StaticMlp.Tests.Combat
             Assert.That(StatusEntityLookup.TryFind<BurningStatus>(target.GID, out _), Is.True);
             Assert.That(StatusEntityLookup.TryFind<OiledStatus>(target.GID, out _), Is.False);
 
-            scope.SetGameTime(now, 1f);
+            scope.AdvanceSimulationSeconds(1f);
             new ServerAreaEffectTickSystem().Update();
             new ServerEffectPreprocessSystem().Update();
             new ServerDamageApplySystem().Update();
@@ -133,6 +162,7 @@ namespace StaticMlp.Tests.Combat
         public void Update_PoisonEffectsMergeIntoSingleStatusEntity()
         {
             using var scope = new CombatTestServerWorldScope();
+            scope.SetSimulationTime(120);
             var source = scope.CreateEntity();
             var target = scope.CreateMonsterWithHealth(Vector3.zero);
 
@@ -148,10 +178,10 @@ namespace StaticMlp.Tests.Combat
                 poisonStatusCount++;
 
             Assert.That(poisonStatusCount, Is.EqualTo(1));
-            Assert.That(statusEntity.Read<LifeTime>().RemainingTime, Is.EqualTo(6f));
+            Assert.That(statusEntity.Read<LifeTime>().EndTick, Is.EqualTo(120u + scope.SecondsToTicks(6f)));
             Assert.That(statusEntity.Read<StatusStrength>().Power, Is.EqualTo(5f));
             Assert.That(statusEntity.Read<StatusStrength>().Stacks, Is.EqualTo(3));
-            Assert.That(statusEntity.Read<StatusTickState>().Interval, Is.EqualTo(0.5f));
+            Assert.That(statusEntity.Read<StatusTickState>().IntervalTicks, Is.EqualTo(scope.SecondsToTicks(0.5f)));
             Assert.That(statusEntity.Read<StatusContext>().RequestId, Is.EqualTo(12u));
             Assert.That(statusEntity.Read<StatusContext>().RootEffectId, Is.EqualTo(12u));
             Assert.That(statusEntity.Read<StatusContext>().ChainDepth, Is.EqualTo(2));

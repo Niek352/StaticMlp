@@ -1,7 +1,6 @@
 using StaticMlp.Features.AiBots;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
-using UnityEngine;
 
 namespace StaticMlp.Features.AiActions
 {
@@ -43,7 +42,7 @@ namespace StaticMlp.Features.AiActions
             {
                 Target = enemyGid
             });
-            task.Timer += Time.deltaTime;
+            task.ElapsedTicks++;
         }
     }
 }

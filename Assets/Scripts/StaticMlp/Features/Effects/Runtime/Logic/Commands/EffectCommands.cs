@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Networking;
-using UnityEngine;
 
 namespace StaticMlp.Features.Effects
 {
@@ -23,7 +23,7 @@ namespace StaticMlp.Features.Effects
             effect.Set(new EffectSource { Value = source });
             effect.Set(new EffectTarget { Value = target });
             effect.Set(new EffectValue { Value = value });
-            effect.Set(new EffectCreatedTick { Tick = (uint)Time.frameCount });
+            effect.Set(new EffectCreatedTick { Tick = SW.GetResource<SimulationTime>().ServerTick });
             effect.Set(new EffectRequestId { Value = requestId });
             effect.Set(new DamageData
             {

@@ -6,6 +6,6 @@ namespace StaticMlp.Features.AiBots
     {
         public ushort BehaviorId;
         public AiTaskType CurrentTask;
-        public float DecisionCooldown;
+        public uint NextDecisionTick;
     }
 }

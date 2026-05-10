@@ -1,10 +1,10 @@
 using System;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
+using StaticMlp.Game;
+using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
-using UnityEngine;
 
 namespace StaticMlp.Features.AiBots
 {
@@ -12,10 +12,11 @@ namespace StaticMlp.Features.AiBots
     {
         public void Update()
         {
+            var deltaTime = SW.GetResource<SimulationTime>().FixedStepSeconds;
             foreach (var entity in SW.Query<All<ServerOwned, AiAgentTag, Health, SW.Multi<AiBlackboardEntry>>>().Entities())
             {
-                var hunger = MathF.Min(1f, AiBlackboardAccess.GetFloat(entity, AiCoreVariableIds.Hunger) + Time.deltaTime * 0.015f);
-                var fear = MathF.Max(0f, AiBlackboardAccess.GetFloat(entity, AiCoreVariableIds.Fear) - Time.deltaTime * 0.04f);
+                var hunger = MathF.Min(1f, AiBlackboardAccess.GetFloat(entity, AiCoreVariableIds.Hunger) + deltaTime * 0.015f);
+                var fear = MathF.Max(0f, AiBlackboardAccess.GetFloat(entity, AiCoreVariableIds.Fear) - deltaTime * 0.04f);
                 ref readonly var health = ref entity.Read<Health>();
                 var health01 = health.Max <= 0f
                     ? 0f

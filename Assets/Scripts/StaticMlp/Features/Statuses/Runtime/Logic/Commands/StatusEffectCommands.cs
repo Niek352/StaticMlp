@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Effects;
+using StaticMlp.Game;
 using StaticMlp.Networking;
-using UnityEngine;
 
 namespace StaticMlp.Features.Statuses
 {
@@ -107,7 +107,7 @@ namespace StaticMlp.Features.Statuses
             effect.Set(new EffectSource { Value = source });
             effect.Set(new EffectTarget { Value = target });
             effect.Set(new EffectValue { Value = power });
-            effect.Set(new EffectCreatedTick { Tick = (uint)Time.frameCount });
+            effect.Set(new EffectCreatedTick { Tick = SW.GetResource<SimulationTime>().ServerTick });
             effect.Set(new EffectRequestId { Value = requestId });
             effect.Set(new AddStatusSpec
             {

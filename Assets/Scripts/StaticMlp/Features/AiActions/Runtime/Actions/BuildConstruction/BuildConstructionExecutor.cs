@@ -1,10 +1,10 @@
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Buildings;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
-using UnityEngine;
 
 namespace StaticMlp.Features.AiActions
 {
@@ -24,6 +24,7 @@ namespace StaticMlp.Features.AiActions
 
         public override void Execute(SW.Entity entity, ref AiTaskState task)
         {
+            var fixedStepSeconds = SW.GetResource<SimulationTime>().FixedStepSeconds;
             if (!AiBlackboardAccess.TryGetEntity(entity, BuildConstructionCollectVariables.BuildTargetSite, out var target)
                 || !ConstructionSiteQuery.TryGetBuildableSite(target, out var site))
             {
@@ -49,7 +50,7 @@ namespace StaticMlp.Features.AiActions
                     Destination = siteTransform.Position,
                     StopDistance = BuildInteractionRange - 0.5f
                 });
-                task.Timer += Time.deltaTime;
+                task.ElapsedTicks++;
                 return;
             }
 
@@ -61,14 +62,14 @@ namespace StaticMlp.Features.AiActions
                     ref mutableSiteState,
                     ref mutableProgress,
                     in siteResources,
-                    BuildWorkPerSecond * Time.deltaTime,
+                    BuildWorkPerSecond * fixedStepSeconds,
                     BuildWorkPerSecond))
             {
                 _transitions.SwitchToIdle(entity, ref task);
                 return;
             }
 
-            task.Timer += Time.deltaTime;
+            task.ElapsedTicks++;
             if (mutableProgress.IsComplete)
                 _transitions.SwitchToIdle(entity, ref task);
         }

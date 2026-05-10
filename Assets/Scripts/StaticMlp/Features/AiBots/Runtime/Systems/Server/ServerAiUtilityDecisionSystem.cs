@@ -1,8 +1,8 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
-using UnityEngine;
 
 namespace StaticMlp.Features.AiBots
 {
@@ -13,16 +13,17 @@ namespace StaticMlp.Features.AiBots
         public void Update()
         {
             var catalog = SW.GetResource<AiActionCatalog>();
+            var simulationTime = SW.GetResource<SimulationTime>();
+            var decisionIntervalTicks = simulationTime.SecondsToTicks(DECISION_INTERVAL);
 
             foreach (var entity in SW.Query<All<ServerOwned, AiAgentTag, AiBrain, AiTaskState, SW.Multi<AiBlackboardEntry>>>().Entities())
             {
                 ref var brain = ref entity.Mut<AiBrain>();
 
-                brain.DecisionCooldown -= Time.deltaTime;
-                if (brain.DecisionCooldown > 0f)
+                if (simulationTime.ServerTick < brain.NextDecisionTick)
                     continue;
 
-                brain.DecisionCooldown = DECISION_INTERVAL;
+                brain.NextDecisionTick = simulationTime.ServerTick + decisionIntervalTicks;
 
                 if (!catalog.TryGetBehavior(brain.BehaviorId, out var behavior))
                 {
@@ -38,7 +39,7 @@ namespace StaticMlp.Features.AiBots
                 ref var task = ref entity.Mut<AiTaskState>();
                 task.Task = selectedTask;
                 task.Step = 0;
-                task.Timer = 0f;
+                task.ElapsedTicks = 0;
             }
         }
     }

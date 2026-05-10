@@ -45,7 +45,7 @@ namespace StaticMlp.Features.AiBots
                     {
                         BehaviorId = behaviorId,
                         CurrentTask = AiTaskType.Idle,
-                        DecisionCooldown = 0f
+                        NextDecisionTick = 0
                     });
                     entity.Add<SW.Multi<AiBlackboardEntry>>();
                     AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Hunger, hunger);
@@ -61,7 +61,7 @@ namespace StaticMlp.Features.AiBots
                         ActiveTask = AiTaskType.Idle,
                         HasActiveTask = false,
                         Step = 0,
-                        Timer = 0f
+                        ElapsedTicks = 0
                     });
                     entity.Set(new AiNetState
                     {

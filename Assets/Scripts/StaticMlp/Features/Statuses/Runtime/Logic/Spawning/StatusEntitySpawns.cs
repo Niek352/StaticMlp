@@ -1,6 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Effects;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -14,7 +15,8 @@ namespace StaticMlp.Features.Statuses
             EntityGID source,
             AddStatusSpec spec,
             uint requestId,
-            EffectChainData chain)
+            EffectChainData chain,
+            SimulationTime simulationTime)
         {
             return Spawn(
                 target,
@@ -22,14 +24,16 @@ namespace StaticMlp.Features.Statuses
                 spec,
                 requestId,
                 chain,
+                simulationTime,
                 StatusNetworkArchetypes.POISON,
                 entity =>
                 {
                     entity.Set<PoisonStatus>();
+                    var intervalTicks = simulationTime.SecondsToTicks(spec.TickInterval);
                     entity.Set(new StatusTickState
                     {
-                        Interval = spec.TickInterval,
-                        Timer = 0f,
+                        IntervalTicks = intervalTicks,
+                        NextTick = intervalTicks == 0 ? 0 : simulationTime.ServerTick + intervalTicks,
                     });
                 });
         }
@@ -39,7 +43,8 @@ namespace StaticMlp.Features.Statuses
             EntityGID source,
             AddStatusSpec spec,
             uint requestId,
-            EffectChainData chain)
+            EffectChainData chain,
+            SimulationTime simulationTime)
         {
             return Spawn(
                 target,
@@ -47,14 +52,16 @@ namespace StaticMlp.Features.Statuses
                 spec,
                 requestId,
                 chain,
+                simulationTime,
                 StatusNetworkArchetypes.BURNING,
                 entity =>
                 {
                     entity.Set<BurningStatus>();
+                    var intervalTicks = simulationTime.SecondsToTicks(spec.TickInterval);
                     entity.Set(new StatusTickState
                     {
-                        Interval = spec.TickInterval,
-                        Timer = 0f,
+                        IntervalTicks = intervalTicks,
+                        NextTick = intervalTicks == 0 ? 0 : simulationTime.ServerTick + intervalTicks,
                     });
                 });
         }
@@ -64,7 +71,8 @@ namespace StaticMlp.Features.Statuses
             EntityGID source,
             AddStatusSpec spec,
             uint requestId,
-            EffectChainData chain)
+            EffectChainData chain,
+            SimulationTime simulationTime)
         {
             return Spawn(
                 target,
@@ -72,6 +80,7 @@ namespace StaticMlp.Features.Statuses
                 spec,
                 requestId,
                 chain,
+                simulationTime,
                 StatusNetworkArchetypes.OILED,
                 entity => entity.Set<OiledStatus>());
         }
@@ -82,6 +91,7 @@ namespace StaticMlp.Features.Statuses
             AddStatusSpec spec,
             uint requestId,
             EffectChainData chain,
+            SimulationTime simulationTime,
             ushort networkArchetypeId,
             Action<SW.Entity> initialize)
         {
@@ -96,7 +106,7 @@ namespace StaticMlp.Features.Statuses
                 entity =>
                 {
                     entity.Set(new StatusTarget { Value = target.GID });
-                    entity.Set(new LifeTime { RemainingTime = spec.Duration });
+                    entity.Set(new LifeTime { EndTick = simulationTime.DeadlineAfter(spec.Duration) });
                     entity.Set(new StatusStrength
                     {
                         Power = spec.Power,

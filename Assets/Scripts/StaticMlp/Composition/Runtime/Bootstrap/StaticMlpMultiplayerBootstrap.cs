@@ -5,6 +5,7 @@ using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Buildings;
+using StaticMlp.Game;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
 using StaticMlp.Networking.Replication;
@@ -19,6 +20,7 @@ namespace StaticMlp.Composition
     {
         private const string STEAM_LOBBY_HOST_KEY = "host_steam_id";
         private const string STEAM_LOBBY_VIRTUAL_PORT_KEY = "virtual_port";
+        private const int MAX_SERVER_STEPS_PER_FRAME = 4;
 
         public enum RunMode
         {
@@ -41,6 +43,7 @@ namespace StaticMlp.Composition
         [SerializeField] private string connectSteamId = string.Empty;
         [SerializeField] private int steamLobbyMaxMembers = 4;
         [Header("Debug Network")] [Min(0)] [SerializeField] private int debugPingLatencyMs;
+        [Header("Simulation")] [Min(1)] [SerializeField] private int serverTickRateHz = 30;
 
         [Header("UI")] [SerializeField] private bool showMultiplayerUi = true;
         [SerializeField] private string multiplayerUiResourcePath = "Views/MultiplayerStatusUi";
@@ -77,6 +80,7 @@ namespace StaticMlp.Composition
         private ulong _pendingSteamHostSteamId;
         private Lobby? _activeSteamLobby;
         private int _appliedDebugPingLatencyMs = -1;
+        private float _serverSimulationAccumulator;
 
         public RunMode CurrentRunMode => runMode;
         public TransportBackend CurrentTransportBackend => transportBackend;
@@ -244,8 +248,13 @@ namespace StaticMlp.Composition
             MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(),
                 NetworkEventRegistry.RegisterServerWorldTypes,
                 ecsTypeAssemblies: GameplayAssemblies());
+            SW.SetResource(new SimulationTime
+            {
+                FixedStepSeconds = 1f / Mathf.Max(1, serverTickRateHz),
+            });
             SW.SetResource(new InitialBotSpawningResource(initialBotSpawns));
             SW.SetResource(new InitialConstructionSiteSpawningResource(initialConstructionSites));
+            _serverSimulationAccumulator = 0f;
 
             if (transportBackend == TransportBackend.Steam) {
                 Log($"Starting Steam server transport as steamId={LocalSteamId} on virtual port {steamVirtualPort}");
@@ -299,10 +308,37 @@ namespace StaticMlp.Composition
             ApplyRuntimeDebugPingLatency();
 
             if (_serverStarted)
-                MultiplayerSystemBootstrap.UpdateServerFrame();
+                UpdateServerSimulation();
 
             if (_clientStarted)
                 MultiplayerSystemBootstrap.UpdateClientCoreFrame();
+        }
+
+        private void UpdateServerSimulation()
+        {
+            var simulationTime = SW.GetResource<SimulationTime>();
+            var fixedStepSeconds = simulationTime.FixedStepSeconds;
+            if (fixedStepSeconds <= 0f)
+                throw new InvalidOperationException("Server simulation step must be greater than zero.");
+
+            _serverSimulationAccumulator += Mathf.Max(0f, Time.deltaTime);
+
+            var stepCount = 0;
+            while (_serverSimulationAccumulator >= fixedStepSeconds && stepCount < MAX_SERVER_STEPS_PER_FRAME)
+            {
+                _serverSimulationAccumulator -= fixedStepSeconds;
+                simulationTime.AdvanceTick();
+                MultiplayerSystemBootstrap.UpdateServerStep();
+                stepCount++;
+            }
+
+            if (_serverSimulationAccumulator >= fixedStepSeconds)
+            {
+                _serverSimulationAccumulator = fixedStepSeconds;
+                Debug.LogWarning(
+                    $"[StaticMlpBootstrap] Server simulation exceeded {MAX_SERVER_STEPS_PER_FRAME} steps in a single frame. Clamping accumulator.",
+                    this);
+            }
         }
 
         private static WorldConfig DefaultWorldConfig()
@@ -367,6 +403,7 @@ namespace StaticMlp.Composition
                 if (SW.Status != WorldStatus.NotCreated)
                     SW.Destroy();
 
+                _serverSimulationAccumulator = 0f;
                 _serverStarted = false;
                 Log("Server side stopped");
             }

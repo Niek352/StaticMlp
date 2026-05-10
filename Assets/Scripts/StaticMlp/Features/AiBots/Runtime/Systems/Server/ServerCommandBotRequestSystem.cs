@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
@@ -49,12 +50,12 @@ namespace StaticMlp.Features.AiBots
 
             ref var brain = ref bot.Mut<AiBrain>();
             brain.CurrentTask = commandedTask;
-            brain.DecisionCooldown = 0.5f;
+            brain.NextDecisionTick = SW.GetResource<SimulationTime>().DeadlineAfter(0.5f);
 
             ref var task = ref bot.Mut<AiTaskState>();
             task.Task = commandedTask;
             task.Step = 0;
-            task.Timer = 0f;
+            task.ElapsedTicks = 0;
         }
 
         private static bool CanCommandBot(NetworkPeerId sourcePeer, SW.Entity bot)

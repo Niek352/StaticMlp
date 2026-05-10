@@ -9,6 +9,7 @@ Short operational rules for this Unity project. Keep this file small; put detail
 - [Networked gameplay feature recipes](ai/networked_feature_recipes.md)
 - [Gameplay systems memo](ai/gameplay_systems_memo.md)
 - [StaticEcs quick reference](ai/static_ecs_reference.md)
+- [SimulationTime and ServerTick guide](ai/simulation_time_server_tick.md)
 - [Input feature guide](ai/input_feature.md)
 - [MVC usage guidelines](ai/mvc_usage_guidelines.md)
 - [MVC package review](ai/mvc_package_review.md)

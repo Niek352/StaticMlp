@@ -4,6 +4,6 @@ namespace StaticMlp.Game.Components
 {
     public struct LifeTime : IComponent
     {
-        public float RemainingTime;
+        public uint EndTick;
     }
 }

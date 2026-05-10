@@ -9,8 +9,8 @@ namespace StaticMlp.Features.Statuses
     {
         public Vector3 Position;
         public float Radius;
-        public float TickInterval;
-        public float TickTimer;
+        public uint TickIntervalTicks;
+        public uint NextDamageTick;
         public float DamagePerTick;
         public EntityGID Source;
         public uint RequestId;

@@ -18,18 +18,19 @@ namespace StaticMlp.Features.Combat
             foreach (var request in SW.Query<All<CombatAbilityRequest>, None<CombatAbilityValidatedTag>>().Entities())
                 _requests.Add(request.GID);
 
-            var now = SW.GetResource<GameTime>().Time;
+            var simulationTime = SW.GetResource<SimulationTime>();
+            var nowTick = simulationTime.ServerTick;
             var config = SW.GetResource<CombatConfig>();
             for (var i = 0; i < _requests.Count; i++)
             {
                 if (!_requests[i].TryUnpack<ServerWT>(out var request))
                     continue;
 
-                Validate(request, config, now);
+                Validate(request, config, simulationTime, nowTick);
             }
         }
 
-        private static void Validate(SW.Entity request, CombatConfig config, float now)
+        private static void Validate(SW.Entity request, CombatConfig config, SimulationTime simulationTime, uint nowTick)
         {
             ref readonly var data = ref request.Read<CombatAbilityRequest>();
             if (!data.Source.TryUnpack<ServerWT>(out var source)
@@ -69,7 +70,7 @@ namespace StaticMlp.Features.Combat
                 return;
             }
 
-            if (now < attackState.NextAttackAt)
+            if (nowTick < attackState.NextAttackTick)
             {
                 request.Destroy();
                 return;
@@ -78,7 +79,7 @@ namespace StaticMlp.Features.Combat
             if (data.ClientCommandId != 0)
                 attackState.LastAcceptedShotSequence = data.ClientCommandId;
 
-            attackState.NextAttackAt = now + Mathf.Max(0f, GetCooldown(data.AbilityId, config));
+            attackState.NextAttackTick = simulationTime.DeadlineAfter(Mathf.Max(0f, GetCooldown(data.AbilityId, config)));
             request.Set<CombatAbilityValidatedTag>();
         }
 

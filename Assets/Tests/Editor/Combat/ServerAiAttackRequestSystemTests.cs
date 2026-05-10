@@ -4,7 +4,6 @@ using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Statuses;
-using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
@@ -14,10 +13,8 @@ namespace StaticMlp.Tests.Combat
 {
     public sealed class ServerAiAttackRequestSystemTests
     {
-        private static void RunCombatPipeline(float now)
+        private static void RunCombatPipeline()
         {
-            var gameTime = SW.GetResource<GameTime>();
-            gameTime.Time = now;
             new ServerValidateCombatCommandsSystem().Update();
             new ServerAbilityCastSystem().Update();
             new ServerHitToEffectSystem().Update();
@@ -30,8 +27,7 @@ namespace StaticMlp.Tests.Combat
         public void Update_FromAiAttackRequest_CreatesSharedCombatRequest_AndReducesTargetHealth()
         {
             using var scope = new CombatTestServerWorldScope();
-            const float now = 5f;
-            scope.SetGameTime(now);
+            scope.SetSimulationTime(150);
             var attacker = scope.CreateEntity();
             attacker.Set<ServerOwned>();
             attacker.Set<AiAgentTag>();
@@ -56,7 +52,7 @@ namespace StaticMlp.Tests.Combat
 
             var requestSystem = new ServerAiAttackRequestSystem();
             requestSystem.Update();
-            RunCombatPipeline(now);
+            RunCombatPipeline();
 
             Assert.That(target.Read<Health>().Current, Is.EqualTo(90f));
         }
@@ -65,8 +61,7 @@ namespace StaticMlp.Tests.Combat
         public void Update_RespectsServerFireIntervalForAiAttack()
         {
             using var scope = new CombatTestServerWorldScope();
-            var now = 8f;
-            scope.SetGameTime(now);
+            scope.SetSimulationTime(240);
             var attacker = scope.CreateEntity();
             attacker.Set<ServerOwned>();
             attacker.Set<AiAgentTag>();
@@ -91,11 +86,11 @@ namespace StaticMlp.Tests.Combat
 
             var requestSystem = new ServerAiAttackRequestSystem();
             requestSystem.Update();
-            RunCombatPipeline(now);
+            RunCombatPipeline();
 
-            now += 0.1f;
+            scope.AdvanceSimulationSeconds(0.1f);
             requestSystem.Update();
-            RunCombatPipeline(now);
+            RunCombatPipeline();
 
             Assert.That(target.Read<Health>().Current, Is.EqualTo(90f));
         }

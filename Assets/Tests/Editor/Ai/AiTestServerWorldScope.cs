@@ -5,6 +5,7 @@ using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;
@@ -15,6 +16,8 @@ namespace StaticMlp.Tests.Ai
 {
     public sealed class AiTestServerWorldScope : IDisposable
     {
+        private const float DEFAULT_FIXED_STEP_SECONDS = 1f / 30f;
+
         public AiTestServerWorldScope()
         {
             if (SW.Status != WorldStatus.NotCreated)
@@ -31,10 +34,15 @@ namespace StaticMlp.Tests.Ai
             SW.Initialize();
 
             Catalog = AiActionCatalog.Discover(new AiTaskExecutionTransitions());
+            SW.SetResource(new SimulationTime
+            {
+                FixedStepSeconds = DEFAULT_FIXED_STEP_SECONDS,
+            });
             SW.SetResource(Catalog);
         }
 
         public AiActionCatalog Catalog { get; }
+        public SimulationTime SimulationTime => SW.GetResource<SimulationTime>();
 
         public SW.Entity CreateBot(Vector3 position, ushort behaviorId = AiBehaviorIds.Monster)
         {
@@ -51,7 +59,7 @@ namespace StaticMlp.Tests.Ai
             {
                 BehaviorId = behaviorId,
                 CurrentTask = AiTaskType.Idle,
-                DecisionCooldown = 0f
+                NextDecisionTick = 0
             });
             entity.Set(new AiTaskState
             {
@@ -59,7 +67,7 @@ namespace StaticMlp.Tests.Ai
                 ActiveTask = AiTaskType.Idle,
                 HasActiveTask = false,
                 Step = 0,
-                Timer = 0f
+                ElapsedTicks = 0
             });
             entity.Set(new CharacterNetState
             {

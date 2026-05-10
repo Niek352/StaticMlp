@@ -1,7 +1,6 @@
 using StaticMlp.Features.AiBots;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
-using UnityEngine;
 
 namespace StaticMlp.Features.AiActions
 {
@@ -32,7 +31,7 @@ namespace StaticMlp.Features.AiActions
                 Destination = leaderState.Position,
                 StopDistance = 3f
             });
-            task.Timer += Time.deltaTime;
+            task.ElapsedTicks++;
         }
     }
 }

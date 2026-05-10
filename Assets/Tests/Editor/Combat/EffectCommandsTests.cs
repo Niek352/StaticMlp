@@ -2,7 +2,6 @@ using NUnit.Framework;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Statuses;
-using UnityEngine;
 
 namespace StaticMlp.Tests.Combat
 {
@@ -12,6 +11,7 @@ namespace StaticMlp.Tests.Combat
         public void CreateDamage_CreatesEffectEntityWithExpectedContract()
         {
             using var scope = new CombatTestServerWorldScope();
+            scope.SetSimulationTime(123);
             var source = scope.CreateEntity();
             var target = scope.CreateEntity();
 
@@ -24,7 +24,7 @@ namespace StaticMlp.Tests.Combat
             Assert.That(effect.Read<EffectSource>().Value, Is.EqualTo(source.GID));
             Assert.That(effect.Read<EffectTarget>().Value, Is.EqualTo(target.GID));
             Assert.That(effect.Read<EffectValue>().Value, Is.EqualTo(25f));
-            Assert.That(effect.Read<EffectCreatedTick>().Tick, Is.EqualTo((uint)Time.frameCount));
+            Assert.That(effect.Read<EffectCreatedTick>().Tick, Is.EqualTo(123u));
             Assert.That(effect.Read<EffectRequestId>().Value, Is.EqualTo(7u));
             Assert.That(effect.Read<DamageData>().Type, Is.EqualTo(DamageType.Fire));
         }
