@@ -6,7 +6,7 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
-using StaticMlp.Features.World;
+using StaticMlp.Features.Frontier;
 using StaticMlp.Game;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
@@ -236,7 +236,7 @@ namespace StaticMlp.Composition
                 FixedStepSeconds = 1f / Mathf.Max(1, serverTickRateHz),
             });
             SW.SetResource(Stage1SettlementSeedManifest.CreateResource());
-            SW.SetResource(Stage1WorldSeedManifest.CreateResource());
+            SW.SetResource(Stage1FrontierSeedManifest.CreateResource());
             SW.SetResource(Stage1ProgressionSeedManifest.CreateResource());
             _serverSimulationAccumulator = 0f;
 

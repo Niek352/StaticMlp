@@ -9,8 +9,8 @@ namespace StaticMlp.Features.Settlement.Workers
         {
             new(
                 WorkerRoleCatalog.CampBuilderId,
-                SettlementWorkerNetworkArchetypeIds.CampBuilderWorker,
-                SettlementWorkerBehaviorIds.PeacefulBuilder,
+                SettlementWorkerNetworkArchetypeIds.CAMP_BUILDER_WORKER,
+                SettlementWorkerBehaviorIds.PEACEFUL_BUILDER,
                 maxHealth: 100f)
         };
 

@@ -35,7 +35,7 @@ Short operational rules for `StaticMlp.Features.AiBots`. Keep this file small; p
 
 - Add new bot actions end-to-end: update `AiTaskType`, add a localized package under `../AiActions/Runtime/Actions/<ActionName>`, and update `AiNetState` only if clients need to visualize the new state.
 - Route player-issued bot control through `CommandBotEvent` and `ServerCommandBotRequestSystem`; keep validation on the server.
-- Spawn bots through `Stage1WorldSeed` and `AiBotSpawns`. Do not hand-assemble bot entities in unrelated systems.
+- Spawn bots through `Stage1FrontierSeed` and `AiBotSpawns`. Do not hand-assemble bot entities in unrelated systems.
 - If movement behavior changes, keep decision systems writing `AiMoveRequest` or `AiAttackRequest`, and let `ServerAiNavigationSystem` own `CharacterNetState` replication mutations.
 - `AiNavigationRuntime` requires a baked NavMesh and creates its backend by reflected type name. If backend assembly or type names change, update the lookup strings together with the asmdef wiring.
 - Keep `Presentation` view-only. Do not move bootstrap, AI decisions, or scene search logic into `MonoBehaviour` classes here.
@@ -44,7 +44,7 @@ Short operational rules for `StaticMlp.Features.AiBots`. Keep this file small; p
 
 - Do not put Unity Transport calls, packet serialization, or raw network inbox logic into this feature's gameplay systems.
 - Do not store `Entity` across frames; use `EntityGID` in blackboard data, events, spawn relationships, and navigation lookups.
-- Fail fast when required resources such as `AiActionCatalog`, `AiNavigationRuntime`, or `Stage1WorldSeed` are missing or null.
+- Fail fast when required resources such as `AiActionCatalog`, `AiNavigationRuntime`, or `Stage1FrontierSeed` are missing or null.
 - Keep behavior tuning inside `Domain` and ECS systems, not inside presentation or navigation backend implementation details.
 - `AiBots` owns decision input and downstream AI state contracts: `AiBrain`, `AiBlackboardEntry`, `AiBlackboardAccess`, `AiActionCatalog`, `AiTaskState`, `AiTaskType`, `AiMoveRequest`, `AiAttackRequest`, and `AiNetState`.
 - `AiBots` does not own task execution implementation anymore. Do not reintroduce task-specific execution systems into `AiBots/Runtime/Systems/Server`.
@@ -55,5 +55,5 @@ Short operational rules for `StaticMlp.Features.AiBots`. Keep this file small; p
 - For task behavior, read `../AiTaskExecution/Runtime/Systems/Server/ServerAiTaskExecutionSystem.cs` and `../AiActions/Runtime/Actions/*`.
 - For pathing and movement application, read `Navigation`, `NavigationBackend`, and `ServerAiNavigationSystem`.
 - For client-issued commands, read `Events` and `ServerCommandBotRequestSystem`.
-- For bootstrap and spawn flow, read `AiBotsGameplayFeature`, `AiBotSpawns`, and `Stage1WorldSeed`.
+- For bootstrap and spawn flow, read `AiBotsGameplayFeature`, `AiBotSpawns`, and `Stage1FrontierSeed`.
 - If task changes require new blackboard inputs or new command targets, add them through action-local collectors/binders first, then verify the execution facade still resolves the package correctly.

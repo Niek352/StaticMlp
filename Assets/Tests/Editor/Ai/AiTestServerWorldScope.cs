@@ -118,7 +118,7 @@ namespace StaticMlp.Tests.Ai
             Vector3 position,
             SettlementWorkerAssignmentStatus status = SettlementWorkerAssignmentStatus.Unassigned)
         {
-            var entity = CreateBot(position, SettlementWorkerBehaviorIds.PeacefulBuilder);
+            var entity = CreateBot(position, SettlementWorkerBehaviorIds.PEACEFUL_BUILDER);
             entity.Set<SettlementWorkerTag>();
             entity.Set(new SettlementWorkerIdentity
             {

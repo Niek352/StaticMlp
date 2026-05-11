@@ -15,7 +15,7 @@ namespace StaticMlp.Networking.Replication.Generated {
         public const byte LayoutVersion = 1;
 
         public static ComponentDelta CreateDelta(EntityGID gid, in StatusContext state) {
-            var writer = BinaryPackWriter.CreateFromPool(16);
+            var writer = BinaryPackWriter.CreateFromPool(18);
             writer.WriteUlong(state.Source.Raw);
             writer.WriteUint(state.RequestId);
             writer.WriteUint(state.RootEffectId);

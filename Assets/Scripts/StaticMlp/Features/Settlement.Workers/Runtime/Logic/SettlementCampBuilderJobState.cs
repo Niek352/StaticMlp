@@ -49,11 +49,15 @@ namespace StaticMlp.Features.Settlement.Workers
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
+            var anchorId = reader.ReadUshort();
+            var assignedWorkerRaw = reader.ReadUlong();
+            var targetSiteRaw = reader.ReadUlong();
+
             self.Set(new SettlementCampBuilderJobState
             {
-                AnchorId = reader.ReadUshort(),
-                AssignedWorker = new EntityGID(reader.ReadUlong()),
-                TargetSite = new EntityGID(reader.ReadUlong()),
+                AnchorId = anchorId,
+                AssignedWorker = assignedWorkerRaw == 0ul ? default : new EntityGID(assignedWorkerRaw),
+                TargetSite = targetSiteRaw == 0ul ? default : new EntityGID(targetSiteRaw),
                 CurrentTask = (AiTaskType)reader.ReadUshort(),
                 BlockingReason = (SettlementWorkerBlockingReason)reader.ReadByte()
             });

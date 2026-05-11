@@ -8,10 +8,10 @@ namespace StaticMlp.Features.Settlement.Workers
 {
     public static class SettlementCampBuilderJobStateReplication
     {
-        public const ushort TypeId = 56103;
-        public const ReplicationAuthority Authority = ReplicationAuthority.Server;
-        public const ReplicationAudience Audience = ReplicationAudience.All;
-        public const NetDelivery Delivery = NetDelivery.ReliableSequenced;
+        public const ushort TYPE_ID = 56103;
+        public const ReplicationAuthority AUTHORITY = ReplicationAuthority.Server;
+        public const ReplicationAudience AUDIENCE = ReplicationAudience.All;
+        public const NetDelivery DELIVERY = NetDelivery.ReliableSequenced;
 
         public static ComponentDelta CreateDelta(EntityGID gid, in SettlementCampBuilderJobState state)
         {
@@ -23,20 +23,20 @@ namespace StaticMlp.Features.Settlement.Workers
             writer.WriteByte((byte)state.BlockingReason);
             var bytes = writer.CopyToBytes();
             writer.Dispose();
-            return new ComponentDelta(gid, TypeId, bytes);
+            return new ComponentDelta(gid, TYPE_ID, bytes);
         }
 
         public static SettlementCampBuilderJobState Read(byte[] payload)
         {
-            if (payload == null || payload.Length == 0)
-                return default;
-
             var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
+            var anchorId = reader.ReadUshort();
+            var assignedWorkerRaw = reader.ReadUlong();
+            var targetSiteRaw = reader.ReadUlong();
             return new SettlementCampBuilderJobState
             {
-                AnchorId = reader.ReadUshort(),
-                AssignedWorker = new EntityGID(reader.ReadUlong()),
-                TargetSite = new EntityGID(reader.ReadUlong()),
+                AnchorId = anchorId,
+                AssignedWorker = assignedWorkerRaw == 0ul ? default : new EntityGID(assignedWorkerRaw),
+                TargetSite = targetSiteRaw == 0ul ? default : new EntityGID(targetSiteRaw),
                 CurrentTask = (AiTaskType)reader.ReadUshort(),
                 BlockingReason = (SettlementWorkerBlockingReason)reader.ReadByte()
             };

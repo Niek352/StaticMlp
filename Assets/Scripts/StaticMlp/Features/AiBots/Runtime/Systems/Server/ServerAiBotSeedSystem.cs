@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Combat;
 using StaticMlp.Networking;
-using StaticMlp.Features.World;
+using StaticMlp.Features.Frontier;
 
 namespace StaticMlp.Features.AiBots
 {
@@ -17,7 +17,7 @@ namespace StaticMlp.Features.AiBots
                 return;
             }
 
-            var resource = SW.GetResource<Stage1WorldSeed>();
+            var resource = SW.GetResource<Stage1FrontierSeed>();
             var definitions = resource.InitialBotSpawns;
             var spawnedBots = new EntityGID[definitions.Length];
 

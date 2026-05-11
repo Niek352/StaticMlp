@@ -12,7 +12,7 @@
         "StaticMlp.Features.Combat.Logic",
         "StaticMlp.Features.Combat.Presentation",
         "StaticMlp.Features.Shared.Logic",
-        "StaticMlp.Features.World.Logic"
+        "StaticMlp.Features.Frontier.Logic"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

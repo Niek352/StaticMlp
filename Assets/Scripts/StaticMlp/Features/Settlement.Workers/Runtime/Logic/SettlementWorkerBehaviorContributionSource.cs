@@ -8,15 +8,15 @@ namespace StaticMlp.Features.Settlement.Workers
         public void Register(AiBehaviorTaskRegistry registry)
         {
             registry.Add(
-                SettlementWorkerBehaviorIds.PeacefulBuilder,
+                SettlementWorkerBehaviorIds.PEACEFUL_BUILDER,
                 AiTaskType.BuildConstruction,
                 BuildConstructionVariableBindings.Considerations);
             registry.Add(
-                SettlementWorkerBehaviorIds.PeacefulBuilder,
+                SettlementWorkerBehaviorIds.PEACEFUL_BUILDER,
                 AiTaskType.DeliveryResourceToBuilding,
                 DeliveryBuildResourcesVariableBindings.Considerations);
             registry.Add(
-                SettlementWorkerBehaviorIds.PeacefulBuilder,
+                SettlementWorkerBehaviorIds.PEACEFUL_BUILDER,
                 AiTaskType.FollowLeader,
                 FollowLeaderVariableBindings.Considerations);
         }

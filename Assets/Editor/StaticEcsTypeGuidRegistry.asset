@@ -252,6 +252,42 @@ MonoBehaviour:
       - className: SettlementWorkerSummary
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 755a5754-79b6-42da-a8b3-71788f063f4a
+      current:
+        className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 8f1e0f0d-e2d6-456c-ae4a-21e661e9620b
+      current:
+        className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: cd4f4133-8327-48f1-a557-1490506cc236
+      current:
+        className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 86c31ffc-b59f-4cf0-b0ec-f1886e4bcf40
+      current:
+        className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -604,6 +640,42 @@ MonoBehaviour:
       - className: SettlementWorkerSummary
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 755a5754-79b6-42da-a8b3-71788f063f4a
+      current:
+        className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 8f1e0f0d-e2d6-456c-ae4a-21e661e9620b
+      current:
+        className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: cd4f4133-8327-48f1-a557-1490506cc236
+      current:
+        className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 86c31ffc-b59f-4cf0-b0ec-f1886e4bcf40
+      current:
+        className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47

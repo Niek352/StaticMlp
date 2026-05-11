@@ -44,6 +44,7 @@ namespace StaticMlp.Features.AiBots
             systems.Add(new ServerAiBotSeedSystem(), GameplaySystemOrder.ServerConnectionGameplay + 30);
             systems.Add(new ServerCommandBotRequestSystem(), GameplaySystemOrder.Gameplay - 120);
             systems.Add(new ServerBotAiDeathSystem(), GameplaySystemOrder.Gameplay - 110);
+            systems.Add(new ServerFrontierEncounterBotSpawnSystem(), GameplaySystemOrder.Gameplay - 95);
             systems.Add(new ServerAiNeedsSystem(), GameplaySystemOrder.Gameplay - 80);
             systems.Add(new ServerAiPerceptionSystem(), GameplaySystemOrder.Gameplay - 70);
             systems.Add(new ServerAiActionVariablesCollectSystem(), GameplaySystemOrder.Gameplay - 60);

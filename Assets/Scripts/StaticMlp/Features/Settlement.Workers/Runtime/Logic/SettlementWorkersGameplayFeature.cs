@@ -36,7 +36,7 @@ namespace StaticMlp.Features.Settlement.Workers
         {
             SettlementWorkersReplicationRegistration.Register();
 
-            NetArchetypeRegistry.RegisterClient(SettlementWorkerNetworkArchetypeIds.CampBuilderWorker, e =>
+            NetArchetypeRegistry.RegisterClient(SettlementWorkerNetworkArchetypeIds.CAMP_BUILDER_WORKER, e =>
             {
                 e.Set<AiAgentTag>();
                 e.Set<SettlementWorkerTag>();
@@ -47,7 +47,7 @@ namespace StaticMlp.Features.Settlement.Workers
                 });
             });
 
-            NetArchetypeRegistry.RegisterServer(SettlementWorkerNetworkArchetypeIds.CampBuilderWorker, e =>
+            NetArchetypeRegistry.RegisterServer(SettlementWorkerNetworkArchetypeIds.CAMP_BUILDER_WORKER, e =>
             {
                 e.Set<AiAgentTag>();
                 e.Set<SettlementWorkerTag>();

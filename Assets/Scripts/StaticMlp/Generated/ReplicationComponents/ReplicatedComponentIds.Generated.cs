@@ -2,17 +2,25 @@
 namespace StaticMlp.Networking.Replication {
     public static class ReplicatedComponentIds {
         public const ushort AiNetState = 19454;
-        public const ushort Health = 5648;
+        public const ushort ActiveExpeditionState = 30396;
+        public const ushort ExpeditionAvailabilityState = 12104;
+        public const ushort RaidScheduleState = 48438;
+        public const ushort ThreatState = 10069;
         public const ushort ResourcesInventory = 44055;
-        public const ushort StatusContext = 13786;
-        public const ushort StatusStrength = 41076;
-        public const ushort StatusTarget = 19072;
         public const ushort ConstructionProgress = 15866;
         public const ushort ConstructionResources = 8723;
         public const ushort ConstructionSiteState = 23961;
         public const ushort ConstructionTransform = 31104;
-        public const ushort SettlementSharedResources = 48213;
-        public const ushort Stage1SettlementProgression = 51842;
+        public const ushort SettlementSharedResources = 16446;
+        public const ushort Stage1SettlementProgression = 56454;
+        public const ushort SettlementCampBuilderJobState = 19134;
+        public const ushort SettlementWorkerAssignment = 19782;
+        public const ushort SettlementWorkerIdentity = 1506;
+        public const ushort SettlementWorkerSummary = 13846;
+        public const ushort Health = 5648;
+        public const ushort StatusContext = 13786;
+        public const ushort StatusStrength = 41076;
+        public const ushort StatusTarget = 19072;
         public const ushort CharacterNetState = 1;
         public const ushort PhysicsCubeNetState = 39412;
         public const ushort NetworkIdentity = 2;

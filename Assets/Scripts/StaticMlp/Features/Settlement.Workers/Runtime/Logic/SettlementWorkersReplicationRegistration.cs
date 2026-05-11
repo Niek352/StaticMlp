@@ -7,34 +7,34 @@ namespace StaticMlp.Features.Settlement.Workers
         public static void Register()
         {
             ReplicationRegistry.RegisterComponent<SettlementWorkerIdentity>(
-                SettlementWorkerIdentityReplication.TypeId,
-                SettlementWorkerIdentityReplication.Authority,
-                SettlementWorkerIdentityReplication.Audience,
-                SettlementWorkerIdentityReplication.Delivery,
+                SettlementWorkerIdentityReplication.TYPE_ID,
+                SettlementWorkerIdentityReplication.AUTHORITY,
+                SettlementWorkerIdentityReplication.AUDIENCE,
+                SettlementWorkerIdentityReplication.DELIVERY,
                 SettlementWorkerIdentityReplication.CreateDelta,
                 SettlementWorkerIdentityReplication.Read);
 
             ReplicationRegistry.RegisterComponent<SettlementWorkerAssignment>(
-                SettlementWorkerAssignmentReplication.TypeId,
-                SettlementWorkerAssignmentReplication.Authority,
-                SettlementWorkerAssignmentReplication.Audience,
-                SettlementWorkerAssignmentReplication.Delivery,
+                SettlementWorkerAssignmentReplication.TYPE_ID,
+                SettlementWorkerAssignmentReplication.AUTHORITY,
+                SettlementWorkerAssignmentReplication.AUDIENCE,
+                SettlementWorkerAssignmentReplication.DELIVERY,
                 SettlementWorkerAssignmentReplication.CreateDelta,
                 SettlementWorkerAssignmentReplication.Read);
 
             ReplicationRegistry.RegisterComponent<SettlementCampBuilderJobState>(
-                SettlementCampBuilderJobStateReplication.TypeId,
-                SettlementCampBuilderJobStateReplication.Authority,
-                SettlementCampBuilderJobStateReplication.Audience,
-                SettlementCampBuilderJobStateReplication.Delivery,
+                SettlementCampBuilderJobStateReplication.TYPE_ID,
+                SettlementCampBuilderJobStateReplication.AUTHORITY,
+                SettlementCampBuilderJobStateReplication.AUDIENCE,
+                SettlementCampBuilderJobStateReplication.DELIVERY,
                 SettlementCampBuilderJobStateReplication.CreateDelta,
                 SettlementCampBuilderJobStateReplication.Read);
 
             ReplicationRegistry.RegisterComponent<SettlementWorkerSummary>(
-                SettlementWorkerSummaryReplication.TypeId,
-                SettlementWorkerSummaryReplication.Authority,
-                SettlementWorkerSummaryReplication.Audience,
-                SettlementWorkerSummaryReplication.Delivery,
+                SettlementWorkerSummaryReplication.TYPE_ID,
+                SettlementWorkerSummaryReplication.AUTHORITY,
+                SettlementWorkerSummaryReplication.AUDIENCE,
+                SettlementWorkerSummaryReplication.DELIVERY,
                 SettlementWorkerSummaryReplication.CreateDelta,
                 SettlementWorkerSummaryReplication.Read);
         }

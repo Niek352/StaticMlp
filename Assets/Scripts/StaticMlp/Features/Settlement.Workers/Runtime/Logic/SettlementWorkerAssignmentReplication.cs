@@ -7,10 +7,10 @@ namespace StaticMlp.Features.Settlement.Workers
 {
     public static class SettlementWorkerAssignmentReplication
     {
-        public const ushort TypeId = 56102;
-        public const ReplicationAuthority Authority = ReplicationAuthority.Server;
-        public const ReplicationAudience Audience = ReplicationAudience.All;
-        public const NetDelivery Delivery = NetDelivery.ReliableSequenced;
+        public const ushort TYPE_ID = 56102;
+        public const ReplicationAuthority AUTHORITY = ReplicationAuthority.Server;
+        public const ReplicationAudience AUDIENCE = ReplicationAudience.All;
+        public const NetDelivery DELIVERY = NetDelivery.ReliableSequenced;
 
         public static ComponentDelta CreateDelta(EntityGID gid, in SettlementWorkerAssignment state)
         {
@@ -19,7 +19,7 @@ namespace StaticMlp.Features.Settlement.Workers
             writer.WriteUshort(state.AnchorId);
             var bytes = writer.CopyToBytes();
             writer.Dispose();
-            return new ComponentDelta(gid, TypeId, bytes);
+            return new ComponentDelta(gid, TYPE_ID, bytes);
         }
 
         public static SettlementWorkerAssignment Read(byte[] payload)

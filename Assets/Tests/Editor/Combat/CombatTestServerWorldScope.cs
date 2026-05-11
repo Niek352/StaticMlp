@@ -2,8 +2,10 @@ using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Build;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Statuses;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
@@ -27,13 +29,16 @@ namespace StaticMlp.Tests.Combat
             NetworkEventRegistry.Clear();
             new BuildLogicFeature().RegisterNetworkEvents();
             new CombatLogicFeature().RegisterNetworkEvents();
+            new FrontierLogicFeature().RegisterNetworkEvents();
             SW.Create(WorldConfig.Default());
             SW.Types().RegisterAll(
                 typeof(ServerWT).Assembly,
                 typeof(BuildLogicFeature).Assembly,
                 typeof(CombatLogicFeature).Assembly,
                 typeof(EffectsLogicFeature).Assembly,
+                typeof(FrontierLogicFeature).Assembly,
                 typeof(Health).Assembly,
+                typeof(SettlementSharedResourcesGameplayFeature).Assembly,
                 typeof(StatusesLogicFeature).Assembly,
                 typeof(CharacterNetState).Assembly,
                 typeof(StaticMlp.Features.AiBots.AiAgentTag).Assembly);
@@ -46,6 +51,7 @@ namespace StaticMlp.Tests.Combat
             });
             SW.SetResource(new CombatDebugLogBuffer());
             SW.SetResource(new CombatConfig());
+            SW.SetResource(Stage1FrontierSeedManifest.CreateResource());
             SW.SetResource(new StatusesConfig());
         }
 
@@ -141,6 +147,25 @@ namespace StaticMlp.Tests.Combat
             {
                 Current = current,
                 Max = max
+            });
+            return entity;
+        }
+
+        public SW.Entity CreateSettlementAnchor(
+            SettlementAnchorId anchorId,
+            Vector3 position,
+            Stage1SettlementProgressStage stage = Stage1SettlementProgressStage.BuildPrepared)
+        {
+            var entity = SW.NewEntity<Default>();
+            entity.Set(new Stage1SettlementProgression
+            {
+                AnchorId = anchorId.Value,
+                Stage = stage
+            });
+            entity.Set(new ConstructionTransform
+            {
+                Position = position,
+                Rotation = Quaternion.identity
             });
             return entity;
         }

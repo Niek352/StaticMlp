@@ -5,11 +5,13 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Frontier;
+using StaticMlp.Features.ResourcesInventoryMinimal;
+using StaticMlp.Features.Settlement;
+using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Statuses;
-using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Game.Components;
-using StaticMlp.Features.Settlement;
 
 namespace StaticMlp.Networking.Replication.Generated {
     public static class ReplicatedComponentRegistration {
@@ -24,13 +26,37 @@ namespace StaticMlp.Networking.Replication.Generated {
                 AiNetStateReplication.CreateDelta,
                 AiNetStateReplication.Read);
 
-            ReplicationRegistry.RegisterComponent<Health>(
-                ReplicatedComponentIds.Health,
+            ReplicationRegistry.RegisterComponent<ActiveExpeditionState>(
+                ReplicatedComponentIds.ActiveExpeditionState,
                 ReplicationAuthority.Server,
                 ReplicationAudience.All,
                 NetDelivery.ReliableSequenced,
-                HealthReplication.CreateDelta,
-                HealthReplication.Read);
+                ActiveExpeditionStateReplication.CreateDelta,
+                ActiveExpeditionStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<ExpeditionAvailabilityState>(
+                ReplicatedComponentIds.ExpeditionAvailabilityState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                ExpeditionAvailabilityStateReplication.CreateDelta,
+                ExpeditionAvailabilityStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<RaidScheduleState>(
+                ReplicatedComponentIds.RaidScheduleState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                RaidScheduleStateReplication.CreateDelta,
+                RaidScheduleStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<ThreatState>(
+                ReplicatedComponentIds.ThreatState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                ThreatStateReplication.CreateDelta,
+                ThreatStateReplication.Read);
 
             ReplicationRegistry.RegisterComponent<ResourcesInventory>(
                 ReplicatedComponentIds.ResourcesInventory,
@@ -39,30 +65,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 ResourcesInventoryReplication.CreateDelta,
                 ResourcesInventoryReplication.Read);
-
-            ReplicationRegistry.RegisterComponent<StatusContext>(
-                ReplicatedComponentIds.StatusContext,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                StatusContextReplication.CreateDelta,
-                StatusContextReplication.Read);
-
-            ReplicationRegistry.RegisterComponent<StatusStrength>(
-                ReplicatedComponentIds.StatusStrength,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                StatusStrengthReplication.CreateDelta,
-                StatusStrengthReplication.Read);
-
-            ReplicationRegistry.RegisterComponent<StatusTarget>(
-                ReplicatedComponentIds.StatusTarget,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                StatusTargetReplication.CreateDelta,
-                StatusTargetReplication.Read);
 
             ReplicationRegistry.RegisterComponent<ConstructionProgress>(
                 ReplicatedComponentIds.ConstructionProgress,
@@ -112,6 +114,70 @@ namespace StaticMlp.Networking.Replication.Generated {
                 Stage1SettlementProgressionReplication.CreateDelta,
                 Stage1SettlementProgressionReplication.Read);
 
+            ReplicationRegistry.RegisterComponent<SettlementCampBuilderJobState>(
+                ReplicatedComponentIds.SettlementCampBuilderJobState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                SettlementCampBuilderJobStateReplication.CreateDelta,
+                SettlementCampBuilderJobStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<SettlementWorkerAssignment>(
+                ReplicatedComponentIds.SettlementWorkerAssignment,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                SettlementWorkerAssignmentReplication.CreateDelta,
+                SettlementWorkerAssignmentReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<SettlementWorkerIdentity>(
+                ReplicatedComponentIds.SettlementWorkerIdentity,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                SettlementWorkerIdentityReplication.CreateDelta,
+                SettlementWorkerIdentityReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<SettlementWorkerSummary>(
+                ReplicatedComponentIds.SettlementWorkerSummary,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                SettlementWorkerSummaryReplication.CreateDelta,
+                SettlementWorkerSummaryReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<Health>(
+                ReplicatedComponentIds.Health,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                HealthReplication.CreateDelta,
+                HealthReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<StatusContext>(
+                ReplicatedComponentIds.StatusContext,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                StatusContextReplication.CreateDelta,
+                StatusContextReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<StatusStrength>(
+                ReplicatedComponentIds.StatusStrength,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                StatusStrengthReplication.CreateDelta,
+                StatusStrengthReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<StatusTarget>(
+                ReplicatedComponentIds.StatusTarget,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                StatusTargetReplication.CreateDelta,
+                StatusTargetReplication.Read);
+
             ReplicationRegistry.RegisterComponent<CharacterNetState>(
                 ReplicatedComponentIds.CharacterNetState,
                 ReplicationAuthority.Owner,
@@ -136,13 +202,13 @@ namespace StaticMlp.Networking.Replication.Generated {
                 registerClientSystems: RegisterPhysicsCubeNetStateClientSystems,
                 initializeClientState: InitializePhysicsCubeNetStateClientState);
 
+            ReplicationRegistry.RegisterNetworkEntity(5, 1, 200);
             ReplicationRegistry.RegisterNetworkEntity(3, 1, 100);
             ReplicationRegistry.RegisterNetworkEntity(4, 1, 101);
             ReplicationRegistry.RegisterNetworkEntity(1, 1, 1);
-            ReplicationRegistry.RegisterNetworkEntity(2, 1, 2);
-            ReplicationRegistry.RegisterNetworkEntity(5, 1, 200);
+            ReplicationRegistry.RegisterNetworkEntity(7, 1, 300);
             ReplicationRegistry.RegisterNetworkEntity(6, 1, 0);
-            ReplicationRegistry.RegisterNetworkEntity(7, 1, SettlementNetworkArchetypeIds.ResourceStorage);
+            ReplicationRegistry.RegisterNetworkEntity(2, 1, 2);
         }
 
         private static void RegisterCharacterNetStateClientTypes() {

@@ -8,10 +8,10 @@ namespace StaticMlp.Features.Settlement.Workers
 {
     public static class SettlementWorkerSummaryReplication
     {
-        public const ushort TypeId = 56104;
-        public const ReplicationAuthority Authority = ReplicationAuthority.Server;
-        public const ReplicationAudience Audience = ReplicationAudience.All;
-        public const NetDelivery Delivery = NetDelivery.ReliableSequenced;
+        public const ushort TYPE_ID = 56104;
+        public const ReplicationAuthority AUTHORITY = ReplicationAuthority.Server;
+        public const ReplicationAudience AUDIENCE = ReplicationAudience.All;
+        public const NetDelivery DELIVERY = NetDelivery.ReliableSequenced;
 
         public static ComponentDelta CreateDelta(EntityGID gid, in SettlementWorkerSummary state)
         {
@@ -25,7 +25,7 @@ namespace StaticMlp.Features.Settlement.Workers
             writer.WriteByte((byte)state.BlockingReason);
             var bytes = writer.CopyToBytes();
             writer.Dispose();
-            return new ComponentDelta(gid, TypeId, bytes);
+            return new ComponentDelta(gid, TYPE_ID, bytes);
         }
 
         public static SettlementWorkerSummary Read(byte[] payload)
