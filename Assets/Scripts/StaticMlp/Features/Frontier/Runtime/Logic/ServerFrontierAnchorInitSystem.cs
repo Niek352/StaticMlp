@@ -42,6 +42,15 @@ namespace StaticMlp.Features.Frontier
                         Status = RaidScheduleStatus.None
                     });
                 }
+
+                if (!anchor.Has<BossEncounterState>())
+                {
+                    anchor.Set(new BossEncounterState
+                    {
+                        BossIdValue = BossCatalog.RaiderChiefId.Value,
+                        Status = BossEncounterStatus.Unavailable
+                    });
+                }
             }
         }
     }

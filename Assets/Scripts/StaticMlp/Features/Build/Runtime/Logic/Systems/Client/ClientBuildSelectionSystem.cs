@@ -11,6 +11,7 @@ namespace StaticMlp.Features.Build
         public void Update()
         {
             var inputState = CW.GetResource<ClientInputState>();
+            var isBossBuildCommitted = IsBossBuildCommitted();
 
             foreach (var player in CW.Query<All<LocalOwned, PlayerTag>>().Entities())
             {
@@ -21,12 +22,18 @@ namespace StaticMlp.Features.Build
                     player.Set(new ClientBuildSelectionSyncState());
 
                 ref var selection = ref player.Mut<OwnerBuildSelection>();
-                if (inputState.WasPressed(CoreInputActions.Next))
-                    selection.PrimaryModuleId = Stage1BuildRules.NextPrimaryModule(selection.PrimaryModuleId);
-                else if (inputState.WasPressed(CoreInputActions.Previous))
-                    selection.PrimaryModuleId = Stage1BuildRules.PreviousPrimaryModule(selection.PrimaryModuleId);
+                if (!isBossBuildCommitted)
+                {
+                    if (inputState.WasPressed(CoreInputActions.Next))
+                        selection.PrimaryModuleId = Stage1BuildRules.NextPrimaryModule(selection.PrimaryModuleId);
+                    else if (inputState.WasPressed(CoreInputActions.Previous))
+                        selection.PrimaryModuleId = Stage1BuildRules.PreviousPrimaryModule(selection.PrimaryModuleId);
+                }
 
                 player.Set(Stage1BuildRules.CreatePreparedSnapshot(selection));
+
+                if (isBossBuildCommitted)
+                    continue;
 
                 ref var syncState = ref player.Mut<ClientBuildSelectionSyncState>();
                 if (syncState.LastSentPrimaryModuleId == selection.PrimaryModuleId)
@@ -38,6 +45,17 @@ namespace StaticMlp.Features.Build
 
                 syncState.LastSentPrimaryModuleId = selection.PrimaryModuleId;
             }
+        }
+
+        private static bool IsBossBuildCommitted()
+        {
+            foreach (var anchor in CW.Query<All<BossBuildPreparationState>>().Entities())
+            {
+                if (anchor.Read<BossBuildPreparationState>().Status == BossBuildPreparationStatus.Committed)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

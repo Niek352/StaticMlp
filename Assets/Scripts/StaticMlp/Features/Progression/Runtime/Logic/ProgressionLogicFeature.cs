@@ -9,6 +9,7 @@ namespace StaticMlp.Features.Progression
             systems.Add(new ServerStage1ProgressionAnchorInitSystem(), GameplaySystemOrder.Gameplay - 138);
             systems.Add(new ServerStage1RewardApplicationSystem(), GameplaySystemOrder.Gameplay - 93);
             systems.Add(new ServerStage1RaidDefenseProgressionSystem(), GameplaySystemOrder.Gameplay - 90);
+            systems.Add(new ServerStage1BossPreparationProgressionSystem(), GameplaySystemOrder.Gameplay - 89);
         }
     }
 }

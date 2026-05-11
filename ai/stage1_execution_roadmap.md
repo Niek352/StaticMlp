@@ -24,13 +24,14 @@
 
 - `Progression` больше не ограничен только ids/catalogs/seeds: введён runtime owner/state и application layer для expedition rewards.
 - `Frontier` больше не планирует raid напрямую из expedition resolution; handoff уже переведён в цепочку `expedition reward result -> progression write -> threat escalation`.
-- незакрытым остаётся post-raid progression outcome, то есть `CampDefended` и дальнейший boss gate.
+- gameplay owner chain до boss completion уже собрана: `expedition -> reward -> progression -> raid -> boss gate -> boss encounter -> vertical slice completion`.
+- незакрытым остаётся Stage 1 presentation layer поверх новых owners и cleanup prototype/debug seams перед Stage 2.
 
 Это значит, что проект сейчас логичнее считать на этапе:
 
-`между backlog item 10 и item 11/12`
+`после backlog item 14, перед item 15/16`
 
-То есть settlement/build/world foundation уже есть, но связка `expedition -> reward -> progression -> boss gate` ещё не доведена до архитектурно правильного состояния.
+То есть settlement/build/world/progression/boss foundation уже есть, но Stage 1 ещё не закрыт из-за отсутствующего presentation layer и оставшегося cleanup.
 
 ## RoadMap
 
@@ -71,10 +72,10 @@
 
 ### 5. Boss ветка
 
-- [ ] Добавить boss preparation spend/gate поверх `Build + Progression`.
-- [ ] Добавить boss unlock contract после корректной expedition+raid progression chain.
-- [ ] Добавить boss encounter wrapper на существующем combat/AI фундаменте.
-- [ ] Добавить `VerticalSliceComplete` contract.
+- [x] Добавить boss preparation spend/gate поверх `Build + Progression`.
+- [x] Добавить boss unlock contract после корректной expedition+raid progression chain.
+- [x] Добавить boss encounter wrapper на существующем combat/AI фундаменте.
+- [x] Добавить `VerticalSliceComplete` contract.
 
 ### 6. Presentation / MVC
 
@@ -101,9 +102,9 @@
 
 - [x] Reward return уже записывается в authoritative `Progression`, а post-raid outcome теперь фиксируется в той же цепочке.
 - [x] После raid есть корректный persistent progression outcome: `CampDefended` -> `CounterattackDefended`.
-- [ ] Boss path отсутствует.
+- [x] Boss path введён как отдельная chain поверх `Build + Progression + Frontier`, без деградации в second expedition lane.
 - [ ] Нет отдельного Stage 1 presentation layer поверх новых owners.
-- [ ] Vertical slice формально не закрывается состоянием `BossDefeated`.
+- [x] Vertical slice формально закрывается boss completion contract и persistent boss encounter state.
 
 ## Следующая рабочая очередь
 
@@ -113,7 +114,7 @@
 2. [ ] Перевести `ServerFrontierExpeditionResolutionSystem` с прямого raid scheduling на выдачу expedition reward result.
 3. [ ] Добавить application layer: `reward result -> progression flags/resources -> threat escalation`.
 4. [x] Зафиксировать отдельный `CampDefended` progression result после raid resolution.
-5. [ ] Только после этого вводить boss prep, boss unlock и boss encounter.
+5. [x] Только после этого вводить boss prep, boss unlock и boss encounter.
 6. [ ] После стабилизации owners строить Stage 1 MVC/read models.
 
 Актуализация после выполнения:
@@ -122,7 +123,7 @@
 2. [x] Перевести `ServerFrontierExpeditionResolutionSystem` с прямого raid scheduling на выдачу expedition reward result.
 3. [x] Добавить application layer: `reward result -> progression flags/resources -> threat escalation`.
 4. [x] Зафиксировать отдельный `CampDefended` progression result после raid resolution.
-5. [ ] Только после этого вводить boss prep, boss unlock и boss encounter.
+5. [x] Только после этого вводить boss prep, boss unlock и boss encounter.
 6. [ ] После стабилизации owners строить Stage 1 MVC/read models.
 
 Изменение плана:
@@ -142,4 +143,4 @@
 
 После этого:
 
-- [ ] `Boss gate and encounter wrapper`
+- [x] `Boss gate and encounter wrapper`

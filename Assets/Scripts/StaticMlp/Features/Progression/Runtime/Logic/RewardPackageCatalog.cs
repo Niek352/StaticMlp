@@ -20,7 +20,8 @@ namespace StaticMlp.Features.Progression
                 new[]
                 {
                     ProgressFlagCatalog.RecoveredWarCacheAppliedId
-                })
+                },
+                bossPreparationTokenGrants: 1)
         };
 
         public static IReadOnlyList<RewardPackageDefinition> All => Definitions;

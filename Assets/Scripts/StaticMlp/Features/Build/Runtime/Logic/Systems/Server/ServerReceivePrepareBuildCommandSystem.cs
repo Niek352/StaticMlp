@@ -23,6 +23,9 @@ namespace StaticMlp.Features.Build
         {
             foreach (var evt in _requests)
             {
+                if (IsBossBuildCommitted())
+                    continue;
+
                 if (!ServerPeerPlayers.TryGetPlayer(evt.Value.SourcePeer, out var player))
                     continue;
 
@@ -31,6 +34,17 @@ namespace StaticMlp.Features.Build
                     PrimaryModuleId = evt.Value.Value.PrimaryModuleId
                 });
             }
+        }
+
+        private static bool IsBossBuildCommitted()
+        {
+            foreach (var anchor in SW.Query<All<BossBuildPreparationState>>().Entities())
+            {
+                if (anchor.Read<BossBuildPreparationState>().Status == BossBuildPreparationStatus.Committed)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

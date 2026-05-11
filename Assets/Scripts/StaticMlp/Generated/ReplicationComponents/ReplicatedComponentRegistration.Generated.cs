@@ -5,6 +5,7 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Build;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Features.Settlement;
@@ -33,6 +34,30 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 ActiveExpeditionStateReplication.CreateDelta,
                 ActiveExpeditionStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<BossBuildPreparationState>(
+                ReplicatedComponentIds.BossBuildPreparationState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                BossBuildPreparationStateReplication.CreateDelta,
+                BossBuildPreparationStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<BossEncounterState>(
+                ReplicatedComponentIds.BossEncounterState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                BossEncounterStateReplication.CreateDelta,
+                BossEncounterStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<BossPreparedBuildSnapshot>(
+                ReplicatedComponentIds.BossPreparedBuildSnapshot,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                BossPreparedBuildSnapshotReplication.CreateDelta,
+                BossPreparedBuildSnapshotReplication.Read);
 
             ReplicationRegistry.RegisterComponent<ExpeditionAvailabilityState>(
                 ReplicatedComponentIds.ExpeditionAvailabilityState,

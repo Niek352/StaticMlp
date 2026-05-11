@@ -288,6 +288,33 @@ MonoBehaviour:
       - className: ThreatState
         namespaceName: StaticMlp.Features.Frontier
         assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 4a6ac13f-d0a4-4180-b15a-c544f665fafd
+      current:
+        className: BossBuildPreparationState
+        namespaceName: StaticMlp.Features.Build
+        assembly: StaticMlp.Features.Build.Logic
+      history:
+      - className: BossBuildPreparationState
+        namespaceName: StaticMlp.Features.Build
+        assembly: StaticMlp.Features.Build.Logic
+    - guid: 641d2d15-83f0-4328-8b35-4063e914bc61
+      current:
+        className: BossPreparedBuildSnapshot
+        namespaceName: StaticMlp.Features.Build
+        assembly: StaticMlp.Features.Build.Logic
+      history:
+      - className: BossPreparedBuildSnapshot
+        namespaceName: StaticMlp.Features.Build
+        assembly: StaticMlp.Features.Build.Logic
+    - guid: 31db70ec-ecdd-4c31-89a6-c85c3507cfe2
+      current:
+        className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -674,6 +701,33 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Frontier.Logic
       history:
       - className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 4a6ac13f-d0a4-4180-b15a-c544f665fafd
+      current:
+        className: BossBuildPreparationState
+        namespaceName: StaticMlp.Features.Build
+        assembly: StaticMlp.Features.Build.Logic
+      history:
+      - className: BossBuildPreparationState
+        namespaceName: StaticMlp.Features.Build
+        assembly: StaticMlp.Features.Build.Logic
+    - guid: 641d2d15-83f0-4328-8b35-4063e914bc61
+      current:
+        className: BossPreparedBuildSnapshot
+        namespaceName: StaticMlp.Features.Build
+        assembly: StaticMlp.Features.Build.Logic
+      history:
+      - className: BossPreparedBuildSnapshot
+        namespaceName: StaticMlp.Features.Build
+        assembly: StaticMlp.Features.Build.Logic
+    - guid: 31db70ec-ecdd-4c31-89a6-c85c3507cfe2
+      current:
+        className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: BossEncounterState
         namespaceName: StaticMlp.Features.Frontier
         assembly: StaticMlp.Features.Frontier.Logic
     tags: []

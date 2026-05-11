@@ -9,12 +9,14 @@ namespace StaticMlp.Features.Progression
         public ushort AnchorId;
         public uint AppliedFlagsMask;
         public uint AppliedRewardsMask;
+        public byte BossPreparationTokens;
 
         public Stage1ProgressionState(SettlementAnchorId anchorId, uint appliedFlagsMask)
         {
             AnchorId = anchorId.Value;
             AppliedFlagsMask = appliedFlagsMask;
             AppliedRewardsMask = 0;
+            BossPreparationTokens = 0;
         }
 
         public bool HasFlag(ProgressFlagId flagId)
@@ -35,6 +37,25 @@ namespace StaticMlp.Features.Progression
         public void MarkRewardApplied(RewardPackageId rewardPackageId)
         {
             AppliedRewardsMask |= GetRewardBit(rewardPackageId);
+        }
+
+        public void GrantBossPreparationTokens(byte amount)
+        {
+            BossPreparationTokens += amount;
+        }
+
+        public bool HasBossPreparationToken()
+        {
+            return BossPreparationTokens > 0;
+        }
+
+        public bool TrySpendBossPreparationToken()
+        {
+            if (BossPreparationTokens == 0)
+                return false;
+
+            BossPreparationTokens--;
+            return true;
         }
 
         public static uint GetFlagBit(ProgressFlagId flagId)

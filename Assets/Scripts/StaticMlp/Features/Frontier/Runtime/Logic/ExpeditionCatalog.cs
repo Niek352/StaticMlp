@@ -7,7 +7,6 @@ namespace StaticMlp.Features.Frontier
     public static class ExpeditionCatalog
     {
         public static readonly ExpeditionId NearbyRaiderCampId = new(1);
-        public static readonly ExpeditionId ChiefStandId = new(2);
 
         private static readonly ExpeditionDefinition[] Definitions =
         {
@@ -16,13 +15,7 @@ namespace StaticMlp.Features.Frontier
                 RegionCatalog.RaiderFrontierId,
                 EncounterProfileCatalog.RaiderSkirmishId,
                 threatTier: 1,
-                encounterOrigin: new Vector3(16f, 0f, 18f)),
-            new(
-                ChiefStandId,
-                RegionCatalog.RaiderFrontierId,
-                EncounterProfileCatalog.RaiderChiefId,
-                threatTier: 3,
-                encounterOrigin: new Vector3(24f, 0f, 22f))
+                encounterOrigin: new Vector3(16f, 0f, 18f))
         };
 
         public static IReadOnlyList<ExpeditionDefinition> All => Definitions;

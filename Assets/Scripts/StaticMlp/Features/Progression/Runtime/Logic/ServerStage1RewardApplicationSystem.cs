@@ -43,6 +43,7 @@ namespace StaticMlp.Features.Progression
             }
 
             progression.MarkRewardApplied(evt.RewardPackageId);
+            progression.GrantBossPreparationTokens(reward.BossPreparationTokenGrants);
             for (var i = 0; i < reward.ProgressFlagsGranted.Length; i++)
             {
                 var flagId = reward.ProgressFlagsGranted[i];
