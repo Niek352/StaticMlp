@@ -6,8 +6,7 @@
         "Ecs.Networking",
         "Game.Core",
         "StaticMlp.Features.AiBots",
-        "StaticMlp.Features.Buildings",
-        "StaticMlp.Features.Settlement.Logic"
+        "StaticMlp.Features.Shared.Logic"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -2,7 +2,7 @@ using System;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Networking;
 
-namespace StaticMlp.Features.AiActions
+namespace StaticMlp.Features.Settlement.Workers
 {
     public static class DeliveryBuildResourcesVariableBindings
     {

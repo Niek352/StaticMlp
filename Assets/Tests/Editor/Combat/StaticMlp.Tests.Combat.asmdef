@@ -18,7 +18,8 @@
         "StaticMlp.Features.Shared.Logic",
         "StaticMlp.Features.Statuses.Logic",
         "StaticMlp.Features.Statuses.Presentation",
-        "StaticMlp.Generated"
+        "StaticMlp.Generated",
+        "StaticMlp.Features.Progression.Logic"
     ],
     "includePlatforms": [
         "Editor"

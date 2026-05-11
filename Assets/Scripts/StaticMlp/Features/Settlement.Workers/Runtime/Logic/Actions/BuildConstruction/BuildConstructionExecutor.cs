@@ -6,7 +6,7 @@ using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 
-namespace StaticMlp.Features.AiActions
+namespace StaticMlp.Features.Settlement.Workers
 {
     public sealed class BuildConstructionExecutor : AiTaskExecutorBase
     {

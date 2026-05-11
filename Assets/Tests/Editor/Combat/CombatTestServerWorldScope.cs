@@ -6,6 +6,7 @@ using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Settlement;
+using StaticMlp.Features.Progression;
 using StaticMlp.Features.Statuses;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
@@ -38,10 +39,11 @@ namespace StaticMlp.Tests.Combat
                 typeof(EffectsLogicFeature).Assembly,
                 typeof(FrontierLogicFeature).Assembly,
                 typeof(Health).Assembly,
+                typeof(ProgressionLogicFeature).Assembly,
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
                 typeof(StatusesLogicFeature).Assembly,
                 typeof(CharacterNetState).Assembly,
-                typeof(StaticMlp.Features.AiBots.AiAgentTag).Assembly);
+                typeof(Features.AiBots.AiAgentTag).Assembly);
             NetworkEventRegistry.RegisterServerWorldTypes();
             SW.Initialize();
             SW.SetResource(new GameTime());
@@ -52,6 +54,7 @@ namespace StaticMlp.Tests.Combat
             SW.SetResource(new CombatDebugLogBuffer());
             SW.SetResource(new CombatConfig());
             SW.SetResource(Stage1FrontierSeedManifest.CreateResource());
+            SW.SetResource(Stage1ProgressionSeedManifest.CreateResource());
             SW.SetResource(new StatusesConfig());
         }
 
@@ -166,6 +169,18 @@ namespace StaticMlp.Tests.Combat
             {
                 Position = position,
                 Rotation = Quaternion.identity
+            });
+            return entity;
+        }
+
+        public SW.Entity CreateSettlementSharedResources(int wood = 50, int stone = 25)
+        {
+            var entity = SW.NewEntity<Default>();
+            entity.Set<SettlementResourceStorageTag>();
+            entity.Set(new SettlementSharedResources
+            {
+                Wood = wood,
+                Stone = stone
             });
             return entity;
         }

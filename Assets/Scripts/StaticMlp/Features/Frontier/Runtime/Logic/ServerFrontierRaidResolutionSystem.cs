@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -32,6 +33,8 @@ namespace StaticMlp.Features.Frontier
                 ref var mutableThreat = ref ReplicationMut.Mut<ThreatState>(anchor);
                 mutableThreat.Phase = ThreatPhase.Calm;
                 mutableThreat.ThreatValue = 0;
+
+                SW.SendEvent(new RaidDefenseResolvedEvent(anchorId));
             }
         }
     }

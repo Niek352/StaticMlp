@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using StaticMlp.Features.AiBots;
 
-namespace StaticMlp.Features.AiActions
+namespace StaticMlp.Features.Settlement.Workers
 {
     public sealed class BuildConstructionActionPackage : IAiActionPackage
     {

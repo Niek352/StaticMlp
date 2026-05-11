@@ -1,5 +1,5 @@
-using StaticMlp.Features.AiActions;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.AiActions;
 
 namespace StaticMlp.Features.Settlement.Workers
 {

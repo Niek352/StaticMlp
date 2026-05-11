@@ -28,7 +28,8 @@ namespace StaticMlp.Features.Frontier
             systems.Add(new ServerFrontierStartExpeditionSystem(), GameplaySystemOrder.Gameplay - 135);
             systems.Add(new ServerFrontierRaidActivationSystem(), GameplaySystemOrder.Gameplay - 96);
             systems.Add(new ServerFrontierExpeditionResolutionSystem(), GameplaySystemOrder.Gameplay - 94);
-            systems.Add(new ServerFrontierRaidResolutionSystem(), GameplaySystemOrder.Gameplay - 93);
+            systems.Add(new ServerFrontierProgressionFlagThreatEscalationSystem(), GameplaySystemOrder.Gameplay - 92);
+            systems.Add(new ServerFrontierRaidResolutionSystem(), GameplaySystemOrder.Gameplay - 91);
         }
     }
 }

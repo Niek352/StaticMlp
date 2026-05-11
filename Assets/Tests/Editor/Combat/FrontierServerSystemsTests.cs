@@ -3,6 +3,7 @@ using NUnit.Framework;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -118,18 +119,36 @@ namespace StaticMlp.Tests.Combat
             var owner = new NetworkPeerId(1);
             scope.CreatePlayer(owner, Vector3.zero);
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.BuildPrepared);
+            scope.CreateSettlementSharedResources();
             new ServerFrontierAnchorInitSystem().Update();
+            new ServerStage1ProgressionAnchorInitSystem().Update();
             new ServerFrontierExpeditionAvailabilitySystem().Update();
 
             StartExpedition(scope, owner);
             MarkParticipantsAsDead(FrontierEncounterKind.Expedition, ExpeditionCatalog.NearbyRaiderCampId.Value);
             new ServerBotAiDeathSystem().Update();
+            var applyRewardSystem = new ServerStage1RewardApplicationSystem();
+            var escalateThreatSystem = new ServerFrontierProgressionFlagThreatEscalationSystem();
+            applyRewardSystem.Init();
+            escalateThreatSystem.Init();
+
             new ServerFrontierExpeditionResolutionSystem().Update();
+            applyRewardSystem.Update();
+            escalateThreatSystem.Update();
 
             Assert.That(anchor.Read<ActiveExpeditionState>().Status, Is.EqualTo(ExpeditionActivityStatus.Cleared));
+            Assert.That(anchor.Read<Stage1ProgressionState>().HasAppliedReward(RewardPackageCatalog.RecoveredWarCacheId), Is.True);
+            Assert.That(anchor.Read<Stage1ProgressionState>().HasFlag(ProgressFlagCatalog.RecoveredWarCacheAppliedId), Is.True);
             Assert.That(anchor.Read<ThreatState>().Phase, Is.EqualTo(ThreatPhase.RaidPending));
             Assert.That(anchor.Read<RaidScheduleState>().Status, Is.EqualTo(RaidScheduleStatus.Pending));
             Assert.That(anchor.Read<RaidScheduleState>().ActivateAtTick, Is.EqualTo(scope.SimulationTime.DeadlineAfter(5f)));
+
+            var sharedResources = SettlementSharedResourcesQuery.GetServerEntity().Read<SettlementSharedResources>();
+            Assert.That(sharedResources.Wood, Is.EqualTo(70));
+            Assert.That(sharedResources.Stone, Is.EqualTo(35));
+
+            escalateThreatSystem.Destroy();
+            applyRewardSystem.Destroy();
         }
 
         [Test]
@@ -176,6 +195,7 @@ namespace StaticMlp.Tests.Combat
             using var scope = new CombatTestServerWorldScope();
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.BuildPrepared);
             new ServerFrontierAnchorInitSystem().Update();
+            new ServerStage1ProgressionAnchorInitSystem().Update();
 
             anchor.Set(new ThreatState
             {
@@ -199,13 +219,19 @@ namespace StaticMlp.Tests.Combat
             participant.Set<AiAgentTag>();
             participant.Set<IsDiedTag>();
 
+            var applyRaidDefenseProgressionSystem = new ServerStage1RaidDefenseProgressionSystem();
+            applyRaidDefenseProgressionSystem.Init();
             new ServerBotAiDeathSystem().Update();
             new ServerFrontierRaidResolutionSystem().Update();
+            applyRaidDefenseProgressionSystem.Update();
 
             Assert.That(anchor.Read<RaidScheduleState>().Status, Is.EqualTo(RaidScheduleStatus.None));
             Assert.That(anchor.Read<RaidScheduleState>().ActivateAtTick, Is.EqualTo(0));
             Assert.That(anchor.Read<ThreatState>().Phase, Is.EqualTo(ThreatPhase.Calm));
             Assert.That(anchor.Read<ThreatState>().ThreatValue, Is.EqualTo(0));
+            Assert.That(anchor.Read<Stage1ProgressionState>().HasFlag(ProgressFlagCatalog.CounterattackDefendedId), Is.True);
+
+            applyRaidDefenseProgressionSystem.Destroy();
         }
 
         private static void StartExpedition(CombatTestServerWorldScope scope, NetworkPeerId owner)

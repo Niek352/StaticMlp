@@ -8,6 +8,7 @@
         "Game.Core",
         "StaticMlp.Features.Build.Logic",
         "StaticMlp.Features.Combat.Logic",
+        "StaticMlp.Features.Progression.Logic",
         "StaticMlp.Features.Settlement.Logic"
     ],
     "includePlatforms": [],

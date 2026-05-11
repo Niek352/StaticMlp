@@ -6,7 +6,7 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 
-namespace StaticMlp.Features.AiActions
+namespace StaticMlp.Features.Settlement.Workers
 {
     public sealed class DeliveryBuildResourcesExecutor : AiTaskExecutorBase
     {

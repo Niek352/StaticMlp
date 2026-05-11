@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using StaticMlp.Features.AiActions;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
@@ -90,6 +89,20 @@ namespace StaticMlp.Tests.Ai
             Assert.That(AiBlackboardAccess.TryGetEntity(worker, BuildConstructionCollectVariables.BuildTargetSite, out var target), Is.True);
             Assert.That(target, Is.EqualTo(site.GID));
             Assert.That(AiBlackboardAccess.TryGetEntity(worker, DeliveryBuildResourcesCollectVariables.TargetSite, out _), Is.False);
+        }
+
+        [Test]
+        public void ActionCatalog_ResolvesWorkerOwnedExecutors_FromSettlementWorkersAssembly()
+        {
+            using var scope = new AiTestServerWorldScope();
+
+            var buildExecutor = scope.Catalog.ResolveExecutor(AiTaskType.BuildConstruction);
+            var deliveryExecutor = scope.Catalog.ResolveExecutor(AiTaskType.DeliveryResourceToBuilding);
+            var followLeaderExecutor = scope.Catalog.ResolveExecutor(AiTaskType.FollowLeader);
+
+            Assert.That(buildExecutor.GetType().Namespace, Is.EqualTo("StaticMlp.Features.Settlement.Workers"));
+            Assert.That(deliveryExecutor.GetType().Namespace, Is.EqualTo("StaticMlp.Features.Settlement.Workers"));
+            Assert.That(followLeaderExecutor.GetType().Namespace, Is.EqualTo("StaticMlp.Features.AiActions"));
         }
     }
 }

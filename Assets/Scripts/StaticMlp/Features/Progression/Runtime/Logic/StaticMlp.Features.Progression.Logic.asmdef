@@ -3,6 +3,8 @@
     "rootNamespace": "StaticMlp.Features.Progression",
     "references": [
         "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
         "StaticMlp.Features.Settlement.Logic",
         "StaticMlp.Features.Build.Logic"
     ],

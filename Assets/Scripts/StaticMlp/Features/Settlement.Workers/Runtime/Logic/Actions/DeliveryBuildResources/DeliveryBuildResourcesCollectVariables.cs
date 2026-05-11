@@ -5,7 +5,7 @@ using StaticMlp.Game.Components;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 
-namespace StaticMlp.Features.AiActions
+namespace StaticMlp.Features.Settlement.Workers
 {
     public sealed class DeliveryBuildResourcesCollectVariables : IAiActionVariableCollector
     {

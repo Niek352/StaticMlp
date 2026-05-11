@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using StaticMlp.Editor.Ai;
 using StaticMlp.Features.AiActions;
+using StaticMlp.Features.Settlement.Workers;
 
 namespace StaticMlp.Tests.Ai
 {
