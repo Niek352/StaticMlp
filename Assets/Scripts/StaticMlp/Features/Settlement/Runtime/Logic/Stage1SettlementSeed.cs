@@ -8,16 +8,16 @@ namespace StaticMlp.Features.Settlement
         public Stage1SettlementSeed(
             Stage1ConstructionSiteSeed[] initialConstructionSites,
             ResourceAmount[] startingResources,
-            WorkerRoleId[] startingWorkerRoles)
+            Stage1SettlementWorkerSeed[] initialWorkers)
         {
             InitialConstructionSites = CloneOrEmpty(initialConstructionSites);
             StartingResources = CloneOrEmpty(startingResources);
-            StartingWorkerRoles = CloneOrEmpty(startingWorkerRoles);
+            InitialWorkers = CloneOrEmpty(initialWorkers);
         }
 
         public Stage1ConstructionSiteSeed[] InitialConstructionSites { get; }
         public ResourceAmount[] StartingResources { get; }
-        public WorkerRoleId[] StartingWorkerRoles { get; }
+        public Stage1SettlementWorkerSeed[] InitialWorkers { get; }
 
         public int GetStartingResourceAmount(ResourceId resourceId)
         {

@@ -5,6 +5,7 @@ using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Settlement;
+using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Features.Shared;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
@@ -29,6 +30,7 @@ namespace StaticMlp.Tests.Ai
                 typeof(AiActionCatalog).Assembly,
                 typeof(AiActionsGameplayFeature).Assembly,
                 typeof(ConstructionRules).Assembly,
+                typeof(SettlementWorkersGameplayFeature).Assembly,
                 typeof(Health).Assembly,
                 typeof(CharacterNetState).Assembly);
             SW.Initialize();
@@ -95,6 +97,39 @@ namespace StaticMlp.Tests.Ai
             AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.EnemyDistance, 999f);
             AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.WoodStorage01, 1f);
             AiBlackboardAccess.SetVector(entity, AiCoreVariableIds.LastKnownEnemyPosition, position);
+            return entity;
+        }
+
+        public SW.Entity CreateSettlementAnchor(
+            SettlementAnchorId anchorId,
+            Stage1SettlementProgressStage stage = Stage1SettlementProgressStage.CampRepaired)
+        {
+            var entity = SW.NewEntity<Default>();
+            entity.Set(new Stage1SettlementProgression
+            {
+                AnchorId = anchorId.Value,
+                Stage = stage
+            });
+            return entity;
+        }
+
+        public SW.Entity CreateWorker(
+            SettlementAnchorId anchorId,
+            Vector3 position,
+            SettlementWorkerAssignmentStatus status = SettlementWorkerAssignmentStatus.Unassigned)
+        {
+            var entity = CreateBot(position, AiBehaviorIds.PeacefulBuilder);
+            entity.Set<SettlementWorkerTag>();
+            entity.Set(new SettlementWorkerIdentity
+            {
+                HomeAnchorId = anchorId.Value,
+                RoleId = WorkerRoleCatalog.CampBuilderId.Value
+            });
+            entity.Set(new SettlementWorkerAssignment
+            {
+                Status = status,
+                AnchorId = status == SettlementWorkerAssignmentStatus.Assigned ? anchorId.Value : (ushort)0
+            });
             return entity;
         }
 

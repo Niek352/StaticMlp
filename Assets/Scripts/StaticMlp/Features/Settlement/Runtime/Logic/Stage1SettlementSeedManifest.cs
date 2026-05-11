@@ -21,14 +21,14 @@ namespace StaticMlp.Features.Settlement
         };
 
         private static readonly ResourceAmount[] STARTING_RESOURCES = CreateStartingResources();
-        private static readonly WorkerRoleId[] STARTING_WORKER_ROLES = Array.Empty<WorkerRoleId>();
+        private static readonly Stage1SettlementWorkerSeed[] INITIAL_WORKERS = CreateInitialWorkers();
 
         public static Stage1SettlementSeed CreateResource()
         {
             return new Stage1SettlementSeed(
                 INITIAL_CONSTRUCTION_SITES,
                 STARTING_RESOURCES,
-                STARTING_WORKER_ROLES);
+                INITIAL_WORKERS);
         }
 
         private static ResourceAmount[] CreateStartingResources()
@@ -40,6 +40,20 @@ namespace StaticMlp.Features.Settlement
             {
                 new ResourceAmount(ResourceCatalog.WoodId, woodDefinition.StartingSettlementAmount),
                 new ResourceAmount(ResourceCatalog.StoneId, stoneDefinition.StartingSettlementAmount)
+            };
+        }
+
+        private static Stage1SettlementWorkerSeed[] CreateInitialWorkers()
+        {
+            return new[]
+            {
+                new Stage1SettlementWorkerSeed
+                {
+                    AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                    RoleId = WorkerRoleCatalog.CampBuilderId.Value,
+                    Position = new Vector3(-2f, 0f, 14f),
+                    Rotation = Quaternion.identity
+                }
             };
         }
     }

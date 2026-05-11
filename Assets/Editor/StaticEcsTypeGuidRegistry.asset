@@ -216,6 +216,42 @@ MonoBehaviour:
       - className: Stage1SettlementProgression
         namespaceName: StaticMlp.Features.Settlement
         assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 4b90f4d5-861f-4105-a2a5-48d8dbb5f9c8
+      current:
+        className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 8249f97b-a1dd-4f58-a8e0-f90ac8474588
+      current:
+        className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 83d6a5f5-44e1-40df-b527-9b2d3a1c2fd4
+      current:
+        className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 3cc73376-44db-4a4d-8fe3-c42ef153f7c8
+      current:
+        className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -308,6 +344,24 @@ MonoBehaviour:
       - className: BuildConstructionResultEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+    - guid: be4c4d8c-c0f4-4a34-a072-a4a274a01bb8
+      current:
+        className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 7e6fce4d-cf07-4db8-b036-c682ef468c3b
+      current:
+        className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
     links: []
     linksList: []
     multi: []
@@ -514,6 +568,42 @@ MonoBehaviour:
       - className: Stage1SettlementProgression
         namespaceName: StaticMlp.Features.Settlement
         assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 4b90f4d5-861f-4105-a2a5-48d8dbb5f9c8
+      current:
+        className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 8249f97b-a1dd-4f58-a8e0-f90ac8474588
+      current:
+        className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 83d6a5f5-44e1-40df-b527-9b2d3a1c2fd4
+      current:
+        className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 3cc73376-44db-4a4d-8fe3-c42ef153f7c8
+      current:
+        className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -606,6 +696,24 @@ MonoBehaviour:
       - className: BuildConstructionResultEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+    - guid: be4c4d8c-c0f4-4a34-a072-a4a274a01bb8
+      current:
+        className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 7e6fce4d-cf07-4db8-b036-c682ef468c3b
+      current:
+        className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
     links: []
     linksList: []
     multi: []
