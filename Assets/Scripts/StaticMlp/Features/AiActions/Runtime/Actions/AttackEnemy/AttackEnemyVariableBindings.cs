@@ -19,38 +19,31 @@ namespace StaticMlp.Features.AiActions
             new(HasEnemy, ReadHasEnemy)
         };
 
-        public static readonly AiBehaviorTaskContribution[] UtilityTaskContributions =
+        public static readonly UtilityConsideration[] Considerations =
         {
             new()
             {
-                BehaviorId = AiBehaviorIds.Monster,
-                Considerations = new[]
-                {
-                    new UtilityConsideration
-                    {
-                        VariableId = Health01,
-                        Curve = UtilityCurveType.Linear,
-                        Weight = 0.8f
-                    },
-                    new UtilityConsideration
-                    {
-                        VariableId = Fear,
-                        Curve = UtilityCurveType.Inverse,
-                        Weight = 0.7f
-                    },
-                    new UtilityConsideration
-                    {
-                        VariableId = EnemyDistance01,
-                        Curve = UtilityCurveType.Inverse,
-                        Weight = 0.8f
-                    },
-                    new UtilityConsideration
-                    {
-                        VariableId = HasEnemy,
-                        Curve = UtilityCurveType.Linear,
-                        Weight = 1f
-                    }
-                }
+                VariableId = Health01,
+                Curve = UtilityCurveType.Linear,
+                Weight = 0.8f
+            },
+            new()
+            {
+                VariableId = Fear,
+                Curve = UtilityCurveType.Inverse,
+                Weight = 0.7f
+            },
+            new()
+            {
+                VariableId = EnemyDistance01,
+                Curve = UtilityCurveType.Inverse,
+                Weight = 0.8f
+            },
+            new()
+            {
+                VariableId = HasEnemy,
+                Curve = UtilityCurveType.Linear,
+                Weight = 1f
             }
         };
 

@@ -13,7 +13,6 @@ namespace StaticMlp.Features.AiActions
         public IAiActionVariableCollector VariableCollector => null;
         public IAiActionCommandTargetBinder ManualCommandTargetBinder => CommandBinder;
         public IReadOnlyList<AiBlackboardFloatBinding> UtilityBindings => IdleVariableBindings.Bindings;
-        public IReadOnlyList<AiBehaviorTaskContribution> UtilityTaskContributions => IdleVariableBindings.UtilityTaskContributions;
 
         public IAiTaskExecutor CreateExecutor(AiTaskExecutionTransitions transitions)
         {

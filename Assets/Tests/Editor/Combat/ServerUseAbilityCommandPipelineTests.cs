@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
+using StaticMlp.Features.Build;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
@@ -114,7 +115,12 @@ namespace StaticMlp.Tests.Combat
             using var scope = new CombatTestServerWorldScope();
             scope.SetSimulationTime(120);
             var sourcePeer = new NetworkPeerId(23);
-            scope.CreatePlayer(sourcePeer, Vector3.zero);
+            var source = scope.CreatePlayer(sourcePeer, Vector3.zero);
+            source.Set(new OwnerBuildSelection
+            {
+                PrimaryModuleId = BuildModuleCatalog.FireFlaskModuleId
+            });
+            source.Set(Stage1BuildRules.CreatePreparedSnapshot(source.Read<OwnerBuildSelection>()));
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
             StatusEntitySpawns.SpawnOiled(target, target.GID, new AddStatusSpec
             {
@@ -156,6 +162,36 @@ namespace StaticMlp.Tests.Combat
             receive.Destroy();
 
             Assert.That(target.Read<Health>().Current, Is.LessThan(88f));
+        }
+
+        [Test]
+        public void Update_RejectsAbilityOutsidePreparedBuildSnapshot()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            scope.SetSimulationTime(120);
+            var sourcePeer = new NetworkPeerId(25);
+            var source = scope.CreatePlayer(sourcePeer, Vector3.zero);
+            source.Set(new OwnerBuildSelection
+            {
+                PrimaryModuleId = BuildModuleCatalog.FireFlaskModuleId
+            });
+            source.Set(Stage1BuildRules.CreatePreparedSnapshot(source.Read<OwnerBuildSelection>()));
+            var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
+            var receive = new ServerReceiveCombatCommandsSystem();
+
+            receive.Init();
+            SW.SendEvent(new NetworkEventFromClient<UseAbilityCommand>(
+                sourcePeer,
+                new UseAbilityCommand(CombatAbilityId.PoisonArrow, target.GID, 15u)));
+
+            receive.Update();
+            new ServerValidateCombatCommandsSystem().Update();
+            new ServerAbilityCastSystem().Update();
+            new ServerHitToEffectSystem().Update();
+            new ServerDamageApplySystem().Update();
+            receive.Destroy();
+
+            Assert.That(target.Read<Health>().Current, Is.EqualTo(100f));
         }
 
         [Test]

@@ -2,7 +2,10 @@
     "name": "StaticMlp.Features.Build.Logic",
     "rootNamespace": "StaticMlp.Features.Build",
     "references": [
-        "StaticMlp.Features.Combat.Logic"
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking",
+        "Game.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

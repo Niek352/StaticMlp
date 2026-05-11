@@ -4,6 +4,7 @@ using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
+using StaticMlp.Features.Build;
 using StaticMlp.Features.Shared;
 using UnityEngine;
 
@@ -41,9 +42,7 @@ namespace StaticMlp.Features.Combat
 
             ref var state = ref player.Mut<PassiveAutoAttackState>();
             var previousTarget = state.CurrentTarget;
-            var abilityId = player.Has<PlayerCombatAbilityState>()
-                ? player.Read<PlayerCombatAbilityState>().SelectedAbility
-                : CombatAbilityId.BasicMeleeAuto;
+            var abilityId = player.Read<PreparedBuildSnapshot>().PreparedAbilityId;
             state.CurrentTarget = FindNearestTarget(player, GetRange(abilityId, config));
             if (previousTarget.Raw != 0ul && state.CurrentTarget.Raw == 0ul)
                 state.NextFireAt = now;

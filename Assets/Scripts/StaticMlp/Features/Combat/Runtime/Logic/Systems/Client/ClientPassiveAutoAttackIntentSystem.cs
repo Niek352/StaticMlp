@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Build;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
@@ -31,6 +32,7 @@ namespace StaticMlp.Features.Combat
         private static void UpdatePlayer(CW.Entity player, CombatConfig config, float now)
         {
             ref var state = ref player.Mut<PassiveAutoAttackState>();
+            var abilityId = player.Read<PreparedBuildSnapshot>().PreparedAbilityId;
             if (state.CurrentTarget.Raw == 0ul || !state.CurrentTarget.TryUnpack<ClientCoreWT>(out _))
             {
                 if (player.Has<PassiveAutoAttackIntent>())
@@ -42,9 +44,6 @@ namespace StaticMlp.Features.Combat
                 return;
 
             state.LastShotSequence++;
-            var abilityId = player.Has<PlayerCombatAbilityState>()
-                ? player.Read<PlayerCombatAbilityState>().SelectedAbility
-                : CombatAbilityId.BasicMeleeAuto;
             state.NextFireAt = now + Mathf.Max(0f, GetCooldown(abilityId, config));
 
             player.Set(new PassiveAutoAttackIntent

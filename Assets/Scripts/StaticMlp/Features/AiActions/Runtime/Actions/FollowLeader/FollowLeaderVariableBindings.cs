@@ -16,19 +16,7 @@ namespace StaticMlp.Features.AiActions
             new(Hunger, ReadHunger)
         };
 
-        public static readonly AiBehaviorTaskContribution[] UtilityTaskContributions =
-        {
-            new()
-            {
-                BehaviorId = AiBehaviorIds.Monster,
-                Considerations = CreateCommonConsiderations()
-            },
-            new()
-            {
-                BehaviorId = AiBehaviorIds.PeacefulBuilder,
-                Considerations = CreateCommonConsiderations()
-            }
-        };
+        public static readonly UtilityConsideration[] Considerations = CreateCommonConsiderations();
 
         private static UtilityConsideration[] CreateCommonConsiderations()
         {

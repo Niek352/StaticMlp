@@ -1,5 +1,4 @@
 using System;
-using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Settlement;
 
 namespace StaticMlp.Features.Settlement.Workers
@@ -11,7 +10,7 @@ namespace StaticMlp.Features.Settlement.Workers
             new(
                 WorkerRoleCatalog.CampBuilderId,
                 SettlementWorkerNetworkArchetypeIds.CampBuilderWorker,
-                AiBehaviorIds.PeacefulBuilder,
+                SettlementWorkerBehaviorIds.PeacefulBuilder,
                 maxHealth: 100f)
         };
 

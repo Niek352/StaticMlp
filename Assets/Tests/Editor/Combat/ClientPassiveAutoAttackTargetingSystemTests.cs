@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using StaticMlp.Features.Build;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Statuses;
@@ -57,12 +58,31 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
-        public void Update_IgnoresMonstersOutsideRadius()
+        public void Update_IgnoresMonstersOutsidePreparedBuildRange()
         {
             using var scope = new CombatTestClientWorldScope();
             var player = scope.CreateLocalPlayer(Vector3.zero);
-            scope.CreateMonster(new Vector3(8.01f, 0f, 0f));
+            scope.CreateMonster(new Vector3(10.01f, 0f, 0f));
             scope.SetGameTime(4f);
+            var system = new ClientPassiveAutoAttackTargetingSystem();
+
+            system.Update();
+
+            Assert.That(player.Read<PassiveAutoAttackState>().CurrentTarget.Raw, Is.EqualTo(0ul));
+        }
+
+        [Test]
+        public void Update_WhenPreparedBuildChanges_UsesSnapshotRangeInsteadOfCombatDefault()
+        {
+            using var scope = new CombatTestClientWorldScope();
+            var player = scope.CreateLocalPlayer(Vector3.zero);
+            player.Set(new OwnerBuildSelection
+            {
+                PrimaryModuleId = BuildModuleCatalog.FireFlaskModuleId
+            });
+            player.Set(Stage1BuildRules.CreatePreparedSnapshot(player.Read<OwnerBuildSelection>()));
+            scope.CreateMonster(new Vector3(9.5f, 0f, 0f));
+            scope.SetGameTime(4.5f);
             var system = new ClientPassiveAutoAttackTargetingSystem();
 
             system.Update();

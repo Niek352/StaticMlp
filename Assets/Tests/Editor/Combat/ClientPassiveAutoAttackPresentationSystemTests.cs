@@ -56,7 +56,7 @@ namespace StaticMlp.Tests.Combat
 
             ref var firstState = ref first.Mut<CharacterNetState>();
             firstState.Position = new Vector3(30f, 0f, 0f);
-            now += scope.Config.FireInterval;
+            now += scope.Config.PoisonArrowCooldown;
 
             scope.SetGameTime(now, scope.PresentationConfig.HighlightFadeOut);
             targeting.Update();

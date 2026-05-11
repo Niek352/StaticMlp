@@ -38,11 +38,12 @@ namespace StaticMlp.Features.AiBots
                 throw new ArgumentNullException(nameof(transitions));
 
             var packages = DiscoverPackages();
+            var behaviorSources = DiscoverBehaviorContributionSources();
             var utilityBindings = new Dictionary<ushort, AiBlackboardFloatBinding>();
             var manualCommandBinders = new Dictionary<AiTaskType, IAiActionCommandTargetBinder>();
             var executors = new Dictionary<AiTaskType, IAiTaskExecutor>();
             var collectors = new List<IAiActionVariableCollector>();
-            var tasksByBehavior = new Dictionary<ushort, List<UtilityTaskDefinition>>();
+            var behaviorRegistry = new AiBehaviorTaskRegistry();
 
             for (var i = 0; i < packages.Length; i++)
             {
@@ -50,10 +51,12 @@ namespace StaticMlp.Features.AiBots
                 RegisterExecutor(package, transitions, executors);
                 RegisterManualCommandBinder(package, manualCommandBinders);
                 RegisterUtilityBindings(package, utilityBindings);
-                RegisterBehaviorContributions(package, tasksByBehavior);
                 if (package.VariableCollector != null)
                     collectors.Add(package.VariableCollector);
             }
+
+            for (var i = 0; i < behaviorSources.Length; i++)
+                behaviorSources[i].Register(behaviorRegistry);
 
             if (!executors.TryGetValue(AiTaskType.Idle, out var idleExecutor))
             {
@@ -61,17 +64,8 @@ namespace StaticMlp.Features.AiBots
                     $"AI action discovery must register an executor for task '{AiTaskType.Idle}'.");
             }
 
-            var behaviors = tasksByBehavior
-                .OrderBy(pair => pair.Key)
-                .Select(pair => new AiBehaviorDefinition
-                {
-                    BehaviorId = pair.Key,
-                    Tasks = pair.Value.ToArray()
-                })
-                .ToArray();
-
             return new AiActionCatalog(
-                new AiBehaviorCatalog(behaviors),
+                new AiBehaviorCatalog(behaviorRegistry.BuildDefinitions()),
                 idleExecutor,
                 executors,
                 manualCommandBinders,
@@ -124,6 +118,17 @@ namespace StaticMlp.Features.AiBots
                 .ToArray();
         }
 
+        private static IAiBehaviorContributionSource[] DiscoverBehaviorContributionSources()
+        {
+            return AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(GetTypesSafe)
+                .Where(IsBehaviorContributionSourceType)
+                .OrderBy(type => type.FullName, StringComparer.Ordinal)
+                .Select(type => (IAiBehaviorContributionSource)Activator.CreateInstance(type))
+                .ToArray();
+        }
+
         private static IEnumerable<Type> GetTypesSafe(Assembly assembly)
         {
             try
@@ -143,6 +148,14 @@ namespace StaticMlp.Features.AiBots
         private static bool IsPackageType(Type type)
         {
             return typeof(IAiActionPackage).IsAssignableFrom(type)
+                   && !type.IsAbstract
+                   && !type.IsInterface
+                   && type.GetConstructor(Type.EmptyTypes) != null;
+        }
+
+        private static bool IsBehaviorContributionSourceType(Type type)
+        {
+            return typeof(IAiBehaviorContributionSource).IsAssignableFrom(type)
                    && !type.IsAbstract
                    && !type.IsInterface
                    && type.GetConstructor(Type.EmptyTypes) != null;
@@ -213,29 +226,5 @@ namespace StaticMlp.Features.AiBots
             }
         }
 
-        private static void RegisterBehaviorContributions(
-            IAiActionPackage package,
-            Dictionary<ushort, List<UtilityTaskDefinition>> tasksByBehavior)
-        {
-            var contributions = package.UtilityTaskContributions;
-            if (contributions == null)
-                return;
-
-            for (var i = 0; i < contributions.Count; i++)
-            {
-                var contribution = contributions[i];
-                if (!tasksByBehavior.TryGetValue(contribution.BehaviorId, out var tasks))
-                {
-                    tasks = new List<UtilityTaskDefinition>();
-                    tasksByBehavior.Add(contribution.BehaviorId, tasks);
-                }
-
-                tasks.Add(new UtilityTaskDefinition
-                {
-                    Task = package.TaskType,
-                    Considerations = contribution.Considerations ?? Array.Empty<UtilityConsideration>()
-                });
-            }
-        }
     }
 }

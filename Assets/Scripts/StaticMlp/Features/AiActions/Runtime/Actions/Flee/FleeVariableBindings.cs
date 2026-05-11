@@ -19,14 +19,7 @@ namespace StaticMlp.Features.AiActions
             new(HasEnemy, ReadHasEnemy)
         };
 
-        public static readonly AiBehaviorTaskContribution[] UtilityTaskContributions =
-        {
-            new()
-            {
-                BehaviorId = AiBehaviorIds.Monster,
-                Considerations = CreateCommonConsiderations(0.85f, 0.85f)
-            }
-        };
+        public static readonly UtilityConsideration[] Considerations = CreateCommonConsiderations(0.85f, 0.85f);
 
         private static UtilityConsideration[] CreateCommonConsiderations(float healthWeight, float fearWeight)
         {

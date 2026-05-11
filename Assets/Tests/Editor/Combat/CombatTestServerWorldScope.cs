@@ -1,5 +1,6 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Build;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
@@ -24,10 +25,12 @@ namespace StaticMlp.Tests.Combat
 
             ServerPeerRegistry.Clear();
             NetworkEventRegistry.Clear();
+            new BuildLogicFeature().RegisterNetworkEvents();
             new CombatLogicFeature().RegisterNetworkEvents();
             SW.Create(WorldConfig.Default());
             SW.Types().RegisterAll(
                 typeof(ServerWT).Assembly,
+                typeof(BuildLogicFeature).Assembly,
                 typeof(CombatLogicFeature).Assembly,
                 typeof(EffectsLogicFeature).Assembly,
                 typeof(Health).Assembly,
@@ -119,6 +122,8 @@ namespace StaticMlp.Tests.Combat
                 Current = 100f,
                 Max = 100f
             });
+            entity.Set(Stage1BuildRules.DefaultSelection());
+            entity.Set(Stage1BuildRules.CreatePreparedSnapshot(entity.Read<OwnerBuildSelection>()));
             return entity;
         }
 

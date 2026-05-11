@@ -13,20 +13,13 @@ namespace StaticMlp.Features.AiActions
             new(HAS_DELIVERY_TARGET, ReadHasDeliveryTarget)
         };
 
-        public static readonly AiBehaviorTaskContribution[] UtilityTaskContributions =
+        public static readonly UtilityConsideration[] Considerations =
         {
             new()
             {
-                BehaviorId = AiBehaviorIds.PeacefulBuilder,
-                Considerations = new[]
-                {
-                    new UtilityConsideration
-                    {
-                        VariableId = HAS_DELIVERY_TARGET,
-                        Curve = UtilityCurveType.Linear,
-                        Weight = 1f
-                    }
-                }
+                VariableId = HAS_DELIVERY_TARGET,
+                Curve = UtilityCurveType.Linear,
+                Weight = 1f
             }
         };
 

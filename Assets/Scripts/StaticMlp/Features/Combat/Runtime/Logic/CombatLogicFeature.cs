@@ -24,7 +24,6 @@ namespace StaticMlp.Features.Combat
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
             systems.Add(new ClientCombatConfigInitSystem(), GameplaySystemOrder.Gameplay - 10);
-            systems.Add(new ClientCombatAbilitySelectionSystem(), GameplaySystemOrder.Gameplay);
             systems.Add(new ClientPassiveAutoAttackTargetingSystem(), GameplaySystemOrder.Gameplay + 10);
             systems.Add(new ClientPassiveAutoAttackIntentSystem(), GameplaySystemOrder.Gameplay + 20);
             systems.Add(new ClientPassiveAutoAttackSendSystem(), GameplaySystemOrder.Gameplay + 30);

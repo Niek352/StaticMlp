@@ -16,32 +16,25 @@ namespace StaticMlp.Features.AiActions
             new(FEAR, ReadFear)
         };
 
-        public static readonly AiBehaviorTaskContribution[] UtilityTaskContributions =
+        public static readonly UtilityConsideration[] Considerations =
         {
             new()
             {
-                BehaviorId = AiBehaviorIds.PeacefulBuilder,
-                Considerations = new[]
-                {
-                    new UtilityConsideration
-                    {
-                        VariableId = HAS_BUILD_TARGET,
-                        Curve = UtilityCurveType.Linear,
-                        Weight = 1f
-                    },
-                    new UtilityConsideration
-                    {
-                        VariableId = HEALTH01,
-                        Curve = UtilityCurveType.Linear,
-                        Weight = 0.4f
-                    },
-                    new UtilityConsideration
-                    {
-                        VariableId = FEAR,
-                        Curve = UtilityCurveType.Inverse,
-                        Weight = 0.4f
-                    }
-                }
+                VariableId = HAS_BUILD_TARGET,
+                Curve = UtilityCurveType.Linear,
+                Weight = 1f
+            },
+            new()
+            {
+                VariableId = HEALTH01,
+                Curve = UtilityCurveType.Linear,
+                Weight = 0.4f
+            },
+            new()
+            {
+                VariableId = FEAR,
+                Curve = UtilityCurveType.Inverse,
+                Weight = 0.4f
             }
         };
 

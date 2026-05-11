@@ -59,7 +59,7 @@ namespace StaticMlp.Tests.Ai
             return entity;
         }
 
-        public SW.Entity CreateBot(Vector3 position, ushort behaviorId = AiBehaviorIds.Monster)
+        public SW.Entity CreateBot(Vector3 position, ushort behaviorId = CombatEnemyBehaviorIds.Default)
         {
             const float maxHealth = 100f;
             var entity = SW.NewEntity<Default>();
@@ -118,7 +118,7 @@ namespace StaticMlp.Tests.Ai
             Vector3 position,
             SettlementWorkerAssignmentStatus status = SettlementWorkerAssignmentStatus.Unassigned)
         {
-            var entity = CreateBot(position, AiBehaviorIds.PeacefulBuilder);
+            var entity = CreateBot(position, SettlementWorkerBehaviorIds.PeacefulBuilder);
             entity.Set<SettlementWorkerTag>();
             entity.Set(new SettlementWorkerIdentity
             {

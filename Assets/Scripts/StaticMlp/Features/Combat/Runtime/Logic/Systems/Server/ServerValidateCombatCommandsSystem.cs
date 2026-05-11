@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Build;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
@@ -39,6 +40,16 @@ namespace StaticMlp.Features.Combat
             {
                 request.Destroy();
                 return;
+            }
+
+            if (source.Has<PlayerTag>())
+            {
+                ref readonly var preparedBuild = ref source.Read<PreparedBuildSnapshot>();
+                if (!Stage1BuildRules.IsAbilityPrepared(preparedBuild, data.AbilityId))
+                {
+                    request.Destroy();
+                    return;
+                }
             }
 
             if (!data.Target.TryUnpack<ServerWT>(out var target)

@@ -1,5 +1,6 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Build;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
@@ -21,10 +22,12 @@ namespace StaticMlp.Tests.Combat
                 CW.Destroy();
 
             NetworkEventRegistry.Clear();
+            new BuildLogicFeature().RegisterNetworkEvents();
             new CombatLogicFeature().RegisterNetworkEvents();
             CW.Create(WorldConfig.Default());
             CW.Types().RegisterAll(
                 typeof(ClientCoreWT).Assembly,
+                typeof(BuildLogicFeature).Assembly,
                 typeof(CombatLogicFeature).Assembly,
                 typeof(CombatPresentationFeature).Assembly,
                 typeof(EffectsLogicFeature).Assembly,
@@ -67,6 +70,8 @@ namespace StaticMlp.Tests.Combat
                 Position = position,
                 Rotation = Quaternion.identity
             });
+            player.Set(Stage1BuildRules.DefaultSelection());
+            player.Set(Stage1BuildRules.CreatePreparedSnapshot(player.Read<OwnerBuildSelection>()));
             return player;
         }
 

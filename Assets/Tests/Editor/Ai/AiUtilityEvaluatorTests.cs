@@ -1,7 +1,9 @@
 using NUnit.Framework;
 using StaticMlp.Features.AiActions;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Combat;
 using StaticMlp.Features.Settlement;
+using StaticMlp.Features.Settlement.Workers;
 using UnityEngine;
 
 namespace StaticMlp.Tests.Ai
@@ -12,7 +14,7 @@ namespace StaticMlp.Tests.Ai
         public void MonsterBehavior_PrefersAttackEnemy_WhenHealthyAndEnemyIsNear()
         {
             using var scope = new AiTestServerWorldScope();
-            var bot = scope.CreateBot(Vector3.zero, AiBehaviorIds.Monster);
+            var bot = scope.CreateBot(Vector3.zero, CombatEnemyBehaviorIds.Monster);
             var enemy = scope.CreateBot(new Vector3(2f, 0f, 0f));
 
             AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.Health01, 1f);
@@ -20,7 +22,7 @@ namespace StaticMlp.Tests.Ai
             AiBlackboardAccess.SetEntity(bot, AiCoreVariableIds.Enemy, enemy.GID);
             AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.EnemyDistance, 2f);
 
-            Assert.That(scope.Catalog.TryGetBehavior(AiBehaviorIds.Monster, out var behavior), Is.True);
+            Assert.That(scope.Catalog.TryGetBehavior(CombatEnemyBehaviorIds.Monster, out var behavior), Is.True);
             var selectedTask = AiUtilityEvaluator.SelectBestTask(bot, scope.Catalog, in behavior);
             Assert.That(selectedTask, Is.EqualTo(AiTaskType.AttackEnemy));
         }
@@ -29,7 +31,7 @@ namespace StaticMlp.Tests.Ai
         public void MonsterBehavior_PrefersFlee_WhenFearIsHighAndEnemyIsNear()
         {
             using var scope = new AiTestServerWorldScope();
-            var bot = scope.CreateBot(Vector3.zero, AiBehaviorIds.Monster);
+            var bot = scope.CreateBot(Vector3.zero, CombatEnemyBehaviorIds.Monster);
             var enemy = scope.CreateBot(new Vector3(2f, 0f, 0f));
 
             AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.Health01, 0.15f);
@@ -37,7 +39,7 @@ namespace StaticMlp.Tests.Ai
             AiBlackboardAccess.SetEntity(bot, AiCoreVariableIds.Enemy, enemy.GID);
             AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.EnemyDistance, 2f);
 
-            Assert.That(scope.Catalog.TryGetBehavior(AiBehaviorIds.Monster, out var behavior), Is.True);
+            Assert.That(scope.Catalog.TryGetBehavior(CombatEnemyBehaviorIds.Monster, out var behavior), Is.True);
             var selectedTask = AiUtilityEvaluator.SelectBestTask(bot, scope.Catalog, in behavior);
             Assert.That(selectedTask, Is.EqualTo(AiTaskType.Flee));
         }
@@ -46,7 +48,7 @@ namespace StaticMlp.Tests.Ai
         public void PeacefulBuilderBehavior_PrefersBuildConstruction_WhenBuildableSiteExists()
         {
             using var scope = new AiTestServerWorldScope();
-            var bot = scope.CreateBot(Vector3.zero, AiBehaviorIds.PeacefulBuilder);
+            var bot = scope.CreateBot(Vector3.zero, SettlementWorkerBehaviorIds.PeacefulBuilder);
             scope.CreateConstructionSite(new Vector3(3f, 0f, 0f), ConstructionPhase.ReadyToBuild, resourcesComplete: true);
 
             AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.Health01, 1f);
@@ -56,7 +58,7 @@ namespace StaticMlp.Tests.Ai
 
             scope.Catalog.CollectVariables(bot);
 
-            Assert.That(scope.Catalog.TryGetBehavior(AiBehaviorIds.PeacefulBuilder, out var behavior), Is.True);
+            Assert.That(scope.Catalog.TryGetBehavior(SettlementWorkerBehaviorIds.PeacefulBuilder, out var behavior), Is.True);
             var selectedTask = AiUtilityEvaluator.SelectBestTask(bot, scope.Catalog, in behavior);
             Assert.That(selectedTask, Is.EqualTo(AiTaskType.BuildConstruction));
         }
@@ -65,7 +67,7 @@ namespace StaticMlp.Tests.Ai
         public void DeliveryBuildResourcesCollector_DoesNotSelectTarget_WhenSharedStorageIsEmpty()
         {
             using var scope = new AiTestServerWorldScope();
-            var bot = scope.CreateBot(Vector3.zero, AiBehaviorIds.PeacefulBuilder);
+            var bot = scope.CreateBot(Vector3.zero, SettlementWorkerBehaviorIds.PeacefulBuilder);
             scope.CreateConstructionSite(new Vector3(3f, 0f, 0f), ConstructionPhase.WaitingForResources, resourcesComplete: false);
 
             var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
@@ -82,8 +84,8 @@ namespace StaticMlp.Tests.Ai
         public void PeacefulBuilderBehavior_DoesNotChooseFlee_WhenFearIsHighAndEnemyIsNear()
         {
             using var scope = new AiTestServerWorldScope();
-            var bot = scope.CreateBot(Vector3.zero, AiBehaviorIds.PeacefulBuilder);
-            var enemy = scope.CreateBot(new Vector3(2f, 0f, 0f), AiBehaviorIds.Monster);
+            var bot = scope.CreateBot(Vector3.zero, SettlementWorkerBehaviorIds.PeacefulBuilder);
+            var enemy = scope.CreateBot(new Vector3(2f, 0f, 0f), CombatEnemyBehaviorIds.Monster);
 
             AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.Health01, 0.15f);
             AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.Fear, 0.95f);
@@ -91,7 +93,7 @@ namespace StaticMlp.Tests.Ai
             AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.EnemyDistance, 2f);
             AiBlackboardAccess.Remove(bot, AiCoreVariableIds.Leader);
 
-            Assert.That(scope.Catalog.TryGetBehavior(AiBehaviorIds.PeacefulBuilder, out var behavior), Is.True);
+            Assert.That(scope.Catalog.TryGetBehavior(SettlementWorkerBehaviorIds.PeacefulBuilder, out var behavior), Is.True);
             var selectedTask = AiUtilityEvaluator.SelectBestTask(bot, scope.Catalog, in behavior);
             Assert.That(selectedTask, Is.Not.EqualTo(AiTaskType.Flee));
         }

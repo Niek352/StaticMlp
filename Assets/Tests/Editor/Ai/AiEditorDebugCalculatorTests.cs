@@ -2,6 +2,7 @@ using System.Linq;
 using NUnit.Framework;
 using StaticMlp.Editor.Ai;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Combat;
 using UnityEngine;
 
 namespace StaticMlp.Tests.Ai
@@ -12,7 +13,7 @@ namespace StaticMlp.Tests.Ai
         public void Snapshot_MatchesRuntimeUtilityScoresAndFlags()
         {
             using var scope = new AiTestServerWorldScope();
-            var bot = scope.CreateBot(Vector3.zero, AiBehaviorIds.Monster);
+            var bot = scope.CreateBot(Vector3.zero, CombatEnemyBehaviorIds.Monster);
             var enemy = scope.CreateBot(new Vector3(2f, 0f, 0f));
 
             AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.Health01, 1f);
@@ -25,7 +26,7 @@ namespace StaticMlp.Tests.Ai
             taskState.ActiveTask = AiTaskType.AttackEnemy;
             taskState.HasActiveTask = true;
 
-            Assert.That(scope.Catalog.TryGetBehavior(AiBehaviorIds.Monster, out var behavior), Is.True);
+            Assert.That(scope.Catalog.TryGetBehavior(CombatEnemyBehaviorIds.Monster, out var behavior), Is.True);
             var brain = bot.Read<AiBrain>();
             var snapshot = AiEditorDebugCalculator.BuildSnapshot(bot, scope.Catalog, behavior, brain, taskState);
 

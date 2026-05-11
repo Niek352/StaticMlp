@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Combat;
 using StaticMlp.Networking;
 using StaticMlp.Features.World;
 
@@ -25,7 +26,7 @@ namespace StaticMlp.Features.AiBots
                 var definition = definitions[i];
                 var leader = ResolveLeader(definition.LeaderIndex, spawnedBots);
                 var behaviorId = definition.BehaviorId == 0
-                    ? AiBehaviorIds.Monster
+                    ? CombatEnemyBehaviorIds.Default
                     : definition.BehaviorId;
                 spawnedBots[i] = AiBotSpawns.SpawnBot(
                     definition.Position,

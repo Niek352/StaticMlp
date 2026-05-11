@@ -10,7 +10,7 @@ namespace StaticMlp.Tests.Combat
     public sealed class ClientPassiveAutoAttackIntentSystemTests
     {
         [Test]
-        public void Update_WithStableTarget_EmitsOncePerFireInterval()
+        public void Update_WithStableTarget_EmitsOncePerPreparedBuildCooldown()
         {
             using var scope = new CombatTestClientWorldScope();
             var now = 10f;
@@ -24,6 +24,7 @@ namespace StaticMlp.Tests.Combat
             intent.Update();
 
             Assert.That(player.Has<PassiveAutoAttackIntent>(), Is.True);
+            Assert.That(player.Read<PassiveAutoAttackIntent>().AbilityId, Is.EqualTo(CombatAbilityId.PoisonArrow));
             Assert.That(player.Read<PassiveAutoAttackIntent>().Target, Is.EqualTo(target.GID));
             Assert.That(player.Read<PassiveAutoAttackIntent>().ShotSequence, Is.EqualTo(1u));
 
@@ -31,7 +32,7 @@ namespace StaticMlp.Tests.Combat
             intent.Update();
             Assert.That(player.Read<PassiveAutoAttackIntent>().ShotSequence, Is.EqualTo(1u));
 
-            now += scope.Config.FireInterval;
+            now += scope.Config.PoisonArrowCooldown;
             scope.SetGameTime(now);
             intent.Update();
             Assert.That(player.Read<PassiveAutoAttackIntent>().ShotSequence, Is.EqualTo(2u));
