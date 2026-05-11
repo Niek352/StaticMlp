@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Player;
-using StaticMlp.Game.Components.Buildings;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Input;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;

@@ -12,7 +12,8 @@
         "StaticMlp.Features.Combat.Logic",
         "StaticMlp.Features.Combat.Presentation",
         "StaticMlp.Features.EcsViews",
-        "StaticMlp.Features.Shared.Logic"
+        "StaticMlp.Features.Shared.Logic",
+        "StaticMlp.Features.Settlement.Logic"
     ],
     "includePlatforms": [
         "Editor"

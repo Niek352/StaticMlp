@@ -4,7 +4,7 @@ using FFS.Libraries.StaticPack;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 
-namespace StaticMlp.Game.Components.Buildings
+namespace StaticMlp.Features.Settlement
 {
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,

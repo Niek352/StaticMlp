@@ -1,4 +1,4 @@
-using StaticMlp.Game.Components.Buildings;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;

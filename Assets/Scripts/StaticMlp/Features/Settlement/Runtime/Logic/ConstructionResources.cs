@@ -5,7 +5,7 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 
-namespace StaticMlp.Game.Components.Buildings
+namespace StaticMlp.Features.Settlement
 {
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,

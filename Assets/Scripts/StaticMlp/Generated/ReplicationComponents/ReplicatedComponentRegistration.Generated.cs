@@ -9,7 +9,7 @@ using StaticMlp.Features.Shared;
 using StaticMlp.Features.Statuses;
 using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Game.Components;
-using StaticMlp.Game.Components.Buildings;
+using StaticMlp.Features.Settlement;
 
 namespace StaticMlp.Networking.Replication.Generated {
     public static class ReplicatedComponentRegistration {

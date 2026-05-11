@@ -4,7 +4,6 @@ using StaticMlp.Features.EcsViews;
 using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Bootstrap;
-using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;

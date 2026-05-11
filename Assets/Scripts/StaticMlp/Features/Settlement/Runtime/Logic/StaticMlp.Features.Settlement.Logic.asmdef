@@ -2,8 +2,10 @@
     "name": "StaticMlp.Features.Settlement.Logic",
     "rootNamespace": "StaticMlp.Features.Settlement",
     "references": [
-        "GUID:a84b84de04e11b9429a8ea22effe7302",
-        "FFS.StaticEcs"
+        "StaticMlp.Features.Shared.Logic",
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "FFS.StaticPack"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

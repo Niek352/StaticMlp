@@ -2,7 +2,7 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Game.Components;
-using StaticMlp.Game.Components.Buildings;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.AiActions

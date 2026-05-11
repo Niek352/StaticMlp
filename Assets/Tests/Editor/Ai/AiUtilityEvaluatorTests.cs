@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
-using StaticMlp.Game.Components.Buildings;
+using StaticMlp.Features.Settlement;
 using UnityEngine;
 
 namespace StaticMlp.Tests.Ai

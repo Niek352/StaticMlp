@@ -1,4 +1,4 @@
-namespace StaticMlp.Game.Components.Buildings
+namespace StaticMlp.Features.Settlement
 {
     public enum ConstructionPhase : byte
     {

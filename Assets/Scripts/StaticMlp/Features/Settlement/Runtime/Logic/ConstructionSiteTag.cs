@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace StaticMlp.Game.Components.Buildings
+namespace StaticMlp.Features.Settlement
 {
     public struct ConstructionSiteTag : ITag
     {

@@ -2,7 +2,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
-using StaticMlp.Game.Components.Buildings;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 using UnityEngine;
 

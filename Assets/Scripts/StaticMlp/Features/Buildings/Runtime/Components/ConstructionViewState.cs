@@ -1,5 +1,5 @@
 using StaticMlp.Features.EcsViews;
-using StaticMlp.Game.Components.Buildings;
+using StaticMlp.Features.Settlement;
 
 namespace StaticMlp.Features.Buildings
 {

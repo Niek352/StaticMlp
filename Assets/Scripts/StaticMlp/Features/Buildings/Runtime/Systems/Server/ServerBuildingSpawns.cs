@@ -2,7 +2,6 @@ using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Settlement;
-using StaticMlp.Game.Components.Buildings;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;

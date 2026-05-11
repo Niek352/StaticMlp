@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
-using StaticMlp.Game.Components.Buildings;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Buildings {

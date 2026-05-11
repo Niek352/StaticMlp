@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
-using StaticMlp.Game.Components.Buildings;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;

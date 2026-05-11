@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Game.Components.Buildings;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
