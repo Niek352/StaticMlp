@@ -198,6 +198,24 @@ MonoBehaviour:
       - className: StatusTarget
         namespaceName: StaticMlp.Features.Statuses
         assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 1fd72b18-30b4-4f37-ae61-b95f52eafb65
+      current:
+        className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 8d47b71d-f6a0-4ecf-9b4e-b9a3d8fae6c1
+      current:
+        className: Stage1SettlementProgression
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: Stage1SettlementProgression
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -478,6 +496,24 @@ MonoBehaviour:
       - className: StatusTarget
         namespaceName: StaticMlp.Features.Statuses
         assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 1fd72b18-30b4-4f37-ae61-b95f52eafb65
+      current:
+        className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 8d47b71d-f6a0-4ecf-9b4e-b9a3d8fae6c1
+      current:
+        className: Stage1SettlementProgression
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: Stage1SettlementProgression
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47

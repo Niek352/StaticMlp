@@ -38,6 +38,15 @@ namespace StaticMlp.Features.Buildings
             if (!siteGid.TryUnpack<ServerWT>(out var site))
                 throw new System.InvalidOperationException("Spawned initial construction site could not be unpacked in server world.");
 
+            if (definition.AnchorId != 0)
+            {
+                site.Set(new Stage1SettlementProgression
+                {
+                    AnchorId = definition.AnchorId,
+                    Stage = Stage1SettlementProgressStage.DamagedCampStart
+                });
+            }
+
             if (definition.StartReadyToBuild)
             {
                 ref var siteState = ref ReplicationMut.Mut<ConstructionSiteState>(site);

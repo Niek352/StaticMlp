@@ -1,5 +1,6 @@
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking.Replication;
+using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Settlement
 {
@@ -8,6 +9,7 @@ namespace StaticMlp.Features.Settlement
         public override void RegisterNetworkEvents()
         {
             ProjectionRegistry.Register<SettlementSharedResources>();
+            ProjectionRegistry.Register<Stage1SettlementProgression>();
         }
 
         public override void RegisterPrefabs()
@@ -26,6 +28,7 @@ namespace StaticMlp.Features.Settlement
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
             systems.Add(new ServerSettlementSharedResourcesSpawnSystem(), GameplaySystemOrder.ServerConnectionGameplay + 5);
+            systems.Add(new ServerStage1SettlementProgressionSystem(), GameplaySystemOrder.Gameplay - 40);
         }
     }
 }

@@ -104,6 +104,14 @@ namespace StaticMlp.Networking.Replication.Generated {
                 SettlementSharedResourcesReplication.CreateDelta,
                 SettlementSharedResourcesReplication.Read);
 
+            ReplicationRegistry.RegisterComponent<Stage1SettlementProgression>(
+                ReplicatedComponentIds.Stage1SettlementProgression,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                Stage1SettlementProgressionReplication.CreateDelta,
+                Stage1SettlementProgressionReplication.Read);
+
             ReplicationRegistry.RegisterComponent<CharacterNetState>(
                 ReplicatedComponentIds.CharacterNetState,
                 ReplicationAuthority.Owner,

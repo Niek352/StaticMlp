@@ -11,6 +11,7 @@ namespace StaticMlp.Features.Settlement
         {
             new()
             {
+                AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
                 BuildingId = CAMP_CORE_BUILDING_ID,
                 Position = new Vector3(0f, 0f, 16f),
                 Rotation = Quaternion.identity,
