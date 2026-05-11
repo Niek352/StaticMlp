@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 55d7d993c26421042b5e16ba5a52aadf
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Sprite
+      assembly: UnityEngine.CoreModule
+      name: dropdownArrow
+    second: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - first:
+      type: UnityEngine:Sprite
+      assembly: UnityEngine.CoreModule
+      name: dropdownBackground
+    second: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: f5448093f7fffd74bb0fb9cb17ee3edb, type: 3}

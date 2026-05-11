@@ -33,11 +33,15 @@ namespace StaticMlp.Features.Buildings
                 new NetworkPeerId(0),
                 buildingDefinition,
                 definition.Position,
-                definition.Rotation);
+                definition.Rotation,
+                site => ConfigureInitialSite(site, definition));
 
             if (!siteGid.TryUnpack<ServerWT>(out var site))
                 throw new System.InvalidOperationException("Spawned initial construction site could not be unpacked in server world.");
+        }
 
+        private static void ConfigureInitialSite(SW.Entity site, Stage1ConstructionSiteSeed definition)
+        {
             if (definition.AnchorId != 0)
             {
                 site.Set(new Stage1SettlementProgression

@@ -3,9 +3,6 @@ using FFS.Libraries.StaticEcs;
 namespace StaticMlp.Networking.Replication {
     public static class ReplicationSnapshotBroadcaster {
         public static void SendClusterSnapshot(NetworkPeerId peer, ushort clusterId, bool gzip = true) {
-            if (!SW.IsWorldInitialized || !SW.HasResource<NetOutbox>())
-                return;
-
             ref var outbox = ref SW.GetResource<NetOutbox>();
             outbox.Enqueue(peer, PacketCodec.EncodeSnapshot(new ReplicationSnapshotMessage {
                 Kind = ReplicationSnapshotKind.Cluster,
@@ -23,9 +20,6 @@ namespace StaticMlp.Networking.Replication {
         }
 
         public static void SendChunkSnapshot(NetworkPeerId peer, uint chunkIdx, bool gzip = true) {
-            if (!SW.IsWorldInitialized || !SW.HasResource<NetOutbox>())
-                return;
-
             var clusterId = SW.GetChunkClusterId(chunkIdx);
             ref var outbox = ref SW.GetResource<NetOutbox>();
             outbox.Enqueue(peer, PacketCodec.EncodeSnapshot(new ReplicationSnapshotMessage {

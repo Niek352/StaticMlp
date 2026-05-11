@@ -1,0 +1,25 @@
+{
+    "name": "StaticMlp.Features.Progression.Presentation",
+    "rootNamespace": "StaticMlp.Features.Progression",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "Code.EcsUi.Mvc",
+        "UniTask",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
+        "StaticMlp.Features.Frontier.Logic",
+        "StaticMlp.Features.Progression.Logic",
+        "StaticMlp.Features.Settlement.Logic"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

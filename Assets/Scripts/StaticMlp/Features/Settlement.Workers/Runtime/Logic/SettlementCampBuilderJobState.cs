@@ -19,10 +19,10 @@ namespace StaticMlp.Features.Settlement.Workers
         [ReplicatedField]
         public ushort AnchorId;
 
-        [ReplicatedField]
+        [ReplicatedField(AllowZeroEntityGid = true)]
         public EntityGID AssignedWorker;
 
-        [ReplicatedField]
+        [ReplicatedField(AllowZeroEntityGid = true)]
         public EntityGID TargetSite;
 
         [ReplicatedField]

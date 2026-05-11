@@ -29,7 +29,9 @@ namespace StaticMlp.Tests.Ai
                 typeof(ServerWT).Assembly,
                 typeof(AiActionCatalog).Assembly,
                 typeof(AiActionsGameplayFeature).Assembly,
+                typeof(CombatLogicFeature).Assembly,
                 typeof(ConstructionRules).Assembly,
+                typeof(SettlementSharedResourcesGameplayFeature).Assembly,
                 typeof(SettlementWorkersGameplayFeature).Assembly,
                 typeof(Health).Assembly,
                 typeof(CharacterNetState).Assembly);

@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 5ff298406cb48ad42896e705b9cf7ff9
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Sprite
+      assembly: UnityEngine.CoreModule
+      name: toggleBackground
+    second: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  - first:
+      type: UnityEngine:Sprite
+      assembly: UnityEngine.CoreModule
+      name: toggleCheckmark
+    second: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: f5448093f7fffd74bb0fb9cb17ee3edb, type: 3}

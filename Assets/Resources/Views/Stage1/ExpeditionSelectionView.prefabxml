@@ -1,0 +1,138 @@
+<UnityPrefab>
+    <GameObject name="ExpeditionSelectionView" id="Root">
+        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+        <Canvas m_RenderMode="ScreenSpaceOverlay" m_SortingOrder="90" />
+        <CanvasScaler m_UiScaleMode="ScaleWithScreenSize" m_ReferenceResolution="1920, 1080" m_ScreenMatchMode="MatchWidthOrHeight" m_MatchWidthOrHeight="0.5" />
+        <GraphicRaycaster />
+        <ExpeditionSelectionView
+            panelRoot="#Panel"
+            startButton="#StartButton"
+            closeButton="#CloseButton"
+            summaryLabel="#SummaryLabelText" />
+
+        <GameObject name="Backdrop">
+            <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+            <Image m_Color="#081117BF" m_RaycastTarget="true" />
+        </GameObject>
+
+        <GameObject name="Panel" id="Panel" active="false">
+            <RectTransform m_SizeDelta="560, 420" />
+            <Image m_Color="#162229F4" m_RaycastTarget="true" />
+            <VerticalLayoutGroup
+                m_Padding.m_Left="18"
+                m_Padding.m_Right="18"
+                m_Padding.m_Top="18"
+                m_Padding.m_Bottom="18"
+                m_Spacing="12"
+                m_ChildControlWidth="true"
+                
+                m_ChildForceExpandWidth="true"
+                m_ChildForceExpandHeight="false" />
+
+            <GameObject name="Title">
+                <RectTransform m_SizeDelta="0, 34" />
+                <TextMeshProUGUI
+                    m_text="Expedition Selection"
+                    m_fontSize="24"
+                    m_fontStyle="Bold"
+                    m_fontColor="#F3F6EF"
+                    m_HorizontalAlignment="Center"
+                    m_VerticalAlignment="Middle"
+                    m_RaycastTarget="false" />
+                <LayoutElement m_PreferredHeight="34" />
+            </GameObject>
+
+            <GameObject name="SummaryCard">
+                <RectTransform m_SizeDelta="0, 190" />
+                <Image m_Color="#22313A" m_RaycastTarget="false" />
+
+                <GameObject name="SummaryText" id="SummaryLabelText">
+                    <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="-24, -20" />
+                    <TextMeshProUGUI
+                        m_text="Expedition Selection&#10;Destination: Nearby Raider Camp&#10;Availability: Locked&#10;Activity: Idle&#10;Prepared build: Not prepared&#10;Reward: Recovered War Cache&#10;Threat: None"
+                        m_fontSize="16"
+                        m_fontColor="#D5E2D3"
+                        m_HorizontalAlignment="Left"
+                        m_VerticalAlignment="Top"
+                        m_TextWrappingMode="Normal"
+                        m_overflowMode="Truncate"
+                        m_RaycastTarget="false" />
+                </GameObject>
+
+                <LayoutElement m_PreferredHeight="190" />
+            </GameObject>
+
+            <GameObject name="Hint">
+                <RectTransform m_SizeDelta="0, 44" />
+                <TextMeshProUGUI
+                    m_text="Confirm the prepared loadout before sending the party to the nearby raider camp."
+                    m_fontSize="15"
+                    m_fontColor="#AFC6B1"
+                    m_HorizontalAlignment="Left"
+                    m_VerticalAlignment="Middle"
+                    m_TextWrappingMode="Normal"
+                    m_RaycastTarget="false" />
+                <LayoutElement m_PreferredHeight="44" />
+            </GameObject>
+
+            <GameObject name="BottomRow">
+                <RectTransform m_SizeDelta="0, 44" />
+                <HorizontalLayoutGroup
+                    m_Spacing="12"
+                    m_ChildControlWidth="true"
+                    
+                    m_ChildForceExpandWidth="true"
+                    m_ChildForceExpandHeight="false" />
+                <LayoutElement m_PreferredHeight="44" />
+
+                <GameObject name="StartButton" id="StartButton">
+                    <RectTransform m_SizeDelta="0, 44" />
+                    <Image m_Color="#2F6A93" m_RaycastTarget="true" />
+                    <Button
+                        m_Transition="ColorTint"
+                        m_Colors.m_NormalColor="#FFFFFF"
+                        m_Colors.m_HighlightedColor="#E4F2FA"
+                        m_Colors.m_PressedColor="#BED6E5"
+                        m_Colors.m_DisabledColor="#6A7585AA"
+                        m_Colors.m_FadeDuration="0.08" />
+
+                    <GameObject name="Label">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+                        <TextMeshProUGUI
+                            m_text="Start Expedition"
+                            m_fontSize="16"
+                            m_fontStyle="Bold"
+                            m_fontColor="#FFFFFF"
+                            m_HorizontalAlignment="Center"
+                            m_VerticalAlignment="Middle"
+                            m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+
+                <GameObject name="CloseButton" id="CloseButton">
+                    <RectTransform m_SizeDelta="0, 44" />
+                    <Image m_Color="#445560" m_RaycastTarget="true" />
+                    <Button
+                        m_Transition="ColorTint"
+                        m_Colors.m_NormalColor="#FFFFFF"
+                        m_Colors.m_HighlightedColor="#E8EEF1"
+                        m_Colors.m_PressedColor="#CBD8DE"
+                        m_Colors.m_DisabledColor="#6A7585AA"
+                        m_Colors.m_FadeDuration="0.08" />
+
+                    <GameObject name="Label">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+                        <TextMeshProUGUI
+                            m_text="Close"
+                            m_fontSize="16"
+                            m_fontStyle="Bold"
+                            m_fontColor="#FFFFFF"
+                            m_HorizontalAlignment="Center"
+                            m_VerticalAlignment="Middle"
+                            m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+            </GameObject>
+        </GameObject>
+    </GameObject>
+</UnityPrefab>

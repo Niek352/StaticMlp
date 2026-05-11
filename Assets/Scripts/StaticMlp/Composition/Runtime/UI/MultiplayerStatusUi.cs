@@ -1,12 +1,14 @@
 using TMPro;
 using StaticMlp.Networking.Transport;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace StaticMlp.Composition
 {
     public sealed class MultiplayerStatusUi : MonoBehaviour
     {
+        [SerializeField] private GameObject panelRoot;
         [SerializeField] private TextMeshProUGUI statusText;
         [SerializeField] private Button hostButton;
         [SerializeField] private Button serverButton;
@@ -30,6 +32,8 @@ namespace StaticMlp.Composition
 
         private void Awake()
         {
+            if (panelRoot == null)
+                throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(panelRoot)}.");
             if (statusText == null)
                 throw new MissingReferenceException($"{nameof(MultiplayerStatusUi)} requires {nameof(statusText)}.");
             if (hostButton == null)
@@ -88,6 +92,9 @@ namespace StaticMlp.Composition
 
         private void Update()
         {
+            if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
+                panelRoot.SetActive(!panelRoot.activeSelf);
+
             Refresh();
         }
 

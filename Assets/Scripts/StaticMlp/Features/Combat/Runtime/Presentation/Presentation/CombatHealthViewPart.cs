@@ -87,7 +87,7 @@ namespace StaticMlp.Features.Combat
             _damageFlashObject.transform.localScale = _damageFlashBaseScale;
             var collider = _damageFlashObject.GetComponent<Collider>();
             if (collider != null)
-                Destroy(collider);
+                DestroyUnityObject(collider);
 
             _damageFlashMaterial = RuntimeVisualMaterial.Create(_damageFlashColor, transparent: true);
             _damageFlashObject.GetComponent<Renderer>().sharedMaterial = _damageFlashMaterial;
@@ -105,7 +105,21 @@ namespace StaticMlp.Features.Combat
         private void OnDestroy()
         {
             if (_damageFlashMaterial != null)
-                Destroy(_damageFlashMaterial);
+                DestroyUnityObject(_damageFlashMaterial);
+        }
+
+        private static void DestroyUnityObject(Object target)
+        {
+            if (target == null)
+                return;
+
+            if (Application.isPlaying)
+            {
+                Destroy(target);
+                return;
+            }
+
+            DestroyImmediate(target);
         }
     }
 }

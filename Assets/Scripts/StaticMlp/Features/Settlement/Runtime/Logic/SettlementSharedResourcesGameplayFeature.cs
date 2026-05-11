@@ -27,7 +27,7 @@ namespace StaticMlp.Features.Settlement
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
-            systems.Add(new ServerSettlementSharedResourcesSpawnSystem(), GameplaySystemOrder.ServerConnectionGameplay + 5);
+            systems.Add(new ServerSettlementSharedResourcesSpawnSystem(), (short)(GameplaySystemOrder.ServerConnectionGameplay - 15));
             systems.Add(new ServerStage1SettlementProgressionSystem(), GameplaySystemOrder.Gameplay - 40);
         }
     }

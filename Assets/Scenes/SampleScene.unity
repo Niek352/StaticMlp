@@ -642,39 +642,9 @@ MonoBehaviour:
   connectSteamId: 76561198873497439
   steamLobbyMaxMembers: 4
   debugPingLatencyMs: 0
+  serverTickRateHz: 30
   showMultiplayerUi: 1
   multiplayerUiResourcePath: Views/MultiplayerStatusUi
-  initialBotSpawns:
-  - Position: {x: 0, y: 0, z: 8}
-    BehaviorId: 2
-    Health01: 1
-    Hunger: 0.1
-    Fear: 0.05
-    LeaderIndex: -1
-  - Position: {x: -2.5, y: 0, z: 10}
-    BehaviorId: 2
-    Health01: 1
-    Hunger: 0.15
-    Fear: 0.05
-    LeaderIndex: -1
-  - Position: {x: 2.5, y: 0, z: 10}
-    BehaviorId: 2
-    Health01: 0.35
-    Hunger: 0.1
-    Fear: 0.55
-    LeaderIndex: -1
-  - Position: {x: 2.5, y: 0, z: 10}
-    BehaviorId: 1
-    Health01: 1
-    Hunger: 0.1
-    Fear: 0.55
-    LeaderIndex: -1
-  initialConstructionSites:
-  - BuildingId: 1
-    Position: {x: 0, y: 0, z: 16}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-    StartReadyToBuild: 1
-    InitialBuildWork: 0
 --- !u!4 &1258054335
 Transform:
   m_ObjectHideFlags: 0

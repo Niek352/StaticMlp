@@ -4,9 +4,9 @@
         <Canvas m_RenderMode="0" m_SortingOrder="100" />
         <CanvasScaler m_UiScaleMode="1" m_ReferenceResolution="1920, 1080" m_ScreenMatchMode="0" m_MatchWidthOrHeight="0.5" />
         <GraphicRaycaster />
-        <MultiplayerStatusUi statusText="#StatusText" hostButton="#HostButton" serverButton="#ServerButton" clientButton="#ClientButton" utpTransportButton="#UtpTransportButton" steamTransportButton="#SteamTransportButton" inviteButton="#InviteButton" copySteamIdButton="#CopySteamIdButton" pasteSteamIdButton="#PasteSteamIdButton" connectSteamButton="#ConnectSteamButton" steamIdInput="#SteamIdInput" disconnectButton="#DisconnectButton" />
+        <MultiplayerStatusUi panelRoot="#Panel" statusText="#StatusText" hostButton="#HostButton" serverButton="#ServerButton" clientButton="#ClientButton" utpTransportButton="#UtpTransportButton" steamTransportButton="#SteamTransportButton" inviteButton="#InviteButton" copySteamIdButton="#CopySteamIdButton" pasteSteamIdButton="#PasteSteamIdButton" connectSteamButton="#ConnectSteamButton" steamIdInput="#SteamIdInput" disconnectButton="#DisconnectButton" />
 
-        <GameObject name="Panel">
+        <GameObject name="Panel" id="Panel">
             <RectTransform m_AnchorMin="0, 1" m_AnchorMax="0, 1" m_Pivot="0, 1" m_SizeDelta="360, 438" m_AnchoredPosition="18, -18" />
             <Image m_Color="#16202BE6" m_RaycastTarget="true" />
             <VerticalLayoutGroup m_Padding.m_Left="14" m_Padding.m_Right="14" m_Padding.m_Top="12" m_Padding.m_Bottom="12" m_Spacing="10" m_ChildControlWidth="true" m_ChildControlHeight="true" m_ChildForceExpandWidth="true" m_ChildForceExpandHeight="false" />

@@ -98,9 +98,6 @@ namespace StaticMlp.Features.Combat
                     continue;
 
                 ref readonly var intent = ref player.Read<PassiveAutoAttackIntent>();
-                if (intent.AbilityId != CombatAbilityId.BasicMeleeAuto)
-                    continue;
-
                 if (!intent.Target.TryUnpack<ClientCoreWT>(out var target) || !target.Has<CharacterNetState>())
                     continue;
 

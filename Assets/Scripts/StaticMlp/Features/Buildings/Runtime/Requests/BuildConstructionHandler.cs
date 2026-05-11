@@ -12,7 +12,7 @@ namespace StaticMlp.Features.Buildings
         private readonly float _interactionRange;
         private readonly float _maxWorkPerRequest;
 
-        public BuildConstructionHandler(float interactionRange = 4f, float maxWorkPerRequest = 5f)
+        public BuildConstructionHandler(float interactionRange = 4f, float maxWorkPerRequest = 35f)
         {
             _interactionRange = interactionRange;
             _maxWorkPerRequest = maxWorkPerRequest;

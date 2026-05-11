@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 110b9d4ac5808ee47a7f40674074df02
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Sprite
+      assembly: UnityEngine.CoreModule
+      name: sliderBackground
+    second: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  - first:
+      type: UnityEngine:Sprite
+      assembly: UnityEngine.CoreModule
+      name: sliderFill
+    second: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: f5448093f7fffd74bb0fb9cb17ee3edb, type: 3}

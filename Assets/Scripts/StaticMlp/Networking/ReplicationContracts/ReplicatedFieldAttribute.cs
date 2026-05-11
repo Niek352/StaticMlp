@@ -6,5 +6,6 @@ namespace StaticMlp.Networking.Replication {
         public float Quantize;
         public bool Compress;
         public ReplicatedFieldInterpolation Interpolation;
+        public bool AllowZeroEntityGid;
     }
 }

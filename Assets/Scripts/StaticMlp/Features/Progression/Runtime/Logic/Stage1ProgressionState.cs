@@ -4,7 +4,7 @@ using StaticMlp.Features.Settlement;
 
 namespace StaticMlp.Features.Progression
 {
-    public struct Stage1ProgressionState : IComponent
+    public struct Stage1ProgressionState : IComponent, ITrackableChanged
     {
         public ushort AnchorId;
         public uint AppliedFlagsMask;

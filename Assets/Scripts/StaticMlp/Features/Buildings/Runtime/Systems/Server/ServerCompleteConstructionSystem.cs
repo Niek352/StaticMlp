@@ -38,19 +38,23 @@ namespace StaticMlp.Features.Buildings
             var state = site.Read<ConstructionSiteState>();
             var transform = site.Read<ConstructionTransform>();
             var definition = StaticMlp.Features.BuildingCatalog.BuildingCatalogData.Get(new BuildingId(state.BuildingId));
+            var hasProgression = site.Has<Stage1SettlementProgression>();
+            var progression = hasProgression
+                ? site.Read<Stage1SettlementProgression>()
+                : default;
 
-            var finishedGid = ServerBuildingSpawns.SpawnFinishedBuilding(owner, definition, transform);
+            if (hasProgression && progression.Stage != Stage1SettlementProgressStage.CampRepaired)
+                progression.AdvanceTo(Stage1SettlementProgressStage.CampRepaired);
+
+            var finishedGid = ServerBuildingSpawns.SpawnFinishedBuilding(
+                owner,
+                definition,
+                transform,
+                hasProgression
+                    ? entity => entity.Set(progression)
+                    : null);
             if (!finishedGid.TryUnpack<ServerWT>(out var finishedBuilding))
                 throw new System.InvalidOperationException("Spawned finished building could not be unpacked in server world.");
-
-            if (site.Has<Stage1SettlementProgression>())
-            {
-                var progression = site.Read<Stage1SettlementProgression>();
-                if (progression.Stage != Stage1SettlementProgressStage.CampRepaired)
-                    progression.AdvanceTo(Stage1SettlementProgressStage.CampRepaired);
-
-                finishedBuilding.Set(progression);
-            }
 
             NetworkEntityDespawner.DespawnAndDestroy(site);
         }

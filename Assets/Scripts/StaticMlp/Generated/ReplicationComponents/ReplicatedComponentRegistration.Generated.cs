@@ -27,14 +27,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 AiNetStateReplication.CreateDelta,
                 AiNetStateReplication.Read);
 
-            ReplicationRegistry.RegisterComponent<ActiveExpeditionState>(
-                ReplicatedComponentIds.ActiveExpeditionState,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                ActiveExpeditionStateReplication.CreateDelta,
-                ActiveExpeditionStateReplication.Read);
-
             ReplicationRegistry.RegisterComponent<BossBuildPreparationState>(
                 ReplicatedComponentIds.BossBuildPreparationState,
                 ReplicationAuthority.Server,
@@ -43,14 +35,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 BossBuildPreparationStateReplication.CreateDelta,
                 BossBuildPreparationStateReplication.Read);
 
-            ReplicationRegistry.RegisterComponent<BossEncounterState>(
-                ReplicatedComponentIds.BossEncounterState,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                BossEncounterStateReplication.CreateDelta,
-                BossEncounterStateReplication.Read);
-
             ReplicationRegistry.RegisterComponent<BossPreparedBuildSnapshot>(
                 ReplicatedComponentIds.BossPreparedBuildSnapshot,
                 ReplicationAuthority.Server,
@@ -58,6 +42,22 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 BossPreparedBuildSnapshotReplication.CreateDelta,
                 BossPreparedBuildSnapshotReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<ActiveExpeditionState>(
+                ReplicatedComponentIds.ActiveExpeditionState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                ActiveExpeditionStateReplication.CreateDelta,
+                ActiveExpeditionStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<BossEncounterState>(
+                ReplicatedComponentIds.BossEncounterState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                BossEncounterStateReplication.CreateDelta,
+                BossEncounterStateReplication.Read);
 
             ReplicationRegistry.RegisterComponent<ExpeditionAvailabilityState>(
                 ReplicatedComponentIds.ExpeditionAvailabilityState,

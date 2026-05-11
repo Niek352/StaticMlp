@@ -18,7 +18,7 @@ namespace StaticMlp.Networking.Replication
         public delegate ComponentDelta ComponentDeltaWriter<T>(EntityGID gid, in T state)
             where T : struct, IComponent, ITrackableChanged;
 
-        public delegate T ComponentDeltaReader<T>(byte[] payload)
+        public delegate T ComponentDeltaReader<out T>(byte[] payload)
             where T : struct, IComponent, ITrackableChanged;
 
         private static readonly Dictionary<ushort, IComponentHandler> ComponentHandlers = new();

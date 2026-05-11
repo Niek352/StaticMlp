@@ -9,6 +9,7 @@ namespace Code.EcsUi.Mvc
     /// Do not use it for gameplay, validation, or domain state transitions.
     /// </summary>
     public abstract class ControllerEcsBridgeSystem<TController> : ISystem, IControllerEcsBridgeSystem<TController>
+        where TController : class, IController
     {
         private bool isActive;
         private bool isBound;
@@ -17,8 +18,17 @@ namespace Code.EcsUi.Mvc
 
         public void Update()
         {
-            if (!isActive)
+            if (!isBound)
                 return;
+
+            if (Controller.State == ControllerState.ViewHidden)
+            {
+                isActive = false;
+                return;
+            }
+
+            if (!isActive)
+                isActive = true;
 
             EnsureBound();
             SyncPresentation();

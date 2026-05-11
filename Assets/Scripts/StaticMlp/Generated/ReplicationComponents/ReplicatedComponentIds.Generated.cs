@@ -2,10 +2,10 @@
 namespace StaticMlp.Networking.Replication {
     public static class ReplicatedComponentIds {
         public const ushort AiNetState = 19454;
+        public const ushort BossBuildPreparationState = 9445;
+        public const ushort BossPreparedBuildSnapshot = 20450;
         public const ushort ActiveExpeditionState = 30396;
-        public const ushort BossBuildPreparationState = 52001;
-        public const ushort BossEncounterState = 52003;
-        public const ushort BossPreparedBuildSnapshot = 52002;
+        public const ushort BossEncounterState = 20985;
         public const ushort ExpeditionAvailabilityState = 12104;
         public const ushort RaidScheduleState = 48438;
         public const ushort ThreatState = 10069;

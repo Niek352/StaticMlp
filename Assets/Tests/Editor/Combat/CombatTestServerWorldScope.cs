@@ -1,6 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Build;
+using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Shared;
@@ -11,6 +12,7 @@ using StaticMlp.Features.Statuses;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
 using UnityEngine;
@@ -35,6 +37,7 @@ namespace StaticMlp.Tests.Combat
             SW.Types().RegisterAll(
                 typeof(ServerWT).Assembly,
                 typeof(BuildLogicFeature).Assembly,
+                typeof(BuildingsGameplayFeature).Assembly,
                 typeof(CombatLogicFeature).Assembly,
                 typeof(EffectsLogicFeature).Assembly,
                 typeof(FrontierLogicFeature).Assembly,
@@ -181,6 +184,59 @@ namespace StaticMlp.Tests.Combat
             {
                 Wood = wood,
                 Stone = stone
+            });
+            return entity;
+        }
+
+        public SW.Entity CreateNetworkedConstructionSite(
+            Stage1SettlementProgressStage stage = Stage1SettlementProgressStage.RepairResourcesReady,
+            ConstructionPhase phase = ConstructionPhase.ReadyToBuild,
+            float buildWorkRequired = 100f,
+            float buildWorkDone = 0f,
+            int woodRequired = 10,
+            int stoneRequired = 4,
+            Vector3? position = null,
+            NetworkPeerId? owner = null)
+        {
+            const ushort woodenHutBuildingId = 1;
+            const ushort woodenHutBlueprintArchetypeId = 100;
+
+            var entity = SW.NewEntity<ConstructionSiteNetworkEntity>();
+            entity.Set(new NetworkIdentity
+            {
+                Owner = owner ?? new NetworkPeerId(1),
+                Authority = NetworkAuthority.Server,
+                NetworkArchetypeId = woodenHutBlueprintArchetypeId
+            });
+            entity.Set<NetworkedTag>();
+            entity.Set(new NetworkReplicationState());
+            entity.Set<ConstructionSiteTag>();
+            entity.Set(new Stage1SettlementProgression
+            {
+                AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                Stage = stage
+            });
+            entity.Set(new ConstructionSiteState
+            {
+                BuildingId = woodenHutBuildingId,
+                Phase = phase
+            });
+            entity.Set(new ConstructionTransform
+            {
+                Position = position ?? Vector3.zero,
+                Rotation = Quaternion.identity
+            });
+            entity.Set(new ConstructionResources
+            {
+                WoodRequired = woodRequired,
+                StoneRequired = stoneRequired,
+                WoodDelivered = woodRequired,
+                StoneDelivered = stoneRequired
+            });
+            entity.Set(new ConstructionProgress
+            {
+                BuildWorkRequired = buildWorkRequired,
+                BuildWorkDone = buildWorkDone
             });
             return entity;
         }

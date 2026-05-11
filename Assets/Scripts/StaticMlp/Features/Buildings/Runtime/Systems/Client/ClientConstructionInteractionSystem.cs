@@ -78,7 +78,7 @@ namespace StaticMlp.Features.Buildings
             var found = false;
             site = default;
 
-            foreach (var e in CW.Query<All<ConstructionSiteTag, ConstructionTransform, ConstructionSiteState>>().Entities())
+            foreach (var e in CW.Query<All<ConstructionTransform, ConstructionSiteState>>().Entities())
             {
                 ref readonly var state = ref ClientProjection.Read<ConstructionSiteState>(e);
                 if (state.Phase == ConstructionPhase.Completed)

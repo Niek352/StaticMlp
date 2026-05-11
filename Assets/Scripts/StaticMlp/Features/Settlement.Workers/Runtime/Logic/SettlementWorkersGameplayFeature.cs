@@ -16,6 +16,9 @@ namespace StaticMlp.Features.Settlement.Workers
 
         public override void RegisterNetworkEvents()
         {
+            ProjectionRegistry.Register<SettlementWorkerSummary>();
+            ProjectionRegistry.Register<SettlementCampBuilderJobState>();
+
             NetworkEventRegistry.Register<SetSettlementWorkerAssignmentRequestEvent>(
                 SetSettlementWorkerAssignmentRequestEvent.NETWORK_EVENT_ID,
                 NetDelivery.ReliableSequenced,

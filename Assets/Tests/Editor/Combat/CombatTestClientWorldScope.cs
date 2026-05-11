@@ -5,6 +5,7 @@ using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Statuses;
+using StaticMlp.Features.EcsViews;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
@@ -32,6 +33,7 @@ namespace StaticMlp.Tests.Combat
                 typeof(CombatPresentationFeature).Assembly,
                 typeof(EffectsLogicFeature).Assembly,
                 typeof(EffectsPresentationFeature).Assembly,
+                typeof(ViewPath).Assembly,
                 typeof(Health).Assembly,
                 typeof(StatusesLogicFeature).Assembly,
                 typeof(StatusesPresentationFeature).Assembly,

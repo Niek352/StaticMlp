@@ -3,7 +3,9 @@
     "rootNamespace": "Code.EcsUi.Mvc",
     "references": [
         "FFS.StaticEcs",
-        "UniTask"
+        "UniTask",
+        "UnityEngine.UI",
+        "Ecs.Networking"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

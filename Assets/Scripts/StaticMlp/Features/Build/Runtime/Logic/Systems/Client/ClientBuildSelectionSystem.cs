@@ -1,6 +1,5 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components;
-using StaticMlp.Game.Input;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 
@@ -10,7 +9,6 @@ namespace StaticMlp.Features.Build
     {
         public void Update()
         {
-            var inputState = CW.GetResource<ClientInputState>();
             var isBossBuildCommitted = IsBossBuildCommitted();
 
             foreach (var player in CW.Query<All<LocalOwned, PlayerTag>>().Entities())
@@ -22,21 +20,15 @@ namespace StaticMlp.Features.Build
                     player.Set(new ClientBuildSelectionSyncState());
 
                 ref var selection = ref player.Mut<OwnerBuildSelection>();
-                if (!isBossBuildCommitted)
-                {
-                    if (inputState.WasPressed(CoreInputActions.Next))
-                        selection.PrimaryModuleId = Stage1BuildRules.NextPrimaryModule(selection.PrimaryModuleId);
-                    else if (inputState.WasPressed(CoreInputActions.Previous))
-                        selection.PrimaryModuleId = Stage1BuildRules.PreviousPrimaryModule(selection.PrimaryModuleId);
-                }
-
                 player.Set(Stage1BuildRules.CreatePreparedSnapshot(selection));
 
-                if (isBossBuildCommitted)
+                ref var syncState = ref player.Mut<ClientBuildSelectionSyncState>();
+                if (!syncState.ShouldCommitSelection)
                     continue;
 
-                ref var syncState = ref player.Mut<ClientBuildSelectionSyncState>();
-                if (syncState.LastSentPrimaryModuleId == selection.PrimaryModuleId)
+                syncState.ShouldCommitSelection = false;
+
+                if (isBossBuildCommitted || syncState.LastSentPrimaryModuleId == selection.PrimaryModuleId)
                     continue;
 
                 var command = new PrepareBuildCommand(selection.PrimaryModuleId);

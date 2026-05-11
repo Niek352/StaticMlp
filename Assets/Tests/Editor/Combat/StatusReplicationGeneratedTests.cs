@@ -11,12 +11,15 @@ namespace StaticMlp.Tests.Combat
         [Test]
         public void StatusTargetReplication_RoundTripsEntityGidWithoutRawProxyField()
         {
+            using var scope = new CombatTestServerWorldScope();
+            var targetEntity = scope.CreateEntity();
+            var ownerEntity = scope.CreateEntity();
             var source = new StatusTarget
             {
-                Value = new EntityGID(0x0102030405060708ul),
+                Value = targetEntity.GID,
             };
 
-            var delta = StatusTargetReplication.CreateDelta(new EntityGID(77ul), source);
+            var delta = StatusTargetReplication.CreateDelta(ownerEntity.GID, source);
             var restored = StatusTargetReplication.Read(delta.Payload);
 
             Assert.That(restored.Value, Is.EqualTo(source.Value));
@@ -26,16 +29,19 @@ namespace StaticMlp.Tests.Combat
         [Test]
         public void StatusContextReplication_RoundTripsEntityGidAndChainMetadata()
         {
+            using var scope = new CombatTestServerWorldScope();
+            var sourceEntity = scope.CreateEntity();
+            var ownerEntity = scope.CreateEntity();
             var source = new StatusContext
             {
-                Source = new EntityGID(0x0908070605040302ul),
+                Source = sourceEntity.GID,
                 RequestId = 17u,
                 RootEffectId = 19u,
                 ChainDepth = 2,
                 MaxDepth = 5,
             };
 
-            var delta = StatusContextReplication.CreateDelta(new EntityGID(88ul), source);
+            var delta = StatusContextReplication.CreateDelta(ownerEntity.GID, source);
             var restored = StatusContextReplication.Read(delta.Payload);
 
             Assert.That(restored.Source, Is.EqualTo(source.Source));

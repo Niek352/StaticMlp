@@ -5,6 +5,7 @@ using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Buildings {
     [NetworkEntityManifest(
+        typeof(Stage1SettlementProgression),
         typeof(ConstructionSiteState),
         typeof(ConstructionTransform),
         typeof(ConstructionResources),

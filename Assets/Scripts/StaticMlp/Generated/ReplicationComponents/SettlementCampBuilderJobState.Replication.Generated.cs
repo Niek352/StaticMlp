@@ -18,8 +18,8 @@ namespace StaticMlp.Networking.Replication.Generated {
         public static ComponentDelta CreateDelta(EntityGID gid, in SettlementCampBuilderJobState state) {
             var writer = BinaryPackWriter.CreateFromPool(21);
             writer.WriteUshort(state.AnchorId);
-            writer.WriteUlong(state.AssignedWorker.Raw);
-            writer.WriteUlong(state.TargetSite.Raw);
+            writer.WriteEntityGID(state.AssignedWorker);
+            writer.WriteEntityGID(state.TargetSite);
             writer.WriteUshort((ushort)state.CurrentTask);
             writer.WriteByte((byte)state.BlockingReason);
             var bytes = writer.CopyToBytes();
@@ -32,16 +32,18 @@ namespace StaticMlp.Networking.Replication.Generated {
                 return default;
 
             var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
-            var anchorId = reader.ReadUshort();
-            var assignedWorkerRaw = reader.ReadUlong();
-            var targetSiteRaw = reader.ReadUlong();
             return new SettlementCampBuilderJobState {
-                AnchorId = anchorId,
-                AssignedWorker = assignedWorkerRaw == 0ul ? default : new EntityGID(assignedWorkerRaw),
-                TargetSite = targetSiteRaw == 0ul ? default : new EntityGID(targetSiteRaw),
+                AnchorId = reader.ReadUshort(),
+                AssignedWorker = ReadOptionalEntityGid(ref reader),
+                TargetSite = ReadOptionalEntityGid(ref reader),
                 CurrentTask = (AiTaskType)reader.ReadUshort(),
                 BlockingReason = (SettlementWorkerBlockingReason)reader.ReadByte(),
             };
+        }
+
+        private static EntityGID ReadOptionalEntityGid(ref BinaryPackReader reader) {
+            var raw = reader.ReadUlong();
+            return raw == 0ul ? default : new EntityGID(raw);
         }
     }
 }

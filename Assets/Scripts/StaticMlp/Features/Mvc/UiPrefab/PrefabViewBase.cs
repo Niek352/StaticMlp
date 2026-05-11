@@ -8,9 +8,8 @@ namespace Code.EcsUi.Mvc
 {
     public abstract class PrefabViewBase : MonoBehaviour, IView
     {
-        [SerializeField] private bool _useSelfCanvas;
-        [SerializeField] private Canvas canvas; //Optional
-        [SerializeField] private GraphicRaycaster graphicRaycaster; //Optional
+        [SerializeField] private Canvas canvas; //Can be null by design
+        [SerializeField] private GraphicRaycaster graphicRaycaster; //Can be null by design
 
         public event Action ViewHidden;
         public event Action ViewShown;
@@ -21,8 +20,6 @@ namespace Code.EcsUi.Mvc
 
         protected virtual void Awake()
         {
-            canvas ??= GetComponentInChildren<Canvas>(true);
-            graphicRaycaster ??= GetComponentInChildren<GraphicRaycaster>(true);
         }
 
         public void SetDrawOrder(ViewOrdering order)
@@ -56,9 +53,7 @@ namespace Code.EcsUi.Mvc
 
         public virtual void SetPresentationActive(bool isActive)
         {
-            if (canvas != null)
-                canvas.enabled = isActive;
-
+            canvas.enabled = isActive;
             SetRaycasterEnabled(isActive);
         }
 

@@ -14,34 +14,46 @@ namespace StaticMlp.Features.Buildings
             NetworkPeerId owner,
             in BuildingDefinition definition,
             Vector3 position,
-            Quaternion rotation)
+            Quaternion rotation,
+            Action<SW.Entity> configure = null)
         {
             if (!BuildingNetworkCatalog.TryGet(definition.Id, out var network))
                 throw new InvalidOperationException($"Missing network catalog entry for building {definition.Id}.");
 
             var localDefinition = definition;
+            var localConfigure = configure;
             return NetworkEntitySpawner.SpawnServerEntity<ConstructionSiteNetworkEntity>(
                 owner,
                 NetworkAuthority.Server,
                 network.BlueprintArchetypeId,
-                entity => InitializeConstructionSite(entity, in localDefinition, position, rotation));
+                entity =>
+                {
+                    InitializeConstructionSite(entity, in localDefinition, position, rotation);
+                    localConfigure?.Invoke(entity);
+                });
         }
 
         public static EntityGID SpawnFinishedBuilding(
             NetworkPeerId owner,
             in BuildingDefinition definition,
-            in ConstructionTransform transform)
+            in ConstructionTransform transform,
+            Action<SW.Entity> configure = null)
         {
             if (!BuildingNetworkCatalog.TryGet(definition.Id, out var network))
                 throw new InvalidOperationException($"Missing network catalog entry for building {definition.Id}.");
 
             var localDefinition = definition;
             var localTransform = transform;
+            var localConfigure = configure;
             return NetworkEntitySpawner.SpawnServerEntity<FinishedBuildingNetworkEntity>(
                 owner,
                 NetworkAuthority.Server,
                 network.FinishedArchetypeId,
-                entity => InitializeFinishedBuilding(entity, in localDefinition, in localTransform));
+                entity =>
+                {
+                    InitializeFinishedBuilding(entity, in localDefinition, in localTransform);
+                    localConfigure?.Invoke(entity);
+                });
         }
 
         private static void InitializeConstructionSite(

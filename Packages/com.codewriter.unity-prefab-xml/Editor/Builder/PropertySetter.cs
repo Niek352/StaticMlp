@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityPrefabXML;
 
 namespace UnityPrefabXML.Builder
 {
@@ -240,16 +241,7 @@ namespace UnityPrefabXML.Builder
                     break;
 
                 case SerializedPropertyType.Enum:
-                    if (int.TryParse(value, out var enumInt))
-                    {
-                        prop.intValue = enumInt;
-                    }
-                    else
-                    {
-                        var fieldInfo = ScriptAttributeUtilityProxy.GetFieldInfoAndStaticTypeFromProperty(prop, out _);
-                        prop.intValue = (int) Enum.Parse(fieldInfo.FieldType, value, true);
-                    }
-
+                    SerializedPropertyEnumSupport.SetEnumValue(prop, value);
                     break;
 
                 case SerializedPropertyType.Vector2:

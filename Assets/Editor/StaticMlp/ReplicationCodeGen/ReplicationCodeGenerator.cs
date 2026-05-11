@@ -97,6 +97,9 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 return null;
             }
 
+            if (attribute.AllowZeroEntityGid && kind.Name != "EntityGID")
+                diagnostics.Add($"{field.DeclaringType.FullName}.{field.Name}: AllowZeroEntityGid is supported only for EntityGID fields.");
+
             if (attribute.Quantize > 0f && !kind.CanQuantize)
                 diagnostics.Add($"{field.DeclaringType.FullName}.{field.Name}: Quantize is supported only for float, Vector2, Vector3 and Quaternion.");
 
@@ -257,6 +260,13 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 AppendRead(builder, field);
             builder.AppendLine("            };");
             builder.AppendLine("        }");
+            if (NeedsOptionalEntityGidHelper(component)) {
+                builder.AppendLine();
+                builder.AppendLine("        private static EntityGID ReadOptionalEntityGid(ref BinaryPackReader reader) {");
+                builder.AppendLine("            var raw = reader.ReadUlong();");
+                builder.AppendLine("            return raw == 0ul ? default : new EntityGID(raw);");
+                builder.AppendLine("        }");
+            }
             if (component.HasInterpolatedFields) {
                 builder.AppendLine();
                 builder.AppendLine($"        public static void ApplyClientDelta(CW.Entity e, byte[] payload) {{");
@@ -542,7 +552,9 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                     builder.AppendLine($"                {name} = new Quaternion(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat()){comma}");
                     break;
                 case "EntityGID":
-                    builder.AppendLine($"                {name} = new EntityGID(reader.ReadUlong()){comma}");
+                    builder.AppendLine(field.Attribute.AllowZeroEntityGid
+                        ? $"                {name} = ReadOptionalEntityGid(ref reader){comma}"
+                        : $"                {name} = new EntityGID(reader.ReadUlong()){comma}");
                     break;
                 case "EnumByte":
                     builder.AppendLine($"                {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadByte(){comma}");
@@ -618,6 +630,10 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
 
         private static string FloatLiteral(float value) {
             return value.ToString("0.########", CultureInfo.InvariantCulture) + "f";
+        }
+
+        private static bool NeedsOptionalEntityGidHelper(ComponentInfo component) {
+            return component.Fields.Any(x => x.Kind.Name == "EntityGID" && x.Attribute.AllowZeroEntityGid);
         }
 
         private static string GetTypeName(Type type) {

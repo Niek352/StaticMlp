@@ -50,19 +50,14 @@ namespace StaticMlp.Features.Buildings
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
-            systems.Add(new ServerInitialConstructionSiteSpawnSystem(), GameplaySystemOrder.ServerConnectionGameplay + 20);
+            systems.Add(new ServerInitialConstructionSiteSpawnSystem(), (short)(GameplaySystemOrder.ServerConnectionGameplay - 10));
             systems.Add(new ServerPlaceBuildingRequestSystem(), GameplaySystemOrder.Gameplay - 80);
             systems.Add(new ServerCompleteConstructionSystem(), GameplaySystemOrder.Gameplay - 50);
         }
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
-            systems.Add(new ClientBuildingMenuSystem(), GameplaySystemOrder.Gameplay - 90);
-            systems.Add(new ClientBuildingMenuMvcSystem(), GameplaySystemOrder.ClientPresentation + 10);
-            systems.Add(new ClientPlacementInputSystem(), GameplaySystemOrder.Gameplay - 80);
-            systems.Add(new ClientPlacementValidationPreviewSystem(), GameplaySystemOrder.Gameplay - 70);
-            systems.Add(new ClientPlacementConfirmSystem(), GameplaySystemOrder.Gameplay - 60);
-            systems.Add(new ClientConstructionInteractionSystem(), GameplaySystemOrder.Gameplay - 50);
+            systems.Add(new ClientConstructionInteractionSystem(), (short)(GameplaySystemOrder.Gameplay - 5));
             systems.Add(new ClientConstructionViewStateSystem(), ViewSystemOrder.BuildPresentationState);
         }
 

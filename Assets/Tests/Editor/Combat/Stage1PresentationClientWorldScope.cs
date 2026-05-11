@@ -1,0 +1,229 @@
+using System;
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Build;
+using StaticMlp.Features.Buildings;
+using StaticMlp.Features.Frontier;
+using StaticMlp.Features.Player;
+using StaticMlp.Features.Progression;
+using StaticMlp.Features.Settlement;
+using StaticMlp.Features.Settlement.Workers;
+using StaticMlp.Game.Components;
+using StaticMlp.Networking;
+using StaticMlp.Networking.Ownership;
+using StaticMlp.Networking.Replication;
+using StaticMlp.Networking.Requests;
+using UnityEngine;
+
+namespace StaticMlp.Tests.Combat
+{
+    public sealed class Stage1PresentationClientWorldScope : IDisposable
+    {
+        public Stage1PresentationClientWorldScope()
+        {
+            if (CW.Status != WorldStatus.NotCreated)
+                CW.Destroy();
+
+            NetworkRuntime.LocalPeerId = new NetworkPeerId(1);
+            NetworkEventRegistry.Clear();
+            RequestRegistry.Clear();
+            ProjectionRegistry.Clear();
+
+            new SettlementSharedResourcesGameplayFeature().RegisterNetworkEvents();
+            new SettlementWorkersGameplayFeature().RegisterNetworkEvents();
+            new BuildLogicFeature().RegisterNetworkEvents();
+            new BuildingsGameplayFeature().RegisterNetworkEvents();
+            new FrontierLogicFeature().RegisterNetworkEvents();
+            new ProgressionLogicFeature().RegisterNetworkEvents();
+
+            
+            CW.Create(WorldConfig.Default());
+            CW.Types().RegisterAll(
+                typeof(ClientCoreWT).Assembly,
+                typeof(SettlementSharedResourcesGameplayFeature).Assembly,
+                typeof(SettlementPresentationFeature).Assembly,
+                typeof(SettlementWorkersGameplayFeature).Assembly,
+                typeof(BuildLogicFeature).Assembly,
+                typeof(BuildPresentationFeature).Assembly,
+                typeof(BuildingsGameplayFeature).Assembly,
+                typeof(FrontierLogicFeature).Assembly,
+                typeof(FrontierPresentationFeature).Assembly,
+                typeof(ProgressionLogicFeature).Assembly,
+                typeof(ProgressionPresentationFeature).Assembly,
+                typeof(PlayerTag).Assembly);
+            ProjectionRegistry.RegisterClientWorldTypes();
+            NetworkEventRegistry.RegisterClientWorldTypes();
+            CW.Initialize();
+            CW.SetResource(new NetOutbox());
+        }
+
+        public CW.Entity CreateAnchor(
+            Stage1SettlementProgressStage stage = Stage1SettlementProgressStage.DamagedCampStart,
+            ThreatPhase threatPhase = ThreatPhase.Calm,
+            RaidScheduleStatus raidStatus = RaidScheduleStatus.None,
+            ExpeditionAvailabilityStatus expeditionAvailability = ExpeditionAvailabilityStatus.Unavailable,
+            ExpeditionActivityStatus expeditionActivity = ExpeditionActivityStatus.None,
+            BossEncounterStatus bossStatus = BossEncounterStatus.Unavailable)
+        {
+            var anchor = CW.NewEntity<Default>();
+            anchor.Set(new Stage1SettlementProgression
+            {
+                AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                Stage = stage
+            });
+            anchor.Set(new Stage1ProgressionState(SettlementAnchorCatalog.HomeCampId, 0));
+            anchor.Set(new SettlementWorkerSummary
+            {
+                AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                BlockingReason = SettlementWorkerBlockingReason.NoAssignment
+            });
+            anchor.Set(new SettlementCampBuilderJobState
+            {
+                AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                BlockingReason = SettlementWorkerBlockingReason.NoAssignment
+            });
+            anchor.Set(new ExpeditionAvailabilityState
+            {
+                ExpeditionIdValue = ExpeditionCatalog.NearbyRaiderCampId.Value,
+                Status = expeditionAvailability
+            });
+            anchor.Set(new ActiveExpeditionState
+            {
+                ExpeditionIdValue = ExpeditionCatalog.NearbyRaiderCampId.Value,
+                Status = expeditionActivity
+            });
+            anchor.Set(new ThreatState
+            {
+                Phase = threatPhase,
+                ThreatValue = 1
+            });
+            anchor.Set(new RaidScheduleState
+            {
+                RaidIdValue = RaidCatalog.RaiderCounterattackId.Value,
+                Status = raidStatus,
+                ActivateAtTick = 77
+            });
+            anchor.Set(new BossEncounterState
+            {
+                BossIdValue = BossCatalog.RaiderChiefId.Value,
+                Status = bossStatus
+            });
+            return anchor;
+        }
+
+        public CW.Entity CreateSharedResources(int wood = 50, int stone = 25)
+        {
+            var entity = CW.NewEntity<Default>();
+            entity.Set<SettlementResourceStorageTag>();
+            entity.Set(new SettlementSharedResources
+            {
+                Wood = wood,
+                Stone = stone
+            });
+            return entity;
+        }
+
+        public CW.Entity CreateLocalPlayer(BuildModuleId moduleId)
+        {
+            var player = CW.NewEntity<Default>();
+            player.Set<LocalOwned>();
+            player.Set<PlayerTag>();
+            player.Set(new CharacterNetState
+            {
+                Position = Vector3.zero,
+                Rotation = Quaternion.identity
+            });
+            player.Set(new OwnerBuildSelection
+            {
+                PrimaryModuleId = moduleId
+            });
+            player.Set(Stage1BuildRules.CreatePreparedSnapshot(player.Read<OwnerBuildSelection>()));
+            player.Set(new ClientBuildSelectionSyncState());
+            return player;
+        }
+
+        public CW.Entity CreateConstructionSite(ConstructionPhase phase, int woodRequired, int woodDelivered, int stoneRequired, int stoneDelivered, float progress01)
+        {
+            var site = CW.NewEntity<Default>();
+            site.Set<ConstructionSiteTag>();
+            site.Set(new ConstructionTransform
+            {
+                Position = new Vector3(0f, 0f, 1f),
+                Rotation = Quaternion.identity
+            });
+            site.Set(new ConstructionSiteState
+            {
+                Phase = phase
+            });
+            site.Set(new ConstructionResources
+            {
+                WoodRequired = woodRequired,
+                WoodDelivered = woodDelivered,
+                StoneRequired = stoneRequired,
+                StoneDelivered = stoneDelivered
+            });
+            site.Set(new ConstructionProgress
+            {
+                BuildWorkRequired = 1f,
+                BuildWorkDone = progress01
+            });
+            return site;
+        }
+
+        public CW.Entity CreateWorker(bool assigned, SettlementWorkerBlockingReason blockingReason, AiTaskType activeTask = AiTaskType.Idle)
+        {
+            var worker = CW.NewEntity<Default>();
+            worker.Set<SettlementWorkerTag>();
+            worker.Set(new SettlementWorkerIdentity
+            {
+                HomeAnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                RoleId = WorkerRoleCatalog.CampBuilderId.Value
+            });
+            worker.Set(new SettlementWorkerAssignment
+            {
+                AnchorId = assigned ? SettlementAnchorCatalog.HomeCampId.Value : (ushort)0,
+                Status = assigned ? SettlementWorkerAssignmentStatus.Assigned : SettlementWorkerAssignmentStatus.Unassigned
+            });
+            worker.Set(new CharacterNetState
+            {
+                Position = new Vector3(0f, 0f, 2f),
+                Rotation = Quaternion.identity
+            });
+
+            foreach (var anchor in CW.Query<All<Stage1SettlementProgression>>().Entities())
+            {
+                anchor.Set(new SettlementWorkerSummary
+                {
+                    AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                    TotalWorkers = 1,
+                    AssignedWorkers = assigned ? (ushort)1 : (ushort)0,
+                    CampBuilderWorkers = 1,
+                    CampBuilderAssignedWorkers = assigned ? (ushort)1 : (ushort)0,
+                    ActiveTask = activeTask,
+                    BlockingReason = blockingReason
+                });
+                anchor.Set(new SettlementCampBuilderJobState
+                {
+                    AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                    AssignedWorker = assigned ? worker.GID : default,
+                    CurrentTask = activeTask,
+                    BlockingReason = blockingReason
+                });
+                break;
+            }
+
+            return worker;
+        }
+
+        public void RefreshProjections()
+        {
+            ProjectionRegistry.Rebuild();
+        }
+
+        public void Dispose()
+        {
+            if (CW.Status != WorldStatus.NotCreated)
+                CW.Destroy();
+        }
+    }
+}
