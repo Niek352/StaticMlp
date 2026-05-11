@@ -2,6 +2,7 @@ using NUnit.Framework;
 using StaticMlp.Features.Build;
 using StaticMlp.Features.Combat;
 using StaticMlp.Game.Input;
+using StaticMlp.Networking;
 using UnityEngine;
 
 namespace StaticMlp.Tests.Combat
