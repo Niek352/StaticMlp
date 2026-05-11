@@ -1,7 +1,6 @@
 using System;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.EcsViews;
-using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Presentation;
@@ -27,7 +26,6 @@ namespace StaticMlp.Features.Buildings
                 DepositConstructionResourcesResultEvent.Write,
                 DepositConstructionResourcesResultEvent.TryRead);
 
-            ProjectionRegistry.Register<ResourcesInventory>();
             ProjectionRegistry.Register<ConstructionResources>();
             ProjectionRegistry.Register<ConstructionSiteState>();
             ProjectionRegistry.Register<ConstructionProgress>();

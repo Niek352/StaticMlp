@@ -96,6 +96,14 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ConstructionTransformReplication.CreateDelta,
                 ConstructionTransformReplication.Read);
 
+            ReplicationRegistry.RegisterComponent<SettlementSharedResources>(
+                ReplicatedComponentIds.SettlementSharedResources,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                SettlementSharedResourcesReplication.CreateDelta,
+                SettlementSharedResourcesReplication.Read);
+
             ReplicationRegistry.RegisterComponent<CharacterNetState>(
                 ReplicatedComponentIds.CharacterNetState,
                 ReplicationAuthority.Owner,
@@ -126,6 +134,7 @@ namespace StaticMlp.Networking.Replication.Generated {
             ReplicationRegistry.RegisterNetworkEntity(2, 1, 2);
             ReplicationRegistry.RegisterNetworkEntity(5, 1, 200);
             ReplicationRegistry.RegisterNetworkEntity(6, 1, 0);
+            ReplicationRegistry.RegisterNetworkEntity(7, 1, SettlementNetworkArchetypeIds.ResourceStorage);
         }
 
         private static void RegisterCharacterNetStateClientTypes() {

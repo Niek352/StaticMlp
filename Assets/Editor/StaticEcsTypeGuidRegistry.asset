@@ -60,39 +60,51 @@ MonoBehaviour:
     - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec04
       current:
         className: ConstructionProgress
-        namespaceName: StaticMlp.Game.Components.Buildings
-        assembly: Game.Core
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
       history:
       - className: ConstructionProgress
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
+      - className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec03
       current:
         className: ConstructionResources
-        namespaceName: StaticMlp.Game.Components.Buildings
-        assembly: Game.Core
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
       history:
       - className: ConstructionResources
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
+      - className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec01
       current:
         className: ConstructionSiteState
-        namespaceName: StaticMlp.Game.Components.Buildings
-        assembly: Game.Core
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
       history:
       - className: ConstructionSiteState
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
+      - className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec02
       current:
         className: ConstructionTransform
-        namespaceName: StaticMlp.Game.Components.Buildings
-        assembly: Game.Core
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
       history:
       - className: ConstructionTransform
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
+      - className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     - guid: 943d0dd7-7080-4d28-8afc-44a649ac2c01
       current:
         className: ResourcesInventory
@@ -328,39 +340,51 @@ MonoBehaviour:
     - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec04
       current:
         className: ConstructionProgress
-        namespaceName: StaticMlp.Game.Components.Buildings
-        assembly: Game.Core
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
       history:
       - className: ConstructionProgress
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
+      - className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec03
       current:
         className: ConstructionResources
-        namespaceName: StaticMlp.Game.Components.Buildings
-        assembly: Game.Core
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
       history:
       - className: ConstructionResources
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
+      - className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec01
       current:
         className: ConstructionSiteState
-        namespaceName: StaticMlp.Game.Components.Buildings
-        assembly: Game.Core
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
       history:
       - className: ConstructionSiteState
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
+      - className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec02
       current:
         className: ConstructionTransform
-        namespaceName: StaticMlp.Game.Components.Buildings
-        assembly: Game.Core
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
       history:
       - className: ConstructionTransform
         namespaceName: StaticMlp.Game.Components.Buildings
         assembly: Game.Core
+      - className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     - guid: 943d0dd7-7080-4d28-8afc-44a649ac2c01
       current:
         className: ResourcesInventory

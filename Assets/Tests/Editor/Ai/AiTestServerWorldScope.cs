@@ -39,10 +39,23 @@ namespace StaticMlp.Tests.Ai
                 FixedStepSeconds = DEFAULT_FIXED_STEP_SECONDS,
             });
             SW.SetResource(Catalog);
+            CreateSettlementSharedResources();
         }
 
         public AiActionCatalog Catalog { get; }
         public SimulationTime SimulationTime => SW.GetResource<SimulationTime>();
+
+        public SW.Entity CreateSettlementSharedResources(int wood = 50, int stone = 25)
+        {
+            var entity = SW.NewEntity<Default>();
+            entity.Set<SettlementResourceStorageTag>();
+            entity.Set(new SettlementSharedResources
+            {
+                Wood = wood,
+                Stone = stone
+            });
+            return entity;
+        }
 
         public SW.Entity CreateBot(Vector3 position, ushort behaviorId = AiBehaviorIds.Monster)
         {

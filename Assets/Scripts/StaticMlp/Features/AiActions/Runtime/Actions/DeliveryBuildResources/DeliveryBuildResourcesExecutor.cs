@@ -31,6 +31,7 @@ namespace StaticMlp.Features.AiActions
             }
 
             ref readonly var siteState = ref site.Read<ConstructionSiteState>();
+            ref readonly var siteResources = ref site.Read<ConstructionResources>();
             if (!ConstructionRules.CanDepositResources(in siteState))
             {
                 _transitions.SwitchToIdle(entity, ref task);
@@ -50,11 +51,31 @@ namespace StaticMlp.Features.AiActions
                 task.ElapsedTicks++;
                 return;
             }
-            
+
+            var sharedStorageEntity = SettlementSharedResourcesQuery.GetServerEntity();
+            var sharedStorage = sharedStorageEntity.Read<SettlementSharedResources>();
+            if (!ConstructionRules.TryPlanResourceDeposit(
+                    in siteState,
+                    in siteResources,
+                    sharedStorage.GetAmount(ResourceCatalog.WoodId),
+                    sharedStorage.GetAmount(ResourceCatalog.StoneId),
+                    siteResources.RemainingWood,
+                    siteResources.RemainingStone,
+                    out var acceptedWood,
+                    out var acceptedStone))
+            {
+                _transitions.SwitchToIdle(entity, ref task);
+                return;
+            }
+
+            ref var mutableSharedStorage = ref ReplicationMut.Mut<SettlementSharedResources>(sharedStorageEntity);
+            var spentWood = mutableSharedStorage.Spend(ResourceCatalog.WoodId, acceptedWood);
+            var spentStone = mutableSharedStorage.Spend(ResourceCatalog.StoneId, acceptedStone);
+
             ref var mutableSiteState = ref ReplicationMut.Mut<ConstructionSiteState>(site);
             ref var resources = ref ReplicationMut.Mut<ConstructionResources>(site);
 
-            if (!ConstructionRules.ApplyResourceDeposit(ref mutableSiteState, ref resources, 100, 100))
+            if (!ConstructionRules.ApplyResourceDeposit(ref mutableSiteState, ref resources, spentWood, spentStone))
             {
                 _transitions.SwitchToIdle(entity, ref task);
                 return;

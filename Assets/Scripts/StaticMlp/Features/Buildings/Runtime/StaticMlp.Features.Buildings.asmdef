@@ -10,7 +10,6 @@
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.BuildingCatalog",
         "StaticMlp.Features.Player",
-        "StaticMlp.Features.ResourcesInventoryMinimal",
         "UniTask",
         "Unity.InputSystem",
         "Unity.TextMeshPro",

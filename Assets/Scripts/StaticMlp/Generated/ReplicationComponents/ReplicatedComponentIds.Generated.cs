@@ -11,6 +11,7 @@ namespace StaticMlp.Networking.Replication {
         public const ushort ConstructionResources = 8723;
         public const ushort ConstructionSiteState = 23961;
         public const ushort ConstructionTransform = 31104;
+        public const ushort SettlementSharedResources = 48213;
         public const ushort CharacterNetState = 1;
         public const ushort PhysicsCubeNetState = 39412;
         public const ushort NetworkIdentity = 2;

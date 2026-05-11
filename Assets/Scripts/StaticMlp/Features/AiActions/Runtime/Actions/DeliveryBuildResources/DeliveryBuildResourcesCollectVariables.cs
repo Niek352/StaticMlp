@@ -23,13 +23,24 @@ namespace StaticMlp.Features.AiActions
         private static EntityGID FindNearestDepositSite(SW.Entity builder)
         {
             ref readonly var builderState = ref builder.Read<CharacterNetState>();
+            var sharedStorageEntity = SettlementSharedResourcesQuery.GetServerEntity();
+            ref readonly var sharedResources = ref sharedStorageEntity.Read<SettlementSharedResources>();
             var bestDistanceSq = float.MaxValue;
             var bestSite = default(EntityGID);
 
             foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState, ConstructionResources, ConstructionTransform>>().Entities())
             {
                 ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-                if (!ConstructionRules.CanDepositResources(in siteState))
+                ref readonly var siteResources = ref site.Read<ConstructionResources>();
+                if (!ConstructionRules.TryPlanResourceDeposit(
+                        in siteState,
+                        in siteResources,
+                        sharedResources.GetAmount(ResourceCatalog.WoodId),
+                        sharedResources.GetAmount(ResourceCatalog.StoneId),
+                        siteResources.RemainingWood,
+                        siteResources.RemainingStone,
+                        out _,
+                        out _))
                     continue;
 
                 ref readonly var transform = ref site.Read<ConstructionTransform>();

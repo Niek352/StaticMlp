@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using StaticMlp.Features.AiActions;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Settlement;
 using UnityEngine;
@@ -58,6 +59,23 @@ namespace StaticMlp.Tests.Ai
             Assert.That(scope.Catalog.TryGetBehavior(AiBehaviorIds.PeacefulBuilder, out var behavior), Is.True);
             var selectedTask = AiUtilityEvaluator.SelectBestTask(bot, scope.Catalog, in behavior);
             Assert.That(selectedTask, Is.EqualTo(AiTaskType.BuildConstruction));
+        }
+
+        [Test]
+        public void DeliveryBuildResourcesCollector_DoesNotSelectTarget_WhenSharedStorageIsEmpty()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var bot = scope.CreateBot(Vector3.zero, AiBehaviorIds.PeacefulBuilder);
+            scope.CreateConstructionSite(new Vector3(3f, 0f, 0f), ConstructionPhase.WaitingForResources, resourcesComplete: false);
+
+            var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
+            storageEntity.Set(new SettlementSharedResources());
+
+            new DeliveryBuildResourcesCollectVariables().Collect(bot);
+
+            Assert.That(
+                AiBlackboardAccess.TryGetEntity(bot, DeliveryBuildResourcesCollectVariables.TargetSite, out _),
+                Is.False);
         }
 
         [Test]

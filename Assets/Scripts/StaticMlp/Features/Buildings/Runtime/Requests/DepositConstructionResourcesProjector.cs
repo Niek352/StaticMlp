@@ -1,9 +1,6 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.ResourcesInventoryMinimal;
-using StaticMlp.Game.Components;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Buildings
@@ -19,26 +16,24 @@ namespace StaticMlp.Features.Buildings
                 || !site.Has<Projected<ConstructionResources>>())
                 return;
 
-            if (!TryGetLocalPlayer(out var player))
-                return;
-
-            ref readonly var projectedInventory = ref ClientProjection.Read<ResourcesInventory>(player);
+            var storageEntity = SettlementSharedResourcesQuery.GetClientEntity();
+            ref readonly var projectedStorage = ref ClientProjection.Read<SettlementSharedResources>(storageEntity);
             ref readonly var projectedState = ref ClientProjection.Read<ConstructionSiteState>(site);
             ref readonly var projectedResources = ref ClientProjection.Read<ConstructionResources>(site);
             if (!ConstructionRules.TryPlanResourceDeposit(
                     in projectedState,
                     in projectedResources,
-                    projectedInventory.Wood,
-                    projectedInventory.Stone,
+                    projectedStorage.GetAmount(ResourceCatalog.WoodId),
+                    projectedStorage.GetAmount(ResourceCatalog.StoneId),
                     request.Wood,
                     request.Stone,
                     out var wood,
                     out var stone))
                 return;
 
-            ref var inventory = ref ClientProjection.Mut<ResourcesInventory>(player);
-            inventory.SpendWood(wood);
-            inventory.SpendStone(stone);
+            ref var storage = ref ClientProjection.Mut<SettlementSharedResources>(storageEntity);
+            storage.Spend(ResourceCatalog.WoodId, wood);
+            storage.Spend(ResourceCatalog.StoneId, stone);
 
             ref var state = ref ClientProjection.Mut<ConstructionSiteState>(site);
             ref var resources = ref ClientProjection.Mut<ConstructionResources>(site);
@@ -53,18 +48,6 @@ namespace StaticMlp.Features.Buildings
             in DepositConstructionResourcesRequestEvent request,
             in DepositConstructionResourcesResultEvent result)
         {
-        }
-
-        private static bool TryGetLocalPlayer(out CW.Entity player)
-        {
-            foreach (var entity in CW.Query<All<LocalOwned, PlayerTag, ResourcesInventory>>().Entities())
-            {
-                player = entity;
-                return true;
-            }
-
-            player = default;
-            return false;
         }
     }
 }

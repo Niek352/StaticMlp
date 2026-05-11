@@ -1,4 +1,3 @@
-using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
@@ -35,27 +34,24 @@ namespace StaticMlp.Features.Buildings
             if (!ServerPeerPlayers.IsPlayerNear(sourcePeer, transform.Position, _interactionRange))
                 return rejected;
 
-            if (!ServerPeerPlayers.TryGetPlayer(sourcePeer, out var player)
-                || !player.Has<ResourcesInventory>())
-                return rejected;
-
-            var inventory = player.Read<ResourcesInventory>();
+            var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
+            var storage = storageEntity.Read<SettlementSharedResources>();
             var currentState = site.Read<ConstructionSiteState>();
             var currentResources = site.Read<ConstructionResources>();
             if (!ConstructionRules.TryPlanResourceDeposit(
                     in currentState,
                     in currentResources,
-                    inventory.Wood,
-                    inventory.Stone,
+                    storage.GetAmount(ResourceCatalog.WoodId),
+                    storage.GetAmount(ResourceCatalog.StoneId),
                     request.Wood,
                     request.Stone,
                     out var wood,
                     out var stone))
                 return rejected;
 
-            ref var mutableInventory = ref ReplicationMut.Mut<ResourcesInventory>(player);
-            var spentWood = mutableInventory.SpendWood(wood);
-            var spentStone = mutableInventory.SpendStone(stone);
+            ref var mutableStorage = ref ReplicationMut.Mut<SettlementSharedResources>(storageEntity);
+            var spentWood = mutableStorage.Spend(ResourceCatalog.WoodId, wood);
+            var spentStone = mutableStorage.Spend(ResourceCatalog.StoneId, stone);
 
             ref var state = ref ReplicationMut.Mut<ConstructionSiteState>(site);
             ref var resources = ref ReplicationMut.Mut<ConstructionResources>(site);
