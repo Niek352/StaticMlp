@@ -11,7 +11,10 @@ Each feature should be understandable as an isolated module with explicit runtim
 ## Feature Shape
 
 - Prefer one feature per top-level folder and one asmdef per feature runtime module.
-- Typical runtime split is `Components`, `Events`, `Requests`, `Systems`, `Presentation`, and optional `Domain`, `Input`, or `NetworkEntityTypes`.
+- Follow `.agents/skills/staticmlp-code-writing/SKILL.md` for the canonical feature folder layout.
+- New files, and existing files touched during a change, must use an approved type/role bucket such as `Components`, `Events`, `Systems`, `Factories`, `WorldResources`, `Ids`, `EntityTypes`, `NetworkEntityTypes`, `Domain`, `Catalogs`, `Definitions`, `Validation`, `Queries`, `Seeds`, `Input`, `Controllers`, `Views`, `ViewParts`, or `Actions`.
+- Do not create arbitrary first-level folders inside a feature. If no approved bucket fits, stop and propose either a new feature boundary or a new folder-layout rule.
+- Use `WorldResources` for StaticEcs `IResource` scripts; do not create script folders named `Resources`.
 - Use `Systems/Client` and `Systems/Server` only when the runtime behavior truly differs by context.
 - Register feature systems through `GameplayFeature`, not by editing global bootstrap classes directly.
 - Register typed network commands through `GameplayFeature.RegisterNetworkEvents`.
