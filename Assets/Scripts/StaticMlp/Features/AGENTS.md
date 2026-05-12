@@ -38,6 +38,8 @@ Each feature should be understandable as an isolated module with explicit runtim
 
 - Before adding code, decide whether it belongs in feature gameplay, feature presentation, shared `Game`, or `Networking`.
 - Prefer explicit names such as `Rules`, `Spawner`, `Request`, or `System`; avoid `Helper` and `Utility`.
+- Keep feature behavior in systems, not in free-floating static classes.
+- Keep systems focused on one responsibility; split long multi-purpose systems into ordered systems connected by components/events.
 - When a feature grows multiple subsystems or invariants, add a local `AGENTS.md` inside that specific feature folder.
 - Fail fast on required runtime state; do not add silent early returns for missing bindings or references.
 

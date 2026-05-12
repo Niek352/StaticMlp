@@ -116,6 +116,9 @@ Use ECS data flow rather than service calls:
 - Server gameplay systems query `ServerOwned` or validated `ClientOwned`.
 - Add feature systems through the feature's `GameplayFeature` entry point.
 - Do not edit global bootstrap classes unless the architecture explicitly owns the composition there.
+- Gameplay and presentation behavior should live in systems, not in free-floating static classes.
+- Systems must have one clear responsibility and stay short enough that their ECS query/event flow is easy to read.
+- If a system grows multiple responsibilities, split it into ordered systems that communicate through components/events.
 
 Prefer explicit system names that reveal context and ownership:
 
@@ -130,6 +133,7 @@ Avoid names that hide intent:
 - `Utility`
 - `Manager` unless the surrounding architecture already uses that exact role.
 - Generic static orchestration classes.
+- Static classes that exist only to hold feature behavior outside the ECS system pipeline.
 
 ## Components, Events, And Resources
 

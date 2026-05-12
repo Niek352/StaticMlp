@@ -28,7 +28,7 @@ namespace Code.EcsUi.Mvc
             }
 
             if (!isActive)
-                isActive = true;
+                return;
 
             EnsureBound();
             SyncPresentation();

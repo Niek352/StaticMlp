@@ -10,17 +10,13 @@ namespace Code.EcsUi.Mvc
         where TController : class, IController<TView, ControllerNoData>
     {
         private readonly Func<IMvcManager, TController> _controllerFactory;
-        private readonly Action<TController> _syncActiveController;
 
         private IMvcManager _mvcManager;
         private TController _controller;
 
-        public PersistentControllerHostSystem(
-            Func<IMvcManager, TController> controllerFactory,
-            Action<TController> syncActiveController = null)
+        public PersistentControllerHostSystem(Func<IMvcManager, TController> controllerFactory)
         {
             _controllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
-            _syncActiveController = syncActiveController;
         }
 
         public void Init()
@@ -37,8 +33,6 @@ namespace Code.EcsUi.Mvc
                 _mvcManager.ShowAsync(ControllerBase<TView>.IssueCommand()).Forget();
                 return;
             }
-
-            _syncActiveController?.Invoke(_controller);
         }
     }
 }
