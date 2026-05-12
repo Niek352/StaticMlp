@@ -1,6 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -8,32 +9,39 @@ using UnityEngine;
 
 namespace StaticMlp.Features.AiBots
 {
-    public static class AiBotSpawns
+    public sealed class AiBotFactory : NetEntityFactory<AiBotNetworkEntity>, IResource
     {
-        public static EntityGID Spawn(AiBotSpawnSpec spec)
+        private AiBotSpawnSpec _spec;
+
+        public EntityGID Spawn(AiBotSpawnSpec spec)
         {
-            return NetworkEntitySpawner.SpawnServerEntity<AiBotNetworkEntity>(
+            _spec = spec;
+            var entity = CreateEntity(
                 new NetworkPeerId(0),
                 NetworkAuthority.Server,
-                spec.NetworkArchetypeId,
-                entity =>
-                {
-                    entity.Set<MonsterTag>();
-                    entity.Set<AiAgentTag>();
-                    entity.Set(new ServerCombatAttackState());
-                    ApplyServerAiAgentState(entity, new AiAgentSpawnStateSpec(
-                        spec.Position,
-                        spec.Rotation,
-                        spec.BehaviorId,
-                        spec.MaxHealth,
-                        spec.Health01,
-                        spec.Hunger,
-                        spec.Fear,
-                        spec.Leader));
-                });
+                spec.NetworkArchetypeId);
+            Configure(entity);
+            SendEntity(entity);
+            return entity;
         }
 
-        public static void ApplyServerAiAgentState(SW.Entity entity, in AiAgentSpawnStateSpec spec)
+        private void Configure(SW.Entity entity)
+        {
+            entity.Set<MonsterTag>();
+            entity.Set<AiAgentTag>();
+            entity.Set(new ServerCombatAttackState());
+            ApplyServerAiAgentState(entity, new AiAgentSpawnStateSpec(
+                _spec.Position,
+                _spec.Rotation,
+                _spec.BehaviorId,
+                _spec.MaxHealth,
+                _spec.Health01,
+                _spec.Hunger,
+                _spec.Fear,
+                _spec.Leader));
+        }
+
+        public void ApplyServerAiAgentState(SW.Entity entity, in AiAgentSpawnStateSpec spec)
         {
             var clampedHealth01 = Mathf.Clamp01(spec.Health01);
             entity.Set(new Health

@@ -19,20 +19,7 @@ namespace StaticMlp.Features.Settlement
                 return;
             }
 
-            var settlementSeed = SW.GetResource<Stage1SettlementSeed>();
-            NetworkEntitySpawner.SpawnServerEntity<SettlementSharedResourcesNetworkEntity>(
-                new NetworkPeerId(0),
-                NetworkAuthority.Server,
-                SettlementNetworkArchetypeIds.ResourceStorage,
-                entity =>
-                {
-                    entity.Set<SettlementResourceStorageTag>();
-                    entity.Set(new SettlementSharedResources
-                    {
-                        Wood = settlementSeed.GetStartingResourceAmount(ResourceCatalog.WoodId),
-                        Stone = settlementSeed.GetStartingResourceAmount(ResourceCatalog.StoneId)
-                    });
-                });
+            SW.GetResource<SettlementSharedResourcesFactory>().Spawn(SW.GetResource<Stage1SettlementSeed>());
 
             _spawned = true;
         }

@@ -59,7 +59,7 @@ namespace StaticMlp.Features.Statuses
             }
             else
             {
-                StatusEntitySpawns.SpawnOiled(target, source.Value, spec, request.Value, chain, simulationTime);
+                SW.GetResource<StatusEntityFactory>().SpawnOiled(target, source.Value, spec, request.Value, chain, simulationTime);
             }
 
             EffectLifecycle.MarkProcessed(effect);

@@ -28,7 +28,7 @@ namespace StaticMlp.Features.AiBots
                 var behaviorId = definition.BehaviorId == 0
                     ? CombatEnemyBehaviorIds.Default
                     : definition.BehaviorId;
-                spawnedBots[i] = AiBotSpawns.Spawn(new AiBotSpawnSpec(
+                spawnedBots[i] = SW.GetResource<AiBotFactory>().Spawn(new AiBotSpawnSpec(
                     AiBotsGameplayFeature.BOT,
                     definition.Position,
                     UnityEngine.Quaternion.identity,

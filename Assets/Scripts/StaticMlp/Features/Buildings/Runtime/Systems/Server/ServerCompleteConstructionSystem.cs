@@ -42,7 +42,7 @@ namespace StaticMlp.Features.Buildings
 
             SW.SendEvent(new Stage1RepairCompletedEvent(anchorRef.Anchor));
 
-            var finishedGid = BuildingEntitySpawner.SpawnFinishedBuilding(new FinishedBuildingSpawnSpec(
+            var finishedGid = SW.GetResource<BuildingEntityFactory>().SpawnFinishedBuilding(new FinishedBuildingSpawnSpec(
                 owner,
                 definition,
                 anchorRef.Anchor,

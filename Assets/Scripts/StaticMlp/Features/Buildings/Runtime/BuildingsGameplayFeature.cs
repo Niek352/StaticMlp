@@ -8,6 +8,7 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
+using FFS.Libraries.StaticEcs;
 
 namespace StaticMlp.Features.Buildings
 {
@@ -47,6 +48,11 @@ namespace StaticMlp.Features.Buildings
                 var definition = BuildingCatalogData.All[i];
                 RegisterBuilding(definition);
             }
+        }
+
+        public override void RegisterServerResources()
+        {
+            SW.SetResource(new BuildingEntityFactory());
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)

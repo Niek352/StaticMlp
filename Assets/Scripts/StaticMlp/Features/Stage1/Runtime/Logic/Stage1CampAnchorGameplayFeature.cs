@@ -2,6 +2,8 @@ using StaticMlp.Game.Bootstrap;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Requests;
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Stage1
 {
@@ -16,6 +18,11 @@ namespace StaticMlp.Features.Stage1
         {
             NetArchetypeRegistry.RegisterClient(SettlementNetworkArchetypeIds.CampAnchor, _ => { });
             NetArchetypeRegistry.RegisterServer(SettlementNetworkArchetypeIds.CampAnchor, _ => { });
+        }
+
+        public override void RegisterServerResources()
+        {
+            SW.SetResource(new Stage1CampAnchorFactory());
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)

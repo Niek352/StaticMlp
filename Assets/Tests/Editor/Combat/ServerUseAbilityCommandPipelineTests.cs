@@ -122,7 +122,7 @@ namespace StaticMlp.Tests.Combat
             });
             source.Set(Stage1BuildRules.CreatePreparedSnapshot(source.Read<OwnerBuildSelection>()));
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
-            StatusEntitySpawns.SpawnOiled(target, target.GID, new AddStatusSpec
+            SW.GetResource<StatusEntityFactory>().SpawnOiled(target, target.GID, new AddStatusSpec
             {
                 Duration = 4f,
                 TickInterval = 0f,

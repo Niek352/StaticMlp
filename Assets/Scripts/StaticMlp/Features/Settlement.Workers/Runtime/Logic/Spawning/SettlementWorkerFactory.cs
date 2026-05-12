@@ -1,23 +1,25 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Game;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Settlement.Workers
 {
-    public static class SettlementWorkerSpawner
+    public sealed class SettlementWorkerFactory : NetEntityFactory<AiBotNetworkEntity>, IResource
     {
-        public static EntityGID Spawn(in SettlementWorkerSpawnSpec spec)
+        public EntityGID Spawn(in SettlementWorkerSpawnSpec spec)
         {
-            var localSpec = spec;
-            return NetworkEntitySpawner.SpawnServerEntity<AiBotNetworkEntity>(
+            var entity = CreateEntity(
                 new NetworkPeerId(0),
                 NetworkAuthority.Server,
-                spec.NetworkArchetypeId,
-                entity => InitializeWorker(entity, in localSpec));
+                spec.NetworkArchetypeId);
+            Configure(entity, spec);
+            SendEntity(entity);
+            return entity;
         }
 
-        private static void InitializeWorker(SW.Entity entity, in SettlementWorkerSpawnSpec spec)
+        private static void Configure(SW.Entity entity, in SettlementWorkerSpawnSpec spec)
         {
             entity.Set<AiAgentTag>();
             entity.Set<SettlementWorkerTag>();
@@ -31,7 +33,7 @@ namespace StaticMlp.Features.Settlement.Workers
                 Status = SettlementWorkerAssignmentStatus.Unassigned,
                 AnchorId = 0
             });
-            AiBotSpawns.ApplyServerAiAgentState(entity, new AiAgentSpawnStateSpec(
+            SW.GetResource<AiBotFactory>().ApplyServerAiAgentState(entity, new AiAgentSpawnStateSpec(
                 spec.Position,
                 spec.Rotation,
                 spec.BehaviorId,

@@ -26,7 +26,7 @@ namespace StaticMlp.Features.AiBots
 
         private static void Handle(in SpawnFrontierEncounterBotEvent request)
         {
-            var gid = AiBotSpawns.Spawn(new AiBotSpawnSpec(
+            var gid = SW.GetResource<AiBotFactory>().Spawn(new AiBotSpawnSpec(
                 AiBotsGameplayFeature.BOT,
                 request.Position,
                 UnityEngine.Quaternion.identity,

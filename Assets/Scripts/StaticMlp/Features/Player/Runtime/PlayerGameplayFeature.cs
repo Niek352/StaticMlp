@@ -3,6 +3,8 @@ using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Networking.Replication;
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Player
 {
@@ -24,6 +26,11 @@ namespace StaticMlp.Features.Player
             });
 
             NetArchetypeRegistry.RegisterServer(PLAYER, e => e.Set<PlayerTag>());
+        }
+
+        public override void RegisterServerResources()
+        {
+            SW.SetResource(new PlayerFactory());
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)

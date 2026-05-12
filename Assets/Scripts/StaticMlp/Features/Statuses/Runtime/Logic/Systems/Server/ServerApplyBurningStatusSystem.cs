@@ -68,7 +68,7 @@ namespace StaticMlp.Features.Statuses
             }
             else
             {
-                StatusEntitySpawns.SpawnBurning(target, source.Value, spec, request.Value, chain, simulationTime);
+                SW.GetResource<StatusEntityFactory>().SpawnBurning(target, source.Value, spec, request.Value, chain, simulationTime);
             }
 
             EffectLifecycle.MarkProcessed(effect);

@@ -1,47 +1,48 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
+using StaticMlp.Networking.Replication;
 
-namespace StaticMlp.Networking.Replication
+namespace StaticMlp.Game
 {
-    public static class NetworkEntitySpawner
+    public abstract class NetEntityFactory<TNetworkEntityType>
+        where TNetworkEntityType : struct, INetworkEntityType
     {
-        public const ushort NETWORKED_ENTITY_CLUSTER = 1;
+        internal const ushort NETWORKED_ENTITY_CLUSTER = 1;
+        protected bool _debugTrackCreation;
 
-        public static EntityGID SpawnServerEntity<TNetworkEntityType>(
+        protected World<ServerWT>.Entity CreateEntity(
             NetworkPeerId owner,
             NetworkAuthority authority,
-            Action<SW.Entity> initialize)
-            where TNetworkEntityType : struct, INetworkEntityType
+            ushort networkArchetypeId)
         {
-            return SpawnServerEntity<TNetworkEntityType>(
-                owner,
-                authority,
-                default(TNetworkEntityType).DefaultNetworkArchetypeId(),
-                initialize);
-        }
-
-        public static EntityGID SpawnServerEntity<TNetworkEntityType>(
-            NetworkPeerId owner,
-            NetworkAuthority authority,
-            ushort networkArchetypeId,
-            Action<SW.Entity> initialize)
-            where TNetworkEntityType : struct, INetworkEntityType
-        {
-            EnsureNetworkedEntityCluster();
+#if FFS_ECS_DEBUG
+            if (_debugTrackCreation)
+                throw new Exception($"Tried to create a second server-side instance of the same net-entity.");
+            _debugTrackCreation = true;
+#endif
+            
             var entity = SW.NewEntity<TNetworkEntityType>(NETWORKED_ENTITY_CLUSTER);
             InitializeNetworkEntity(entity, owner, authority, networkArchetypeId);
-
-            initialize?.Invoke(entity);
-            ValidateManifestComponents<TNetworkEntityType>(entity);
-
-            OwnershipTags.ApplyForServer(entity, owner, authority);
-            SpawnBroadcaster.SendSpawn(entity);
-            return entity.GID;
+            OwnershipTags.ApplyForServer(entity, authority);
+            return entity;
         }
 
-        private static void InitializeNetworkEntity(
+        protected void SendEntity(World<ServerWT>.Entity entity)
+        {
+#if FFS_ECS_DEBUG
+            if (!_debugTrackCreation)
+                throw new Exception($"Tried to create before creating an actual world-space");
+            _debugTrackCreation = false;
+            ValidateManifestComponents(entity);
+#endif
+            SpawnBroadcaster.SendSpawn(entity);
+        }
+
+        internal static void InitializeNetworkEntity(
             SW.Entity entity,
             NetworkPeerId owner,
             NetworkAuthority authority,
@@ -56,15 +57,9 @@ namespace StaticMlp.Networking.Replication
             entity.Set<NetworkedTag>();
             entity.Set(new NetworkReplicationState());
         }
-
-        private static void EnsureNetworkedEntityCluster()
-        {
-            if (!SW.ClusterIsRegistered(NETWORKED_ENTITY_CLUSTER))
-                SW.RegisterCluster(NETWORKED_ENTITY_CLUSTER);
-        }
-
-        private static void ValidateManifestComponents<TNetworkEntityType>(SW.Entity entity)
-            where TNetworkEntityType : struct, INetworkEntityType
+        
+        [Conditional("FFS_ECS_DEBUG")]
+        internal static void ValidateManifestComponents(SW.Entity entity)
         {
             var manifest = typeof(TNetworkEntityType).GetCustomAttribute<NetworkEntityManifestAttribute>();
             if (manifest == null)

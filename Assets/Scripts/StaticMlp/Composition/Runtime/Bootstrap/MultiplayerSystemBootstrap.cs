@@ -24,6 +24,7 @@ namespace StaticMlp.Composition
 
             ServerSys.Add(new ServerReceiveClientOwnedStateSystem(), order: -780);
             ServerSys.Add(new ServerNetworkEventApplySystem(), order: -770);
+            GameplayFeatureDiscovery.RegisterServerResources();
             GameplayFeatureDiscovery.RegisterServerSystems(new ServerSystemsBuilder());
             ServerSys.Add(new ServerOwnedReplicationCollectSystem(), order: 500);
             ServerSys.Add(new ServerRelayClientOwnedStateSystem(), order: 550);

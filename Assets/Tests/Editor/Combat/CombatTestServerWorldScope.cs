@@ -1,6 +1,8 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Build;
+using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Frontier;
@@ -11,10 +13,10 @@ using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Statuses;
 using StaticMlp.Features.Stage1;
+using StaticMlp.Features.Player;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Transport;
 using UnityEngine;
@@ -50,7 +52,7 @@ namespace StaticMlp.Tests.Combat
                 typeof(Stage1CampAnchorGameplayFeature).Assembly,
                 typeof(StatusesLogicFeature).Assembly,
                 typeof(CharacterNetState).Assembly,
-                typeof(Features.AiBots.AiAgentTag).Assembly);
+                typeof(AiAgentTag).Assembly);
             NetworkEventRegistry.RegisterServerWorldTypes();
             SW.Initialize();
             SW.SetResource(new GameTime());
@@ -63,6 +65,13 @@ namespace StaticMlp.Tests.Combat
             SW.SetResource(Stage1FrontierSeedManifest.CreateResource());
             SW.SetResource(Stage1ProgressionSeedManifest.CreateResource());
             SW.SetResource(new StatusesConfig());
+            SW.SetResource(new AiBotFactory());
+            SW.SetResource(new BuildingEntityFactory());
+            SW.SetResource(new PlayerFactory());
+            SW.SetResource(new SettlementSharedResourcesFactory());
+            SW.SetResource(new SettlementWorkerFactory());
+            SW.SetResource(new Stage1CampAnchorFactory());
+            SW.SetResource(new StatusEntityFactory());
         }
 
         public CombatDebugLogBuffer DebugLog => SW.GetResource<CombatDebugLogBuffer>();
@@ -255,39 +264,32 @@ namespace StaticMlp.Tests.Combat
             const ushort woodenHutBuildingId = 1;
             const ushort woodenHutBlueprintArchetypeId = 100;
 
-            var entity = SW.NewEntity<ConstructionSiteNetworkEntity>();
-            entity.Set(new NetworkIdentity
-            {
-                Owner = owner ?? new NetworkPeerId(1),
-                Authority = NetworkAuthority.Server,
-                NetworkArchetypeId = woodenHutBlueprintArchetypeId
-            });
-            entity.Set<NetworkedTag>();
-            entity.Set(new NetworkReplicationState());
-            entity.Set<ConstructionSiteTag>();
-            entity.Set(new SettlementAnchorRef(SettlementAnchorCatalog.HomeCampId));
-            entity.Set(new ConstructionSiteState
-            {
-                BuildingId = woodenHutBuildingId,
-                Phase = phase
-            });
-            entity.Set(new ConstructionTransform
-            {
-                Position = position ?? Vector3.zero,
-                Rotation = Quaternion.identity
-            });
-            entity.Set(new ConstructionResources
-            {
-                WoodRequired = woodRequired,
-                StoneRequired = stoneRequired,
-                WoodDelivered = woodRequired,
-                StoneDelivered = stoneRequired
-            });
-            entity.Set(new ConstructionProgress
-            {
-                BuildWorkRequired = buildWorkRequired,
-                BuildWorkDone = buildWorkDone
-            });
+            var definition = BuildingCatalogData.Get(new BuildingId(woodenHutBuildingId));
+            var gid = SW.GetResource<BuildingEntityFactory>().SpawnConstructionSite(new ConstructionSiteSpawnSpec(
+                owner ?? new NetworkPeerId(1),
+                definition,
+                SettlementAnchorCatalog.HomeCampId,
+                position ?? Vector3.zero,
+                Quaternion.identity,
+                startReadyToBuild: true,
+                initialBuildWork: 0f));
+
+            if (!gid.TryUnpack<ServerWT>(out var entity))
+                throw new InvalidOperationException("Spawned construction site could not be unpacked in server world.");
+
+            ref var state = ref entity.Mut<ConstructionSiteState>();
+            state.Phase = phase;
+
+            ref var resources = ref entity.Mut<ConstructionResources>();
+            resources.WoodRequired = woodRequired;
+            resources.StoneRequired = stoneRequired;
+            resources.WoodDelivered = woodRequired;
+            resources.StoneDelivered = stoneRequired;
+
+            ref var progress = ref entity.Mut<ConstructionProgress>();
+            progress.BuildWorkRequired = buildWorkRequired;
+            progress.BuildWorkDone = buildWorkDone;
+
             return entity;
         }
 

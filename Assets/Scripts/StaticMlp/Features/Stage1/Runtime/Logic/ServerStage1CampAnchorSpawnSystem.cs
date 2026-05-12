@@ -44,7 +44,7 @@ namespace StaticMlp.Features.Stage1
 
         private static void SpawnAnchor(Stage1ConstructionSiteSeed siteSeed, Stage1ProgressionSeed progressionSeed)
         {
-            Stage1CampAnchorSpawner.Spawn(new Stage1CampAnchorSpawnSpec(
+            SW.GetResource<Stage1CampAnchorFactory>().Spawn(new Stage1CampAnchorSpawnSpec(
                 new SettlementAnchorId(siteSeed.AnchorId),
                 siteSeed.Position,
                 siteSeed.Rotation,

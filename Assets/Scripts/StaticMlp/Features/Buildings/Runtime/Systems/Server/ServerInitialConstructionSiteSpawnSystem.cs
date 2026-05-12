@@ -29,7 +29,7 @@ namespace StaticMlp.Features.Buildings
         private static void SpawnInitialSite(Stage1ConstructionSiteSeed definition)
         {
             var buildingDefinition = BuildingCatalogData.Get(new BuildingId(definition.BuildingId));
-            var siteGid = BuildingEntitySpawner.SpawnConstructionSite(new ConstructionSiteSpawnSpec(
+            var siteGid = SW.GetResource<BuildingEntityFactory>().SpawnConstructionSite(new ConstructionSiteSpawnSpec(
                 new NetworkPeerId(0),
                 buildingDefinition,
                 new SettlementAnchorId(definition.AnchorId),

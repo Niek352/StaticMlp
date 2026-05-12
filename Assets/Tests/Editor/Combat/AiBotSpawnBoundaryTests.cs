@@ -1,3 +1,4 @@
+using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Settlement;
@@ -16,7 +17,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
 
-            var gid = AiBotSpawns.Spawn(new AiBotSpawnSpec(
+            var gid = SW.GetResource<AiBotFactory>().Spawn(new AiBotSpawnSpec(
                 AiBotsGameplayFeature.BOT,
                 new Vector3(4f, 0f, 6f),
                 Quaternion.identity,
@@ -41,7 +42,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
 
-            var gid = SettlementWorkerSpawner.Spawn(new SettlementWorkerSpawnSpec(
+            var gid = SW.GetResource<SettlementWorkerFactory>().Spawn(new SettlementWorkerSpawnSpec(
                 SettlementAnchorCatalog.HomeCampId,
                 WorkerRoleCatalog.CampBuilderId,
                 SettlementWorkerNetworkArchetypeIds.CAMP_BUILDER_WORKER,

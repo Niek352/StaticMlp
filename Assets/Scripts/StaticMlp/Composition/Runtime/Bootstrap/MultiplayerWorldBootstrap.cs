@@ -17,6 +17,7 @@ namespace StaticMlp.Composition {
             SW.Types().RegisterAll(assemblies.First, assemblies.Rest);
             registerGeneratedTypes?.Invoke();
             SW.Initialize();
+            SW.RegisterCluster(1);
         }
 
         public static void CreateClientCore(WorldConfig config = default, params Assembly[] ecsTypeAssemblies) {

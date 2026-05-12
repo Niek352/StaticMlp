@@ -2,14 +2,15 @@ using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Settlement;
+using StaticMlp.Game;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Buildings
 {
-    public static class BuildingEntitySpawner
+    public sealed class BuildingEntityFactory : IResource
     {
-        public static EntityGID SpawnConstructionSite(in ConstructionSiteSpawnSpec spec)
+        public EntityGID SpawnConstructionSite(in ConstructionSiteSpawnSpec spec)
         {
             if (spec.AnchorId.Value == 0)
                 throw new InvalidOperationException("Construction site spawn requires a non-zero settlement anchor id.");
@@ -17,15 +18,14 @@ namespace StaticMlp.Features.Buildings
             if (!BuildingNetworkCatalog.TryGet(spec.Definition.Id, out var network))
                 throw new InvalidOperationException($"Missing network catalog entry for building {spec.Definition.Id}.");
 
-            var localSpec = spec;
-            return NetworkEntitySpawner.SpawnServerEntity<ConstructionSiteNetworkEntity>(
+            return new ConstructionSiteFactory().Spawn(
                 spec.Owner,
                 NetworkAuthority.Server,
                 network.BlueprintArchetypeId,
-                entity => InitializeConstructionSite(entity, in localSpec));
+                spec);
         }
 
-        public static EntityGID SpawnFinishedBuilding(in FinishedBuildingSpawnSpec spec)
+        public EntityGID SpawnFinishedBuilding(in FinishedBuildingSpawnSpec spec)
         {
             if (spec.AnchorId.Value == 0)
                 throw new InvalidOperationException("Finished building spawn requires a non-zero settlement anchor id.");
@@ -33,12 +33,51 @@ namespace StaticMlp.Features.Buildings
             if (!BuildingNetworkCatalog.TryGet(spec.Definition.Id, out var network))
                 throw new InvalidOperationException($"Missing network catalog entry for building {spec.Definition.Id}.");
 
-            var localSpec = spec;
-            return NetworkEntitySpawner.SpawnServerEntity<FinishedBuildingNetworkEntity>(
+            return new FinishedBuildingFactory().Spawn(
                 spec.Owner,
                 NetworkAuthority.Server,
                 network.FinishedArchetypeId,
-                entity => InitializeFinishedBuilding(entity, in localSpec));
+                spec);
+        }
+
+        private sealed class ConstructionSiteFactory : NetEntityFactory<ConstructionSiteNetworkEntity>
+        {
+            public EntityGID Spawn(
+                NetworkPeerId owner,
+                NetworkAuthority authority,
+                ushort networkArchetypeId,
+                in ConstructionSiteSpawnSpec spec)
+            {
+                var entity = CreateEntity(owner, authority, networkArchetypeId);
+                Configure(entity, spec);
+                SendEntity(entity);
+                return entity;
+            }
+
+            private static void Configure(SW.Entity entity, in ConstructionSiteSpawnSpec spec)
+            {
+                InitializeConstructionSite(entity, in spec);
+            }
+        }
+
+        private sealed class FinishedBuildingFactory : NetEntityFactory<FinishedBuildingNetworkEntity>
+        {
+            public EntityGID Spawn(
+                NetworkPeerId owner,
+                NetworkAuthority authority,
+                ushort networkArchetypeId,
+                in FinishedBuildingSpawnSpec spec)
+            {
+                var entity = CreateEntity(owner, authority, networkArchetypeId);
+                Configure(entity, spec);
+                SendEntity(entity);
+                return entity;
+            }
+
+            private static void Configure(SW.Entity entity, in FinishedBuildingSpawnSpec spec)
+            {
+                InitializeFinishedBuilding(entity, in spec);
+            }
         }
 
         private static void InitializeConstructionSite(SW.Entity entity, in ConstructionSiteSpawnSpec spec)

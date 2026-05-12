@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace StaticMlp.Tests.Combat
 {
-    public sealed class BuildingEntitySpawnerTests
+    public sealed class BuildingEntityFactoryTests
     {
         [Test]
         public void SpawnConstructionSite_InitializesManifestAndSeedDerivedState()
@@ -18,7 +18,7 @@ namespace StaticMlp.Tests.Combat
             using var scope = new CombatTestServerWorldScope();
             var owner = new NetworkPeerId(7);
             var definition = BuildingCatalogData.Get(BuildingCatalogData.WoodenHutId);
-            var gid = BuildingEntitySpawner.SpawnConstructionSite(new ConstructionSiteSpawnSpec(
+            var gid = SW.GetResource<BuildingEntityFactory>().SpawnConstructionSite(new ConstructionSiteSpawnSpec(
                 owner,
                 definition,
                 SettlementAnchorCatalog.HomeCampId,

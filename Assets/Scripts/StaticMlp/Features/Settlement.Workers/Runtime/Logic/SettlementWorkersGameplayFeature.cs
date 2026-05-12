@@ -7,6 +7,7 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Requests;
 using UnityEngine;
+using FFS.Libraries.StaticEcs;
 
 namespace StaticMlp.Features.Settlement.Workers
 {
@@ -55,6 +56,11 @@ namespace StaticMlp.Features.Settlement.Workers
                 e.Set<AiAgentTag>();
                 e.Set<SettlementWorkerTag>();
             });
+        }
+
+        public override void RegisterServerResources()
+        {
+            SW.SetResource(new SettlementWorkerFactory());
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)

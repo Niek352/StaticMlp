@@ -46,7 +46,7 @@ namespace StaticMlp.Features.Buildings
             if (!validation.IsValid)
                 return;
 
-            BuildingEntitySpawner.SpawnConstructionSite(new ConstructionSiteSpawnSpec(
+            SW.GetResource<BuildingEntityFactory>().SpawnConstructionSite(new ConstructionSiteSpawnSpec(
                 sourcePeer,
                 definition,
                 SettlementAnchorCatalog.HomeCampId,

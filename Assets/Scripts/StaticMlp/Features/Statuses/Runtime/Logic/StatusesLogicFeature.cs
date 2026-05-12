@@ -1,5 +1,7 @@
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking.Replication;
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Statuses
 {
@@ -10,6 +12,11 @@ namespace StaticMlp.Features.Statuses
             NetArchetypeRegistry.RegisterClient(StatusNetworkArchetypes.POISON, e => e.Set<PoisonStatus>());
             NetArchetypeRegistry.RegisterClient(StatusNetworkArchetypes.BURNING, e => e.Set<BurningStatus>());
             NetArchetypeRegistry.RegisterClient(StatusNetworkArchetypes.OILED, e => e.Set<OiledStatus>());
+        }
+
+        public override void RegisterServerResources()
+        {
+            SW.SetResource(new StatusEntityFactory());
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)

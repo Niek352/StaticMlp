@@ -27,7 +27,7 @@ namespace StaticMlp.Features.Settlement.Workers
         {
             var profile = SettlementWorkerRuntimeProfileCatalog.Get(seed.Role);
 
-            SettlementWorkerSpawner.Spawn(new SettlementWorkerSpawnSpec(
+            SW.GetResource<SettlementWorkerFactory>().Spawn(new SettlementWorkerSpawnSpec(
                 seed.Anchor,
                 seed.Role,
                 profile.NetworkArchetypeId,

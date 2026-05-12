@@ -10,6 +10,10 @@ namespace StaticMlp.Game.Bootstrap
         {
         }
 
+        public virtual void RegisterServerResources()
+        {
+        }
+
         public virtual void RegisterServerSystems(ServerSystemsBuilder systems)
         {
         }

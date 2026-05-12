@@ -6,6 +6,8 @@ using StaticMlp.Game.Systems;
 using StaticMlp.Game.Systems.Client;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking.Replication;
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Game.Features.Builtin
 {
@@ -25,6 +27,11 @@ namespace StaticMlp.Game.Features.Builtin
             });
 
             NetArchetypeRegistry.RegisterServer(PHYSICS_CUBE, e => e.Set<CubeTag>());
+        }
+
+        public override void RegisterServerResources()
+        {
+            SW.SetResource(new PhysicsCubeFactory());
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)

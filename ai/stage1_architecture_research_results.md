@@ -270,13 +270,13 @@ Presentation may be permissive for optional visuals, but required gameplay read 
 
 ### Status
 
-- Done: `NetworkEntitySpawner` still initializes the entity before `SpawnBroadcaster.SendSpawn`, and typed `SpawnServerEntity<TNetworkEntityType>(...)` now fails fast when manifest-declared replicated components are missing after `initialize`.
+- Done: `NetworkEntitySpawner` still initializes the entity before `SpawnBroadcaster.SendSpawn`, and typed `SpawnServerEntity<TNetworkEntityType>(...)` now fails fast when manifest-declared replicated components are missing after factory configuration.
 - Done: Stage1 no longer uses building spawn callbacks to move `Stage1SettlementProgression` between transient building entities; camp-global progression stays on the dedicated camp anchor.
 - Done: status spawning already exposes typed feature entrypoints (`SpawnPoison`, `SpawnBurning`, `SpawnOiled`) and keeps subtype-specific initialization private inside `StatusEntitySpawns`.
-- Not done: `ServerBuildingSpawns.SpawnConstructionSite(...)` and `SpawnFinishedBuilding(...)` still expose `Action<SW.Entity> configure`, so callers can still inject arbitrary components into the spawn contract.
-- Not done: initial construction-site spawn and construction completion still depend on that building `configure` callback for anchor-linking and seed-specific setup; these flows should move to explicit spawn specs or dedicated typed factory methods.
-- Not done: `ServerStage1CampAnchorSpawnSystem` still assembles the full anchor entity inline and calls `NetworkEntitySpawner` directly instead of going through a dedicated `Stage1CampAnchorSpawner` with an explicit spawn spec.
-- Not done: feature spawn APIs are still inconsistent about explicit spawn contracts; Buildings remains callback-driven, and Player/AI/Worker spawn paths still use ad-hoc method parameters instead of shared `*SpawnSpec` contracts that document required versus optional spawn-time state.
+- Done: `NetworkEntitySpawner` is now internal infrastructure and no longer exposes `Action<SW.Entity>` callbacks to feature code.
+- Done: feature spawn entrypoints are bound as server resources and spawn through `NetEntityFactory` implementations instead of public static `NetworkEntitySpawner` calls.
+- Done: building, player, AI bot, worker, status, shared resource, Stage1 anchor, and physics cube spawns now go through resource-owned factory APIs.
+- Not done: some factory resources still keep short-lived spawn context in the resource instance while the internal spawn executes synchronously; if spawn ever becomes re-entrant/asynchronous, these should move to immutable per-spawn factory instances.
 
 ### Problem
 

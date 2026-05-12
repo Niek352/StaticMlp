@@ -1,6 +1,8 @@
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Requests;
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement
 {
@@ -23,6 +25,11 @@ namespace StaticMlp.Features.Settlement
             {
                 e.Set<SettlementResourceStorageTag>();
             });
+        }
+
+        public override void RegisterServerResources()
+        {
+            SW.SetResource(new SettlementSharedResourcesFactory());
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)

@@ -59,6 +59,12 @@ namespace StaticMlp.Composition
                 feature.RegisterPrefabs();
         }
 
+        public static void RegisterServerResources()
+        {
+            foreach (var feature in GetFeatures())
+                feature.RegisterServerResources();
+        }
+
         public static void RegisterServerSystems(ServerSystemsBuilder systems)
         {
             foreach (var feature in GetFeatures())

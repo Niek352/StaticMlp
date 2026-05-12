@@ -5,6 +5,8 @@ using StaticMlp.Game.Components;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.AiBots
 {
@@ -36,6 +38,11 @@ namespace StaticMlp.Features.AiBots
                 e.Set<MonsterTag>();
                 e.Set<AiAgentTag>();
             });
+        }
+
+        public override void RegisterServerResources()
+        {
+            SW.SetResource(new AiBotFactory());
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)

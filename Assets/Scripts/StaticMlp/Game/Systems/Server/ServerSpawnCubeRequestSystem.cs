@@ -47,7 +47,7 @@ namespace StaticMlp.Game.Systems.Server
             var rotation = Quaternion.Euler(0f, request.Value.CameraYaw, 0f);
             var forward = rotation * Vector3.forward;
             var spawnPosition = playerState.Position + forward * _spawnDistance + Vector3.up * _spawnHeight;
-            ServerSpawns.ServerSpawnPhysicsCube(sourcePeer, spawnPosition, rotation);
+            SW.GetResource<PhysicsCubeFactory>().ServerSpawnPhysicsCube(sourcePeer, spawnPosition, rotation);
         }
 
         private static bool TryGetPlayerState(NetworkPeerId owner, out CharacterNetState state)
