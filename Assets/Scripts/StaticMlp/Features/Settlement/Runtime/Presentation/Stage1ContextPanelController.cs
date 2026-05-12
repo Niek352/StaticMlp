@@ -65,7 +65,7 @@ namespace StaticMlp.Features.Settlement
                     state.FocusedSite,
                     Mathf.Max(0, state.WoodRequired - state.WoodDelivered),
                     Mathf.Max(0, state.StoneRequired - state.StoneDelivered));
-                RequestApi.Send(depositRequest);
+                RequestApi.Send<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(depositRequest);
                 return;
             }
 
@@ -73,7 +73,7 @@ namespace StaticMlp.Features.Settlement
                 return;
 
             var buildRequest = new BuildConstructionRequestEvent(state.FocusedSite, UI_BUILD_WORK_PER_CLICK);
-            RequestApi.Send(buildRequest);
+            RequestApi.Send<BuildConstructionRequestEvent, BuildConstructionResultEvent>(buildRequest);
         }
 
         private static void ToggleWorkerAssignment(in Stage1ContextPanelState state)
@@ -85,7 +85,7 @@ namespace StaticMlp.Features.Settlement
                 state.WorkerId,
                 state.AnchorId,
                 assigned: !state.WorkerAssigned);
-            RequestApi.Send(request);
+            RequestApi.Send<SetSettlementWorkerAssignmentRequestEvent, SetSettlementWorkerAssignmentResultEvent>(request);
         }
     }
 }

@@ -33,8 +33,7 @@ namespace StaticMlp.Features.Buildings
             ProjectionRegistry.Register<SettlementAnchorRef>();
             RequestRegistry.Register<BuildConstructionRequestEvent, BuildConstructionResultEvent>(
                 new BuildConstructionHandler(),
-                new BuildConstructionProjector(),
-                GameplaySystemOrder.Gameplay - 60);
+                new BuildConstructionProjector(), GameplaySystemOrder.Gameplay - 60);
             RequestRegistry.Register<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(
                 new DepositConstructionResourcesHandler(),
                 new DepositConstructionResourcesProjector(),

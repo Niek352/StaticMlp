@@ -30,9 +30,7 @@ namespace StaticMlp.Features.Buildings
                 preview.Position,
                 preview.Rotation);
 
-            if (!CW.SendToServerEvent(in request))
-                return;
-
+            CW.SendToServerEvent(in request);
             menuState.ClearSelection();
 
             PlacementPreviewEntityUtility.DestroyAll();

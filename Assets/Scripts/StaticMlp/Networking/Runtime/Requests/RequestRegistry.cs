@@ -35,30 +35,29 @@ namespace StaticMlp.Networking.Requests
             SystemRegistrations.Add(registration);
         }
 
-        public static bool Send<TRequest>(TRequest request)
-            where TRequest : struct, IRequest
-        {
-            if (!RegistrationsByRequestType.TryGetValue(typeof(TRequest), out var registration))
-                throw new InvalidOperationException($"Request {typeof(TRequest).FullName} is not registered.");
+        public static void Send<TRequest, TResult>(TRequest request)
+            where TRequest : struct, IRequest<TResult>
+            where TResult : struct, IRequestResult 
+            => GetHandler<TRequest, TResult>().Send(request);
 
-            return registration.SendBoxed(request);
+        private static RequestRegistration<TRequest, TResult> GetHandler<TRequest, TResult>()
+            where TRequest : struct, IRequest<TResult> where TResult : struct, IRequestResult
+        {
+            if (RegistrationsByRequestType.TryGetValue(typeof(TRequest), out var registration))
+            {
+                return registration as RequestRegistration<TRequest, TResult>;
+            }
+            throw new InvalidOperationException($"Missing request handler registration for {typeof(TRequest).FullName} -> {typeof(TResult).FullName}.");
         }
 
         public static TResult HandleServer<TRequest, TResult>(NetworkPeerId sourcePeer, in TRequest request)
             where TRequest : struct, IRequest<TResult>
             where TResult : struct, IRequestResult
-        {
-            if (!RegistrationsByRequestType.TryGetValue(typeof(TRequest), out var registration)
-                || registration is not RequestRegistration<TRequest, TResult> typed)
-                throw new InvalidOperationException(
-                    $"Missing request handler registration for {typeof(TRequest).FullName} -> {typeof(TResult).FullName}.");
+            => GetHandler<TRequest, TResult>().Handle(sourcePeer, in request);
 
-            return typed.Handle(sourcePeer, in request);
-        }
 
         private interface IRequestRegistration
         {
-            bool SendBoxed(object request);
         }
 
         private sealed class RequestRegistration<TRequest, TResult> : IRequestRegistration, IRequestSystemRegistration
@@ -99,19 +98,13 @@ namespace StaticMlp.Networking.Requests
                 return _handler.Handle(sourcePeer, in request);
             }
 
-            public bool SendBoxed(object request)
+            public void Send(TRequest request)
             {
-                if (request is not TRequest typedRequest)
-                    throw new InvalidOperationException($"Invalid request payload type {request?.GetType().FullName}.");
-
                 var pending = CW.GetResource<ClientPendingRequests>();
-                typedRequest.RequestId = pending.AllocateId();
+                request.RequestId = pending.AllocateId();
 
-                if (!CW.SendToServerEvent(in typedRequest))
-                    return false;
-
-                pending.Add(in typedRequest, _projector);
-                return true;
+                CW.SendToServerEvent(in request);
+                pending.Add(in request, _projector);
             }
         }
     }

@@ -32,9 +32,7 @@ namespace StaticMlp.Features.Build
                     continue;
 
                 var command = new PrepareBuildCommand(selection.PrimaryModuleId);
-                if (!CW.SendToServerEvent(in command))
-                    continue;
-
+                CW.SendToServerEvent(in command);
                 syncState.LastSentPrimaryModuleId = selection.PrimaryModuleId;
             }
         }

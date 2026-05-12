@@ -58,7 +58,7 @@ namespace StaticMlp.Networking.Replication
                 handler.RegisterServerWorldType();
         }
 
-        internal static bool TryCreatePacket<TEvent>(
+        internal static void CreatePacket<TEvent>(
             NetworkPeerId targetPeer,
             in TEvent evt,
             out NetworkEventPacket packet)
@@ -66,8 +66,7 @@ namespace StaticMlp.Networking.Replication
         {
             if (!HandlersByType.TryGetValue(typeof(TEvent), out var handler) || handler is not Handler<TEvent> typedHandler)
             {
-                packet = default;
-                return false;
+                throw new ArgumentException($"No network events of type '{typeof(IEvent)}' are currently supported. for {typeof(TEvent).FullName}");
             }
 
             packet = new NetworkEventPacket(
@@ -76,7 +75,6 @@ namespace StaticMlp.Networking.Replication
                 handler.EventTypeId,
                 handler.Delivery,
                 typedHandler.Write(evt));
-            return true;
         }
 
         internal static bool TryApplyToServer(in NetworkEventPacket packet)

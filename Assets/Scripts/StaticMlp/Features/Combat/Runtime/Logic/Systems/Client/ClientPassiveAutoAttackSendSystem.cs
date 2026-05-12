@@ -20,9 +20,8 @@ namespace StaticMlp.Features.Combat
                     intent.AbilityId,
                     intent.Target,
                     intent.ShotSequence);
-                if (!CW.SendToServerEvent(in request))
-                    continue;
-
+                
+                CW.SendToServerEvent(in request);
                 state.LastSentShotSequence = intent.ShotSequence;
             }
         }

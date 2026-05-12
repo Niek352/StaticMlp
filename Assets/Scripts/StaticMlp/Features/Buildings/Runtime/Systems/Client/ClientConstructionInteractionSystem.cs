@@ -50,7 +50,7 @@ namespace StaticMlp.Features.Buildings
                 resources.RemainingWood,
                 resources.RemainingStone);
 
-            RequestApi.Send(request);
+            RequestApi.Send<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(request);
         }
 
         private void SendBuild(CW.Entity site)
@@ -69,7 +69,7 @@ namespace StaticMlp.Features.Buildings
                 site.GID,
                 _buildWorkPerSecond * Time.deltaTime);
 
-            RequestApi.Send(request);
+            RequestApi.Send<BuildConstructionRequestEvent, BuildConstructionResultEvent>(request);
         }
 
         private bool TryFindNearestSite(Vector3 playerPosition, out CW.Entity site)

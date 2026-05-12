@@ -51,9 +51,7 @@ namespace StaticMlp.Features.Frontier
         {
             ref readonly var state = ref CW.GetResource<ExpeditionSelectionScreenState>();
             var request = new StartExpeditionRequestEvent(state.AnchorId, state.ExpeditionId);
-            if (!CW.SendToServerEvent(in request))
-                throw new InvalidOperationException("Failed to enqueue Stage 1 expedition start request.");
-
+            CW.SendToServerEvent(in request);
             RequestClose();
         }
     }
