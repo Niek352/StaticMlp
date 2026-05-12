@@ -29,6 +29,7 @@ namespace StaticMlp.Features.Buildings
             ProjectionRegistry.Register<ConstructionResources>();
             ProjectionRegistry.Register<ConstructionSiteState>();
             ProjectionRegistry.Register<ConstructionProgress>();
+            ProjectionRegistry.Register<SettlementAnchorRef>();
             RequestRegistry.Register<BuildConstructionRequestEvent, BuildConstructionResultEvent>(
                 new BuildConstructionHandler(),
                 new BuildConstructionProjector(),

@@ -1,5 +1,4 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game;
 using StaticMlp.Networking;
@@ -13,8 +12,6 @@ namespace StaticMlp.Features.Frontier
         {
             foreach (var anchor in SW.Query<All<Stage1SettlementProgression, ExpeditionAvailabilityState, ActiveExpeditionState, ThreatState, RaidScheduleState>>().Entities())
             {
-                SyncBuildPreparedStage(anchor);
-
                 ref readonly var progression = ref anchor.Read<Stage1SettlementProgression>();
                 var shouldBeAvailable =
                     progression.Stage == Stage1SettlementProgressStage.BuildPrepared
@@ -28,20 +25,6 @@ namespace StaticMlp.Features.Frontier
                 availability.Status = shouldBeAvailable
                     ? ExpeditionAvailabilityStatus.Available
                     : ExpeditionAvailabilityStatus.Unavailable;
-            }
-        }
-
-        private static void SyncBuildPreparedStage(SW.Entity anchor)
-        {
-            ref readonly var progression = ref anchor.Read<Stage1SettlementProgression>();
-            if (progression.Stage != Stage1SettlementProgressStage.WorkerAssigned)
-                return;
-
-            foreach (var player in SW.Query<All<PreparedBuildSnapshot>>().Entities())
-            {
-                ref var mutable = ref ReplicationMut.Mut<Stage1SettlementProgression>(anchor);
-                mutable.AdvanceTo(Stage1SettlementProgressStage.BuildPrepared);
-                return;
             }
         }
     }

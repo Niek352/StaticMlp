@@ -25,7 +25,7 @@ namespace StaticMlp.Features.Player
                     continue;
 
                 var spawnPosition = new Vector3((peer.Value - 1) * _spawnSpacing, 0f, 0f);
-                PlayerSpawns.SpawnPlayer(peer, spawnPosition);
+                PlayerSpawns.Spawn(new PlayerSpawnSpec(peer, spawnPosition, Quaternion.identity));
                 SpawnBroadcaster.SendExistingSpawns(peer);
             }
         }

@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -36,7 +37,7 @@ namespace StaticMlp.Features.Buildings
                 return;
 
             var id = new BuildingId(request.Value.BuildingId);
-            var definition = StaticMlp.Features.BuildingCatalog.BuildingCatalogData.Get(id);
+            var definition = BuildingCatalogData.Get(id);
 
             var validation = ConstructionPlacementValidator.ValidateAuthoritative(
                 definition,
@@ -45,11 +46,14 @@ namespace StaticMlp.Features.Buildings
             if (!validation.IsValid)
                 return;
 
-            ServerBuildingSpawns.SpawnConstructionSite(
+            BuildingEntitySpawner.SpawnConstructionSite(new ConstructionSiteSpawnSpec(
                 sourcePeer,
                 definition,
+                SettlementAnchorCatalog.HomeCampId,
                 request.Value.Position,
-                request.Value.Rotation);
+                request.Value.Rotation,
+                startReadyToBuild: false,
+                initialBuildWork: 0f));
         }
     }
 }

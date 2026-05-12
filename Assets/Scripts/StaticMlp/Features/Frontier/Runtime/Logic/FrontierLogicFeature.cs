@@ -30,7 +30,6 @@ namespace StaticMlp.Features.Frontier
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
-            systems.Add(new ServerFrontierAnchorInitSystem(), GameplaySystemOrder.Gameplay - 137);
             systems.Add(new ServerFrontierExpeditionAvailabilitySystem(), GameplaySystemOrder.Gameplay - 136);
             systems.Add(new ServerFrontierStartExpeditionSystem(), GameplaySystemOrder.Gameplay - 135);
             systems.Add(new ServerFrontierRaidActivationSystem(), GameplaySystemOrder.Gameplay - 96);

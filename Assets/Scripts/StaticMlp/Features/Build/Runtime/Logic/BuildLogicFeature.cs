@@ -15,7 +15,6 @@ namespace StaticMlp.Features.Build
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
-            systems.Add(new ServerBossBuildPreparationAnchorInitSystem(), GameplaySystemOrder.Gameplay - 141);
             systems.Add(new ServerBuildSelectionInitSystem(), GameplaySystemOrder.Gameplay - 140);
             systems.Add(new ServerReceivePrepareBuildCommandSystem(), GameplaySystemOrder.Gameplay - 139);
             systems.Add(new ServerPreparedBuildSnapshotSystem(), GameplaySystemOrder.Gameplay - 138);

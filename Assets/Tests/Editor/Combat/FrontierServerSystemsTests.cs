@@ -15,13 +15,10 @@ namespace StaticMlp.Tests.Combat
     public sealed class FrontierServerSystemsTests
     {
         [Test]
-        public void AnchorInitSystem_AddsDefaultFrontierStateComponents()
+        public void CreateSettlementAnchor_AddsDefaultFrontierStateComponents()
         {
             using var scope = new CombatTestServerWorldScope();
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.BuildPrepared);
-
-            new ServerBossBuildPreparationAnchorInitSystem().Update();
-            new ServerFrontierAnchorInitSystem().Update();
 
             Assert.That(anchor.Has<ExpeditionAvailabilityState>(), Is.True);
             Assert.That(anchor.Has<ActiveExpeditionState>(), Is.True);
@@ -41,8 +38,6 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.CampRepaired);
-            new ServerBossBuildPreparationAnchorInitSystem().Update();
-            new ServerFrontierAnchorInitSystem().Update();
 
             new ServerFrontierExpeditionAvailabilitySystem().Update();
 
@@ -67,8 +62,6 @@ namespace StaticMlp.Tests.Combat
             var owner = new NetworkPeerId(1);
             scope.CreatePlayer(owner, Vector3.zero);
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.BuildPrepared);
-            new ServerBossBuildPreparationAnchorInitSystem().Update();
-            new ServerFrontierAnchorInitSystem().Update();
             new ServerFrontierExpeditionAvailabilitySystem().Update();
 
             var startSystem = new ServerFrontierStartExpeditionSystem();
@@ -129,9 +122,6 @@ namespace StaticMlp.Tests.Combat
             scope.CreatePlayer(owner, Vector3.zero);
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.BuildPrepared);
             scope.CreateSettlementSharedResources();
-            new ServerBossBuildPreparationAnchorInitSystem().Update();
-            new ServerFrontierAnchorInitSystem().Update();
-            new ServerStage1ProgressionAnchorInitSystem().Update();
             new ServerFrontierExpeditionAvailabilitySystem().Update();
 
             StartExpedition(scope, owner);
@@ -167,8 +157,6 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.BuildPrepared);
-            new ServerBossBuildPreparationAnchorInitSystem().Update();
-            new ServerFrontierAnchorInitSystem().Update();
 
             anchor.Set(new ThreatState
             {
@@ -206,9 +194,6 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.BuildPrepared);
-            new ServerBossBuildPreparationAnchorInitSystem().Update();
-            new ServerFrontierAnchorInitSystem().Update();
-            new ServerStage1ProgressionAnchorInitSystem().Update();
 
             anchor.Set(new ThreatState
             {
@@ -439,9 +424,6 @@ namespace StaticMlp.Tests.Combat
 
         private static void InitializeStage1BossPath(CombatTestServerWorldScope scope)
         {
-            new ServerBossBuildPreparationAnchorInitSystem().Update();
-            new ServerFrontierAnchorInitSystem().Update();
-            new ServerStage1ProgressionAnchorInitSystem().Update();
             scope.CreateSettlementSharedResources();
         }
 

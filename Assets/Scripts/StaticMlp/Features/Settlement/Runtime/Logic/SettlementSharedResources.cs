@@ -20,7 +20,7 @@ namespace StaticMlp.Features.Settlement
         [ReplicatedField]
         public int Stone;
 
-        public int GetAmount(ResourceId resourceId)
+        public readonly int GetAmount(ResourceId resourceId)
         {
             if (resourceId == ResourceCatalog.WoodId)
                 return Wood;

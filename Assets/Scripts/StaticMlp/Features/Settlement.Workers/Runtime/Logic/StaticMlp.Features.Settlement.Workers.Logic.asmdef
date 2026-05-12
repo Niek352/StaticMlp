@@ -11,8 +11,12 @@
         "StaticMlp.Features.Build.Logic",
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.EcsViews",
+        "StaticMlp.Features.Buildings.Contracts",
+        "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Settlement.Logic",
-        "StaticMlp.Features.Shared.Logic"
+        "StaticMlp.Features.Settlement.Workers.Contracts",
+        "StaticMlp.Features.Shared.Logic",
+        "StaticMlp.Features.Stage1.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

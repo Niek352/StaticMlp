@@ -26,13 +26,16 @@ namespace StaticMlp.Features.AiBots
 
         private static void Handle(in SpawnFrontierEncounterBotEvent request)
         {
-            var gid = AiBotSpawns.SpawnBot(
+            var gid = AiBotSpawns.Spawn(new AiBotSpawnSpec(
+                AiBotsGameplayFeature.BOT,
                 request.Position,
-                default,
+                UnityEngine.Quaternion.identity,
                 request.BehaviorId,
+                maxHealth: 100f,
                 request.Health01,
                 request.Hunger,
-                request.Fear);
+                request.Fear,
+                leader: default));
 
             if (!gid.TryUnpack<ServerWT>(out var entity))
                 throw new System.InvalidOperationException("Spawned frontier encounter bot could not be unpacked in server world.");

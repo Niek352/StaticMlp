@@ -1,0 +1,27 @@
+{
+    "name": "StaticMlp.Features.Stage1.Logic",
+    "rootNamespace": "StaticMlp.Features.Stage1",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.Stage1.Contracts",
+        "StaticMlp.Features.Settlement.Contracts",
+        "StaticMlp.Features.Build.Logic",
+        "StaticMlp.Features.Frontier.Logic",
+        "StaticMlp.Features.Progression.Logic",
+        "StaticMlp.Features.Settlement.Logic",
+        "StaticMlp.Features.Settlement.Workers.Logic",
+        "StaticMlp.Features.Progression.Contracts",
+        "StaticMlp.Features.Frontier.Contracts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

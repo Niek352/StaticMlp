@@ -1,8 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.AiBots;
-using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Settlement.Workers
 {
@@ -30,34 +27,14 @@ namespace StaticMlp.Features.Settlement.Workers
         {
             var profile = SettlementWorkerRuntimeProfileCatalog.Get(seed.Role);
 
-            NetworkEntitySpawner.SpawnServerEntity<AiBotNetworkEntity>(
-                new NetworkPeerId(0),
-                NetworkAuthority.Server,
+            SettlementWorkerSpawner.Spawn(new SettlementWorkerSpawnSpec(
+                seed.Anchor,
+                seed.Role,
                 profile.NetworkArchetypeId,
-                entity =>
-                {
-                    entity.Set<AiAgentTag>();
-                    entity.Set<SettlementWorkerTag>();
-                    entity.Set(new SettlementWorkerIdentity
-                    {
-                        HomeAnchorId = seed.AnchorId,
-                        RoleId = seed.RoleId
-                    });
-                    entity.Set(new SettlementWorkerAssignment
-                    {
-                        Status = SettlementWorkerAssignmentStatus.Unassigned,
-                        AnchorId = 0
-                    });
-                    AiBotSpawns.InitializeServerAiAgent(
-                        entity,
-                        seed.Position,
-                        seed.Rotation,
-                        profile.BehaviorId,
-                        profile.MaxHealth,
-                        hunger: 0f,
-                        fear: 0f,
-                        leader: default);
-                });
+                profile.BehaviorId,
+                profile.MaxHealth,
+                seed.Position,
+                seed.Rotation));
         }
 
         private static bool HasAnyWorker()

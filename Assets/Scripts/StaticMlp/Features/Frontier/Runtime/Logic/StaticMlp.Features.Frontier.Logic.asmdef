@@ -8,7 +8,11 @@
         "Game.Core",
         "StaticMlp.Features.Build.Logic",
         "StaticMlp.Features.Combat.Logic",
+        "StaticMlp.Features.Frontier.Contracts",
+        "StaticMlp.Features.Progression.Contracts",
         "StaticMlp.Features.Progression.Logic",
+        "StaticMlp.Features.Settlement.Contracts",
+        "StaticMlp.Features.Stage1.Contracts",
         "StaticMlp.Features.Settlement.Logic"
     ],
     "includePlatforms": [],

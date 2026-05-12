@@ -17,6 +17,18 @@ This audit found that the current Stage1 bugs are not isolated defects. They com
 
 ## A. Stable Authoritative Anchor Model
 
+### Status
+
+- Done: added a dedicated `Stage1CampAnchorNetworkEntity` and one-time server spawn system for camp anchors.
+- Done: moved `Stage1SettlementProgression` off construction-site and finished-building network manifests.
+- Done: added replicated `SettlementAnchorRef` for construction/finished building entities.
+- Done: server repair progression, construction completion, client repair focus lookup, and raid origin lookup now resolve through the stable anchor instead of treating the building entity as the camp.
+- Done: the spawned anchor is initialized with Stage1 camp-global runtime state currently used by Settlement, Workers, Build, Frontier, and Progression systems.
+- Done: `Stage1ProgressionState` is now part of the generated replicated component contract and the camp anchor manifest.
+- Done: removed lazy anchor init systems for Frontier, Build boss preparation, and Progression state.
+- Not done: Stage1 flow ownership is still split across existing feature systems; that is part of Stage C.
+- Not done: runtime parity tests have not yet been converted to prove spawn/apply/despawn behavior through the real replication loop.
+
 ### Problem
 
 `Stage1SettlementProgression` is treated as the camp anchor, but it is attached to construction/building entities:
@@ -79,6 +91,14 @@ Keep these on construction/building entities:
 
 ## B. Spawn/Despawn Contract
 
+### Status
+
+- Done: removed the late anchor init systems called out in this section (`ServerFrontierAnchorInitSystem`, `ServerBossBuildPreparationAnchorInitSystem`, and `ServerStage1ProgressionAnchorInitSystem`).
+- Done: `ServerStage1CampAnchorSpawnSystem` now creates the Stage1 camp anchor through `NetworkEntitySpawner.SpawnServerEntity(...)` and initializes the replicated camp state inside the spawn initializer before `SpawnBroadcaster.SendSpawn`.
+- Done: `ConstructionSiteNetworkEntity` and `FinishedBuildingNetworkEntity` no longer declare `Stage1SettlementProgression` in their manifests, so camp-global progression is no longer part of the building spawn contract.
+- Done: `NetworkEntitySpawner` now validates after `initialize` that every replicated component declared by `NetworkEntityManifest` is both registered and present before broadcast.
+- Done: `ServerSettlementWorkerCampBuilderJobSystem` and `ServerSettlementWorkerTaskSyncSystem` now treat `SettlementCampBuilderJobState` and `SettlementWorkerSummary` as required anchor state and mutate/read them directly instead of late-attaching or guarding them as optional.
+
 ### Problem
 
 The spawner itself supports correct initial state by invoking `initialize` before `SpawnBroadcaster.SendSpawn`: `Assets/Scripts/StaticMlp/Game/Replication/NetworkEntitySpawner.cs:35` and `Assets/Scripts/StaticMlp/Game/Replication/NetworkEntitySpawner.cs:38`.
@@ -117,6 +137,16 @@ Illegal after spawn:
 - Add a code review rule: if a server system calls `Set(...)` for a replicated component on a networked entity after spawn, it must be either optional-by-design or converted to spawn initialization.
 
 ## C. Stage1 Flow Ownership And Gating
+
+### Status
+
+- Done: introduced a dedicated Stage1 flow owner in `Features/Stage1/Runtime/Logic` as the only code path that mutates `Stage1SettlementProgression.Stage`.
+- Done: `ServerCompleteConstructionSystem`, `SetSettlementWorkerAssignmentHandler`, and `ServerReceivePrepareBuildCommandSystem` now publish typed Stage1 flow facts instead of mutating progression directly.
+- Done: `ServerFrontierExpeditionAvailabilitySystem` no longer advances Stage1 progression and now only computes frontier availability from replicated state.
+- Done: added replicated `Stage1FlowViewState` on the camp anchor and switched HUD/build/context-panel gating to that owner-authored read model.
+- Done: added flow-owner server tests for automatic repair stages, repair completion, worker assignment, build preparation, and the negative case that frontier availability no longer advances the stage.
+- Not done: `PrepareBuildCommand` still has no explicit `AnchorId`; the build-prepared fact currently targets `SettlementAnchorCatalog.HomeCampId` and remains single-camp specific.
+- Not done: `ClientStage1ContextPanelSessionSystem` still chooses repair/building focus from `Stage1SettlementProgression` plus site lookup instead of a dedicated repair-focus read model.
 
 ### Problem
 
@@ -238,6 +268,16 @@ Presentation may be permissive for optional visuals, but required gameplay read 
 
 ## G. Spawn Factory API Boundary
 
+### Status
+
+- Done: `NetworkEntitySpawner` still initializes the entity before `SpawnBroadcaster.SendSpawn`, and typed `SpawnServerEntity<TNetworkEntityType>(...)` now fails fast when manifest-declared replicated components are missing after `initialize`.
+- Done: Stage1 no longer uses building spawn callbacks to move `Stage1SettlementProgression` between transient building entities; camp-global progression stays on the dedicated camp anchor.
+- Done: status spawning already exposes typed feature entrypoints (`SpawnPoison`, `SpawnBurning`, `SpawnOiled`) and keeps subtype-specific initialization private inside `StatusEntitySpawns`.
+- Not done: `ServerBuildingSpawns.SpawnConstructionSite(...)` and `SpawnFinishedBuilding(...)` still expose `Action<SW.Entity> configure`, so callers can still inject arbitrary components into the spawn contract.
+- Not done: initial construction-site spawn and construction completion still depend on that building `configure` callback for anchor-linking and seed-specific setup; these flows should move to explicit spawn specs or dedicated typed factory methods.
+- Not done: `ServerStage1CampAnchorSpawnSystem` still assembles the full anchor entity inline and calls `NetworkEntitySpawner` directly instead of going through a dedicated `Stage1CampAnchorSpawner` with an explicit spawn spec.
+- Not done: feature spawn APIs are still inconsistent about explicit spawn contracts; Buildings remains callback-driven, and Player/AI/Worker spawn paths still use ad-hoc method parameters instead of shared `*SpawnSpec` contracts that document required versus optional spawn-time state.
+
 ### Problem
 
 `NetworkEntitySpawner.SpawnServerEntity(..., Action<SW.Entity> initialize)` has the correct timing: it invokes `initialize` before `SpawnBroadcaster.SendSpawn`: `Assets/Scripts/StaticMlp/Game/Replication/NetworkEntitySpawner.cs:31` and `Assets/Scripts/StaticMlp/Game/Replication/NetworkEntitySpawner.cs:35`.
@@ -306,6 +346,21 @@ Target rule:
 For construction this means a command such as `BuildConstructionRequestEvent` should carry a semantic operation/profile id or validated domain intent, not arbitrary UI-owned work constants. For Stage1 flow this means feature events feed the flow owner, not a generic command mutating progression directly.
 
 ## H. Feature Boundary Contracts
+
+### Status
+
+- Done: Frontier no longer mutates `Stage1SettlementProgression` directly; Stage1 flow transitions now go through `Stage1BuildPreparedEvent` and `ServerStage1FlowSystem`.
+- Done: Stage1, Buildings, and Settlement.Workers now have typed spawn entrypoints/specs for camp anchors, construction/finished buildings, and workers.
+- Done: Buildings exposes typed request handlers for player construction work and resource deposit instead of letting UI mutate construction state directly.
+- Done: Stage1 flow view state is owner-authored and consumed as a read model by presentation.
+- Done: feature contract folders/asmdefs now exist for Stage1, Buildings, Settlement, Settlement.Workers, Build, Frontier, Progression, Combat, Effects, and Statuses.
+- Done: first-pass public contract types were moved to contract assemblies: settlement anchor ids/refs, Stage1 flow events/read model, Buildings requests/results/spawn specs, Worker assignment requests/results, Build boss request, Frontier ids/start requests, Progression ids/events, Combat result/request events, Status marker tags, and Effects lifecycle tags.
+- Done: Combat and Statuses now mark Effects lifecycle state through the Effects-owned `EffectLifecycle` contract instead of setting `EffectProcessedTag` directly.
+- Not done: most feature contracts, owned components, systems, catalogs, and read models are still public from `Runtime/Logic`, so asmdefs do not enforce ownership boundaries.
+- Not done: Settlement.Workers still mutates Buildings-owned construction state and Settlement-owned shared resources directly from worker executors.
+- Not done: Progression still mutates Settlement-owned shared resources and Build-owned boss preparation state directly.
+- Not done: Combat and Statuses still query Effects-owned effect entity state directly; only processed/rejected lifecycle writes are routed through the owner contract.
+- Not done: there is no automated or review-time ownership map that defines which feature owns each component, tag, event, resource, factory, and read model.
 
 ### Problem
 

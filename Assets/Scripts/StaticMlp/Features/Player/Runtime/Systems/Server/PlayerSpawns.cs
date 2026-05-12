@@ -12,10 +12,10 @@ namespace StaticMlp.Features.Player
     {
         private const float DEFAULT_MAX_HEALTH = 100f;
 
-        public static EntityGID SpawnPlayer(NetworkPeerId owner, Vector3 spawnPosition)
+        public static EntityGID Spawn(PlayerSpawnSpec spec)
         {
             return NetworkEntitySpawner.SpawnServerEntity<PlayerNetworkEntity>(
-                owner,
+                spec.Owner,
                 NetworkAuthority.Owner,
                 PlayerGameplayFeature.PLAYER,
                 entity =>
@@ -29,9 +29,9 @@ namespace StaticMlp.Features.Player
                     });
                     entity.Set(new CharacterNetState
                     {
-                        Position = spawnPosition,
+                        Position = spec.Position,
                         Velocity = Vector3.zero,
-                        Rotation = Quaternion.identity
+                        Rotation = spec.Rotation
                     });
                 });
         }

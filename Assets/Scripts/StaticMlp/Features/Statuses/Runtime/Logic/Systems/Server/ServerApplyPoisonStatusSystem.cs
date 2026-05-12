@@ -32,7 +32,7 @@ namespace StaticMlp.Features.Statuses
             var targetGid = effect.Read<EffectTarget>().Value;
             if (!targetGid.TryUnpack<ServerWT>(out var target))
             {
-                effect.Set<EffectProcessedTag>();
+                EffectLifecycle.MarkProcessed(effect);
                 return;
             }
 
@@ -71,7 +71,7 @@ namespace StaticMlp.Features.Statuses
                 StatusEntitySpawns.SpawnPoison(target, source.Value, spec, request.Value, chain, simulationTime);
             }
 
-            effect.Set<EffectProcessedTag>();
+            EffectLifecycle.MarkProcessed(effect);
         }
     }
 }

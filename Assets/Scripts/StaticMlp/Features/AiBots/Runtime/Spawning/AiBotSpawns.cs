@@ -10,74 +10,57 @@ namespace StaticMlp.Features.AiBots
 {
     public static class AiBotSpawns
     {
-        public static EntityGID SpawnBot(
-            Vector3 spawnPosition,
-            EntityGID leader,
-            ushort behaviorId,
-            float health01,
-            float hunger,
-            float fear)
+        public static EntityGID Spawn(AiBotSpawnSpec spec)
         {
             return NetworkEntitySpawner.SpawnServerEntity<AiBotNetworkEntity>(
                 new NetworkPeerId(0),
                 NetworkAuthority.Server,
-                AiBotsGameplayFeature.BOT,
+                spec.NetworkArchetypeId,
                 entity =>
                 {
-                    var clampedHealth01 = Mathf.Clamp01(health01);
                     entity.Set<MonsterTag>();
                     entity.Set<AiAgentTag>();
                     entity.Set(new ServerCombatAttackState());
-                    InitializeServerAiAgent(
-                        entity,
-                        spawnPosition,
-                        Quaternion.identity,
-                        behaviorId,
-                        100f,
-                        hunger,
-                        fear,
-                        leader,
-                        clampedHealth01);
+                    ApplyServerAiAgentState(entity, new AiAgentSpawnStateSpec(
+                        spec.Position,
+                        spec.Rotation,
+                        spec.BehaviorId,
+                        spec.MaxHealth,
+                        spec.Health01,
+                        spec.Hunger,
+                        spec.Fear,
+                        spec.Leader));
                 });
         }
 
-        public static void InitializeServerAiAgent(
-            SW.Entity entity,
-            Vector3 spawnPosition,
-            Quaternion rotation,
-            ushort behaviorId,
-            float maxHealth,
-            float hunger,
-            float fear,
-            EntityGID leader,
-            float health01 = 1f)
+        public static void ApplyServerAiAgentState(SW.Entity entity, in AiAgentSpawnStateSpec spec)
         {
-            var clampedHealth01 = Mathf.Clamp01(health01);
+            var clampedHealth01 = Mathf.Clamp01(spec.Health01);
             entity.Set(new Health
             {
-                Current = maxHealth * clampedHealth01,
-                Max = maxHealth
+                Current = spec.MaxHealth * clampedHealth01,
+                Max = spec.MaxHealth
             });
             entity.Set(new CharacterNetState
             {
-                Position = spawnPosition,
+                Position = spec.Position,
                 Velocity = Vector3.zero,
-                Rotation = rotation
+                Rotation = spec.Rotation
             });
             entity.Set(new AiBrain
             {
-                BehaviorId = behaviorId,
+                BehaviorId = spec.BehaviorId,
                 CurrentTask = AiTaskType.Idle,
                 NextDecisionTick = 0
             });
             entity.Add<SW.Multi<AiBlackboardEntry>>();
-            AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Hunger, hunger);
+            AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Hunger, spec.Hunger);
             AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Health01, clampedHealth01);
-            AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Fear, fear);
+            AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.Fear, spec.Fear);
             AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.EnemyDistance, 999f);
             AiBlackboardAccess.SetFloat(entity, AiCoreVariableIds.WoodStorage01, 1f);
-            AiBlackboardAccess.SetEntity(entity, AiCoreVariableIds.Leader, leader);
-            AiBlackboardAccess.SetVector(entity, AiCoreVariableIds.LastKnownEnemyPosition, spawnPosition);
+            AiBlackboardAccess.SetEntity(entity, AiCoreVariableIds.Leader, spec.Leader);
+            AiBlackboardAccess.SetVector(entity, AiCoreVariableIds.LastKnownEnemyPosition, spec.Position);
             entity.Set(new AiTaskState
             {
                 Task = AiTaskType.Idle,

@@ -122,11 +122,6 @@ namespace StaticMlp.Tests.Combat
                 stoneRequired: 5,
                 stoneDelivered: 5,
                 progress01: 0.2f);
-            site.Set(new Stage1SettlementProgression
-            {
-                AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
-                Stage = Stage1SettlementProgressStage.DamagedCampStart
-            });
             scope.RefreshProjections();
 
             new ClientStage1PresentationBootstrapSystem().Init();
@@ -172,7 +167,7 @@ namespace StaticMlp.Tests.Combat
         public void BuildPreparationScreenState_UsesLocalSelectionAndBossCommitGate()
         {
             using var scope = new Stage1PresentationClientWorldScope();
-            scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkerAssigned);
             scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
             var bossPreparation = CW.NewEntity<Default>();
             bossPreparation.Set(new BossBuildPreparationState
@@ -188,6 +183,20 @@ namespace StaticMlp.Tests.Combat
             Assert.That(state.FireFlaskSelected, Is.True);
             Assert.That(state.IsBossCommitted, Is.True);
             Assert.That(state.CanConfirm, Is.False);
+        }
+
+        [Test]
+        public void BuildPreparationScreenState_WhenWorkerIsNotAssignedYet_StaysClosedFromFlowViewState()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
+            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.RefreshProjections();
+
+            new ClientBuildPreparationScreenStateSystem().Update();
+
+            ref readonly var state = ref CW.GetResource<BuildPreparationScreenState>();
+            Assert.That(state.IsAvailable, Is.False);
         }
 
         [Test]

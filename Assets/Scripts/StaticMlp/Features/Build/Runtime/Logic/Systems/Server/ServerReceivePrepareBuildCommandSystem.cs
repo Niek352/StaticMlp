@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -33,6 +34,7 @@ namespace StaticMlp.Features.Build
                 {
                     PrimaryModuleId = evt.Value.Value.PrimaryModuleId
                 });
+                SW.SendEvent(new Stage1BuildPreparedEvent(SettlementAnchorCatalog.HomeCampId));
             }
         }
 

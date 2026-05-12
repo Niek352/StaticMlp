@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Combat;
-using StaticMlp.Networking;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.AiBots
 {
@@ -28,13 +28,16 @@ namespace StaticMlp.Features.AiBots
                 var behaviorId = definition.BehaviorId == 0
                     ? CombatEnemyBehaviorIds.Default
                     : definition.BehaviorId;
-                spawnedBots[i] = AiBotSpawns.SpawnBot(
+                spawnedBots[i] = AiBotSpawns.Spawn(new AiBotSpawnSpec(
+                    AiBotsGameplayFeature.BOT,
                     definition.Position,
-                    leader,
+                    UnityEngine.Quaternion.identity,
                     behaviorId,
+                    maxHealth: 100f,
                     definition.Health01,
                     definition.Hunger,
-                    definition.Fear);
+                    definition.Fear,
+                    leader));
             }
 
             _spawned = true;

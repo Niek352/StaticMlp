@@ -7,6 +7,7 @@
         "Game.Core",
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.Shared.Logic",
+        "StaticMlp.Features.Statuses.Contracts",
         "StaticMlp.Features.Statuses.Logic"
     ],
     "includePlatforms": [],

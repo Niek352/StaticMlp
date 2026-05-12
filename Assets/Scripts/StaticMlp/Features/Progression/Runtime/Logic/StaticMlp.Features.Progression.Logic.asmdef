@@ -3,11 +3,14 @@
     "rootNamespace": "StaticMlp.Features.Progression",
     "references": [
         "FFS.StaticEcs",
+        "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core",
+        "StaticMlp.Features.Build.Contracts",
+        "StaticMlp.Features.Progression.Contracts",
+        "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Settlement.Logic",
-        "StaticMlp.Features.Build.Logic",
-        "FFS.StaticPack"
+        "StaticMlp.Features.Build.Logic"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

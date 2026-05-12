@@ -51,6 +51,7 @@ namespace StaticMlp.Features.Settlement
         {
             if (Stage1SettlementProgressionQuery.TryGetClientAnchor(state.AnchorId, out var anchor))
             {
+                ref readonly var flow = ref ClientProjection.Read<Stage1FlowViewState>(anchor);
                 if (anchor.Has<Projected<SettlementWorkerSummary>>())
                 {
                     ref readonly var summary = ref ClientProjection.Read<SettlementWorkerSummary>(anchor);
@@ -67,8 +68,7 @@ namespace StaticMlp.Features.Settlement
                     state.WorkerBlockingReason = job.BlockingReason;
                 }
 
-                ref readonly var progression = ref anchor.Read<Stage1SettlementProgression>();
-                state.CanToggleWorkerAssignment = progression.Stage >= Stage1SettlementProgressStage.CampRepaired;
+                state.CanToggleWorkerAssignment = flow.CanToggleWorkerAssignment;
             }
 
             foreach (var worker in CW.Query<All<SettlementWorkerTag, SettlementWorkerIdentity, SettlementWorkerAssignment>>().Entities())

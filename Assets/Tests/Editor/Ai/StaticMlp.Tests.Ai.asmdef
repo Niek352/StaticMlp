@@ -8,13 +8,17 @@
         "StaticMlp.Editor.Ai",
         "StaticMlp.Features.AiBots",
         "StaticMlp.Features.AiActions",
+        "StaticMlp.Features.Buildings.Contracts",
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.Combat.Logic",
         "StaticMlp.Features.Combat.Presentation",
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.Shared.Logic",
+        "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Settlement.Logic",
-        "StaticMlp.Features.Settlement.Workers.Logic"
+        "StaticMlp.Features.Settlement.Workers.Contracts",
+        "StaticMlp.Features.Settlement.Workers.Logic",
+        "StaticMlp.Features.Stage1.Contracts"
     ],
     "includePlatforms": [
         "Editor"

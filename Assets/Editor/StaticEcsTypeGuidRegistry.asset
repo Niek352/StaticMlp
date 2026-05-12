@@ -315,6 +315,36 @@ MonoBehaviour:
       - className: BossEncounterState
         namespaceName: StaticMlp.Features.Frontier
         assembly: StaticMlp.Features.Frontier.Logic
+    - guid: c6f1d334-a1e4-4472-a7a0-311c3e84fd54
+      current:
+        className: Stage1ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+      history:
+      - className: Stage1ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+    - guid: e271ae45-3257-4897-955f-d411a1dac94f
+      current:
+        className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      - className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: ce5bcff2-7cdb-4b27-8c53-66c6639e28fa
+      current:
+        className: Stage1FlowViewState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Stage1.Contracts
+      history:
+      - className: Stage1FlowViewState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Stage1.Contracts
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -330,29 +360,38 @@ MonoBehaviour:
       current:
         className: BuildConstructionRequestEvent
         namespaceName: StaticMlp.Features.Buildings
-        assembly: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
       history:
       - className: BuildConstructionRequestEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+      - className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
     - guid: 5d30f087-d3b5-411c-b3be-92faf9f9551f
       current:
         className: DepositConstructionResourcesRequestEvent
         namespaceName: StaticMlp.Features.Buildings
-        assembly: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
       history:
       - className: DepositConstructionResourcesRequestEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+      - className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
     - guid: b877f5b3-e768-4e7c-8c5a-816ced8e01f2
       current:
         className: PlaceBuildingRequestEvent
         namespaceName: StaticMlp.Features.Buildings
-        assembly: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
       history:
       - className: PlaceBuildingRequestEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+      - className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
     - guid: f4372422-950d-4411-b8e5-446fa688dc3e
       current:
         className: NetworkEventPacket
@@ -393,38 +432,50 @@ MonoBehaviour:
       current:
         className: DepositConstructionResourcesResultEvent
         namespaceName: StaticMlp.Features.Buildings
-        assembly: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
       history:
       - className: DepositConstructionResourcesResultEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+      - className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
     - guid: 998f596e-433b-4b10-b557-03b292444df2
       current:
         className: BuildConstructionResultEvent
         namespaceName: StaticMlp.Features.Buildings
-        assembly: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
       history:
       - className: BuildConstructionResultEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+      - className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
     - guid: be4c4d8c-c0f4-4a34-a072-a4a274a01bb8
       current:
         className: SetSettlementWorkerAssignmentRequestEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
-        assembly: StaticMlp.Features.Settlement.Workers.Logic
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
       history:
       - className: SetSettlementWorkerAssignmentRequestEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Logic
+      - className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
     - guid: 7e6fce4d-cf07-4db8-b036-c682ef468c3b
       current:
         className: SetSettlementWorkerAssignmentResultEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
-        assembly: StaticMlp.Features.Settlement.Workers.Logic
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
       history:
       - className: SetSettlementWorkerAssignmentResultEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Logic
+      - className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
     links: []
     linksList: []
     multi: []
@@ -730,6 +781,36 @@ MonoBehaviour:
       - className: BossEncounterState
         namespaceName: StaticMlp.Features.Frontier
         assembly: StaticMlp.Features.Frontier.Logic
+    - guid: c6f1d334-a1e4-4472-a7a0-311c3e84fd54
+      current:
+        className: Stage1ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+      history:
+      - className: Stage1ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+    - guid: e271ae45-3257-4897-955f-d411a1dac94f
+      current:
+        className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      - className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: ce5bcff2-7cdb-4b27-8c53-66c6639e28fa
+      current:
+        className: Stage1FlowViewState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Stage1.Contracts
+      history:
+      - className: Stage1FlowViewState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Stage1.Contracts
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -745,29 +826,38 @@ MonoBehaviour:
       current:
         className: BuildConstructionRequestEvent
         namespaceName: StaticMlp.Features.Buildings
-        assembly: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
       history:
       - className: BuildConstructionRequestEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+      - className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
     - guid: 5d30f087-d3b5-411c-b3be-92faf9f9551f
       current:
         className: DepositConstructionResourcesRequestEvent
         namespaceName: StaticMlp.Features.Buildings
-        assembly: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
       history:
       - className: DepositConstructionResourcesRequestEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+      - className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
     - guid: b877f5b3-e768-4e7c-8c5a-816ced8e01f2
       current:
         className: PlaceBuildingRequestEvent
         namespaceName: StaticMlp.Features.Buildings
-        assembly: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
       history:
       - className: PlaceBuildingRequestEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+      - className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
     - guid: f4372422-950d-4411-b8e5-446fa688dc3e
       current:
         className: NetworkEventPacket
@@ -808,38 +898,50 @@ MonoBehaviour:
       current:
         className: DepositConstructionResourcesResultEvent
         namespaceName: StaticMlp.Features.Buildings
-        assembly: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
       history:
       - className: DepositConstructionResourcesResultEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+      - className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
     - guid: 998f596e-433b-4b10-b557-03b292444df2
       current:
         className: BuildConstructionResultEvent
         namespaceName: StaticMlp.Features.Buildings
-        assembly: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
       history:
       - className: BuildConstructionResultEvent
         namespaceName: StaticMlp.Features.Buildings
         assembly: StaticMlp.Features.Buildings
+      - className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
     - guid: be4c4d8c-c0f4-4a34-a072-a4a274a01bb8
       current:
         className: SetSettlementWorkerAssignmentRequestEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
-        assembly: StaticMlp.Features.Settlement.Workers.Logic
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
       history:
       - className: SetSettlementWorkerAssignmentRequestEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Logic
+      - className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
     - guid: 7e6fce4d-cf07-4db8-b036-c682ef468c3b
       current:
         className: SetSettlementWorkerAssignmentResultEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
-        assembly: StaticMlp.Features.Settlement.Workers.Logic
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
       history:
       - className: SetSettlementWorkerAssignmentResultEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Logic
+      - className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
     links: []
     linksList: []
     multi: []

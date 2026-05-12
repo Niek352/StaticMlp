@@ -7,8 +7,10 @@ using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Settlement;
+using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Statuses;
+using StaticMlp.Features.Stage1;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
@@ -33,6 +35,7 @@ namespace StaticMlp.Tests.Combat
             new BuildLogicFeature().RegisterNetworkEvents();
             new CombatLogicFeature().RegisterNetworkEvents();
             new FrontierLogicFeature().RegisterNetworkEvents();
+            new Stage1CampAnchorGameplayFeature().RegisterNetworkEvents();
             SW.Create(WorldConfig.Default());
             SW.Types().RegisterAll(
                 typeof(ServerWT).Assembly,
@@ -44,6 +47,7 @@ namespace StaticMlp.Tests.Combat
                 typeof(Health).Assembly,
                 typeof(ProgressionLogicFeature).Assembly,
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
+                typeof(Stage1CampAnchorGameplayFeature).Assembly,
                 typeof(StatusesLogicFeature).Assembly,
                 typeof(CharacterNetState).Assembly,
                 typeof(Features.AiBots.AiAgentTag).Assembly);
@@ -168,11 +172,62 @@ namespace StaticMlp.Tests.Combat
                 AnchorId = anchorId.Value,
                 Stage = stage
             });
-            entity.Set(new ConstructionTransform
+            entity.Set(new Stage1FlowViewState
             {
-                Position = position,
-                Rotation = Quaternion.identity
+                AnchorId = anchorId.Value,
+                Stage = stage,
+                Objective = stage < Stage1SettlementProgressStage.CampRepaired
+                    ? Stage1FlowObjective.RepairCamp
+                    : stage < Stage1SettlementProgressStage.WorkerAssigned
+                        ? Stage1FlowObjective.AssignWorker
+                        : Stage1FlowObjective.PrepareBuild,
+                Hint = stage == Stage1SettlementProgressStage.RepairResourcesReady
+                    ? Stage1FlowHint.ContinueRepairBuild
+                    : stage < Stage1SettlementProgressStage.RepairResourcesReady
+                        ? Stage1FlowHint.GatherRepairResources
+                        : stage == Stage1SettlementProgressStage.CampRepaired
+                            ? Stage1FlowHint.AssignWorker
+                            : Stage1FlowHint.None,
+                CanToggleWorkerAssignment = stage >= Stage1SettlementProgressStage.CampRepaired,
+                CanOpenBuildPreparation = stage >= Stage1SettlementProgressStage.WorkerAssigned
             });
+            entity.Set(new Stage1ProgressionState(anchorId, 0u));
+            entity.Set(new SettlementAnchorLocation(position, Quaternion.identity));
+            entity.Set(new SettlementWorkerSummary
+            {
+                AnchorId = anchorId.Value
+            });
+            entity.Set(new SettlementCampBuilderJobState
+            {
+                AnchorId = anchorId.Value
+            });
+            entity.Set(new ExpeditionAvailabilityState
+            {
+                ExpeditionIdValue = ExpeditionCatalog.NearbyRaiderCampId.Value,
+                Status = ExpeditionAvailabilityStatus.Unavailable
+            });
+            entity.Set(new ActiveExpeditionState
+            {
+                Status = ExpeditionActivityStatus.None
+            });
+            entity.Set(new ThreatState
+            {
+                Phase = ThreatPhase.Calm
+            });
+            entity.Set(new RaidScheduleState
+            {
+                Status = RaidScheduleStatus.None
+            });
+            entity.Set(new BossEncounterState
+            {
+                BossIdValue = BossCatalog.RaiderChiefId.Value,
+                Status = BossEncounterStatus.Unavailable
+            });
+            entity.Set(new BossBuildPreparationState
+            {
+                Status = BossBuildPreparationStatus.None
+            });
+            entity.Set(new BossPreparedBuildSnapshot());
             return entity;
         }
 
@@ -189,7 +244,6 @@ namespace StaticMlp.Tests.Combat
         }
 
         public SW.Entity CreateNetworkedConstructionSite(
-            Stage1SettlementProgressStage stage = Stage1SettlementProgressStage.RepairResourcesReady,
             ConstructionPhase phase = ConstructionPhase.ReadyToBuild,
             float buildWorkRequired = 100f,
             float buildWorkDone = 0f,
@@ -211,11 +265,7 @@ namespace StaticMlp.Tests.Combat
             entity.Set<NetworkedTag>();
             entity.Set(new NetworkReplicationState());
             entity.Set<ConstructionSiteTag>();
-            entity.Set(new Stage1SettlementProgression
-            {
-                AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
-                Stage = stage
-            });
+            entity.Set(new SettlementAnchorRef(SettlementAnchorCatalog.HomeCampId));
             entity.Set(new ConstructionSiteState
             {
                 BuildingId = woodenHutBuildingId,

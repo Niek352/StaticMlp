@@ -7,6 +7,7 @@ using UnityEngine;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Build;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.Progression;
 using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
@@ -123,6 +124,14 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ConstructionTransformReplication.CreateDelta,
                 ConstructionTransformReplication.Read);
 
+            ReplicationRegistry.RegisterComponent<SettlementAnchorRef>(
+                ReplicatedComponentIds.SettlementAnchorRef,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                SettlementAnchorRefReplication.CreateDelta,
+                SettlementAnchorRefReplication.Read);
+
             ReplicationRegistry.RegisterComponent<SettlementSharedResources>(
                 ReplicatedComponentIds.SettlementSharedResources,
                 ReplicationAuthority.Server,
@@ -138,6 +147,22 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 Stage1SettlementProgressionReplication.CreateDelta,
                 Stage1SettlementProgressionReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<Stage1FlowViewState>(
+                ReplicatedComponentIds.Stage1FlowViewState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                Stage1FlowViewStateReplication.CreateDelta,
+                Stage1FlowViewStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<Stage1ProgressionState>(
+                ReplicatedComponentIds.Stage1ProgressionState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                Stage1ProgressionStateReplication.CreateDelta,
+                Stage1ProgressionStateReplication.Read);
 
             ReplicationRegistry.RegisterComponent<SettlementCampBuilderJobState>(
                 ReplicatedComponentIds.SettlementCampBuilderJobState,
@@ -232,6 +257,7 @@ namespace StaticMlp.Networking.Replication.Generated {
             ReplicationRegistry.RegisterNetworkEntity(4, 1, 101);
             ReplicationRegistry.RegisterNetworkEntity(1, 1, 1);
             ReplicationRegistry.RegisterNetworkEntity(7, 1, 300);
+            ReplicationRegistry.RegisterNetworkEntity(8, 1, 320);
             ReplicationRegistry.RegisterNetworkEntity(6, 1, 0);
             ReplicationRegistry.RegisterNetworkEntity(2, 1, 2);
         }

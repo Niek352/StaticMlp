@@ -12,16 +12,19 @@ namespace StaticMlp.Features.Settlement
     {
         public void Update()
         {
-            if (!TryGetRequiredState(out var anchor, out var settlementProgression, out var resources))
+            if (!TryGetRequiredState(out var anchor, out var flow, out var resources))
                 return;
 
             var next = new Stage1HudState
             {
-                AnchorId = settlementProgression.Anchor,
-                Objective = Stage1ObjectiveKind.RepairCamp,
-                SettlementStage = settlementProgression.Stage,
+                AnchorId = flow.Anchor,
+                Objective = ToPresentationObjective(flow.Objective),
+                ObjectiveHint = ToPresentationHint(flow.Hint),
+                SettlementStage = flow.Stage,
                 Wood = resources.Wood,
                 Stone = resources.Stone,
+                CanOpenBuildPreparation = flow.CanOpenBuildPreparation,
+                CanOpenExpeditionSelection = flow.CanOpenExpeditionSelection,
             };
 
             if (anchor.Has<Projected<Stage1ProgressionState>>())
@@ -66,31 +69,22 @@ namespace StaticMlp.Features.Settlement
                 next.HasPreparedBuild = preparedBuild.PrimaryModuleId.Value != 0;
             }
 
-            next.CanOpenBuildPreparation = next.SettlementStage >= Stage1SettlementProgressStage.CampRepaired
-                                           && next.BossEncounterStatus != BossEncounterStatus.Active
-                                           && next.BossEncounterStatus != BossEncounterStatus.Defeated;
-            next.CanOpenExpeditionSelection = next.ExpeditionAvailability == ExpeditionAvailabilityStatus.Available
-                                              && next.ThreatPhase != ThreatPhase.RaidPending
-                                              && next.ThreatPhase != ThreatPhase.RaidActive;
-            next.Objective = ResolveObjective(next);
-            next.ObjectiveHint = ResolveObjectiveHint(next);
-
             CW.SetResource(next);
         }
 
         private static bool TryGetRequiredState(
             out CW.Entity anchor,
-            out Stage1SettlementProgression settlementProgression,
+            out Stage1FlowViewState flow,
             out SettlementSharedResources resources)
         {
             if (!Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out anchor))
             {
-                settlementProgression = default;
+                flow = default;
                 resources = default;
                 return false;
             }
 
-            settlementProgression = anchor.Read<Stage1SettlementProgression>();
+            flow = ClientProjection.Read<Stage1FlowViewState>(anchor);
 
             if (!TryReadSharedResources(out resources))
                 return false;
@@ -98,56 +92,48 @@ namespace StaticMlp.Features.Settlement
             return true;
         }
 
-        private static Stage1ObjectiveKind ResolveObjective(in Stage1HudState state)
+        private static Stage1ObjectiveKind ToPresentationObjective(Stage1FlowObjective objective)
         {
-            if (state.BossEncounterStatus == BossEncounterStatus.Defeated)
-                return Stage1ObjectiveKind.VerticalSliceComplete;
-
-            if (state.BossEncounterStatus == BossEncounterStatus.Active)
-                return Stage1ObjectiveKind.DefeatBoss;
-
-            if (state.BossEncounterStatus == BossEncounterStatus.Available)
-                return Stage1ObjectiveKind.StartBossEncounter;
-
-            if (state.ThreatPhase == ThreatPhase.RaidPending || state.ThreatPhase == ThreatPhase.RaidActive)
-                return Stage1ObjectiveKind.DefendCamp;
-
-            if (state.ExpeditionActivity == ExpeditionActivityStatus.Active)
-                return Stage1ObjectiveKind.ClearExpedition;
-
-            if (state.SettlementStage < Stage1SettlementProgressStage.CampRepaired)
-                return Stage1ObjectiveKind.RepairCamp;
-
-            if (state.SettlementStage < Stage1SettlementProgressStage.WorkerAssigned)
-                return Stage1ObjectiveKind.AssignWorker;
-
-            if (state.SettlementStage < Stage1SettlementProgressStage.BuildPrepared)
-                return Stage1ObjectiveKind.PrepareBuild;
-
-            if (state.ExpeditionAvailability == ExpeditionAvailabilityStatus.Available)
-                return Stage1ObjectiveKind.StartExpedition;
-
-            if (state.HasCounterattackDefended && !state.HasBossUnlocked)
-                return Stage1ObjectiveKind.PrepareBoss;
-
-            if (state.HasBossUnlocked)
-                return Stage1ObjectiveKind.StartBossEncounter;
-
-            return Stage1ObjectiveKind.PrepareBuild;
+            switch (objective)
+            {
+                case Stage1FlowObjective.RepairCamp:
+                    return Stage1ObjectiveKind.RepairCamp;
+                case Stage1FlowObjective.AssignWorker:
+                    return Stage1ObjectiveKind.AssignWorker;
+                case Stage1FlowObjective.PrepareBuild:
+                    return Stage1ObjectiveKind.PrepareBuild;
+                case Stage1FlowObjective.StartExpedition:
+                    return Stage1ObjectiveKind.StartExpedition;
+                case Stage1FlowObjective.ClearExpedition:
+                    return Stage1ObjectiveKind.ClearExpedition;
+                case Stage1FlowObjective.DefendCamp:
+                    return Stage1ObjectiveKind.DefendCamp;
+                case Stage1FlowObjective.PrepareBoss:
+                    return Stage1ObjectiveKind.PrepareBoss;
+                case Stage1FlowObjective.StartBossEncounter:
+                    return Stage1ObjectiveKind.StartBossEncounter;
+                case Stage1FlowObjective.DefeatBoss:
+                    return Stage1ObjectiveKind.DefeatBoss;
+                case Stage1FlowObjective.VerticalSliceComplete:
+                    return Stage1ObjectiveKind.VerticalSliceComplete;
+                default:
+                    return Stage1ObjectiveKind.None;
+            }
         }
 
-        private static string ResolveObjectiveHint(in Stage1HudState state)
+        private static string ToPresentationHint(Stage1FlowHint hint)
         {
-            if (state.SettlementStage == Stage1SettlementProgressStage.RepairResourcesReady)
-                return "Resources delivered. Keep building the camp core to finish repairs.";
-
-            if (state.SettlementStage < Stage1SettlementProgressStage.RepairResourcesReady)
-                return "Gather the camp resources needed to begin repairs.";
-
-            if (state.Objective == Stage1ObjectiveKind.AssignWorker)
-                return "The camp is repaired. Assign the camp builder to continue the loop.";
-
-            return string.Empty;
+            switch (hint)
+            {
+                case Stage1FlowHint.GatherRepairResources:
+                    return "Gather the camp resources needed to begin repairs.";
+                case Stage1FlowHint.ContinueRepairBuild:
+                    return "Resources delivered. Keep building the camp core to finish repairs.";
+                case Stage1FlowHint.AssignWorker:
+                    return "The camp is repaired. Assign the camp builder to continue the loop.";
+                default:
+                    return string.Empty;
+            }
         }
 
         private static bool TryReadPreparedBuild(out PreparedBuildSnapshot snapshot)

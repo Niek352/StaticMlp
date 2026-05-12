@@ -1,0 +1,17 @@
+{
+    "name": "StaticMlp.Features.Statuses.Contracts",
+    "rootNamespace": "StaticMlp.Features.Statuses",
+    "references": [
+        "FFS.StaticEcs",
+        "Game.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

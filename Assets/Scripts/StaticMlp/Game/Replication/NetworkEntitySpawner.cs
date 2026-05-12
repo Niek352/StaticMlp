@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking.Ownership;
 
@@ -6,7 +7,7 @@ namespace StaticMlp.Networking.Replication
 {
     public static class NetworkEntitySpawner
     {
-        public const ushort NetworkedEntityCluster = 1;
+        public const ushort NETWORKED_ENTITY_CLUSTER = 1;
 
         public static EntityGID SpawnServerEntity<TNetworkEntityType>(
             NetworkPeerId owner,
@@ -29,27 +30,11 @@ namespace StaticMlp.Networking.Replication
             where TNetworkEntityType : struct, INetworkEntityType
         {
             EnsureNetworkedEntityCluster();
-            var entity = SW.NewEntity<TNetworkEntityType>(NetworkedEntityCluster);
+            var entity = SW.NewEntity<TNetworkEntityType>(NETWORKED_ENTITY_CLUSTER);
             InitializeNetworkEntity(entity, owner, authority, networkArchetypeId);
 
             initialize?.Invoke(entity);
-
-            OwnershipTags.ApplyForServer(entity, owner, authority);
-            SpawnBroadcaster.SendSpawn(entity);
-            return entity.GID;
-        }
-
-        public static EntityGID SpawnServerEntity(
-            NetworkPeerId owner,
-            NetworkAuthority authority,
-            ushort networkArchetypeId,
-            Action<SW.Entity> initialize)
-        {
-            EnsureNetworkedEntityCluster();
-            var entity = SW.NewEntity<Default>(NetworkedEntityCluster);
-            InitializeNetworkEntity(entity, owner, authority, networkArchetypeId);
-
-            initialize?.Invoke(entity);
+            ValidateManifestComponents<TNetworkEntityType>(entity);
 
             OwnershipTags.ApplyForServer(entity, owner, authority);
             SpawnBroadcaster.SendSpawn(entity);
@@ -74,8 +59,33 @@ namespace StaticMlp.Networking.Replication
 
         private static void EnsureNetworkedEntityCluster()
         {
-            if (!SW.ClusterIsRegistered(NetworkedEntityCluster))
-                SW.RegisterCluster(NetworkedEntityCluster);
+            if (!SW.ClusterIsRegistered(NETWORKED_ENTITY_CLUSTER))
+                SW.RegisterCluster(NETWORKED_ENTITY_CLUSTER);
+        }
+
+        private static void ValidateManifestComponents<TNetworkEntityType>(SW.Entity entity)
+            where TNetworkEntityType : struct, INetworkEntityType
+        {
+            var manifest = typeof(TNetworkEntityType).GetCustomAttribute<NetworkEntityManifestAttribute>();
+            if (manifest == null)
+                throw new InvalidOperationException(
+                    $"Network entity type `{typeof(TNetworkEntityType).FullName}` is missing {nameof(NetworkEntityManifestAttribute)}.");
+
+            for (var i = 0; i < manifest.ReplicatedComponents.Length; i++)
+            {
+                var componentType = manifest.ReplicatedComponents[i];
+                if (!ReplicationRegistry.IsReplicatedComponentRegistered(componentType))
+                {
+                    throw new InvalidOperationException(
+                        $"Network entity `{typeof(TNetworkEntityType).Name}` declares replicated component `{componentType.FullName}` in its manifest, but that component is not registered in {nameof(ReplicationRegistry)}.");
+                }
+
+                if (!ReplicationRegistry.HasReplicatedComponent(entity, componentType))
+                {
+                    throw new InvalidOperationException(
+                        $"Network entity `{typeof(TNetworkEntityType).Name}` was spawned without required manifest component `{componentType.FullName}`.");
+                }
+            }
         }
     }
 }

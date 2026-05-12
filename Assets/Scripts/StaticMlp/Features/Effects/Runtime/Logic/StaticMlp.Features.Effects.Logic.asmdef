@@ -4,7 +4,8 @@
     "references": [
         "FFS.StaticEcs",
         "Ecs.Networking",
-        "Game.Core"
+        "Game.Core",
+        "StaticMlp.Features.Effects.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

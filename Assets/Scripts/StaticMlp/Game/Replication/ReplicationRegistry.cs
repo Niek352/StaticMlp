@@ -92,6 +92,37 @@ namespace StaticMlp.Networking.Replication
                    && handler.Authority == ReplicationAuthority.Owner;
         }
 
+        public static bool IsReplicatedComponentRegistered(Type componentType)
+        {
+            if (componentType == null)
+                throw new ArgumentNullException(nameof(componentType));
+
+            foreach (var handler in ComponentHandlers.Values)
+            {
+                if (handler.ComponentType == componentType)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool HasReplicatedComponent(SW.Entity entity, Type componentType)
+        {
+            if (componentType == null)
+                throw new ArgumentNullException(nameof(componentType));
+
+            foreach (var handler in ComponentHandlers.Values)
+            {
+                if (handler.ComponentType != componentType)
+                    continue;
+
+                return handler.Has(entity);
+            }
+
+            throw new InvalidOperationException(
+                $"Replicated component `{componentType.FullName}` is not registered in {nameof(ReplicationRegistry)}.");
+        }
+
         public static string GetComponentDisplayName(ushort componentTypeId)
         {
             if (componentTypeId == NetworkIdentityReplication.TypeId)
@@ -246,6 +277,7 @@ namespace StaticMlp.Networking.Replication
 
         private interface IComponentHandler
         {
+            Type ComponentType { get; }
             string ComponentDisplayName { get; }
             ReplicationAuthority Authority { get; }
             ReplicationAudience Audience { get; }
@@ -298,6 +330,7 @@ namespace StaticMlp.Networking.Replication
             }
 
             private ushort TypeId { get; }
+            public Type ComponentType => typeof(T);
             public string ComponentDisplayName { get; }
             public ReplicationAuthority Authority { get; }
             public ReplicationAudience Audience { get; }

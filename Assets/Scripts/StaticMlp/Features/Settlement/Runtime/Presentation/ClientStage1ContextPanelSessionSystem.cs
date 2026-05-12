@@ -28,8 +28,9 @@ namespace StaticMlp.Features.Settlement
 
             if (stage < Stage1SettlementProgressStage.CampRepaired)
             {
-                if (!TryFindRepairFocusSite(anchor, out var repairSite))
+                if (!TryFindRepairFocusSite(out var repairSite))
                 {
+                    return;
                     throw new InvalidOperationException(
                         $"Stage 1 repair flow requires a construction-site repair target for anchor {SettlementAnchorCatalog.HomeCampId.Value}.");
                 }
@@ -57,11 +58,8 @@ namespace StaticMlp.Features.Settlement
             session.FocusedSite = default;
         }
 
-        private bool TryFindRepairFocusSite(CW.Entity anchor, out CW.Entity site)
+        private bool TryFindRepairFocusSite(out CW.Entity site)
         {
-            if (TryUseAnchorAsRepairSite(anchor, out site))
-                return true;
-
             if (TryFindAnchorRepairSite(SettlementAnchorCatalog.HomeCampId, out site))
                 return true;
 
@@ -100,10 +98,10 @@ namespace StaticMlp.Features.Settlement
 
         private static bool TryFindAnchorRepairSite(SettlementAnchorId anchorId, out CW.Entity site)
         {
-            foreach (var entity in CW.Query<All<ConstructionSiteState, Stage1SettlementProgression>>().Entities())
+            foreach (var entity in CW.Query<All<ConstructionSiteState, SettlementAnchorRef>>().Entities())
             {
-                ref readonly var progression = ref entity.Read<Stage1SettlementProgression>();
-                if (progression.AnchorId != anchorId.Value)
+                ref readonly var anchorRef = ref ClientProjection.Read<SettlementAnchorRef>(entity);
+                if (anchorRef.AnchorId != anchorId.Value)
                     continue;
 
                 ref readonly var state = ref ClientProjection.Read<ConstructionSiteState>(entity);
@@ -111,18 +109,6 @@ namespace StaticMlp.Features.Settlement
                     continue;
 
                 site = entity;
-                return true;
-            }
-
-            site = default;
-            return false;
-        }
-
-        private static bool TryUseAnchorAsRepairSite(CW.Entity anchor, out CW.Entity site)
-        {
-            if (anchor.Has<ConstructionSiteState>())
-            {
-                site = anchor;
                 return true;
             }
 

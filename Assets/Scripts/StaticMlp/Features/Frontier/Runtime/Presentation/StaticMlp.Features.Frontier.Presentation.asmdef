@@ -10,8 +10,11 @@
         "Unity.TextMeshPro",
         "UnityEngine.UI",
         "StaticMlp.Features.Build.Logic",
+        "StaticMlp.Features.Frontier.Contracts",
+        "StaticMlp.Features.Progression.Contracts",
         "StaticMlp.Features.Frontier.Logic",
         "StaticMlp.Features.Progression.Logic",
+        "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Settlement.Logic"
     ],
     "includePlatforms": [],

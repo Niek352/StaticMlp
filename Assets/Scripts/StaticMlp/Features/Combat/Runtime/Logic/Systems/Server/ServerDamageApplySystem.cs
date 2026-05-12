@@ -39,7 +39,7 @@ namespace StaticMlp.Features.Combat
 
             if (!targetRef.Value.TryUnpack<ServerWT>(out var target))
             {
-                effect.Set<EffectProcessedTag>();
+                EffectLifecycle.MarkProcessed(effect);
                 SW.GetResource<CombatDebugLogBuffer>().Append(
                     $"discard damage target={targetRef.Value} type={damageRef.Type} reason=missing_target");
                 return;
@@ -60,7 +60,7 @@ namespace StaticMlp.Features.Combat
 
             var previous = health.Current;
             health.Current = next;
-            effect.Set<EffectProcessedTag>();
+            EffectLifecycle.MarkProcessed(effect);
 
             SW.GetResource<CombatDebugLogBuffer>().Append(
                 $"apply damage target={target.GID} type={damageRef.Type} previous={previous} current={health.Current}");

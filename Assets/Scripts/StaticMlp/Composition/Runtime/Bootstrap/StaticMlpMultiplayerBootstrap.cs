@@ -409,7 +409,6 @@ namespace StaticMlp.Composition
             _multiplayerStatusUi = _multiplayerStatusUiInstance.GetComponent<MultiplayerStatusUi>();
             if (_multiplayerStatusUi == null)
                 throw new MissingComponentException($"Multiplayer UI prefab must have {nameof(MultiplayerStatusUi)} on its root.");
-
             _multiplayerStatusUi.Bind(this);
 
             if (dontDestroyOnLoad)

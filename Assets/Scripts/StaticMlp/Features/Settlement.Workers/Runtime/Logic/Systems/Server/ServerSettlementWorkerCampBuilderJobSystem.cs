@@ -19,15 +19,11 @@ namespace StaticMlp.Features.Settlement.Workers
                 var jobState = CreateJobState(progression.Anchor, assignedWorker, in progression);
                 var summary = CreateSummary(progression.Anchor, jobState, assignedWorker);
 
-                Apply(anchor, jobState);
-                Apply(anchor, summary);
+                ref var mutableJobState = ref ReplicationMut.Mut<SettlementCampBuilderJobState>(anchor);
+                mutableJobState = jobState;
 
-                if (assignedWorker.TryUnpack<ServerWT>(out _)
-                    && progression.Stage == Stage1SettlementProgressStage.CampRepaired)
-                {
-                    ref var mutableProgression = ref ReplicationMut.Mut<Stage1SettlementProgression>(anchor);
-                    mutableProgression.AdvanceTo(Stage1SettlementProgressStage.WorkerAssigned);
-                }
+                ref var mutableSummary = ref ReplicationMut.Mut<SettlementWorkerSummary>(anchor);
+                mutableSummary = summary;
             }
         }
 
@@ -210,30 +206,6 @@ namespace StaticMlp.Features.Settlement.Workers
             }
 
             return false;
-        }
-
-        private static void Apply(SW.Entity anchor, SettlementCampBuilderJobState state)
-        {
-            if (anchor.Has<SettlementCampBuilderJobState>())
-            {
-                ref var mutable = ref ReplicationMut.Mut<SettlementCampBuilderJobState>(anchor);
-                mutable = state;
-                return;
-            }
-
-            anchor.Set(state);
-        }
-
-        private static void Apply(SW.Entity anchor, SettlementWorkerSummary summary)
-        {
-            if (anchor.Has<SettlementWorkerSummary>())
-            {
-                ref var mutable = ref ReplicationMut.Mut<SettlementWorkerSummary>(anchor);
-                mutable = summary;
-                return;
-            }
-
-            anchor.Set(summary);
         }
     }
 }

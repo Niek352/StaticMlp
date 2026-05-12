@@ -17,7 +17,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
 
-            var gid = PlayerSpawns.SpawnPlayer(new NetworkPeerId(1), new Vector3(2f, 0f, 0f));
+            var gid = PlayerSpawns.Spawn(new PlayerSpawnSpec(new NetworkPeerId(1), new Vector3(2f, 0f, 0f), Quaternion.identity));
 
             Assert.That(gid.TryUnpack<ServerWT>(out var entity), Is.True);
             Assert.That(entity.Has<PlayerTag>(), Is.True);

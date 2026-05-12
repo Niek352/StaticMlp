@@ -1,0 +1,22 @@
+{
+    "name": "StaticMlp.Features.Buildings.Contracts",
+    "rootNamespace": "StaticMlp.Features.Buildings",
+    "references": [
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.BuildingCatalog",
+        "StaticMlp.Features.Settlement.Contracts",
+        "StaticMlp.Features.Settlement.Logic"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

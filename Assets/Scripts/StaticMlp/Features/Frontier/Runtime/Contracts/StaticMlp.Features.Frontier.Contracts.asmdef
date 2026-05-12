@@ -1,0 +1,19 @@
+{
+    "name": "StaticMlp.Features.Frontier.Contracts",
+    "rootNamespace": "StaticMlp.Features.Frontier",
+    "references": [
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Game.Core",
+        "StaticMlp.Features.Settlement.Contracts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

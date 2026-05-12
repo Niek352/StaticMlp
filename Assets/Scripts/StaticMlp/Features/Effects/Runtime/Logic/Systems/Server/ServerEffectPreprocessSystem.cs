@@ -40,7 +40,7 @@ namespace StaticMlp.Features.Effects
 
         private static void Reject(SW.Entity effect, EffectRejectedReasonCode reason, string log)
         {
-            effect.Set<EffectRejectedTag>();
+            EffectLifecycle.MarkRejected(effect);
             effect.Set(new EffectRejectedReason { Value = reason });
             SW.GetResource<CombatDebugLogBuffer>().Append(log);
         }

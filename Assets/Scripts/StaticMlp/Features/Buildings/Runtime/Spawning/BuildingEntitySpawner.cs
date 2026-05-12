@@ -1,0 +1,123 @@
+using System;
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Features.Settlement;
+using StaticMlp.Networking;
+using StaticMlp.Networking.Replication;
+
+namespace StaticMlp.Features.Buildings
+{
+    public static class BuildingEntitySpawner
+    {
+        public static EntityGID SpawnConstructionSite(in ConstructionSiteSpawnSpec spec)
+        {
+            if (spec.AnchorId.Value == 0)
+                throw new InvalidOperationException("Construction site spawn requires a non-zero settlement anchor id.");
+
+            if (!BuildingNetworkCatalog.TryGet(spec.Definition.Id, out var network))
+                throw new InvalidOperationException($"Missing network catalog entry for building {spec.Definition.Id}.");
+
+            var localSpec = spec;
+            return NetworkEntitySpawner.SpawnServerEntity<ConstructionSiteNetworkEntity>(
+                spec.Owner,
+                NetworkAuthority.Server,
+                network.BlueprintArchetypeId,
+                entity => InitializeConstructionSite(entity, in localSpec));
+        }
+
+        public static EntityGID SpawnFinishedBuilding(in FinishedBuildingSpawnSpec spec)
+        {
+            if (spec.AnchorId.Value == 0)
+                throw new InvalidOperationException("Finished building spawn requires a non-zero settlement anchor id.");
+
+            if (!BuildingNetworkCatalog.TryGet(spec.Definition.Id, out var network))
+                throw new InvalidOperationException($"Missing network catalog entry for building {spec.Definition.Id}.");
+
+            var localSpec = spec;
+            return NetworkEntitySpawner.SpawnServerEntity<FinishedBuildingNetworkEntity>(
+                spec.Owner,
+                NetworkAuthority.Server,
+                network.FinishedArchetypeId,
+                entity => InitializeFinishedBuilding(entity, in localSpec));
+        }
+
+        private static void InitializeConstructionSite(SW.Entity entity, in ConstructionSiteSpawnSpec spec)
+        {
+            var woodCost = spec.Definition.GetConstructionCost(ResourceCatalog.WoodId);
+            var stoneCost = spec.Definition.GetConstructionCost(ResourceCatalog.StoneId);
+
+            entity.Set(new SettlementAnchorRef(spec.AnchorId));
+            entity.Set<ConstructionSiteTag>();
+            entity.Set(new ConstructionSiteState
+            {
+                BuildingId = spec.Definition.Id.Value,
+                Phase = ConstructionPhase.WaitingForResources
+            });
+            entity.Set(new ConstructionTransform
+            {
+                Position = spec.Position,
+                Rotation = spec.Rotation
+            });
+            entity.Set(new ConstructionResources
+            {
+                WoodRequired = woodCost,
+                StoneRequired = stoneCost
+            });
+            entity.Set(new ConstructionProgress
+            {
+                BuildWorkRequired = spec.Definition.BuildWorkRequired
+            });
+            entity.Set(new BuildingFootprint(spec.Definition.FootprintWidth, spec.Definition.FootprintLength));
+
+            if (spec.StartReadyToBuild)
+            {
+                ref var siteState = ref ReplicationMut.Mut<ConstructionSiteState>(entity);
+                ref var siteResources = ref ReplicationMut.Mut<ConstructionResources>(entity);
+                siteResources.WoodDelivered = siteResources.WoodRequired;
+                siteResources.StoneDelivered = siteResources.StoneRequired;
+                siteState.Phase = ConstructionPhase.ReadyToBuild;
+            }
+
+            if (spec.InitialBuildWork <= 0f)
+                return;
+
+            ref var buildState = ref ReplicationMut.Mut<ConstructionSiteState>(entity);
+            ref readonly var buildResources = ref entity.Read<ConstructionResources>();
+            ref var progress = ref ReplicationMut.Mut<ConstructionProgress>(entity);
+            ConstructionRules.ApplyBuildWork(
+                ref buildState,
+                ref progress,
+                in buildResources,
+                spec.InitialBuildWork,
+                progress.BuildWorkRequired);
+        }
+
+        private static void InitializeFinishedBuilding(SW.Entity entity, in FinishedBuildingSpawnSpec spec)
+        {
+            var woodCost = spec.Definition.GetConstructionCost(ResourceCatalog.WoodId);
+            var stoneCost = spec.Definition.GetConstructionCost(ResourceCatalog.StoneId);
+
+            entity.Set(new SettlementAnchorRef(spec.AnchorId));
+            entity.Set<FinishedBuildingTag>();
+            entity.Set(new ConstructionSiteState
+            {
+                BuildingId = spec.Definition.Id.Value,
+                Phase = ConstructionPhase.Completed
+            });
+            entity.Set(spec.Transform);
+            entity.Set(new ConstructionResources
+            {
+                WoodRequired = woodCost,
+                StoneRequired = stoneCost,
+                WoodDelivered = woodCost,
+                StoneDelivered = stoneCost
+            });
+            entity.Set(new ConstructionProgress
+            {
+                BuildWorkRequired = spec.Definition.BuildWorkRequired,
+                BuildWorkDone = spec.Definition.BuildWorkRequired
+            });
+            entity.Set(new BuildingFootprint(spec.Definition.FootprintWidth, spec.Definition.FootprintLength));
+        }
+    }
+}

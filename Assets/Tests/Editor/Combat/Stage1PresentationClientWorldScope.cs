@@ -8,6 +8,7 @@ using StaticMlp.Features.Player;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
+using StaticMlp.Features.Stage1;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
@@ -35,6 +36,7 @@ namespace StaticMlp.Tests.Combat
             new BuildingsGameplayFeature().RegisterNetworkEvents();
             new FrontierLogicFeature().RegisterNetworkEvents();
             new ProgressionLogicFeature().RegisterNetworkEvents();
+            new Stage1CampAnchorGameplayFeature().RegisterNetworkEvents();
 
             
             CW.Create(WorldConfig.Default());
@@ -50,6 +52,7 @@ namespace StaticMlp.Tests.Combat
                 typeof(FrontierPresentationFeature).Assembly,
                 typeof(ProgressionLogicFeature).Assembly,
                 typeof(ProgressionPresentationFeature).Assembly,
+                typeof(Stage1CampAnchorGameplayFeature).Assembly,
                 typeof(PlayerTag).Assembly);
             ProjectionRegistry.RegisterClientWorldTypes();
             NetworkEventRegistry.RegisterClientWorldTypes();
@@ -72,6 +75,7 @@ namespace StaticMlp.Tests.Combat
                 Stage = stage
             });
             anchor.Set(new Stage1ProgressionState(SettlementAnchorCatalog.HomeCampId, 0));
+            anchor.Set(CreateFlowViewState(stage, expeditionAvailability, expeditionActivity, threatPhase, bossStatus));
             anchor.Set(new SettlementWorkerSummary
             {
                 AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
@@ -162,6 +166,7 @@ namespace StaticMlp.Tests.Combat
                 StoneRequired = stoneRequired,
                 StoneDelivered = stoneDelivered
             });
+            site.Set(new SettlementAnchorRef(SettlementAnchorCatalog.HomeCampId));
             site.Set(new ConstructionProgress
             {
                 BuildWorkRequired = 1f,
@@ -218,6 +223,81 @@ namespace StaticMlp.Tests.Combat
         public void RefreshProjections()
         {
             ProjectionRegistry.Rebuild();
+        }
+
+        private static Stage1FlowViewState CreateFlowViewState(
+            Stage1SettlementProgressStage stage,
+            ExpeditionAvailabilityStatus expeditionAvailability,
+            ExpeditionActivityStatus expeditionActivity,
+            ThreatPhase threatPhase,
+            BossEncounterStatus bossStatus)
+        {
+            return new Stage1FlowViewState
+            {
+                AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                Stage = stage,
+                Objective = ResolveObjective(stage, expeditionAvailability, expeditionActivity, threatPhase, bossStatus),
+                Hint = ResolveHint(stage),
+                CanToggleWorkerAssignment = stage >= Stage1SettlementProgressStage.CampRepaired,
+                CanOpenBuildPreparation = stage >= Stage1SettlementProgressStage.WorkerAssigned
+                                         && bossStatus != BossEncounterStatus.Active
+                                         && bossStatus != BossEncounterStatus.Defeated,
+                CanOpenExpeditionSelection = expeditionAvailability == ExpeditionAvailabilityStatus.Available
+                                             && expeditionActivity == ExpeditionActivityStatus.None
+                                             && threatPhase != ThreatPhase.RaidPending
+                                             && threatPhase != ThreatPhase.RaidActive
+            };
+        }
+
+        private static Stage1FlowObjective ResolveObjective(
+            Stage1SettlementProgressStage stage,
+            ExpeditionAvailabilityStatus expeditionAvailability,
+            ExpeditionActivityStatus expeditionActivity,
+            ThreatPhase threatPhase,
+            BossEncounterStatus bossStatus)
+        {
+            if (bossStatus == BossEncounterStatus.Defeated)
+                return Stage1FlowObjective.VerticalSliceComplete;
+
+            if (bossStatus == BossEncounterStatus.Active)
+                return Stage1FlowObjective.DefeatBoss;
+
+            if (bossStatus == BossEncounterStatus.Available)
+                return Stage1FlowObjective.StartBossEncounter;
+
+            if (threatPhase == ThreatPhase.RaidPending || threatPhase == ThreatPhase.RaidActive)
+                return Stage1FlowObjective.DefendCamp;
+
+            if (expeditionActivity == ExpeditionActivityStatus.Active)
+                return Stage1FlowObjective.ClearExpedition;
+
+            if (stage < Stage1SettlementProgressStage.CampRepaired)
+                return Stage1FlowObjective.RepairCamp;
+
+            if (stage < Stage1SettlementProgressStage.WorkerAssigned)
+                return Stage1FlowObjective.AssignWorker;
+
+            if (stage < Stage1SettlementProgressStage.BuildPrepared)
+                return Stage1FlowObjective.PrepareBuild;
+
+            if (expeditionAvailability == ExpeditionAvailabilityStatus.Available)
+                return Stage1FlowObjective.StartExpedition;
+
+            return Stage1FlowObjective.PrepareBuild;
+        }
+
+        private static Stage1FlowHint ResolveHint(Stage1SettlementProgressStage stage)
+        {
+            if (stage == Stage1SettlementProgressStage.RepairResourcesReady)
+                return Stage1FlowHint.ContinueRepairBuild;
+
+            if (stage < Stage1SettlementProgressStage.RepairResourcesReady)
+                return Stage1FlowHint.GatherRepairResources;
+
+            if (stage == Stage1SettlementProgressStage.CampRepaired)
+                return Stage1FlowHint.AssignWorker;
+
+            return Stage1FlowHint.None;
         }
 
         public void Dispose()

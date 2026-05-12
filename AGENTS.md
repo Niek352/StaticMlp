@@ -54,6 +54,7 @@ Gameplay systems should only:
 - Do not cross module boundaries with hidden dependencies or direct calls when an event/component boundary belongs there.
 - Do not store `Entity` across frames; use `EntityGID` for persistent references.
 - Do not expose entity references as raw `ulong`, `*Raw`, or similar surrogate fields in gameplay/replication contracts. Use `EntityGID` directly, and only touch `.Raw` at explicit serialization/codegen boundaries.
+- Do not manually edit `.Generated.cs` files. They must be changed only through the corresponding code generation pipeline.
 - Do not create `static class` types to store mutable runtime data, commands, or state.
 - Private fields use `_camelCase` naming, for example `_mvcManager`.
 - `const` members use `CAPS_UNDER` naming.

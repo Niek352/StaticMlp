@@ -9,7 +9,11 @@
         "UniTask",
         "Unity.TextMeshPro",
         "UnityEngine.UI",
+        "StaticMlp.Features.Buildings.Contracts",
         "StaticMlp.Features.Build.Logic",
+        "StaticMlp.Features.Progression.Contracts",
+        "StaticMlp.Features.Settlement.Contracts",
+        "StaticMlp.Features.Stage1.Contracts",
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.Frontier.Logic",
         "StaticMlp.Features.Player",
@@ -18,7 +22,8 @@
         "StaticMlp.Features.Settlement.Workers.Logic",
         "StaticMlp.Features.AiBots",
         "StaticMlp.Features.Frontier.Presentation",
-        "StaticMlp.Features.Build.Presentation"
+        "StaticMlp.Features.Build.Presentation",
+        "StaticMlp.Features.Settlement.Workers.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

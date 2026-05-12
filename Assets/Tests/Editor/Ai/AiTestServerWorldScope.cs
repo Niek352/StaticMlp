@@ -112,6 +112,15 @@ namespace StaticMlp.Tests.Ai
                 AnchorId = anchorId.Value,
                 Stage = stage
             });
+            entity.Set(new SettlementAnchorLocation(Vector3.zero, Quaternion.identity));
+            entity.Set(new SettlementWorkerSummary
+            {
+                AnchorId = anchorId.Value
+            });
+            entity.Set(new SettlementCampBuilderJobState
+            {
+                AnchorId = anchorId.Value
+            });
             return entity;
         }
 
@@ -139,6 +148,7 @@ namespace StaticMlp.Tests.Ai
         {
             var entity = SW.NewEntity<Default>();
             entity.Set<ConstructionSiteTag>();
+            entity.Set(new SettlementAnchorRef(SettlementAnchorCatalog.HomeCampId));
             entity.Set(new ConstructionSiteState
             {
                 BuildingId = 1,

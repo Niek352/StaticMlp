@@ -1,6 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Build
 {
@@ -21,15 +22,12 @@ namespace StaticMlp.Features.Build
                 break;
             }
 
-            foreach (var anchor in CW.Query<All<Stage1SettlementProgression>>().Entities())
-            {
-                next.IsAvailable = anchor.Read<Stage1SettlementProgression>().Stage >= Stage1SettlementProgressStage.CampRepaired;
-                break;
-            }
+            if (Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
+                next.IsAvailable = ClientProjection.Read<Stage1FlowViewState>(anchor).CanOpenBuildPreparation;
 
-            foreach (var anchor in CW.Query<All<BossBuildPreparationState>>().Entities())
+            foreach (var bossPreparation in CW.Query<All<BossBuildPreparationState>>().Entities())
             {
-                next.IsBossCommitted = anchor.Read<BossBuildPreparationState>().Status == BossBuildPreparationStatus.Committed;
+                next.IsBossCommitted = bossPreparation.Read<BossBuildPreparationState>().Status == BossBuildPreparationStatus.Committed;
                 break;
             }
 

@@ -29,49 +29,17 @@ namespace StaticMlp.Features.Buildings
         private static void SpawnInitialSite(Stage1ConstructionSiteSeed definition)
         {
             var buildingDefinition = BuildingCatalogData.Get(new BuildingId(definition.BuildingId));
-            var siteGid = ServerBuildingSpawns.SpawnConstructionSite(
+            var siteGid = BuildingEntitySpawner.SpawnConstructionSite(new ConstructionSiteSpawnSpec(
                 new NetworkPeerId(0),
                 buildingDefinition,
+                new SettlementAnchorId(definition.AnchorId),
                 definition.Position,
                 definition.Rotation,
-                site => ConfigureInitialSite(site, definition));
+                definition.StartReadyToBuild,
+                definition.InitialBuildWork));
 
             if (!siteGid.TryUnpack<ServerWT>(out var site))
                 throw new System.InvalidOperationException("Spawned initial construction site could not be unpacked in server world.");
-        }
-
-        private static void ConfigureInitialSite(SW.Entity site, Stage1ConstructionSiteSeed definition)
-        {
-            if (definition.AnchorId != 0)
-            {
-                site.Set(new Stage1SettlementProgression
-                {
-                    AnchorId = definition.AnchorId,
-                    Stage = Stage1SettlementProgressStage.DamagedCampStart
-                });
-            }
-
-            if (definition.StartReadyToBuild)
-            {
-                ref var siteState = ref ReplicationMut.Mut<ConstructionSiteState>(site);
-                ref var siteResources = ref ReplicationMut.Mut<ConstructionResources>(site);
-                siteResources.WoodDelivered = siteResources.WoodRequired;
-                siteResources.StoneDelivered = siteResources.StoneRequired;
-                siteState.Phase = ConstructionPhase.ReadyToBuild;
-            }
-
-            if (definition.InitialBuildWork <= 0f)
-                return;
-
-            ref var buildState = ref ReplicationMut.Mut<ConstructionSiteState>(site);
-            ref readonly var buildResources = ref site.Read<ConstructionResources>();
-            ref var progress = ref ReplicationMut.Mut<ConstructionProgress>(site);
-            ConstructionRules.ApplyBuildWork(
-                ref buildState,
-                ref progress,
-                in buildResources,
-                definition.InitialBuildWork,
-                progress.BuildWorkRequired);
         }
 
         private static bool HasAnyConstructionSite()

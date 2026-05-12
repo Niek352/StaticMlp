@@ -14,7 +14,7 @@ namespace StaticMlp.Features.Frontier
         public void Update()
         {
             var simulationTime = SW.GetResource<SimulationTime>();
-            foreach (var anchor in SW.Query<All<Stage1SettlementProgression, ConstructionTransform, RaidScheduleState, ThreatState>>().Entities())
+            foreach (var anchor in SW.Query<All<Stage1SettlementProgression, SettlementAnchorLocation, RaidScheduleState, ThreatState>>().Entities())
             {
                 ref readonly var raidSchedule = ref anchor.Read<RaidScheduleState>();
                 if (raidSchedule.Status != RaidScheduleStatus.Pending
@@ -24,7 +24,7 @@ namespace StaticMlp.Features.Frontier
                 }
 
                 var raid = RaidCatalog.Get(raidSchedule.RaidId);
-                var origin = anchor.Read<ConstructionTransform>().Position + RAID_SPAWN_OFFSET;
+                var origin = anchor.Read<SettlementAnchorLocation>().Position + RAID_SPAWN_OFFSET;
                 FrontierEncounterSpawner.SpawnEncounter(
                     anchor.Read<Stage1SettlementProgression>().AnchorId,
                     FrontierEncounterKind.Raid,
