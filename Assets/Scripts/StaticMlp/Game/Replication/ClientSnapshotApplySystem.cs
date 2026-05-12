@@ -23,7 +23,7 @@ namespace StaticMlp.Networking.Replication {
             if (!CW.ClusterIsRegistered(snapshot.ClusterId))
                 CW.RegisterCluster(snapshot.ClusterId);
 
-            CW.Serializer.LoadClusterSnapshot(snapshot.Payload, gzip: snapshot.Gzip);
+            CW.Serializer.LoadClusterSnapshot(snapshot.Payload);
             MarkClusterAsRemote(snapshot.ClusterId);
             PostLoadCluster(snapshot.ClusterId);
         }
@@ -35,7 +35,7 @@ namespace StaticMlp.Networking.Replication {
             if (!CW.ChunkIsRegistered(snapshot.ChunkIdx))
                 CW.RegisterChunk(snapshot.ChunkIdx, ChunkOwnerType.Other, snapshot.ClusterId);
 
-            CW.Serializer.LoadChunkSnapshot(snapshot.Payload, gzip: snapshot.Gzip);
+            CW.Serializer.LoadChunkSnapshot(snapshot.Payload);
             MarkChunkAsRemote(snapshot.ChunkIdx);
             PostLoadCluster(snapshot.ClusterId);
         }

@@ -20,11 +20,10 @@
       "dependencies": {}
     },
     "com.felid-force-studios.static-ecs": {
-      "version": "https://github.com/Felid-Force-Studios/StaticEcs.git",
+      "version": "file:com.felid-force-studios.static-ecs",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "b9ab907789ecc5320d5cffa762866629200457a6"
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.felid-force-studios.static-ecs-unity": {
       "version": "file:StaticEcs-Unity",
@@ -37,7 +36,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "bee2fd4eea9803c6bdfc89593d69d70ca417cbca"
+      "hash": "9533a6c7019459d4bf9084057f6047172b9e96aa"
     },
     "com.projectdawn.navigation": {
       "version": "file:com.projectdawn.navigation",

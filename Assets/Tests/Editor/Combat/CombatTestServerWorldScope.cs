@@ -262,7 +262,6 @@ namespace StaticMlp.Tests.Combat
             NetworkPeerId? owner = null)
         {
             const ushort woodenHutBuildingId = 1;
-            const ushort woodenHutBlueprintArchetypeId = 100;
 
             var definition = BuildingCatalogData.Get(new BuildingId(woodenHutBuildingId));
             var gid = SW.GetResource<BuildingEntityFactory>().SpawnConstructionSite(new ConstructionSiteSpawnSpec(
