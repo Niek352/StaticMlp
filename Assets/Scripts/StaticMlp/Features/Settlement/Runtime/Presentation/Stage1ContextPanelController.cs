@@ -8,7 +8,8 @@ using UnityEngine;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class Stage1ContextPanelController : ControllerBase<Stage1ContextPanelView>
+    public sealed class Stage1ContextPanelController
+        : ControllerBase<Stage1ContextPanelView>, IResourcePresentationController<Stage1ContextPanelState>
     {
         private const float UI_BUILD_WORK_PER_CLICK = 35f;
 

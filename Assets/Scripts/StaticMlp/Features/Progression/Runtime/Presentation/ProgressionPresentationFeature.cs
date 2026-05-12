@@ -9,14 +9,14 @@ namespace StaticMlp.Features.Progression
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
-            var bridge = new ControllerResourceBridgeSystem<RewardResultPopupController, RewardResultPopupState>((controller, state) => controller.Apply(in state));
+            var bridge = new ControllerResourceBridgeSystem<RewardResultPopupController, RewardResultPopupState>();
 
             systems.Add(new ClientProgressionPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 40);
             systems.Add(new ClientRewardResultPopupStateSystem(), GameplaySystemOrder.ClientPresentation + 41);
             systems.Add(new PopupControllerHostSystem<RewardResultPopupView, RewardResultPopupController, RewardResultPopupState>(
                 _ => new RewardResultPopupController(ResourcesViewFactory.CreateLazy<RewardResultPopupView>(REWARD_RESULT_POPUP_VIEW_RESOURCE_PATH), bridge),
-                state => state.IsVisible,
-                (controller, state) => controller.Apply(in state)), GameplaySystemOrder.ClientPresentation + 43);
+                state => state.IsVisible), GameplaySystemOrder.ClientPresentation + 43);
+            systems.Add(bridge, GameplaySystemOrder.ClientPresentation + 44);
         }
     }
 }

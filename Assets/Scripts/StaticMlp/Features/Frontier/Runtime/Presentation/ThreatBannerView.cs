@@ -1,9 +1,8 @@
 using Code.EcsUi.Mvc;
-using StaticMlp.Features.Frontier;
 using TMPro;
 using UnityEngine;
 
-namespace StaticMlp.Features.Settlement
+namespace StaticMlp.Features.Frontier
 {
     public sealed class ThreatBannerView : PrefabViewBase
     {

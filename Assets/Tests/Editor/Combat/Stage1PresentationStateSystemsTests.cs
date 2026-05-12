@@ -1,5 +1,7 @@
 using System.Reflection;
+using System.Threading;
 using Code.EcsUi.Mvc;
+using Cysharp.Threading.Tasks;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
@@ -210,7 +212,7 @@ namespace StaticMlp.Tests.Combat
 
             var controller = new BuildPreparationController(
                 () => null,
-                new ControllerResourceBridgeSystem<BuildPreparationController, BuildPreparationScreenState>((_, _) => { }));
+                new ControllerResourceBridgeSystem<BuildPreparationController, BuildPreparationScreenState>());
             var sendSystem = new ClientNetworkEventSendSystem();
             sendSystem.Init();
 
@@ -264,7 +266,7 @@ namespace StaticMlp.Tests.Combat
 
             var controller = new ExpeditionSelectionController(
                 () => null,
-                new ControllerResourceBridgeSystem<ExpeditionSelectionController, ExpeditionSelectionScreenState>((_, _) => { }));
+                new ControllerResourceBridgeSystem<ExpeditionSelectionController, ExpeditionSelectionScreenState>());
             var sendSystem = new ClientNetworkEventSendSystem();
             sendSystem.Init();
 
@@ -302,11 +304,81 @@ namespace StaticMlp.Tests.Combat
             Assert.That(CW.GetResource<RewardResultPopupState>().IsVisible, Is.False);
         }
 
+        [Test]
+        public void ThreatBannerBridge_WhenStateSystemRunsBeforeSync_AppliesFreshThreatState()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(
+                stage: Stage1SettlementProgressStage.BuildPrepared,
+                threatPhase: ThreatPhase.RaidPending,
+                raidStatus: RaidScheduleStatus.Pending);
+            scope.RefreshProjections();
+
+            new ClientFrontierPresentationBootstrapSystem().Init();
+            var controller = new TestThreatBannerController { State = ControllerState.ViewFocused };
+            var bridge = new ControllerResourceBridgeSystem<TestThreatBannerController, ThreatBannerState>();
+            bridge.Bind(controller);
+            bridge.Activate();
+
+            new ClientThreatBannerStateSystem().Update();
+            bridge.Update();
+
+            Assert.That(controller.Phase, Is.EqualTo(ThreatPhase.RaidPending));
+            Assert.That(controller.RaidStatus, Is.EqualTo(RaidScheduleStatus.Pending));
+            Assert.That(controller.ActivateAtTick, Is.EqualTo(77));
+        }
+
         private static void InvokePrivate(object target, string methodName)
         {
             var method = target.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(method, Is.Not.Null, $"Expected private method '{methodName}' on {target.GetType().Name}.");
             method.Invoke(target, null);
+        }
+
+        private sealed class TestThreatBannerController : IController, IResourcePresentationController<ThreatBannerState>
+        {
+            public ControllerState State { get; set; }
+            public ViewLayer Layer => ViewLayer.Persistent;
+            public int? PersistentSortOrder => 200;
+            public bool CanBeClosedByEscape => false;
+            public ThreatPhase Phase { get; private set; }
+            public RaidScheduleStatus RaidStatus { get; private set; }
+            public uint ActivateAtTick { get; private set; }
+
+            public void Apply(in ThreatBannerState state)
+            {
+                Phase = state.Phase;
+                RaidStatus = state.RaidStatus;
+                ActivateAtTick = state.ActivateAtTick;
+            }
+
+            public void Dispose()
+            {
+            }
+
+            public void Focus()
+            {
+                State = ControllerState.ViewFocused;
+            }
+
+            public void Blur()
+            {
+                State = ControllerState.ViewBlurred;
+            }
+
+            public UniTask HideViewAsync(CancellationToken ct)
+            {
+                State = ControllerState.ViewHidden;
+                return UniTask.CompletedTask;
+            }
+
+            public void SetViewPresentationActive(bool isActive)
+            {
+            }
+
+            public void RequestClose()
+            {
+            }
         }
     }
 }

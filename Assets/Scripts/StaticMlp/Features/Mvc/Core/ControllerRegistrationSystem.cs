@@ -1,4 +1,3 @@
-using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
 
@@ -8,23 +7,17 @@ namespace Code.EcsUi.Mvc
         where TView : IView
         where TController : class, IController<TView, ControllerNoData>
     {
-        private readonly Func<IMvcManager, TController> _controllerFactory;
-        private TController _controller;
+        private readonly TController _controller;
 
-        public ControllerRegistrationSystem(Func<IMvcManager, TController> controllerFactory)
+        public ControllerRegistrationSystem(TController controller)
         {
-            _controllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
+            _controller = controller;
         }
 
         public void Init()
         {
             var manager = CW.GetResource<MvcManagerResource>().Manager;
-            _controller = _controllerFactory(manager);
             manager.RegisterController(_controller);
-        }
-
-        public void Update()
-        {
         }
     }
 }

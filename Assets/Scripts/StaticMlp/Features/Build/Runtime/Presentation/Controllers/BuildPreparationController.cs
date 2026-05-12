@@ -7,7 +7,8 @@ using StaticMlp.Networking.Ownership;
 
 namespace StaticMlp.Features.Build
 {
-    public sealed class BuildPreparationController : ControllerBase<BuildPreparationView>
+    public sealed class BuildPreparationController
+        : ControllerBase<BuildPreparationView>, IResourcePresentationController<BuildPreparationScreenState>
     {
         public BuildPreparationController(
             ViewFactoryMethod<BuildPreparationView> viewFactory,

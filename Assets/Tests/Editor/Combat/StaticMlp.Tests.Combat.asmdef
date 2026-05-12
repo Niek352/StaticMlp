@@ -38,7 +38,8 @@
         "StaticMlp.Features.Statuses.Presentation",
         "StaticMlp.Generated",
         "StaticMlp.Features.Progression.Logic",
-        "StaticMlp.Features.BuildingCatalog"
+        "StaticMlp.Features.BuildingCatalog",
+        "UniTask"
     ],
     "includePlatforms": [
         "Editor"

@@ -6,7 +6,8 @@ using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Frontier
 {
-    public sealed class ExpeditionSelectionController : ControllerBase<ExpeditionSelectionView>
+    public sealed class ExpeditionSelectionController
+        : ControllerBase<ExpeditionSelectionView>, IResourcePresentationController<ExpeditionSelectionScreenState>
     {
         public ExpeditionSelectionController(
             ViewFactoryMethod<ExpeditionSelectionView> viewFactory,

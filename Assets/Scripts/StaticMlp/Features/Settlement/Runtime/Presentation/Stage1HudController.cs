@@ -7,7 +7,8 @@ using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class Stage1HudController : ControllerBase<Stage1HudView>
+    public sealed class Stage1HudController
+        : ControllerBase<Stage1HudView>, IResourcePresentationController<Stage1HudState>
     {
         private readonly IMvcManager _mvcManager;
 

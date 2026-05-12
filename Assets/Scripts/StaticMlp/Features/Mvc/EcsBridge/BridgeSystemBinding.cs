@@ -32,7 +32,7 @@ namespace Code.EcsUi.Mvc
             presentationSyncSystem = systemInstance ?? throw new ArgumentNullException(nameof(systemInstance));
             presentationSyncSystem.Bind(controller);
 
-            if (controller.State != ControllerState.ViewFocused)
+            if (controller.State == ControllerState.ViewHidden)
                 return;
 
             presentationSyncSystem.Activate();
@@ -46,11 +46,6 @@ namespace Code.EcsUi.Mvc
 
             presentationSyncSystem.Activate();
             presentationSyncSystem.SyncOnce();
-        }
-
-        void IMvcControllerModule.OnBlur()
-        {
-            presentationSyncSystem?.Deactivate();
         }
 
         void IMvcControllerModule.OnViewShow()

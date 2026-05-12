@@ -3,7 +3,8 @@ using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Progression
 {
-    public sealed class RewardResultPopupController : ControllerBase<RewardResultPopupView>
+    public sealed class RewardResultPopupController
+        : ControllerBase<RewardResultPopupView>, IResourcePresentationController<RewardResultPopupState>
     {
         public RewardResultPopupController(
             ViewFactoryMethod<RewardResultPopupView> viewFactory,

@@ -10,17 +10,13 @@ namespace StaticMlp.Features.Build
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
-            var bridge = new ControllerResourceBridgeSystem<BuildPreparationController, BuildPreparationScreenState>((controller, state) => controller.Apply(in state));
+            var bridge = new ControllerResourceBridgeSystem<BuildPreparationController, BuildPreparationScreenState>();
 
             systems.Add(new ClientBuildPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 20);
             systems.Add(new ClientBuildPreparationScreenStateSystem(), GameplaySystemOrder.ClientPresentation + 21);
             systems.Add(new ControllerRegistrationSystem<BuildPreparationView, BuildPreparationController>(
-                _ => new BuildPreparationController(ResourcesViewFactory.CreateLazy<BuildPreparationView>(BUILD_PREPARATION_VIEW_RESOURCE_PATH), bridge),
-                controller =>
-                {
-                    var state = CW.GetResource<BuildPreparationScreenState>();
-                    controller.Apply(in state);
-                }), GameplaySystemOrder.ClientPresentation + 23);
+                new BuildPreparationController(ResourcesViewFactory.CreateLazy<BuildPreparationView>(BUILD_PREPARATION_VIEW_RESOURCE_PATH), bridge)), GameplaySystemOrder.ClientPresentation + 23);
+            systems.Add(bridge, GameplaySystemOrder.ClientPresentation + 24);
         }
     }
 }

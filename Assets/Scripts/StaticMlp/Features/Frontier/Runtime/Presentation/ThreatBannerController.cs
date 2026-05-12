@@ -1,9 +1,9 @@
 using Code.EcsUi.Mvc;
-using StaticMlp.Features.Frontier;
 
-namespace StaticMlp.Features.Settlement
+namespace StaticMlp.Features.Frontier
 {
-    public sealed class ThreatBannerController : ControllerBase<ThreatBannerView>
+    public sealed class ThreatBannerController
+        : ControllerBase<ThreatBannerView>, IResourcePresentationController<ThreatBannerState>
     {
         public ThreatBannerController(
             ViewFactoryMethod<ThreatBannerView> viewFactory,
