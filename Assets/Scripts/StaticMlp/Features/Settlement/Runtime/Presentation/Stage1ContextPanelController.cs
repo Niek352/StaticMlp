@@ -11,8 +11,6 @@ namespace StaticMlp.Features.Settlement
     public sealed class Stage1ContextPanelController
         : ControllerBase<Stage1ContextPanelView>, IResourcePresentationController<Stage1ContextPanelState>
     {
-        private const float UI_BUILD_WORK_PER_CLICK = 35f;
-
         public Stage1ContextPanelController(
             ViewFactoryMethod<Stage1ContextPanelView> viewFactory,
             ControllerResourceBridgeSystem<Stage1ContextPanelController, Stage1ContextPanelState> bridge)
@@ -73,7 +71,9 @@ namespace StaticMlp.Features.Settlement
             if (!state.CanBuild)
                 return;
 
-            var buildRequest = new BuildConstructionRequestEvent(state.FocusedSite, UI_BUILD_WORK_PER_CLICK);
+            var buildRequest = new BuildConstructionRequestEvent(
+                state.FocusedSite,
+                ConstructionActionProfiles.PlayerBuildClickWork);
             RequestApi.Send<BuildConstructionRequestEvent, BuildConstructionResultEvent>(buildRequest);
         }
 

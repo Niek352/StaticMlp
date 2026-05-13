@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
@@ -31,7 +32,7 @@ namespace StaticMlp.Features.Build
                 if (isBossBuildCommitted || syncState.LastSentPrimaryModuleId == selection.PrimaryModuleId)
                     continue;
 
-                var command = new PrepareBuildCommand(selection.PrimaryModuleId);
+                var command = new PrepareBuildCommand(SettlementAnchorCatalog.HomeCampId, selection.PrimaryModuleId);
                 CW.SendToServerEvent(in command);
                 syncState.LastSentPrimaryModuleId = selection.PrimaryModuleId;
             }

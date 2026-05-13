@@ -4,15 +4,12 @@ using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Settlement.Workers
 {
     public sealed class BuildConstructionExecutor : AiTaskExecutorBase
     {
         private const float BuildInteractionRange = 4f;
-        private const float BuildWorkPerSecond = 8f;
-
         private readonly AiTaskExecutionTransitions _transitions;
 
         public BuildConstructionExecutor(AiTaskExecutionTransitions transitions)
@@ -56,22 +53,11 @@ namespace StaticMlp.Features.Settlement.Workers
 
             _transitions.StopMovement(entity);
 
-            ref var mutableSiteState = ref ReplicationMut.Mut<ConstructionSiteState>(site);
-            ref var mutableProgress = ref ReplicationMut.Mut<ConstructionProgress>(site);
-            if (!ConstructionRules.ApplyBuildWork(
-                    ref mutableSiteState,
-                    ref mutableProgress,
-                    in siteResources,
-                    BuildWorkPerSecond * fixedStepSeconds,
-                    BuildWorkPerSecond))
-            {
-                _transitions.SwitchToIdle(entity, ref task);
-                return;
-            }
-
+            SW.SendEvent(new ApplyConstructionBuildWorkEvent(
+                site.GID,
+                ConstructionActionProfiles.WorkerBuildWorkPerSecond * fixedStepSeconds,
+                ConstructionActionProfiles.WorkerBuildWorkPerSecond));
             task.ElapsedTicks++;
-            if (mutableProgress.IsComplete)
-                _transitions.SwitchToIdle(entity, ref task);
         }
     }
 }

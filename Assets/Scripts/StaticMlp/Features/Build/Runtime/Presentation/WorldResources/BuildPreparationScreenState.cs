@@ -6,6 +6,7 @@ namespace StaticMlp.Features.Build
     {
         public bool IsAvailable;
         public bool CanConfirm;
+        public bool CanPrepareBoss;
         public bool IsBossCommitted;
         public BuildModuleId SelectedPrimaryModuleId;
         public bool PoisonArrowAvailable;

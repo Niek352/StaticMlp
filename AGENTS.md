@@ -40,8 +40,8 @@ Do not put networking, packet serialization, raw inbox/outbox access, UI composi
 Gameplay systems should only:
 
 1. Query entities by ownership tags.
-2. Modify replicated components through `Mut<T>()`.
-3. Send gameplay actions through typed replicated events when direct ownership is absent.
+2. Modify owned replicated components through `Mut<T>()`.
+3. Send gameplay actions through typed replicated events when direct ownership or feature ownership is absent.
 
 ## Architecture Rules
 
@@ -56,6 +56,8 @@ Gameplay systems should only:
 - Add feature systems through `GameplayFeature`, not by editing `MultiplayerSystemBootstrap`.
 - Register typed network commands through `GameplayFeature.RegisterNetworkEvents`.
 - Systems communicate through event components, not hidden direct calls across feature boundaries.
+- A feature must not write another feature's component or tag state through `Mut<T>()`, `ReplicationMut.Mut<T>()`, or `ClientProjection.Mut<T>()`.
+- Cross-feature writes must go through `IEvent`: the foreign feature sends the request or fact, and the owner feature system applies the state mutation.
 - Do not create vague extraction buckets such as `Helper`, `Utility`, or generic static orchestration classes.
 - Allowed extracted logic intents are explicit `Domain/Rules` and explicit `Spawner` abstractions.
 
@@ -71,6 +73,7 @@ Gameplay systems should only:
 - Use `[ReplicatedComponent]` for replicated components with stable GUIDs.
 - Enable `trackChanged` for replicated state deltas.
 - Use `Mut<T>()` for replicated state mutation and `Read<T>()` for read-only access.
+- Read-only access to another feature's public contracts is allowed; mutable access is owned by the feature that defines the state.
 - Prefer quantization for floats.
 - Use `UnreliableSequenced` for frequent movement/state updates.
 - Use `ReliableSequenced` for spawn, despawn, ownership, inventory, quests, and important events.

@@ -9,10 +9,13 @@
         "UniTask",
         "Unity.TextMeshPro",
         "UnityEngine.UI",
+        "StaticMlp.Features.Build.Contracts",
         "StaticMlp.Features.Build.Logic",
+        "StaticMlp.Features.Progression.Logic",
         "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Stage1.Contracts",
-        "StaticMlp.Features.Settlement.Logic"
+        "StaticMlp.Features.Settlement.Logic",
+        "StaticMlp.Features.Progression.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

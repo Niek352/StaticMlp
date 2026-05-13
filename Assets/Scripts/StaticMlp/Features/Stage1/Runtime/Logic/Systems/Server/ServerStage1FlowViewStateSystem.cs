@@ -44,7 +44,8 @@ namespace StaticMlp.Features.Stage1
                     && boss.Status != BossEncounterStatus.Active
                     && boss.Status != BossEncounterStatus.Defeated,
                 CanOpenExpeditionSelection =
-                    availability.Status == ExpeditionAvailabilityStatus.Available
+                    (availability.Status == ExpeditionAvailabilityStatus.Available
+                     || boss.Status == BossEncounterStatus.Available)
                     && expedition.Status == ExpeditionActivityStatus.None
                     && threat.Phase != ThreatPhase.RaidPending
                     && threat.Phase != ThreatPhase.RaidActive

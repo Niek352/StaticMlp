@@ -57,14 +57,19 @@ namespace StaticMlp.Features.Frontier
         public void Render(in ExpeditionSelectionScreenState state)
         {
             panelRoot.SetActive(true);
-            summaryLabel.text =
-                $"Expedition Selection\n" +
-                $"Destination: Nearby Raider Camp\n" +
-                $"Availability: {state.AvailabilityStatus}\n" +
-                $"Activity: {state.ActivityStatus}\n" +
-                $"Prepared build: {ExpeditionSelectionController.DescribePreparedBuild(state.PreparedPrimaryModuleId)}\n" +
-                $"Reward: Recovered War Cache\n" +
-                $"Threat: {state.ThreatPhase}";
+            summaryLabel.text = state.IsBossEncounterMode
+                ? $"Boss Encounter\n" +
+                  $"Target: Raider Chief\n" +
+                  $"Status: {state.BossStatus}\n" +
+                  $"Prepared build: {ExpeditionSelectionController.DescribePreparedBuild(state.PreparedPrimaryModuleId)}\n" +
+                  $"Threat: {state.ThreatPhase}"
+                : $"Expedition Selection\n" +
+                  $"Destination: Nearby Raider Camp\n" +
+                  $"Availability: {state.AvailabilityStatus}\n" +
+                  $"Activity: {state.ActivityStatus}\n" +
+                  $"Prepared build: {ExpeditionSelectionController.DescribePreparedBuild(state.PreparedPrimaryModuleId)}\n" +
+                  $"Reward: Recovered War Cache\n" +
+                  $"Threat: {state.ThreatPhase}";
             startButton.interactable = state.CanStart;
         }
 

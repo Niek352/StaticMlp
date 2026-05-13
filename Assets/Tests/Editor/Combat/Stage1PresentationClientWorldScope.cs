@@ -242,7 +242,8 @@ namespace StaticMlp.Tests.Combat
                 CanOpenBuildPreparation = stage >= Stage1SettlementProgressStage.WorkerAssigned
                                          && bossStatus != BossEncounterStatus.Active
                                          && bossStatus != BossEncounterStatus.Defeated,
-                CanOpenExpeditionSelection = expeditionAvailability == ExpeditionAvailabilityStatus.Available
+                CanOpenExpeditionSelection = (expeditionAvailability == ExpeditionAvailabilityStatus.Available
+                                             || bossStatus == BossEncounterStatus.Available)
                                              && expeditionActivity == ExpeditionActivityStatus.None
                                              && threatPhase != ThreatPhase.RaidPending
                                              && threatPhase != ThreatPhase.RaidActive

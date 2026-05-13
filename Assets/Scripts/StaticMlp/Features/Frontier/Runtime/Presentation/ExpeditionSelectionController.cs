@@ -51,6 +51,14 @@ namespace StaticMlp.Features.Frontier
         private void StartExpedition()
         {
             ref readonly var state = ref CW.GetResource<ExpeditionSelectionScreenState>();
+            if (state.IsBossEncounterMode)
+            {
+                var bossRequest = new StartBossEncounterRequestEvent(state.AnchorId, state.BossId);
+                CW.SendToServerEvent(in bossRequest);
+                RequestClose();
+                return;
+            }
+
             var request = new StartExpeditionRequestEvent(state.AnchorId, state.ExpeditionId);
             CW.SendToServerEvent(in request);
             RequestClose();

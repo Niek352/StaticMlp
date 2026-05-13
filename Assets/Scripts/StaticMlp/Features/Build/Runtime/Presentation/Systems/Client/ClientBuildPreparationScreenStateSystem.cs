@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
@@ -23,7 +24,17 @@ namespace StaticMlp.Features.Build
             }
 
             if (Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
+            {
                 next.IsAvailable = ClientProjection.Read<Stage1FlowViewState>(anchor).CanOpenBuildPreparation;
+
+                if (anchor.Has<Projected<Stage1ProgressionState>>())
+                {
+                    ref readonly var progression = ref ClientProjection.Read<Stage1ProgressionState>(anchor);
+                    next.CanPrepareBoss = progression.HasFlag(ProgressFlagCatalog.CounterattackDefendedId)
+                                          && !progression.HasFlag(ProgressFlagCatalog.BossUnlockedId)
+                                          && progression.HasBossPreparationToken();
+                }
+            }
 
             foreach (var bossPreparation in CW.Query<All<BossBuildPreparationState>>().Entities())
             {

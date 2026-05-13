@@ -44,7 +44,7 @@ namespace StaticMlp.Features.Progression
             AppliedFlagsMask |= GetFlagBit(flagId);
         }
 
-        public bool HasAppliedReward(RewardPackageId rewardPackageId)
+        public readonly bool HasAppliedReward(RewardPackageId rewardPackageId)
         {
             return (AppliedRewardsMask & GetRewardBit(rewardPackageId)) != 0;
         }
@@ -62,7 +62,7 @@ namespace StaticMlp.Features.Progression
         public ComponentTypeConfig<Stage1ProgressionState> Config() =>
             new(guid: new Guid("c6f1d334-a1e4-4472-a7a0-311c3e84fd54"));
 
-        public bool HasBossPreparationToken()
+        public readonly bool HasBossPreparationToken()
         {
             return BossPreparationTokens > 0;
         }

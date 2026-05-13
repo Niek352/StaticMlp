@@ -30,7 +30,6 @@ namespace StaticMlp.Features.Settlement
             {
                 if (!TryFindRepairFocusSite(out var repairSite))
                 {
-                    return;
                     throw new InvalidOperationException(
                         $"Stage 1 repair flow requires a construction-site repair target for anchor {SettlementAnchorCatalog.HomeCampId.Value}.");
                 }

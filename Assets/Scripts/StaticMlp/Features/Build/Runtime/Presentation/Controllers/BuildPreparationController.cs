@@ -1,6 +1,7 @@
 using System;
 using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
@@ -74,6 +75,15 @@ namespace StaticMlp.Features.Build
 
         private void ConfirmBuild()
         {
+            ref readonly var state = ref CW.GetResource<BuildPreparationScreenState>();
+            if (state.CanPrepareBoss)
+            {
+                var request = new PrepareBossRequestEvent(SettlementAnchorCatalog.HomeCampId);
+                CW.SendToServerEvent(in request);
+                RequestClose();
+                return;
+            }
+
             foreach (var player in CW.Query<All<LocalOwned, PlayerTag, ClientBuildSelectionSyncState>>().Entities())
             {
                 ref var syncState = ref player.Mut<ClientBuildSelectionSyncState>();

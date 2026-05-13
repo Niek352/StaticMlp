@@ -81,6 +81,7 @@ namespace StaticMlp.Features.Build
                 $"Build Preparation\n" +
                 $"Available: {state.IsAvailable}\n" +
                 $"Boss committed: {state.IsBossCommitted}\n" +
+                $"Boss preparation: {state.CanPrepareBoss}\n" +
                 $"Selected: {BuildPreparationController.DescribeModule(state.SelectedPrimaryModuleId)}";
 
             poisonArrowButton.interactable = state.PoisonArrowAvailable && !state.IsBossCommitted;

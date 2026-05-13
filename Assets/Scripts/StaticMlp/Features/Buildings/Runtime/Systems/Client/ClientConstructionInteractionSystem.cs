@@ -13,7 +13,7 @@ namespace StaticMlp.Features.Buildings
         private readonly float _interactionRange;
         private readonly float _buildWorkPerSecond;
 
-        public ClientConstructionInteractionSystem(float interactionRange = 4f, float buildWorkPerSecond = 35f)
+        public ClientConstructionInteractionSystem(float interactionRange = 4f, float buildWorkPerSecond = ConstructionActionProfiles.PlayerBuildHoldWorkPerSecond)
         {
             _interactionRange = interactionRange;
             _buildWorkPerSecond = buildWorkPerSecond;

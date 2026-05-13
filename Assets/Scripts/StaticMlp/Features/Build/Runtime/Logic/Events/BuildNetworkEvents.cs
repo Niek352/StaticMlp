@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticPack;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 
@@ -26,7 +27,8 @@ namespace StaticMlp.Features.Build
 
         private static byte[] WritePrepareBuildCommand(in PrepareBuildCommand evt)
         {
-            var writer = BinaryPackWriter.CreateFromPool(2);
+            var writer = BinaryPackWriter.CreateFromPool(4);
+            writer.WriteUshort(evt.AnchorId.Value);
             writer.WriteUshort(evt.PrimaryModuleId.Value);
             var bytes = writer.CopyToBytes();
             writer.Dispose();
@@ -44,7 +46,9 @@ namespace StaticMlp.Features.Build
                 }
 
                 var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
-                evt = new PrepareBuildCommand(new BuildModuleId(reader.ReadUshort()));
+                evt = new PrepareBuildCommand(
+                    new SettlementAnchorId(reader.ReadUshort()),
+                    new BuildModuleId(reader.ReadUshort()));
                 return true;
             }
             catch

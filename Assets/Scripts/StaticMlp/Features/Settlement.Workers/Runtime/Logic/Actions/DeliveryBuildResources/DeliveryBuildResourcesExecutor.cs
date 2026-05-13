@@ -3,7 +3,6 @@ using StaticMlp.Features.Buildings;
 using StaticMlp.Game.Components;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Replication;
 using UnityEngine;
 
 namespace StaticMlp.Features.Settlement.Workers
@@ -68,22 +67,8 @@ namespace StaticMlp.Features.Settlement.Workers
                 return;
             }
 
-            ref var mutableSharedStorage = ref ReplicationMut.Mut<SettlementSharedResources>(sharedStorageEntity);
-            var spentWood = mutableSharedStorage.Spend(ResourceCatalog.WoodId, acceptedWood);
-            var spentStone = mutableSharedStorage.Spend(ResourceCatalog.StoneId, acceptedStone);
-
-            ref var mutableSiteState = ref ReplicationMut.Mut<ConstructionSiteState>(site);
-            ref var resources = ref ReplicationMut.Mut<ConstructionResources>(site);
-
-            if (!ConstructionRules.ApplyResourceDeposit(ref mutableSiteState, ref resources, spentWood, spentStone))
-            {
-                _transitions.SwitchToIdle(entity, ref task);
-                return;
-            }
-
+            SW.SendEvent(new DepositConstructionResourcesEvent(site.GID, acceptedWood, acceptedStone));
             task.ElapsedTicks++;
-            if (resources.IsComplete)
-                _transitions.SwitchToIdle(entity, ref task);
         }
     }
 }

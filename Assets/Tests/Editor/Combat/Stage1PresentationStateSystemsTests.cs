@@ -205,10 +205,13 @@ namespace StaticMlp.Tests.Combat
         public void BuildPreparationController_WhenConfirmInvoked_SendsPrepareBuildCommand()
         {
             using var scope = new Stage1PresentationClientWorldScope();
-            scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkerAssigned);
             scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
             CW.SetResource(new NetOutbox());
             NetworkRuntime.LocalPeerId = new NetworkPeerId(1);
+
+            new ClientBuildPresentationBootstrapSystem().Init();
+            new ClientBuildPreparationScreenStateSystem().Update();
 
             var controller = new BuildPreparationController(
                 () => null,
@@ -227,6 +230,37 @@ namespace StaticMlp.Tests.Combat
                 break;
             }
 
+            Assert.That(CW.GetResource<NetOutbox>().NetworkEventPackets, Has.Count.EqualTo(1));
+            sendSystem.Destroy();
+        }
+
+        [Test]
+        public void BuildPreparationController_WhenBossPreparationIsAvailable_SendsPrepareBossRequest()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            var anchor = scope.CreateAnchor(stage: Stage1SettlementProgressStage.BuildPrepared);
+            ref var progression = ref anchor.Mut<Stage1ProgressionState>();
+            progression.ApplyFlag(ProgressFlagCatalog.CounterattackDefendedId);
+            progression.GrantBossPreparationTokens(1);
+            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.RefreshProjections();
+            CW.SetResource(new NetOutbox());
+            NetworkRuntime.LocalPeerId = new NetworkPeerId(1);
+
+            new ClientBuildPresentationBootstrapSystem().Init();
+            new ClientBuildPreparationScreenStateSystem().Update();
+
+            var controller = new BuildPreparationController(
+                () => null,
+                new ControllerResourceBridgeSystem<BuildPreparationController, BuildPreparationScreenState>());
+            var sendSystem = new ClientNetworkEventSendSystem();
+            sendSystem.Init();
+
+            InvokePrivate(controller, "ConfirmBuild");
+            sendSystem.Update();
+
+            ref readonly var state = ref CW.GetResource<BuildPreparationScreenState>();
+            Assert.That(state.CanPrepareBoss, Is.True);
             Assert.That(CW.GetResource<NetOutbox>().NetworkEventPackets, Has.Count.EqualTo(1));
             sendSystem.Destroy();
         }
@@ -273,6 +307,37 @@ namespace StaticMlp.Tests.Combat
             InvokePrivate(controller, "StartExpedition");
             sendSystem.Update();
 
+            Assert.That(CW.GetResource<NetOutbox>().NetworkEventPackets, Has.Count.EqualTo(1));
+            sendSystem.Destroy();
+        }
+
+        [Test]
+        public void ExpeditionSelectionController_WhenBossIsAvailable_SendsStartBossRequest()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(
+                stage: Stage1SettlementProgressStage.BuildPrepared,
+                bossStatus: BossEncounterStatus.Available);
+            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.RefreshProjections();
+            CW.SetResource(new NetOutbox());
+            NetworkRuntime.LocalPeerId = new NetworkPeerId(1);
+
+            new ClientFrontierPresentationBootstrapSystem().Init();
+            new ClientExpeditionSelectionScreenStateSystem().Update();
+
+            var controller = new ExpeditionSelectionController(
+                () => null,
+                new ControllerResourceBridgeSystem<ExpeditionSelectionController, ExpeditionSelectionScreenState>());
+            var sendSystem = new ClientNetworkEventSendSystem();
+            sendSystem.Init();
+
+            InvokePrivate(controller, "StartExpedition");
+            sendSystem.Update();
+
+            ref readonly var state = ref CW.GetResource<ExpeditionSelectionScreenState>();
+            Assert.That(state.IsBossEncounterMode, Is.True);
+            Assert.That(state.CanStart, Is.True);
             Assert.That(CW.GetResource<NetOutbox>().NetworkEventPackets, Has.Count.EqualTo(1));
             sendSystem.Destroy();
         }

@@ -303,7 +303,9 @@ namespace StaticMlp.Tests.Combat
 
             var buildSelectionSystem = new ServerReceivePrepareBuildCommandSystem();
             buildSelectionSystem.Init();
-            var buildRequest = new PrepareBuildCommand(BuildModuleCatalog.PoisonArrowModuleId);
+            var buildRequest = new PrepareBuildCommand(
+                SettlementAnchorCatalog.HomeCampId,
+                BuildModuleCatalog.PoisonArrowModuleId);
             SW.SendEvent(new NetworkEventFromClient<PrepareBuildCommand>(owner, in buildRequest));
             buildSelectionSystem.Update();
 

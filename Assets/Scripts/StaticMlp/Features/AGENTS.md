@@ -26,6 +26,8 @@ Each feature should be understandable as an isolated module with explicit runtim
 - Keep presentation code passive and feature-local.
 - Do not put packet serialization or Unity Transport calls inside feature gameplay systems.
 - Do not let feature `MonoBehaviour` classes become ECS hosts, MVC hosts, or composition roots.
+- Reading another feature's public contracts is allowed when the dependency direction is valid.
+- Writing another feature's components or tags through `Mut<T>()`, `ReplicationMut.Mut<T>()`, or `ClientProjection.Mut<T>()` is forbidden. Send an `IEvent`; the owner feature handles the event and mutates its own state.
 
 ## Data Flow
 
@@ -33,6 +35,7 @@ Each feature should be understandable as an isolated module with explicit runtim
 - Remote presentation reads `RemoteOwned` entities and applies visuals without simulating gameplay.
 - Server gameplay reads `ServerOwned` or validated `ClientOwned` entities.
 - Interactions without direct ownership should go through typed replicated events, not hidden cross-feature calls.
+- Interactions without feature state ownership should also go through StaticEcs events. The requesting feature writes the event; the owning feature reads it, validates invariants, applies `Mut<T>()`, then emits a result or fact event when needed.
 
 ## Editing Rules
 

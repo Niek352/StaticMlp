@@ -15,6 +15,7 @@ namespace StaticMlp.Features.Frontier
             {
                 AnchorId = SettlementAnchorCatalog.HomeCampId,
                 ExpeditionId = ExpeditionCatalog.NearbyRaiderCampId,
+                BossId = BossCatalog.RaiderChiefId,
                 RewardPackageId = RewardPackageCatalog.RecoveredWarCacheId,
             };
 
@@ -32,6 +33,14 @@ namespace StaticMlp.Features.Frontier
 
                 if (anchor.Has<Projected<ThreatState>>())
                     next.ThreatPhase = ClientProjection.Read<ThreatState>(anchor).Phase;
+
+                if (anchor.Has<Projected<BossEncounterState>>())
+                {
+                    ref readonly var boss = ref ClientProjection.Read<BossEncounterState>(anchor);
+                    next.BossId = boss.BossId;
+                    next.BossStatus = boss.Status;
+                    next.IsBossEncounterMode = boss.Status == BossEncounterStatus.Available;
+                }
             }
 
             foreach (var player in CW.Query<All<PreparedBuildSnapshot>>().Entities())
@@ -40,10 +49,15 @@ namespace StaticMlp.Features.Frontier
                 break;
             }
 
-            next.CanStart = next.AvailabilityStatus == ExpeditionAvailabilityStatus.Available
-                            && next.ActivityStatus == ExpeditionActivityStatus.None
-                            && next.ThreatPhase != ThreatPhase.RaidPending
-                            && next.ThreatPhase != ThreatPhase.RaidActive;
+            next.CanStart = next.IsBossEncounterMode
+                ? next.BossStatus == BossEncounterStatus.Available
+                  && next.ActivityStatus == ExpeditionActivityStatus.None
+                  && next.ThreatPhase != ThreatPhase.RaidPending
+                  && next.ThreatPhase != ThreatPhase.RaidActive
+                : next.AvailabilityStatus == ExpeditionAvailabilityStatus.Available
+                  && next.ActivityStatus == ExpeditionActivityStatus.None
+                  && next.ThreatPhase != ThreatPhase.RaidPending
+                  && next.ThreatPhase != ThreatPhase.RaidActive;
 
             CW.SetResource(next);
         }

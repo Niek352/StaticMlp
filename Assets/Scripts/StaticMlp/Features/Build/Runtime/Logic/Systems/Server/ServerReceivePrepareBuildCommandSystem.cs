@@ -34,7 +34,7 @@ namespace StaticMlp.Features.Build
                 {
                     PrimaryModuleId = evt.Value.Value.PrimaryModuleId
                 });
-                SW.SendEvent(new Stage1BuildPreparedEvent(SettlementAnchorCatalog.HomeCampId));
+                SW.SendEvent(new Stage1BuildPreparedEvent(evt.Value.Value.AnchorId));
             }
         }
 

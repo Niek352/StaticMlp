@@ -10,7 +10,7 @@ namespace StaticMlp.Features.Buildings
     {
         private readonly float _maxWorkPerRequest;
 
-        public BuildConstructionProjector(float maxWorkPerRequest = 35f)
+        public BuildConstructionProjector(float maxWorkPerRequest = ConstructionActionProfiles.PlayerBuildMaxWorkPerRequest)
         {
             _maxWorkPerRequest = maxWorkPerRequest;
         }
