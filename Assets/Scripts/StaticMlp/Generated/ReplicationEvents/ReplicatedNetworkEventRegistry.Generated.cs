@@ -3,9 +3,12 @@ using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
-using StaticMlp.Networking.Requests;
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Buildings;
+using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Game.Systems;
+using StaticMlp.Networking.Requests;
+using System;
 using UnityEngine;
 
 namespace StaticMlp.Networking.Replication.Generated {
@@ -16,16 +19,36 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 WriteBuildConstructionRequestEvent,
                 TryReadBuildConstructionRequestEvent);
+            NetworkEventRegistry.Register<BuildConstructionResultEvent>(
+                ReplicatedNetworkEventIds.BuildConstructionResultEvent,
+                NetDelivery.ReliableSequenced,
+                WriteBuildConstructionResultEvent,
+                TryReadBuildConstructionResultEvent);
             NetworkEventRegistry.Register<DepositConstructionResourcesRequestEvent>(
                 ReplicatedNetworkEventIds.DepositConstructionResourcesRequestEvent,
                 NetDelivery.ReliableSequenced,
                 WriteDepositConstructionResourcesRequestEvent,
                 TryReadDepositConstructionResourcesRequestEvent);
+            NetworkEventRegistry.Register<DepositConstructionResourcesResultEvent>(
+                ReplicatedNetworkEventIds.DepositConstructionResourcesResultEvent,
+                NetDelivery.ReliableSequenced,
+                WriteDepositConstructionResourcesResultEvent,
+                TryReadDepositConstructionResourcesResultEvent);
             NetworkEventRegistry.Register<PlaceBuildingRequestEvent>(
                 ReplicatedNetworkEventIds.PlaceBuildingRequestEvent,
                 NetDelivery.ReliableSequenced,
                 WritePlaceBuildingRequestEvent,
                 TryReadPlaceBuildingRequestEvent);
+            NetworkEventRegistry.Register<SetSettlementWorkerAssignmentRequestEvent>(
+                ReplicatedNetworkEventIds.SetSettlementWorkerAssignmentRequestEvent,
+                NetDelivery.ReliableSequenced,
+                WriteSetSettlementWorkerAssignmentRequestEvent,
+                TryReadSetSettlementWorkerAssignmentRequestEvent);
+            NetworkEventRegistry.Register<SetSettlementWorkerAssignmentResultEvent>(
+                ReplicatedNetworkEventIds.SetSettlementWorkerAssignmentResultEvent,
+                NetDelivery.ReliableSequenced,
+                WriteSetSettlementWorkerAssignmentResultEvent,
+                TryReadSetSettlementWorkerAssignmentResultEvent);
             NetworkEventRegistry.Register<SpawnPhysicsCubeRequestEvent>(
                 ReplicatedNetworkEventIds.SpawnPhysicsCubeRequestEvent,
                 NetDelivery.ReliableSequenced,
@@ -34,7 +57,7 @@ namespace StaticMlp.Networking.Replication.Generated {
         }
 
         private static byte[] WriteBuildConstructionRequestEvent(in BuildConstructionRequestEvent evt) {
-            var writer = BinaryPackWriter.CreateFromPool(20);
+            var writer = BinaryPackWriter.CreateFromPool(16);
             writer.WriteUint(evt.RequestId.Value);
             writer.WriteUlong(evt.Site.Raw);
             writer.WriteFloat(evt.WorkAmount);
@@ -55,6 +78,40 @@ namespace StaticMlp.Networking.Replication.Generated {
                     RequestId = new RequestId(reader.ReadUint()),
                     Site = new EntityGID(reader.ReadUlong()),
                     WorkAmount = reader.ReadFloat(),
+                };
+                return true;
+            } catch {
+                evt = default;
+                return false;
+            }
+        }
+
+        private static byte[] WriteBuildConstructionResultEvent(in BuildConstructionResultEvent evt) {
+            var writer = BinaryPackWriter.CreateFromPool(21);
+            writer.WriteUint(evt.RequestId.Value);
+            writer.WriteByte((byte)evt.Status);
+            writer.WriteUlong(evt.Site.Raw);
+            writer.WriteFloat(evt.AcceptedWork);
+            writer.WriteFloat(evt.BuildWorkDone);
+            var bytes = writer.CopyToBytes();
+            writer.Dispose();
+            return bytes;
+        }
+
+        private static bool TryReadBuildConstructionResultEvent(byte[] payload, out BuildConstructionResultEvent evt) {
+            try {
+                if (payload == null || payload.Length == 0) {
+                    evt = default;
+                    return false;
+                }
+
+                var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
+                evt = new BuildConstructionResultEvent {
+                    RequestId = new RequestId(reader.ReadUint()),
+                    Status = (RequestStatus)reader.ReadByte(),
+                    Site = new EntityGID(reader.ReadUlong()),
+                    AcceptedWork = reader.ReadFloat(),
+                    BuildWorkDone = reader.ReadFloat(),
                 };
                 return true;
             } catch {
@@ -95,6 +152,40 @@ namespace StaticMlp.Networking.Replication.Generated {
             }
         }
 
+        private static byte[] WriteDepositConstructionResourcesResultEvent(in DepositConstructionResourcesResultEvent evt) {
+            var writer = BinaryPackWriter.CreateFromPool(21);
+            writer.WriteUlong(evt.Site.Raw);
+            writer.WriteInt(evt.AcceptedWood);
+            writer.WriteInt(evt.AcceptedStone);
+            writer.WriteUint(evt.RequestId.Value);
+            writer.WriteByte((byte)evt.Status);
+            var bytes = writer.CopyToBytes();
+            writer.Dispose();
+            return bytes;
+        }
+
+        private static bool TryReadDepositConstructionResourcesResultEvent(byte[] payload, out DepositConstructionResourcesResultEvent evt) {
+            try {
+                if (payload == null || payload.Length == 0) {
+                    evt = default;
+                    return false;
+                }
+
+                var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
+                evt = new DepositConstructionResourcesResultEvent {
+                    Site = new EntityGID(reader.ReadUlong()),
+                    AcceptedWood = reader.ReadInt(),
+                    AcceptedStone = reader.ReadInt(),
+                    RequestId = new RequestId(reader.ReadUint()),
+                    Status = (RequestStatus)reader.ReadByte(),
+                };
+                return true;
+            } catch {
+                evt = default;
+                return false;
+            }
+        }
+
         private static byte[] WritePlaceBuildingRequestEvent(in PlaceBuildingRequestEvent evt) {
             var writer = BinaryPackWriter.CreateFromPool(30);
             writer.WriteUshort(evt.BuildingId);
@@ -117,6 +208,72 @@ namespace StaticMlp.Networking.Replication.Generated {
                     BuildingId = reader.ReadUshort(),
                     Position = new Vector3(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat()),
                     Rotation = new Quaternion(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat()),
+                };
+                return true;
+            } catch {
+                evt = default;
+                return false;
+            }
+        }
+
+        private static byte[] WriteSetSettlementWorkerAssignmentRequestEvent(in SetSettlementWorkerAssignmentRequestEvent evt) {
+            var writer = BinaryPackWriter.CreateFromPool(16);
+            writer.WriteUint(evt.RequestId.Value);
+            writer.WriteUlong(evt.Worker.Raw);
+            writer.WriteUshort(evt.AnchorId);
+            writer.WriteBool(evt.Assigned);
+            var bytes = writer.CopyToBytes();
+            writer.Dispose();
+            return bytes;
+        }
+
+        private static bool TryReadSetSettlementWorkerAssignmentRequestEvent(byte[] payload, out SetSettlementWorkerAssignmentRequestEvent evt) {
+            try {
+                if (payload == null || payload.Length == 0) {
+                    evt = default;
+                    return false;
+                }
+
+                var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
+                evt = new SetSettlementWorkerAssignmentRequestEvent {
+                    RequestId = new RequestId(reader.ReadUint()),
+                    Worker = new EntityGID(reader.ReadUlong()),
+                    AnchorId = reader.ReadUshort(),
+                    Assigned = reader.ReadBool(),
+                };
+                return true;
+            } catch {
+                evt = default;
+                return false;
+            }
+        }
+
+        private static byte[] WriteSetSettlementWorkerAssignmentResultEvent(in SetSettlementWorkerAssignmentResultEvent evt) {
+            var writer = BinaryPackWriter.CreateFromPool(16);
+            writer.WriteUint(evt.RequestId.Value);
+            writer.WriteByte((byte)evt.Status);
+            writer.WriteUlong(evt.Worker.Raw);
+            writer.WriteUshort(evt.AnchorId);
+            writer.WriteByte((byte)evt.AssignmentStatus);
+            var bytes = writer.CopyToBytes();
+            writer.Dispose();
+            return bytes;
+        }
+
+        private static bool TryReadSetSettlementWorkerAssignmentResultEvent(byte[] payload, out SetSettlementWorkerAssignmentResultEvent evt) {
+            try {
+                if (payload == null || payload.Length == 0) {
+                    evt = default;
+                    return false;
+                }
+
+                var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);
+                evt = new SetSettlementWorkerAssignmentResultEvent {
+                    RequestId = new RequestId(reader.ReadUint()),
+                    Status = (RequestStatus)reader.ReadByte(),
+                    Worker = new EntityGID(reader.ReadUlong()),
+                    AnchorId = reader.ReadUshort(),
+                    AssignmentStatus = (SettlementWorkerAssignmentStatus)reader.ReadByte(),
                 };
                 return true;
             } catch {

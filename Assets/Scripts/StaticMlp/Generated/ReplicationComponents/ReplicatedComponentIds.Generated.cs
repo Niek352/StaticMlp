@@ -9,6 +9,7 @@ namespace StaticMlp.Networking.Replication {
         public const ushort ExpeditionAvailabilityState = 12104;
         public const ushort RaidScheduleState = 48438;
         public const ushort ThreatState = 10069;
+        public const ushort Stage1ProgressionState = 58031;
         public const ushort ResourcesInventory = 44055;
         public const ushort ConstructionProgress = 15866;
         public const ushort ConstructionResources = 8723;
@@ -16,9 +17,8 @@ namespace StaticMlp.Networking.Replication {
         public const ushort ConstructionTransform = 31104;
         public const ushort SettlementAnchorRef = 55002;
         public const ushort SettlementSharedResources = 16446;
-        public const ushort Stage1ProgressionState = 58031;
+        public const ushort Stage1FlowViewState = 42436;
         public const ushort Stage1SettlementProgression = 56454;
-        public const ushort Stage1FlowViewState = 45111;
         public const ushort SettlementCampBuilderJobState = 19134;
         public const ushort SettlementWorkerAssignment = 19782;
         public const ushort SettlementWorkerIdentity = 1506;

@@ -6,6 +6,7 @@ using System.Text;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
+using StaticMlp.Networking.Requests;
 using UnityCodeGen;
 using UnityEditor;
 using UnityEngine;
@@ -55,15 +56,15 @@ namespace StaticMlp.Editor.ReplicationCodeGen
             if (!guid.HasValue)
                 diagnostics.Add($"{type.FullName}: replicated event must expose a stable StaticEcs guid through IEventConfig<T>.Config().");
 
-            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public)
-                .Select(f => FieldInfoFor(f, diagnostics))
+            var members = GetReplicatedMembers(type)
+                .Select(m => MemberInfoFor(m, diagnostics))
                 .Where(x => x != null)
                 .ToList();
 
-            if (fields.Count == 0)
-                diagnostics.Add($"{type.FullName}: replicated event has no public replicated fields.");
+            if (members.Count == 0)
+                diagnostics.Add($"{type.FullName}: replicated event has no public replicated fields or properties.");
 
-            return new EventInfo(type, fields, GetEventId(type, guid), attribute.Delivery);
+            return new EventInfo(type, members, GetEventId(type, guid), attribute.Delivery);
         }
 
         private static Guid? TryReadStaticEcsGuid(Type type)
@@ -85,20 +86,58 @@ namespace StaticMlp.Editor.ReplicationCodeGen
             }
         }
 
-        private static EventFieldInfo FieldInfoFor(FieldInfo field, List<string> diagnostics)
+        private static IEnumerable<MemberInfo> GetReplicatedMembers(Type type)
         {
-            var kind = FieldKind.From(field.FieldType);
+            return type.GetMembers(BindingFlags.Instance | BindingFlags.Public)
+                .Where(m => IsReplicatedMember(m))
+                .OrderBy(m => m.MetadataToken);
+        }
+
+        private static bool IsReplicatedMember(MemberInfo member)
+        {
+            if (member is FieldInfo field)
+                return !field.IsStatic;
+
+            if (member is PropertyInfo property)
+                return property.GetIndexParameters().Length == 0
+                       && property.GetMethod != null
+                       && !property.GetMethod.IsStatic
+                       && property.SetMethod != null
+                       && !property.SetMethod.IsStatic;
+
+            return false;
+        }
+
+        private static EventMemberInfo MemberInfoFor(MemberInfo member, List<string> diagnostics)
+        {
+            var memberType = GetMemberType(member);
+            var kind = FieldKind.From(memberType);
             if (!kind.IsSupported)
             {
-                diagnostics.Add($"{field.DeclaringType.FullName}.{field.Name}: unsupported replicated event field type {field.FieldType.FullName}.");
+                diagnostics.Add($"{member.DeclaringType.FullName}.{member.Name}: unsupported replicated event member type {memberType.FullName}.");
                 return null;
             }
 
-            return new EventFieldInfo(field, kind);
+            return new EventMemberInfo(member, kind);
+        }
+
+        private static Type GetMemberType(MemberInfo member)
+        {
+            if (member is FieldInfo field)
+                return field.FieldType;
+
+            if (member is PropertyInfo property)
+                return property.PropertyType;
+
+            throw new ArgumentException($"Unsupported replicated event member {member.Name}.");
         }
 
         private static ushort GetEventId(Type type, Guid? guid)
         {
+            var explicitId = type.GetField("NETWORK_EVENT_ID", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            if (explicitId != null && explicitId.FieldType == typeof(ushort) && explicitId.IsLiteral)
+                return (ushort)explicitId.GetRawConstantValue();
+
             var source = guid?.ToString("N") ?? type.FullName;
             var hash = 2166136261u;
             foreach (var ch in source)
@@ -152,9 +191,9 @@ namespace StaticMlp.Editor.ReplicationCodeGen
             builder.AppendLine("using FFS.Libraries.StaticPack;");
             builder.AppendLine("using StaticMlp.Networking;");
             builder.AppendLine("using StaticMlp.Networking.Replication;");
-            foreach (var ns in events.Select(x => x.Type.Namespace).Distinct().OrderBy(x => x, StringComparer.Ordinal))
+            foreach (var ns in GetRequiredNamespaces(events))
                 builder.AppendLine($"using {ns};");
-            if (events.Any(x => x.Fields.Any(f => f.Kind.NeedsUnityEngine)))
+            if (events.Any(x => x.Members.Any(f => f.Kind.NeedsUnityEngine)))
                 builder.AppendLine("using UnityEngine;");
             builder.AppendLine();
             builder.AppendLine("namespace StaticMlp.Networking.Replication.Generated {");
@@ -182,13 +221,24 @@ namespace StaticMlp.Editor.ReplicationCodeGen
             return builder.ToString();
         }
 
+        private static IEnumerable<string> GetRequiredNamespaces(IEnumerable<EventInfo> events)
+        {
+            return events
+                .SelectMany(evt => evt.Members
+                    .Select(member => GetMemberType(member.Member).Namespace)
+                    .Concat(new[] { evt.Type.Namespace }))
+                .Where(ns => !string.IsNullOrEmpty(ns) && ns != "UnityEngine")
+                .Distinct()
+                .OrderBy(ns => ns, StringComparer.Ordinal);
+        }
+
         private static void AppendWriteMethod(StringBuilder builder, EventInfo evt)
         {
             var name = evt.Type.Name;
             builder.AppendLine($"        private static byte[] Write{name}(in {name} evt) {{");
             builder.AppendLine($"            var writer = BinaryPackWriter.CreateFromPool({EstimateBufferSize(evt)});");
-            foreach (var field in evt.Fields)
-                AppendWrite(builder, field);
+            foreach (var member in evt.Members)
+                AppendWrite(builder, member);
             builder.AppendLine("            var bytes = writer.CopyToBytes();");
             builder.AppendLine("            writer.Dispose();");
             builder.AppendLine("            return bytes;");
@@ -207,8 +257,8 @@ namespace StaticMlp.Editor.ReplicationCodeGen
             builder.AppendLine();
             builder.AppendLine("                var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);");
             builder.AppendLine($"                evt = new {name} {{");
-            foreach (var field in evt.Fields)
-                AppendRead(builder, field);
+            foreach (var member in evt.Members)
+                AppendRead(builder, member);
             builder.AppendLine("                };");
             builder.AppendLine("                return true;");
             builder.AppendLine("            } catch {");
@@ -218,11 +268,11 @@ namespace StaticMlp.Editor.ReplicationCodeGen
             builder.AppendLine("        }");
         }
 
-        private static void AppendWrite(StringBuilder builder, EventFieldInfo field)
+        private static void AppendWrite(StringBuilder builder, EventMemberInfo member)
         {
-            var source = $"evt.{field.Field.Name}";
+            var source = $"evt.{member.Member.Name}";
 
-            switch (field.Kind.Name)
+            switch (member.Kind.Name)
             {
                 case "Vector2":
                     builder.AppendLine($"            writer.WriteFloat({source}.x, {source}.y);");
@@ -236,6 +286,9 @@ namespace StaticMlp.Editor.ReplicationCodeGen
                 case "EntityGID":
                     builder.AppendLine($"            writer.WriteUlong({source}.Raw);");
                     break;
+                case "RequestId":
+                    builder.AppendLine($"            writer.WriteUint({source}.Value);");
+                    break;
                 case "EnumByte":
                     builder.AppendLine($"            writer.WriteByte((byte){source});");
                     break;
@@ -246,17 +299,17 @@ namespace StaticMlp.Editor.ReplicationCodeGen
                     builder.AppendLine($"            writer.WriteInt((int){source});");
                     break;
                 default:
-                    builder.AppendLine($"            writer.{field.Kind.WriteMethod}({source});");
+                    builder.AppendLine($"            writer.{member.Kind.WriteMethod}({source});");
                     break;
             }
         }
 
-        private static void AppendRead(StringBuilder builder, EventFieldInfo field)
+        private static void AppendRead(StringBuilder builder, EventMemberInfo member)
         {
             var comma = ",";
-            var name = field.Field.Name;
+            var name = member.Member.Name;
 
-            switch (field.Kind.Name)
+            switch (member.Kind.Name)
             {
                 case "Vector2":
                     builder.AppendLine($"                    {name} = new Vector2(reader.ReadFloat(), reader.ReadFloat()){comma}");
@@ -270,24 +323,27 @@ namespace StaticMlp.Editor.ReplicationCodeGen
                 case "EntityGID":
                     builder.AppendLine($"                    {name} = new EntityGID(reader.ReadUlong()){comma}");
                     break;
+                case "RequestId":
+                    builder.AppendLine($"                    {name} = new RequestId(reader.ReadUint()){comma}");
+                    break;
                 case "EnumByte":
-                    builder.AppendLine($"                    {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadByte(){comma}");
+                    builder.AppendLine($"                    {name} = ({GetTypeName(GetMemberType(member.Member))})reader.ReadByte(){comma}");
                     break;
                 case "EnumUshort":
-                    builder.AppendLine($"                    {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadUshort(){comma}");
+                    builder.AppendLine($"                    {name} = ({GetTypeName(GetMemberType(member.Member))})reader.ReadUshort(){comma}");
                     break;
                 case "EnumInt":
-                    builder.AppendLine($"                    {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadInt(){comma}");
+                    builder.AppendLine($"                    {name} = ({GetTypeName(GetMemberType(member.Member))})reader.ReadInt(){comma}");
                     break;
                 default:
-                    builder.AppendLine($"                    {name} = reader.{field.Kind.ReadMethod}(){comma}");
+                    builder.AppendLine($"                    {name} = reader.{member.Kind.ReadMethod}(){comma}");
                     break;
             }
         }
 
         private static int EstimateBufferSize(EventInfo evt)
         {
-            return Math.Max(16, evt.Fields.Sum(x => x.Kind.ByteSize));
+            return Math.Max(16, evt.Members.Sum(x => x.Kind.ByteSize));
         }
 
         private static string GetTypeName(Type type)
@@ -320,27 +376,27 @@ namespace StaticMlp.Editor.ReplicationCodeGen
         private sealed class EventInfo
         {
             public readonly Type Type;
-            public readonly List<EventFieldInfo> Fields;
+            public readonly List<EventMemberInfo> Members;
             public readonly ushort TypeId;
             public readonly NetDelivery Delivery;
 
-            public EventInfo(Type type, List<EventFieldInfo> fields, ushort typeId, NetDelivery delivery)
+            public EventInfo(Type type, List<EventMemberInfo> members, ushort typeId, NetDelivery delivery)
             {
                 Type = type;
-                Fields = fields;
+                Members = members;
                 TypeId = typeId;
                 Delivery = delivery;
             }
         }
 
-        private sealed class EventFieldInfo
+        private sealed class EventMemberInfo
         {
-            public readonly FieldInfo Field;
+            public readonly MemberInfo Member;
             public readonly FieldKind Kind;
 
-            public EventFieldInfo(FieldInfo field, FieldKind kind)
+            public EventMemberInfo(MemberInfo member, FieldKind kind)
             {
-                Field = field;
+                Member = member;
                 Kind = kind;
             }
         }
@@ -376,6 +432,7 @@ namespace StaticMlp.Editor.ReplicationCodeGen
                 if (type == typeof(ulong)) return new FieldKind("Ulong", "WriteUlong", "ReadUlong", 8);
                 if (type == typeof(float)) return new FieldKind("Float", "WriteFloat", "ReadFloat", 4);
                 if (type == typeof(EntityGID)) return new FieldKind("EntityGID", null, null, 8);
+                if (type == typeof(RequestId)) return new FieldKind("RequestId", null, null, 4);
                 if (type == typeof(Vector2)) return new FieldKind("Vector2", null, null, 8, needsUnityEngine: true);
                 if (type == typeof(Vector3)) return new FieldKind("Vector3", null, null, 12, needsUnityEngine: true);
                 if (type == typeof(Quaternion)) return new FieldKind("Quaternion", null, null, 16, needsUnityEngine: true);

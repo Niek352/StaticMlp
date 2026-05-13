@@ -84,6 +84,14 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ThreatStateReplication.CreateDelta,
                 ThreatStateReplication.Read);
 
+            ReplicationRegistry.RegisterComponent<Stage1ProgressionState>(
+                ReplicatedComponentIds.Stage1ProgressionState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                Stage1ProgressionStateReplication.CreateDelta,
+                Stage1ProgressionStateReplication.Read);
+
             ReplicationRegistry.RegisterComponent<ResourcesInventory>(
                 ReplicatedComponentIds.ResourcesInventory,
                 ReplicationAuthority.Server,
@@ -140,14 +148,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 SettlementSharedResourcesReplication.CreateDelta,
                 SettlementSharedResourcesReplication.Read);
 
-            ReplicationRegistry.RegisterComponent<Stage1SettlementProgression>(
-                ReplicatedComponentIds.Stage1SettlementProgression,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                Stage1SettlementProgressionReplication.CreateDelta,
-                Stage1SettlementProgressionReplication.Read);
-
             ReplicationRegistry.RegisterComponent<Stage1FlowViewState>(
                 ReplicatedComponentIds.Stage1FlowViewState,
                 ReplicationAuthority.Server,
@@ -156,13 +156,13 @@ namespace StaticMlp.Networking.Replication.Generated {
                 Stage1FlowViewStateReplication.CreateDelta,
                 Stage1FlowViewStateReplication.Read);
 
-            ReplicationRegistry.RegisterComponent<Stage1ProgressionState>(
-                ReplicatedComponentIds.Stage1ProgressionState,
+            ReplicationRegistry.RegisterComponent<Stage1SettlementProgression>(
+                ReplicatedComponentIds.Stage1SettlementProgression,
                 ReplicationAuthority.Server,
                 ReplicationAudience.All,
                 NetDelivery.ReliableSequenced,
-                Stage1ProgressionStateReplication.CreateDelta,
-                Stage1ProgressionStateReplication.Read);
+                Stage1SettlementProgressionReplication.CreateDelta,
+                Stage1SettlementProgressionReplication.Read);
 
             ReplicationRegistry.RegisterComponent<SettlementCampBuilderJobState>(
                 ReplicatedComponentIds.SettlementCampBuilderJobState,

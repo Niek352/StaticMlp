@@ -140,6 +140,29 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
+        public void ContextPanelSession_WhenRepairStageIsStaleButAnchorConstructionCompleted_ClearsRepairFocus()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.RepairResourcesReady);
+            scope.CreateSharedResources();
+            scope.CreateConstructionSite(
+                ConstructionPhase.Completed,
+                woodRequired: 10,
+                woodDelivered: 10,
+                stoneRequired: 5,
+                stoneDelivered: 5,
+                progress01: 1f);
+            scope.RefreshProjections();
+
+            new ClientStage1PresentationBootstrapSystem().Init();
+            new ClientStage1ContextPanelSessionSystem().Update();
+
+            ref readonly var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            Assert.That(session.Mode, Is.EqualTo(Stage1ContextPanelMode.Worker));
+            Assert.That(session.FocusedSite, Is.EqualTo(default(EntityGID)));
+        }
+
+        [Test]
         public void ContextPanel_WhenWorkerModeIsActive_ShowsAssignmentSummary()
         {
             using var scope = new Stage1PresentationClientWorldScope();

@@ -2,8 +2,9 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
-using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Settlement.Workers;
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.AiBots;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Networking.Replication.Generated {
@@ -18,8 +19,8 @@ namespace StaticMlp.Networking.Replication.Generated {
         public static ComponentDelta CreateDelta(EntityGID gid, in SettlementCampBuilderJobState state) {
             var writer = BinaryPackWriter.CreateFromPool(21);
             writer.WriteUshort(state.AnchorId);
-            writer.WriteEntityGID(state.AssignedWorker);
-            writer.WriteEntityGID(state.TargetSite);
+            writer.WriteUlong(state.AssignedWorker.Raw);
+            writer.WriteUlong(state.TargetSite.Raw);
             writer.WriteUshort((ushort)state.CurrentTask);
             writer.WriteByte((byte)state.BlockingReason);
             var bytes = writer.CopyToBytes();

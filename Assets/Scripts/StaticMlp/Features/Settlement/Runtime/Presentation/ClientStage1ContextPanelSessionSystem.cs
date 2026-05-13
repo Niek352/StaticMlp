@@ -30,6 +30,13 @@ namespace StaticMlp.Features.Settlement
             {
                 if (!TryFindRepairFocusSite(out var repairSite))
                 {
+                    if (HasCompletedAnchorConstruction(SettlementAnchorCatalog.HomeCampId))
+                    {
+                        session.Mode = Stage1ContextPanelMode.Worker;
+                        session.FocusedSite = default;
+                        return;
+                    }
+
                     throw new InvalidOperationException(
                         $"Stage 1 repair flow requires a construction-site repair target for anchor {SettlementAnchorCatalog.HomeCampId.Value}.");
                 }
@@ -112,6 +119,22 @@ namespace StaticMlp.Features.Settlement
             }
 
             site = default;
+            return false;
+        }
+
+        private static bool HasCompletedAnchorConstruction(SettlementAnchorId anchorId)
+        {
+            foreach (var entity in CW.Query<All<ConstructionSiteState, SettlementAnchorRef>>().Entities())
+            {
+                ref readonly var anchorRef = ref ClientProjection.Read<SettlementAnchorRef>(entity);
+                if (anchorRef.AnchorId != anchorId.Value)
+                    continue;
+
+                ref readonly var state = ref ClientProjection.Read<ConstructionSiteState>(entity);
+                if (state.Phase == ConstructionPhase.Completed)
+                    return true;
+            }
+
             return false;
         }
     }

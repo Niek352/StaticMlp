@@ -2,8 +2,8 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
-using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Settlement.Workers;
+using StaticMlp.Features.AiBots;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Networking.Replication.Generated {

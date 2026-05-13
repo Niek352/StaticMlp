@@ -228,6 +228,8 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             builder.AppendLine("using FFS.Libraries.StaticEcs;");
             builder.AppendLine("using FFS.Libraries.StaticPack;");
             builder.AppendLine($"using {component.Type.Namespace};");
+            foreach (var ns in GetRequiredFieldNamespaces(component))
+                builder.AppendLine($"using {ns};");
             builder.AppendLine("using StaticMlp.Networking;");
             if (component.Fields.Any(x => x.Kind.NeedsUnityEngine) || component.HasInterpolatedFields)
                 builder.AppendLine("using UnityEngine;");
@@ -298,6 +300,14 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             builder.AppendLine("    }");
             builder.AppendLine("}");
             return builder.ToString();
+        }
+
+        private static IEnumerable<string> GetRequiredFieldNamespaces(ComponentInfo component) {
+            return component.Fields
+                .Select(field => field.Field.FieldType.Namespace)
+                .Where(ns => !string.IsNullOrEmpty(ns) && ns != component.Type.Namespace && ns != "System" && ns != "UnityEngine")
+                .Distinct()
+                .OrderBy(ns => ns, StringComparer.Ordinal);
         }
 
         private static string EmitRegistry(List<ComponentInfo> components, List<NetworkEntityInfo> networkEntities) {
