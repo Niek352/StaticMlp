@@ -1,0 +1,14 @@
+{
+    "name": "StaticMlp.Features.OpenWorldGeneration.Contracts",
+    "rootNamespace": "StaticMlp.Features.OpenWorldGeneration",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

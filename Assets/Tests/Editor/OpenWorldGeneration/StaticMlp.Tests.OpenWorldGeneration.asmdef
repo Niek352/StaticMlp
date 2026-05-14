@@ -1,0 +1,24 @@
+{
+    "name": "StaticMlp.Tests.OpenWorldGeneration",
+    "rootNamespace": "StaticMlp.Tests.OpenWorldGeneration",
+    "references": [
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
+        "StaticMlp.Features.OpenWorldGeneration.Logic",
+        "StaticMlp.Features.OpenWorldGeneration.Presentation",
+        "StaticMlp.Features.OpenWorldGeneration.LayerProcGen"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

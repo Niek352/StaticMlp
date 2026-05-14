@@ -1,0 +1,21 @@
+{
+    "name": "StaticMlp.Features.OpenWorldGeneration.Presentation",
+    "rootNamespace": "StaticMlp.Features.OpenWorldGeneration",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
+        "StaticMlp.Features.OpenWorldGeneration.Logic",
+        "StaticMlp.Features.OpenWorldGeneration.LayerProcGen"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
