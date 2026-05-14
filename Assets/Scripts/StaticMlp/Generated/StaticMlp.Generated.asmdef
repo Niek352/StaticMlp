@@ -24,7 +24,8 @@
         "StaticMlp.Features.Statuses.Logic",
         "StaticMlp.Features.Settlement.Workers.Contracts",
         "StaticMlp.Features.Settlement.Workers.Logic",
-        "StaticMlp.Features.Progression.Logic"
+        "StaticMlp.Features.Progression.Logic",
+        "StaticMlp.Features.OpenWorldResources"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using StaticMlp.Features.OpenWorldGeneration;
 using UnityEngine;
@@ -42,6 +43,76 @@ namespace StaticMlp.Tests.OpenWorldGeneration
             }
 
             Assert.That(anyDifferent, Is.True);
+        }
+
+        [Test]
+        public void GenerateChunk_Placements_WhenSeedAndChunkMatch_AreDeterministic()
+        {
+            var service = new SimpleWorldGenerationService();
+            var request = CreateRequest(new WorldGenerationSeed(12345), 0, false);
+
+            var first = service.GenerateChunk(new WorldChunkId(0, 0), request);
+            var second = service.GenerateChunk(new WorldChunkId(0, 0), request);
+
+            Assert.That(first.ResourcePlacements, Is.Not.Empty);
+            Assert.That(first.SpawnPlacements, Is.Not.Empty);
+            AssertResourcePlacementsEqual(first.ResourcePlacements, second.ResourcePlacements);
+            AssertSpawnPlacementsEqual(first.SpawnPlacements, second.SpawnPlacements);
+        }
+
+        [Test]
+        public void GenerateChunk_Placements_WhenSeedChanges_ChangesPlacementOutput()
+        {
+            var service = new SimpleWorldGenerationService();
+            var first = service.GenerateChunk(new WorldChunkId(0, 0), CreateRequest(new WorldGenerationSeed(11), 0, false));
+            var second = service.GenerateChunk(new WorldChunkId(0, 0), CreateRequest(new WorldGenerationSeed(12), 0, false));
+
+            Assert.That(
+                ResourcePlacementsDiffer(first.ResourcePlacements, second.ResourcePlacements)
+                || SpawnPlacementsDiffer(first.SpawnPlacements, second.SpawnPlacements),
+                Is.True);
+        }
+
+        [Test]
+        public void GenerateChunk_Placements_AreInsideRequestedChunk()
+        {
+            var service = new SimpleWorldGenerationService();
+            var chunkId = new WorldChunkId(-2, 3);
+            var request = CreateRequest(new WorldGenerationSeed(42), 0, false);
+            var generated = service.GenerateChunk(chunkId, request);
+
+            Assert.That(generated.ResourcePlacements, Is.Not.Empty);
+            Assert.That(generated.SpawnPlacements, Is.Not.Empty);
+            AssertPlacementsInsideChunk(generated.ResourcePlacements, chunkId, request.ChunkWorldSize);
+            AssertPlacementsInsideChunk(generated.SpawnPlacements, chunkId, request.ChunkWorldSize);
+        }
+
+        [Test]
+        public void GenerateChunk_Placements_SkipWaterAndSteepTerrain()
+        {
+            var service = new SimpleWorldGenerationService();
+            var chunkId = new WorldChunkId(0, 0);
+            var request = CreateRequest(new WorldGenerationSeed(12345), 0, false);
+            var sampler = new SimpleSurfaceSampler(request.Seed);
+            var generated = service.GenerateChunk(chunkId, request);
+
+            AssertPlacementSamplesAreValid(generated.ResourcePlacements, sampler);
+            AssertPlacementSamplesAreValid(generated.SpawnPlacements, sampler);
+        }
+
+        [Test]
+        public void LayerProcGenGenerateChunk_Placements_WhenSeedAndChunkMatch_AreDeterministic()
+        {
+            using var service = new LayerProcGenWorldGenerationService();
+            var request = CreateRequest(new WorldGenerationSeed(12345), 0, false);
+
+            var first = service.GenerateChunk(new WorldChunkId(-7, -8), request);
+            var second = service.GenerateChunk(new WorldChunkId(-7, -8), request);
+
+            Assert.That(first.ResourcePlacements, Is.Not.Empty);
+            Assert.That(first.SpawnPlacements, Is.Not.Empty);
+            AssertResourcePlacementsEqual(first.ResourcePlacements, second.ResourcePlacements);
+            AssertSpawnPlacementsEqual(first.SpawnPlacements, second.SpawnPlacements);
         }
 
         [Test]
@@ -288,12 +359,30 @@ namespace StaticMlp.Tests.OpenWorldGeneration
             runtime.StreamAround(Vector3.zero);
 
             Assert.That(GameObject.Find(rootName), Is.Not.Null);
-            Assert.That(Object.FindObjectsOfType<TerrainChunkView>(), Is.Not.Empty);
+            Assert.That(UnityEngine.Object.FindObjectsOfType<TerrainChunkView>(), Is.Not.Empty);
 
             runtime.Dispose();
 
             Assert.That(GameObject.Find(rootName), Is.Null);
-            Assert.That(Object.FindObjectsOfType<TerrainChunkView>(), Is.Empty);
+            Assert.That(UnityEngine.Object.FindObjectsOfType<TerrainChunkView>(), Is.Empty);
+        }
+
+        [Test]
+        public void GeneratedChunkData_LegacyConstructor_UsesEmptyPlacementArrays()
+        {
+            var mesh = new TerrainMeshData(
+                Array.Empty<Vector3>(),
+                Array.Empty<Vector3>(),
+                Array.Empty<Vector4>(),
+                Array.Empty<Vector2>(),
+                Array.Empty<Color32>(),
+                Array.Empty<int>(),
+                new Bounds());
+
+            var generated = new GeneratedChunkData(new WorldChunkId(0, 0), 0, mesh);
+
+            Assert.That(generated.ResourcePlacements, Is.Empty);
+            Assert.That(generated.SpawnPlacements, Is.Empty);
         }
 
         private static WorldGenerationRequest CreateRequest(WorldGenerationSeed seed, int lod, bool addSkirts)
@@ -327,6 +416,96 @@ namespace StaticMlp.Tests.OpenWorldGeneration
             }
 
             return false;
+        }
+
+        private static void AssertResourcePlacementsEqual(ResourcePlacement[] first, ResourcePlacement[] second)
+        {
+            Assert.That(second.Length, Is.EqualTo(first.Length));
+            for (var i = 0; i < first.Length; i++)
+                Assert.That(second[i], Is.EqualTo(first[i]));
+        }
+
+        private static void AssertSpawnPlacementsEqual(SpawnPlacement[] first, SpawnPlacement[] second)
+        {
+            Assert.That(second.Length, Is.EqualTo(first.Length));
+            for (var i = 0; i < first.Length; i++)
+                Assert.That(second[i], Is.EqualTo(first[i]));
+        }
+
+        private static bool ResourcePlacementsDiffer(ResourcePlacement[] first, ResourcePlacement[] second)
+        {
+            if (first.Length != second.Length)
+                return true;
+
+            for (var i = 0; i < first.Length; i++)
+            {
+                if (!first[i].Equals(second[i]))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool SpawnPlacementsDiffer(SpawnPlacement[] first, SpawnPlacement[] second)
+        {
+            if (first.Length != second.Length)
+                return true;
+
+            for (var i = 0; i < first.Length; i++)
+            {
+                if (!first[i].Equals(second[i]))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static void AssertPlacementsInsideChunk(ResourcePlacement[] placements, WorldChunkId chunkId, float chunkWorldSize)
+        {
+            var minX = chunkId.X * chunkWorldSize;
+            var maxX = minX + chunkWorldSize;
+            var minZ = chunkId.Z * chunkWorldSize;
+            var maxZ = minZ + chunkWorldSize;
+            for (var i = 0; i < placements.Length; i++)
+                AssertPositionInsideChunk(placements[i].Position, minX, maxX, minZ, maxZ);
+        }
+
+        private static void AssertPlacementsInsideChunk(SpawnPlacement[] placements, WorldChunkId chunkId, float chunkWorldSize)
+        {
+            var minX = chunkId.X * chunkWorldSize;
+            var maxX = minX + chunkWorldSize;
+            var minZ = chunkId.Z * chunkWorldSize;
+            var maxZ = minZ + chunkWorldSize;
+            for (var i = 0; i < placements.Length; i++)
+                AssertPositionInsideChunk(placements[i].Position, minX, maxX, minZ, maxZ);
+        }
+
+        private static void AssertPositionInsideChunk(Vector3 position, float minX, float maxX, float minZ, float maxZ)
+        {
+            Assert.That(position.x, Is.GreaterThanOrEqualTo(minX));
+            Assert.That(position.x, Is.LessThanOrEqualTo(maxX));
+            Assert.That(position.z, Is.GreaterThanOrEqualTo(minZ));
+            Assert.That(position.z, Is.LessThanOrEqualTo(maxZ));
+        }
+
+        private static void AssertPlacementSamplesAreValid(ResourcePlacement[] placements, ISurfaceSampler sampler)
+        {
+            for (var i = 0; i < placements.Length; i++)
+                AssertPlacementSampleIsValid(placements[i].Position, sampler);
+        }
+
+        private static void AssertPlacementSamplesAreValid(SpawnPlacement[] placements, ISurfaceSampler sampler)
+        {
+            for (var i = 0; i < placements.Length; i++)
+                AssertPlacementSampleIsValid(placements[i].Position, sampler);
+        }
+
+        private static void AssertPlacementSampleIsValid(Vector3 position, ISurfaceSampler sampler)
+        {
+            var sample = sampler.Sample(position.x, position.z);
+            Assert.That(sample.WaterMask, Is.LessThanOrEqualTo(OpenWorldPlacementGenerator.MAX_WATER_MASK));
+            Assert.That(sample.Normal.y, Is.GreaterThanOrEqualTo(OpenWorldPlacementGenerator.MIN_NORMAL_Y));
+            Assert.That(position.y, Is.EqualTo(sample.Height));
         }
 
         private static void AssertLayerProcGenNearBorderContinuity(

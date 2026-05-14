@@ -9,6 +9,8 @@ namespace StaticMlp.Tests.Architecture
     {
         private const string FEATURES_ROOT = "Assets/Scripts/StaticMlp/Features";
         private const string OPEN_WORLD_ROOT = FEATURES_ROOT + "/OpenWorldGeneration";
+        private const string OPEN_WORLD_RESOURCES_ROOT = FEATURES_ROOT + "/OpenWorldResources";
+        private const string FRONTIER_ROOT = FEATURES_ROOT + "/Frontier";
         private const string CONTRACTS_ROOT = OPEN_WORLD_ROOT + "/Runtime/Contracts";
         private const string LPG_NAMESPACE = "Runevision.LayerProcGen";
         private const string OPEN_WORLD_NAMESPACE = "OpenWorldGeneration";
@@ -31,6 +33,7 @@ namespace StaticMlp.Tests.Architecture
             var offenders = Directory
                 .EnumerateDirectories(Path.Combine(ProjectRoot(), FEATURES_ROOT.Replace('/', Path.DirectorySeparatorChar)))
                 .Where(directory => !directory.EndsWith("OpenWorldGeneration", StringComparison.Ordinal))
+                .Where(directory => !directory.EndsWith("OpenWorldResources", StringComparison.Ordinal))
                 .SelectMany(directory => Directory.EnumerateFiles(directory, "*.*", SearchOption.AllDirectories))
                 .Where(path => path.EndsWith(".cs", StringComparison.Ordinal) || path.EndsWith(".asmdef", StringComparison.Ordinal))
                 .Where(path => File.ReadAllText(path).Contains(OPEN_WORLD_NAMESPACE))
@@ -41,12 +44,75 @@ namespace StaticMlp.Tests.Architecture
         }
 
         [Test]
+        public void OpenWorldResources_DependOnOpenWorldGenerationContractsAndLogicOnly()
+        {
+            var asmdefPath = Path.Combine(
+                ProjectRoot(),
+                OPEN_WORLD_RESOURCES_ROOT.Replace('/', Path.DirectorySeparatorChar),
+                "Runtime",
+                "Logic",
+                "StaticMlp.Features.OpenWorldResources.asmdef");
+            var text = File.ReadAllText(asmdefPath);
+
+            Assert.That(text, Does.Contain("\"StaticMlp.Features.OpenWorldGeneration.Contracts\""));
+            Assert.That(text, Does.Contain("\"StaticMlp.Features.OpenWorldGeneration.Logic\""));
+            Assert.That(text, Does.Not.Contain("StaticMlp.Features.OpenWorldGeneration.LayerProcGen"));
+            Assert.That(text, Does.Not.Contain("StaticMlp.Features.OpenWorldGeneration.Presentation"));
+        }
+
+        [Test]
+        public void OpenWorldResources_DoNotReferenceLayerProcGen()
+        {
+            var files = EnumerateProjectFiles(OPEN_WORLD_RESOURCES_ROOT, "*.cs", "*.asmdef");
+            var offenders = files
+                .Where(file => File.ReadAllText(file.FullPath).Contains(LPG_NAMESPACE))
+                .Select(file => file.RelativePath)
+                .ToArray();
+
+            Assert.That(offenders, Is.Empty);
+        }
+
+        [Test]
+        public void Frontier_DoesNotReferenceOpenWorldGeneration()
+        {
+            var offenders = EnumerateProjectFiles(FRONTIER_ROOT, "*.cs", "*.asmdef")
+                .Where(file => File.ReadAllText(file.FullPath).Contains(OPEN_WORLD_NAMESPACE))
+                .Select(file => file.RelativePath)
+                .ToArray();
+
+            Assert.That(offenders, Is.Empty);
+        }
+
+        [Test]
         public void LayerProcGenReferences_AreLimitedToFutureAdapterFolder()
         {
-            var offenders = EnumerateProjectFiles(OPEN_WORLD_ROOT, "*.cs", "*.asmdef")
+            var offenders = EnumerateProjectFiles(FEATURES_ROOT, "*.cs", "*.asmdef")
                 .Where(file => File.ReadAllText(file.FullPath).Contains(LPG_NAMESPACE))
                 .Where(file => file.RelativePath.IndexOf("/Runtime/Logic/LayerProcGen/", StringComparison.Ordinal) < 0)
                 .Select(file => file.RelativePath)
+                .ToArray();
+
+            Assert.That(offenders, Is.Empty);
+        }
+
+        [Test]
+        public void OpenWorldGenerationScope_DoesNotContainGeneratedCodeOrPrefabs()
+        {
+            var roots = new[]
+            {
+                OPEN_WORLD_ROOT,
+                OPEN_WORLD_RESOURCES_ROOT,
+                "Assets/Tests/Editor/OpenWorldGeneration",
+                "Assets/Tests/Editor/OpenWorldResources",
+                "Assets/Tests/Editor/Architecture"
+            };
+            var offenders = roots
+                .Select(root => Path.Combine(ProjectRoot(), root.Replace('/', Path.DirectorySeparatorChar)))
+                .Where(Directory.Exists)
+                .SelectMany(root => Directory.EnumerateFiles(root, "*.*", SearchOption.AllDirectories))
+                .Where(path => path.EndsWith(".prefab", StringComparison.Ordinal)
+                               || path.EndsWith(".Generated.cs", StringComparison.Ordinal))
+                .Select(NormalizeRelativePath)
                 .ToArray();
 
             Assert.That(offenders, Is.Empty);

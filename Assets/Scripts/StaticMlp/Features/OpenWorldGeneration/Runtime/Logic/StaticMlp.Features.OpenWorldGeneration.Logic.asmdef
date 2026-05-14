@@ -2,7 +2,8 @@
     "name": "StaticMlp.Features.OpenWorldGeneration.Logic",
     "rootNamespace": "StaticMlp.Features.OpenWorldGeneration",
     "references": [
-        "StaticMlp.Features.OpenWorldGeneration.Contracts"
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
+        "FFS.StaticEcs"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -13,6 +13,8 @@ namespace StaticMlp.Features.OpenWorldGeneration
         private const int GENERATION_TIMEOUT_MS = 5000;
         private static readonly object ACTIVE_LOCK = new();
         private static LayerProcGenWorldGenerationService _activeService;
+        private static bool _activeServiceIsShared;
+        private static int _activeSharedReferences;
 
         private readonly LayerManager _manager;
         private readonly Dictionary<WorldChunkId, TopLayerDependency>[] _dependenciesByLod = new Dictionary<WorldChunkId, TopLayerDependency>[LpgTerrainMeshLayer.LOD_COUNT];
@@ -21,6 +23,11 @@ namespace StaticMlp.Features.OpenWorldGeneration
         private bool _disposed;
 
         public LayerProcGenWorldGenerationService()
+            : this(false)
+        {
+        }
+
+        private LayerProcGenWorldGenerationService(bool shared)
         {
             lock (ACTIVE_LOCK)
             {
@@ -30,6 +37,8 @@ namespace StaticMlp.Features.OpenWorldGeneration
                     throw new InvalidOperationException("LayerProcGen already has an active LayerManager.");
 
                 _activeService = this;
+                _activeServiceIsShared = shared;
+                _activeSharedReferences = shared ? 1 : 0;
             }
 
             _manager = new LayerManager(false);
@@ -38,6 +47,21 @@ namespace StaticMlp.Features.OpenWorldGeneration
         }
 
         internal static LayerProcGenWorldContext Context { get; private set; }
+
+        public static IWorldGenerationService AcquireShared()
+        {
+            lock (ACTIVE_LOCK)
+            {
+                if (_activeService == null)
+                    return new SharedLease(new LayerProcGenWorldGenerationService(true));
+
+                if (!_activeServiceIsShared)
+                    throw new InvalidOperationException("Only one LayerProcGen world generation service can be active because LayerProcGen layers are process-wide singletons.");
+
+                _activeSharedReferences++;
+                return new SharedLease(_activeService);
+            }
+        }
 
         public GeneratedChunkData GenerateChunk(WorldChunkId chunkId, WorldGenerationRequest request)
         {
@@ -53,10 +77,15 @@ namespace StaticMlp.Features.OpenWorldGeneration
             var layer = LpgTerrainMeshLayer.instance;
             var dependency = GetOrCreateDependency(layer, chunkId, request.Lod, chunkWorldSize);
             WaitForGeneration(dependency);
-            if (!layer.TryGetMesh(chunkId, request.Lod, out var mesh))
-                throw new InvalidOperationException($"LayerProcGen did not produce terrain mesh for chunk {chunkId} LOD{request.Lod}.");
+            if (!layer.TryGetGeneratedChunk(
+                    chunkId,
+                    request.Lod,
+                    out var mesh,
+                    out var resourcePlacements,
+                    out var spawnPlacements))
+                throw new InvalidOperationException($"LayerProcGen did not produce generated chunk data for chunk {chunkId} LOD{request.Lod}.");
 
-            return new GeneratedChunkData(chunkId, request.Lod, mesh);
+            return new GeneratedChunkData(chunkId, request.Lod, mesh, resourcePlacements, spawnPlacements);
         }
 
         public void Dispose()
@@ -73,8 +102,28 @@ namespace StaticMlp.Features.OpenWorldGeneration
             lock (ACTIVE_LOCK)
             {
                 if (_activeService == this)
+                {
                     _activeService = null;
+                    _activeServiceIsShared = false;
+                    _activeSharedReferences = 0;
+                }
             }
+        }
+
+        private static void ReleaseShared(LayerProcGenWorldGenerationService service)
+        {
+            var dispose = false;
+            lock (ACTIVE_LOCK)
+            {
+                if (_activeService != service || !_activeServiceIsShared)
+                    throw new InvalidOperationException("LayerProcGen shared service lease is not active.");
+
+                _activeSharedReferences--;
+                dispose = _activeSharedReferences == 0;
+            }
+
+            if (dispose)
+                service.Dispose();
         }
 
         private TopLayerDependency GetOrCreateDependency(
@@ -185,6 +234,34 @@ namespace StaticMlp.Features.OpenWorldGeneration
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(LayerProcGenWorldGenerationService));
+        }
+
+        private sealed class SharedLease : IWorldGenerationService, IDisposable
+        {
+            private readonly LayerProcGenWorldGenerationService _service;
+            private bool _disposed;
+
+            public SharedLease(LayerProcGenWorldGenerationService service)
+            {
+                _service = service;
+            }
+
+            public GeneratedChunkData GenerateChunk(WorldChunkId chunkId, WorldGenerationRequest request)
+            {
+                if (_disposed)
+                    throw new ObjectDisposedException(nameof(SharedLease));
+
+                return _service.GenerateChunk(chunkId, request);
+            }
+
+            public void Dispose()
+            {
+                if (_disposed)
+                    return;
+
+                _disposed = true;
+                ReleaseShared(_service);
+            }
         }
     }
 }

@@ -22,16 +22,25 @@ namespace StaticMlp.Features.OpenWorldGeneration
             AddLayerDependency(new LayerDependency(LpgSurfaceLayer.instance, 1));
         }
 
-        public bool TryGetMesh(WorldChunkId chunkId, int lod, out TerrainMeshData mesh)
+        public bool TryGetGeneratedChunk(
+            WorldChunkId chunkId,
+            int lod,
+            out TerrainMeshData mesh,
+            out ResourcePlacement[] resourcePlacements,
+            out SpawnPlacement[] spawnPlacements)
         {
             var index = new Point(chunkId.X, chunkId.Z);
             if (TryGetChunk(index, out var chunk, lod))
             {
                 mesh = chunk.GetMesh(lod);
-                return mesh != null;
+                resourcePlacements = chunk.GetResourcePlacements(lod);
+                spawnPlacements = chunk.GetSpawnPlacements(lod);
+                return mesh != null && resourcePlacements != null && spawnPlacements != null;
             }
 
             mesh = null;
+            resourcePlacements = null;
+            spawnPlacements = null;
             return false;
         }
     }

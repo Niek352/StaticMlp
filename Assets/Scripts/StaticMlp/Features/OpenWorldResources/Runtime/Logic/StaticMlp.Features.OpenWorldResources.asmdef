@@ -1,0 +1,21 @@
+{
+    "name": "StaticMlp.Features.OpenWorldResources",
+    "rootNamespace": "StaticMlp.Features.OpenWorldResources",
+    "references": [
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
+        "StaticMlp.Features.OpenWorldGeneration.Logic"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

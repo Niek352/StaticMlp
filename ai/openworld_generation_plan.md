@@ -112,14 +112,35 @@ Verification note 2026-05-14:
 
 ## Phase 4: Server Gameplay Placements
 
-- [ ] Спроектировать public placement contracts без Unity objects и без LPG types.
-- [ ] Добавить `ResourcePlacement` только как generated input, не как replicated truth.
-- [ ] Добавить `SpawnPlacement` только как generated input, не как replicated truth.
-- [ ] На сервере создавать authoritative gameplay entities через owner features/factories.
-- [ ] Не позволять client terrain generation создавать authoritative resources/NPCs.
-- [ ] Связать spawned gameplay entities с `WorldChunkId`, если это нужно для persistence/unload.
-- [ ] Сохранять только deltas: removed resources, mined rocks, chopped trees, built structures, ownership/world state.
-- [ ] Не сохранять generated mesh/heightmap без отдельной причины.
+- [x] Спроектировать public placement contracts без Unity objects и без LPG types.
+- [x] Добавить `ResourcePlacement` только как generated input, не как replicated truth.
+- [x] Добавить `SpawnPlacement` только как generated input, не как replicated truth.
+- [x] Не позволять client terrain generation создавать authoritative resources/NPCs.
+- [x] Remaining Phase 4: server creates authoritative resource-node gameplay entities through owner feature/factory; NPC `SpawnPlacement` remains deferred generated input.
+- [x] Remaining Phase 4: spawned resource-node entities carry `WorldChunkId` data through `OpenWorldChunkRef` for unload/persistence grouping.
+- [x] Remaining Phase 4: resource-node depletion uses in-memory delta persistence for depleted placement ids; disk save/load and broader world deltas remain future work.
+- [x] Не сохранять generated mesh/heightmap без отдельной причины.
+
+Phase 4 implementation note 2026-05-14:
+
+- [x] Added `ResourcePlacementKindId`, `SpawnPlacementKindId`, `ResourcePlacement`, and `SpawnPlacement` public contracts.
+- [x] Extended `GeneratedChunkData` with placement arrays while preserving the legacy constructor.
+- [x] Added deterministic placement generation with water/slope filtering and deterministic fallback scan.
+- [x] Integrated placement output into both `SimpleWorldGenerationService` and `LayerProcGenWorldGenerationService`.
+- [x] Added OpenWorldGeneration and architecture tests for determinism, bounds, invalid surfaces, legacy constructor compatibility, LPG isolation, and no generated prefab/code artifacts.
+- [x] Added authoritative resource-node spawning in `StaticMlp.Features.OpenWorldResources`; NPC spawning remains deferred because AI/balance/catalog ownership is not defined yet.
+
+Phase 4 remaining resource-node implementation note 2026-05-14:
+
+- [x] Added `StaticMlp.Features.OpenWorldResources` as the owner feature for server-owned harvestable resource nodes.
+- [x] Extended `ResourcePlacement` with a stable `PlacementId` while preserving the legacy constructor.
+- [x] Added replicated `OpenWorldResourceNodeState` and `OpenWorldResourceNodeTransform`, plus local `OpenWorldChunkRef`.
+- [x] Added `OpenWorldResourceNodeNetworkEntity` with network entity id `9` and archetype id `400`.
+- [x] Added `OpenWorldResourceNodeFactory`, spawn specs, finite-bounds seed system, and depletion delta capture.
+- [x] Added `OpenWorldGenerationServerRuntime` and LayerProcGen default server registration without leaking LPG types to `OpenWorldResources`.
+- [x] Added edit-mode and architecture tests for resource-node spawning, chunk refs, duplicate prevention, depleted placement skips, delta-store shape, and dependency boundaries.
+- [ ] Run Unity replication generation workflow (`StaticMlp/Replication/Generate`) and commit generated output from Unity, not by manual `.Generated.cs` edits.
+- [ ] Run Unity compile plus `StaticMlp.Tests.OpenWorldGeneration`, `StaticMlp.Tests.OpenWorldResources`, and `StaticMlp.Tests.Architecture`.
 
 ## Phase 5: Frontier Integration If Needed
 

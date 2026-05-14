@@ -12,7 +12,7 @@ namespace StaticMlp.Features.Player
     {
         private readonly float _speed;
 
-        public LocalPlayerMovementSystem(float speed = 5f)
+        public LocalPlayerMovementSystem(float speed = 50f)
         {
             _speed = speed;
         }

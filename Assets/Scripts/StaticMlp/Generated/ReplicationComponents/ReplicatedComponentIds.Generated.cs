@@ -9,6 +9,8 @@ namespace StaticMlp.Networking.Replication {
         public const ushort ExpeditionAvailabilityState = 12104;
         public const ushort RaidScheduleState = 48438;
         public const ushort ThreatState = 10069;
+        public const ushort OpenWorldResourceNodeState = 28580;
+        public const ushort OpenWorldResourceNodeTransform = 55422;
         public const ushort Stage1ProgressionState = 58031;
         public const ushort ResourcesInventory = 44055;
         public const ushort ConstructionProgress = 15866;

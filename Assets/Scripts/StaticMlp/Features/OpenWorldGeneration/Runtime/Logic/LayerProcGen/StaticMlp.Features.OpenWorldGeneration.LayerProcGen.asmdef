@@ -4,9 +4,12 @@
     "references": [
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
         "StaticMlp.Features.OpenWorldGeneration.Logic",
+        "FFS.StaticEcs",
+        "Game.Core",
         "Runevision.LayerProcGen",
         "Runevision.Common",
-        "Runevision.Interop"
+        "Runevision.Interop",
+        "Ecs.Networking"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,0 +1,27 @@
+{
+    "name": "StaticMlp.Tests.OpenWorldResources",
+    "rootNamespace": "StaticMlp.Tests.OpenWorldResources",
+    "references": [
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
+        "StaticMlp.Features.OpenWorldGeneration.Logic",
+        "StaticMlp.Features.OpenWorldResources"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

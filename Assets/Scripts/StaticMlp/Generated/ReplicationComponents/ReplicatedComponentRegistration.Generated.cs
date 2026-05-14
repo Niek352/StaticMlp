@@ -7,6 +7,7 @@ using UnityEngine;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Build;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.OpenWorldResources;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Features.Settlement;
@@ -83,6 +84,22 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 ThreatStateReplication.CreateDelta,
                 ThreatStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<OpenWorldResourceNodeState>(
+                ReplicatedComponentIds.OpenWorldResourceNodeState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                OpenWorldResourceNodeStateReplication.CreateDelta,
+                OpenWorldResourceNodeStateReplication.Read);
+
+            ReplicationRegistry.RegisterComponent<OpenWorldResourceNodeTransform>(
+                ReplicatedComponentIds.OpenWorldResourceNodeTransform,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                OpenWorldResourceNodeTransformReplication.CreateDelta,
+                OpenWorldResourceNodeTransformReplication.Read);
 
             ReplicationRegistry.RegisterComponent<Stage1ProgressionState>(
                 ReplicatedComponentIds.Stage1ProgressionState,
@@ -255,6 +272,7 @@ namespace StaticMlp.Networking.Replication.Generated {
             ReplicationRegistry.RegisterNetworkEntity(5, 1, 200);
             ReplicationRegistry.RegisterNetworkEntity(3, 1, 100);
             ReplicationRegistry.RegisterNetworkEntity(4, 1, 101);
+            ReplicationRegistry.RegisterNetworkEntity(9, 1, 400);
             ReplicationRegistry.RegisterNetworkEntity(1, 1, 1);
             ReplicationRegistry.RegisterNetworkEntity(7, 1, 300);
             ReplicationRegistry.RegisterNetworkEntity(8, 1, 320);

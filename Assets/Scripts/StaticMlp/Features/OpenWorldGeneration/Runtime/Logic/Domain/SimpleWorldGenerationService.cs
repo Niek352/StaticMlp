@@ -19,8 +19,10 @@ namespace StaticMlp.Features.OpenWorldGeneration
                     request.AddSkirts,
                     request.SkirtDepth),
                 sampler);
+            var resourcePlacements = OpenWorldPlacementGenerator.GenerateResourcePlacements(chunkId, request, sampler);
+            var spawnPlacements = OpenWorldPlacementGenerator.GenerateSpawnPlacements(chunkId, request, sampler);
 
-            return new GeneratedChunkData(chunkId, request.Lod, mesh);
+            return new GeneratedChunkData(chunkId, request.Lod, mesh, resourcePlacements, spawnPlacements);
         }
     }
 }

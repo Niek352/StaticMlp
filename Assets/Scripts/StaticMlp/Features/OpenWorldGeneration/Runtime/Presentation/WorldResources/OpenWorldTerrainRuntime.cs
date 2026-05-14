@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using FFS.Libraries.StaticEcs;
 using UnityEngine;
 
 namespace StaticMlp.Features.OpenWorldGeneration
 {
-    public sealed class OpenWorldTerrainRuntime : FFS.Libraries.StaticEcs.IResource, IDisposable
+    public sealed class OpenWorldTerrainRuntime : IResource, IDisposable
     {
         private readonly OpenWorldTerrainStreamingConfig _config;
         private readonly IWorldGenerationService _generationService;
@@ -35,7 +36,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
             var root = new GameObject(config.RootName);
             var gizmos = root.AddComponent<OpenWorldTerrainDebugGizmos>();
             var factory = new TerrainChunkViewFactory(root.transform, config.MaterialColor);
-            var runtime = new OpenWorldTerrainRuntime(config, new LayerProcGenWorldGenerationService(), factory, root);
+            var runtime = new OpenWorldTerrainRuntime(config, LayerProcGenWorldGenerationService.AcquireShared(), factory, root);
             gizmos.Initialize(runtime);
             return runtime;
         }
@@ -89,6 +90,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 _hasFocusChunk,
                 _focusChunk,
                 chunks.ToArray());
+            
         }
 
         public void Dispose()

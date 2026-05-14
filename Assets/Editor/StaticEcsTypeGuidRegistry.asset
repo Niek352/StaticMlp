@@ -345,6 +345,33 @@ MonoBehaviour:
       - className: Stage1FlowViewState
         namespaceName: StaticMlp.Features.Settlement
         assembly: StaticMlp.Features.Stage1.Contracts
+    - guid: 6abb3da8-3525-48cb-8265-f041b1cf0ba3
+      current:
+        className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: 859f7dd8-e326-40be-8ba0-669c9304b3d5
+      current:
+        className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c35019c4-4469-4ae6-a59f-4a9d10d9efaa
+      current:
+        className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -811,6 +838,33 @@ MonoBehaviour:
       - className: Stage1FlowViewState
         namespaceName: StaticMlp.Features.Settlement
         assembly: StaticMlp.Features.Stage1.Contracts
+    - guid: 6abb3da8-3525-48cb-8265-f041b1cf0ba3
+      current:
+        className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: 859f7dd8-e326-40be-8ba0-669c9304b3d5
+      current:
+        className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c35019c4-4469-4ae6-a59f-4a9d10d9efaa
+      current:
+        className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
