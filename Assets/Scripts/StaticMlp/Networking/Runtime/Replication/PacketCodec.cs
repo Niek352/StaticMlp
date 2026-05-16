@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
 using StaticMlp.Networking.Diagnostics;
+using UnityEngine;
 
 namespace StaticMlp.Networking.Replication {
     public static class PacketCodec {
@@ -124,7 +126,9 @@ namespace StaticMlp.Networking.Replication {
 
                 switch (type) {
                     case NetPacketType.Welcome:
-                        NetworkRuntime.LocalPeerId = new NetworkPeerId(reader.ReadUshort());
+                        var welcomePeer = new NetworkPeerId(reader.ReadUshort());
+                        NetworkRuntime.LocalPeerId = welcomePeer;
+                        Debug.Log($"[PacketCodec] Decoded Welcome peer={welcomePeer.Value}");
                         return true;
                     case NetPacketType.Spawn:
                         inbox.Spawns.Add(ReadSpawn(ref reader));
@@ -146,16 +150,21 @@ namespace StaticMlp.Networking.Replication {
                         inbox.ChunkLeases.Add(ReadChunkLease(ref reader));
                         return true;
                     case NetPacketType.EntitySnapshotBatch:
-                        inbox.EntitySnapshotBatches.Add(ReadEntitySnapshotBatch(ref reader, sourcePeer));
+                        var batch = ReadEntitySnapshotBatch(ref reader, sourcePeer);
+                        inbox.EntitySnapshotBatches.Add(batch);
+                        Debug.Log($"[PacketCodec] Decoded EntitySnapshotBatch source={sourcePeer.Value} payloads={batch.Payloads.Count}");
                         return true;
                     case NetPacketType.NetworkEvent:
                         return TryReadNetworkEvent(ref reader, sourcePeer, inbox);
                     case NetPacketType.NetworkEventBatch:
                         return TryReadNetworkEventBatch(ref reader, sourcePeer, inbox);
                     default:
+                        Debug.LogWarning($"[PacketCodec] Unknown packet type: {type}");
                         return true;
                 }
-            } catch {
+            } catch (Exception ex) {
+                Debug.LogError($"[PacketCodec] Decode exception");
+                Debug.LogException(ex);
                 return false;
             }
         }
@@ -195,7 +204,8 @@ namespace StaticMlp.Networking.Replication {
             // Source peer is authoritative only at the transport boundary.
             reader.ReadUshort();
             var batch = new EntitySnapshotBatch {
-                SourcePeer = fallbackSource
+                SourcePeer = fallbackSource,
+                Payloads = new List<byte[]>()
             };
 
             var count = reader.ReadUshort();

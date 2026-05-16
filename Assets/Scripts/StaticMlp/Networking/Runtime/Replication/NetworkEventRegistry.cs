@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
+using UnityEngine;
 
 namespace StaticMlp.Networking.Replication {
     public static class NetworkEventRegistry {
@@ -85,13 +86,17 @@ namespace StaticMlp.Networking.Replication {
         }
 
         internal static bool TryApplyToServer(in NetworkEventPacket packet) {
-            return HandlersById.TryGetValue(packet.EventTypeId, out _)
-                   && packet.Payload.TryApplyToServer(packet.SourcePeer);
+            var hasHandler = HandlersById.TryGetValue(packet.EventTypeId, out var handler);
+            var applied = hasHandler && packet.Payload.TryApplyToServer(packet.SourcePeer);
+            Debug.Log($"[NetworkEventRegistry] TryApplyToServer eventId={packet.EventTypeId} handler={handler?.EventType.Name ?? "null"} applied={applied}");
+            return applied;
         }
 
         internal static bool TryApplyToClient(in NetworkEventPacket packet) {
-            return HandlersById.TryGetValue(packet.EventTypeId, out _)
-                   && packet.Payload.TryApplyToClient(packet.SourcePeer);
+            var hasHandler = HandlersById.TryGetValue(packet.EventTypeId, out var handler);
+            var applied = hasHandler && packet.Payload.TryApplyToClient(packet.SourcePeer);
+            Debug.Log($"[NetworkEventRegistry] TryApplyToClient eventId={packet.EventTypeId} handler={handler?.EventType.Name ?? "null"} applied={applied}");
+            return applied;
         }
 
         private static void RegisterHandler(IHandler handler) {

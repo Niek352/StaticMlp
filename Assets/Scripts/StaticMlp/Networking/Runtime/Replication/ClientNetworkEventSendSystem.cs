@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using UnityEngine;
 
 namespace StaticMlp.Networking.Replication
 {
@@ -23,15 +24,19 @@ namespace StaticMlp.Networking.Replication
             NetOutbox outbox = null;
             if (canSend)
                 outbox = CW.GetResource<NetOutbox>();
-
+            
+            var i = 0;
             foreach (var evt in _events)
             {
+                i++;
                 if (!canSend)
                     continue;
-
+               
                 var packet = evt.Value;
                 outbox.EnqueueNetworkEvent(in packet);
             }
+            
+            Debug.Log($"[ClientNetworkEventSend] canSend={canSend} LocalPeerId={NetworkRuntime.LocalPeerId.Value} eventCount={i}");
         }
     }
 }

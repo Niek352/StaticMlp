@@ -150,24 +150,33 @@ namespace StaticMlp.Networking.Replication {
         }
 
         public static void CollectClientOwnedDirty(NetOutbox outbox, NetworkPeerId peer) {
+            var entityCount = 0;
             foreach (var e in CW.Query<All<LocalOwned, NetworkedTag, NetworkIdentity, NetworkDirty, NetworkReplicationState>>().Entities()) {
+                entityCount++;
                 foreach (var handler in ComponentHandlers.Values) {
                     if (handler.Authority != ReplicationAuthority.Owner || !handler.HasChanged(e))
                         continue;
 
+                    Debug.Log($"[CollectClientOwnedDirty] Sending {handler.ComponentDisplayName} for entity {e.GID.Raw}");
                     outbox.EnqueueEntitySnapshot(peer, CreateClientDirtySnapshot(e, handler.Guid), handler.Delivery);
                 }
 
                 e.Delete<NetworkDirty>();
             }
+            Debug.Log($"[CollectClientOwnedDirty] Entities processed={entityCount}");
         }
 
         public static void CollectServerAuthorityDirty(NetOutbox outbox, IReadOnlyList<NetworkPeerId> peers) {
+            var entityCount = 0;
             foreach (var e in SW.Query<All<NetworkedTag, NetworkIdentity, NetworkDirty, NetworkReplicationState>>().Entities()) {
+                entityCount++;
                 foreach (var handler in ComponentHandlers.Values) {
-                    if (!CanCollectDirtyOnServer(e, handler) || !handler.HasChanged(e))
+                    var canCollect = CanCollectDirtyOnServer(e, handler);
+                    var hasChanged = handler.HasChanged(e);
+                    if (!canCollect || !hasChanged)
                         continue;
 
+                    Debug.Log($"[CollectServerAuthorityDirty] Sending {handler.ComponentDisplayName} for entity {e.GID.Raw} to {peers.Count} peers");
                     var payload = CreateServerDirtySnapshot(e, handler.Guid);
                     for (var i = 0; i < peers.Count; i++) {
                         var peer = peers[i];
@@ -180,6 +189,7 @@ namespace StaticMlp.Networking.Replication {
 
                 e.Delete<NetworkDirty>();
             }
+            Debug.Log($"[CollectServerAuthorityDirty] Entities processed={entityCount}");
         }
 
         public static void RegisterClientCoreGeneratedTypes() {

@@ -24,6 +24,7 @@ namespace StaticMlp.Features.Player
                 if (HasPlayer(peer))
                     continue;
 
+                Debug.Log($"[ServerPlayerJoinSpawn] Spawning player for peer={peer.Value}");
                 var spawnPosition = new Vector3((peer.Value - 1) * _spawnSpacing, 0f, 0f);
                 SW.GetResource<PlayerFactory>().Spawn(new PlayerFactoryData(peer, spawnPosition, Quaternion.identity));
                 SpawnBroadcaster.SendExistingSpawns(peer);

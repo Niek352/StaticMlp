@@ -3,9 +3,18 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking.Replication;
 using Unity.Collections;
 using Unity.Networking.Transport;
+using UnityEngine;
 
 namespace StaticMlp.Networking.Transport {
     public sealed class ClientRawInboxDrainSystem : ISystem {
+        private static string GetPacketType(byte[] payload) {
+            if (payload == null || payload.Length == 0) return "Empty";
+            try {
+                return ((NetPacketType)payload[0]).ToString();
+            } catch {
+                return $"Unknown({payload[0]})";
+            }
+        }
         public void Update() {
             ref var ctx = ref CW.GetResource<UtpTransportContext>();
             ref var inbox = ref CW.GetResource<NetInbox>();
@@ -34,7 +43,8 @@ namespace StaticMlp.Networking.Transport {
 
             while (ctx.RawInbox.Count > 0) {
                 var packet = ctx.RawInbox.Dequeue();
-                PacketCodec.Decode(packet.SourcePeer, packet.Payload, inbox);
+                var decoded = PacketCodec.Decode(packet.SourcePeer, packet.Payload, inbox);
+                Debug.Log($"[ClientRawInbox] Decoded packet type={GetPacketType(packet.Payload)} decoded={decoded} LocalPeerId={NetworkRuntime.LocalPeerId.Value}");
                 var oldPeer = ctx.LocalPeerId;
                 ctx.LocalPeerId = NetworkRuntime.LocalPeerId;
                 if (oldPeer != ctx.LocalPeerId)

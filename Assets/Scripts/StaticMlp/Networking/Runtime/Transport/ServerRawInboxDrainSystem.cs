@@ -3,6 +3,7 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking.Replication;
 using Unity.Collections;
 using Unity.Networking.Transport;
+using UnityEngine;
 
 namespace StaticMlp.Networking.Transport {
     public sealed class ServerRawInboxDrainSystem : ISystem {
@@ -35,7 +36,9 @@ namespace StaticMlp.Networking.Transport {
 
             while (ctx.RawInbox.Count > 0) {
                 var packet = ctx.RawInbox.Dequeue();
-                PacketCodec.Decode(packet.SourcePeer, packet.Payload, inbox);
+                var decoded = PacketCodec.Decode(packet.SourcePeer, packet.Payload, inbox);
+                var typeStr = packet.Payload?.Length > 0 ? ((NetPacketType)packet.Payload[0]).ToString() : "Empty";
+                Debug.Log($"[ServerRawInbox] Decoded packet from peer={packet.SourcePeer.Value} type={typeStr} decoded={decoded}");
             }
         }
 

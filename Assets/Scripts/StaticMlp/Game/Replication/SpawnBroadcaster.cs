@@ -2,6 +2,7 @@ using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Transport;
+using UnityEngine;
 
 namespace StaticMlp.Networking.Replication {
     public static class SpawnBroadcaster {
@@ -10,8 +11,11 @@ namespace StaticMlp.Networking.Replication {
                 return;
 
             ref var outbox = ref SW.GetResource<NetOutbox>();
-            foreach (var peer in ServerPeerRegistry.Peers)
-                outbox.Enqueue(peer, PacketCodec.EncodeSpawn(CreateSpawn(entity, peer)), NetDelivery.ReliableSequenced);
+            foreach (var peer in ServerPeerRegistry.Peers) {
+                var spawn = CreateSpawn(entity, peer);
+                Debug.Log($"[SpawnBroadcaster] Sending spawn gid={spawn.Gid.Raw} type={spawn.EntityType} owner={spawn.Owner.Value} to peer={peer.Value}");
+                outbox.Enqueue(peer, PacketCodec.EncodeSpawn(spawn), NetDelivery.ReliableSequenced);
+            }
         }
 
         public static void SendExistingSpawns(NetworkPeerId peer) {
