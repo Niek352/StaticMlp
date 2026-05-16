@@ -1,16 +1,11 @@
-using System;
-using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.EcsViews;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
-using UnityEngine;
 
 namespace StaticMlp.Features.OpenWorldGeneration
 {
     public sealed class ClientOpenWorldChunkUnloadSystem : ISystem
     {
-        private readonly List<EntityGID> _viewEntities = new();
         private EventReceiver<ClientCoreWT, NetworkEventFromServer<OpenWorldChunkUnloadEvent>> _unloads;
 
         public void Init()
@@ -26,30 +21,25 @@ namespace StaticMlp.Features.OpenWorldGeneration
         public void Update()
         {
             foreach (var unload in _unloads)
-                UnloadCluster(unload.Value.Value.ClusterId);
+                UnloadCluster(unload.Value.Value.ClusterId, unload.Value.ReceiveOrder);
         }
 
-        private void UnloadCluster(ushort clusterId)
+        private void UnloadCluster(ushort clusterId, int receiveOrder)
         {
-            ReadOnlySpan<ushort> clusters = stackalloc ushort[] { clusterId };
-            _viewEntities.Clear();
-            foreach (var entity in CW.Query<All<View>>().Entities(clusters: clusters))
-                _viewEntities.Add(entity.GID);
+            if (HasNewerSnapshotForCluster(clusterId, receiveOrder))
+                return;
 
-            for (var i = 0; i < _viewEntities.Count; i++)
-            {
-                if (!_viewEntities[i].TryUnpack<ClientCoreWT>(out var entity))
-                    continue;
+            CW.DestroyAllEntitiesInCluster(clusterId);
+        }
 
-                ref readonly var view = ref entity.Read<View>();
-                view.Value.Unbind();
+        private static bool HasNewerSnapshotForCluster(ushort clusterId, int receiveOrder)
+        {
+            ref var inbox = ref CW.GetResource<NetInbox>();
+            for (var i = 0; i < inbox.Snapshots.Count; i++)
+                if (inbox.Snapshots[i].ClusterId == clusterId && inbox.Snapshots[i].ReceiveOrder > receiveOrder)
+                    return true;
 
-                if (view.Value is MonoBehaviour monoBehaviour)
-                    UnityEngine.Object.Destroy(monoBehaviour.gameObject);
-            }
-
-            CW.Query().BatchUnload(EntityStatusType.Any, clusters: clusters);
-            _viewEntities.Clear();
+            return false;
         }
     }
 }

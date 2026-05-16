@@ -65,7 +65,7 @@ namespace StaticMlp.Composition
             GameplayFeatureDiscovery.RegisterClientCoreSystems(systemsBuilder);
             GameplayFeatureDiscovery.RegisterClientViewSync(
                 new ViewSyncBuilder(systemsBuilder, ViewSystemOrder.ApplyPresentationState));
-            systemsBuilder.Add(new DestroyEntityViewSystem(viewFactory), ViewSystemOrder.DestroyViews);
+            systemsBuilder.Add(new DestroyEntityViewSystem(), ViewSystemOrder.DestroyViews);
             ClientCoreSys.Add(new ClientNetworkEventSendSystem(), order: 490);
             ClientCoreSys.Add(new ClientReplicationCollectSystem(), order: 500);
 

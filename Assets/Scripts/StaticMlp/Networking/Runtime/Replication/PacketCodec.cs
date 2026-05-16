@@ -65,6 +65,7 @@ namespace StaticMlp.Networking.Replication {
             writer.WriteByte((byte)msg.Kind);
             writer.WriteUshort(msg.ClusterId);
             writer.WriteUint(msg.ChunkIdx);
+            WriteChunkIds(ref writer, msg.ChunkIds);
             writer.WriteBool(msg.Gzip);
             WriteBytes(ref writer, msg.Payload);
             var bytes = writer.CopyToBytes();
@@ -144,7 +145,9 @@ namespace StaticMlp.Networking.Replication {
                         ));
                         return true;
                     case NetPacketType.Snapshot:
-                        inbox.Snapshots.Add(ReadSnapshot(ref reader));
+                        var snapshot = ReadSnapshot(ref reader);
+                        snapshot.ReceiveOrder = inbox.NextReceiveOrder();
+                        inbox.Snapshots.Add(snapshot);
                         return true;
                     case NetPacketType.ChunkLease:
                         inbox.ChunkLeases.Add(ReadChunkLease(ref reader));
@@ -186,6 +189,7 @@ namespace StaticMlp.Networking.Replication {
                 Kind = (ReplicationSnapshotKind)reader.ReadByte(),
                 ClusterId = reader.ReadUshort(),
                 ChunkIdx = reader.ReadUint(),
+                ChunkIds = ReadChunkIds(ref reader),
                 Gzip = reader.ReadBool(),
                 Payload = ReadBytes(ref reader)
             };
@@ -198,6 +202,33 @@ namespace StaticMlp.Networking.Replication {
                 chunks[i] = reader.ReadUint();
 
             return new ChunkLeaseMessage(chunks);
+        }
+
+        private static void WriteChunkIds(ref BinaryPackWriter writer, uint[] chunkIds) {
+            if (chunkIds == null || chunkIds.Length == 0) {
+                writer.WriteUshort(0);
+                return;
+            }
+
+            var count = chunkIds.Length;
+            if (count > ushort.MaxValue)
+                throw new InvalidOperationException($"Snapshot chunk list is too large: {count}.");
+
+            writer.WriteUshort((ushort)count);
+            for (var i = 0; i < count; i++)
+                writer.WriteUint(chunkIds[i]);
+        }
+
+        private static uint[] ReadChunkIds(ref BinaryPackReader reader) {
+            var count = reader.ReadUshort();
+            if (count == 0)
+                return Array.Empty<uint>();
+
+            var chunkIds = new uint[count];
+            for (var i = 0; i < chunkIds.Length; i++)
+                chunkIds[i] = reader.ReadUint();
+
+            return chunkIds;
         }
 
         private static EntitySnapshotBatch ReadEntitySnapshotBatch(ref BinaryPackReader reader, NetworkPeerId fallbackSource) {
@@ -225,7 +256,7 @@ namespace StaticMlp.Networking.Replication {
             if (!NetworkEventRegistry.DecodePacket(sourcePeer, eventTypeId, bytes, out var packet))
                 return false;
 
-            inbox.Events.Add(packet);
+            inbox.Events.Add(packet.WithReceiveOrder(inbox.NextReceiveOrder()));
             return true;
         }
 
@@ -243,7 +274,7 @@ namespace StaticMlp.Networking.Replication {
             }
 
             for (var i = 0; i < decoded.Length; i++)
-                inbox.Events.Add(decoded[i]);
+                inbox.Events.Add(decoded[i].WithReceiveOrder(inbox.NextReceiveOrder()));
             return true;
         }
 

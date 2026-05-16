@@ -19,16 +19,18 @@ namespace StaticMlp.Networking.Replication {
             }
         }
 
-        private static void ApplyClusterSnapshot(ReplicationSnapshotMessage snapshot) {
+        private static void ApplyClusterSnapshot(in ReplicationSnapshotMessage snapshot) {
             if (!CW.ClusterIsRegistered(snapshot.ClusterId))
                 CW.RegisterCluster(snapshot.ClusterId);
 
+            RegisterClusterChunks(snapshot);
+            DestroyExistingClusterEntities(snapshot);
             CW.Serializer.LoadClusterSnapshot(snapshot.Payload);
             MarkClusterAsRemote(snapshot.ClusterId);
             PostLoadCluster(snapshot.ClusterId);
         }
 
-        private static void ApplyChunkSnapshot(ReplicationSnapshotMessage snapshot) {
+        private static void ApplyChunkSnapshot(in ReplicationSnapshotMessage snapshot) {
             if (!CW.ClusterIsRegistered(snapshot.ClusterId))
                 CW.RegisterCluster(snapshot.ClusterId);
 
@@ -38,6 +40,43 @@ namespace StaticMlp.Networking.Replication {
             CW.Serializer.LoadChunkSnapshot(snapshot.Payload);
             MarkChunkAsRemote(snapshot.ChunkIdx);
             PostLoadCluster(snapshot.ClusterId);
+        }
+
+        private static void RegisterClusterChunks(in ReplicationSnapshotMessage snapshot) {
+            if (snapshot.ChunkIds == null)
+                throw new InvalidOperationException("Cluster snapshot message is missing chunk ids.");
+
+            for (var i = 0; i < snapshot.ChunkIds.Length; i++)
+                EnsureRemoteChunk(snapshot.ClusterId, snapshot.ChunkIds[i]);
+        }
+
+        private static void EnsureRemoteChunk(ushort clusterId, uint chunkIdx) {
+            if (!CW.ChunkIsRegistered(chunkIdx)) {
+                CW.RegisterChunk(chunkIdx, ChunkOwnerType.Other, clusterId);
+                return;
+            }
+
+            var existingClusterId = CW.GetChunkClusterId(chunkIdx);
+            if (existingClusterId != clusterId) {
+                if (CW.HasEntitiesInChunk(chunkIdx))
+                    throw new InvalidOperationException(
+                        $"Client chunk {chunkIdx} is already registered in cluster {existingClusterId} with active entities.");
+
+                CW.ChangeChunkCluster(chunkIdx, clusterId);
+            }
+
+            if (CW.GetChunkOwner(chunkIdx) == ChunkOwnerType.Self)
+                CW.ChangeChunkOwner(chunkIdx, ChunkOwnerType.Other);
+        }
+
+        private static void DestroyExistingClusterEntities(in ReplicationSnapshotMessage snapshot) {
+            for (var i = 0; i < snapshot.ChunkIds.Length; i++) {
+                var chunkIdx = snapshot.ChunkIds[i];
+                if (CW.ChunkIsRegistered(chunkIdx) && CW.HasEntitiesInChunk(chunkIdx)) {
+                    CW.DestroyAllEntitiesInCluster(snapshot.ClusterId);
+                    return;
+                }
+            }
         }
 
         private static void MarkClusterAsRemote(ushort clusterId) {

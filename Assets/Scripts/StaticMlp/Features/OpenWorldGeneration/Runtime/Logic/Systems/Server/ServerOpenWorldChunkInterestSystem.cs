@@ -125,9 +125,10 @@ namespace StaticMlp.Features.OpenWorldGeneration
             if (!SW.ClusterIsRegistered(clusterId))
                 SW.RegisterCluster(clusterId);
 
+            SW.SetActiveCluster(clusterId, true);
             if (state.TryGetSnapshot(chunkId, out var snapshot))
             {
-                SW.Serializer.LoadClusterSnapshot(snapshot);
+                //SW.Serializer.LoadClusterSnapshot(snapshot);
             }
             else
             {
@@ -146,7 +147,10 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 return;
 
             var clusterId = OpenWorldSpatialClusterIds.ToClusterId(chunkId, bounds);
-            state.SetSnapshot(
+            state.SetSnapshot(chunkId, null);
+            SW.SetActiveCluster(clusterId, false);
+            //TODO:Rework in future
+            /*state.SetSnapshot(
                 chunkId,
                 SW.Serializer.CreateClusterSnapshot(
                     clusterId,
@@ -154,10 +158,9 @@ namespace StaticMlp.Features.OpenWorldGeneration
                     gzip: true,
                     strategy: ChunkWritingStrategy.All,
                     withEntitiesData: true));
-
             ReadOnlySpan<ushort> clusters = stackalloc ushort[] { clusterId };
             SW.Query().BatchUnload(EntityStatusType.Any, clusters: clusters);
-            state.MarkServerUnloaded(chunkId);
+            state.MarkServerUnloaded(chunkId);*/
         }
 
         private void BuildDesiredChunks(float worldX, float worldZ, OpenWorldGenerationServerRuntime runtime)

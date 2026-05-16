@@ -87,14 +87,14 @@ namespace StaticMlp.Networking.Replication {
 
         internal static bool TryApplyToServer(in NetworkEventPacket packet) {
             var hasHandler = HandlersById.TryGetValue(packet.EventTypeId, out var handler);
-            var applied = hasHandler && packet.Payload.TryApplyToServer(packet.SourcePeer);
+            var applied = hasHandler && packet.Payload.TryApplyToServer(packet.SourcePeer, packet.ReceiveOrder);
             Debug.Log($"[NetworkEventRegistry] TryApplyToServer eventId={packet.EventTypeId} handler={handler?.EventType.Name ?? "null"} applied={applied}");
             return applied;
         }
 
         internal static bool TryApplyToClient(in NetworkEventPacket packet) {
             var hasHandler = HandlersById.TryGetValue(packet.EventTypeId, out var handler);
-            var applied = hasHandler && packet.Payload.TryApplyToClient(packet.SourcePeer);
+            var applied = hasHandler && packet.Payload.TryApplyToClient(packet.SourcePeer, packet.ReceiveOrder);
             Debug.Log($"[NetworkEventRegistry] TryApplyToClient eventId={packet.EventTypeId} handler={handler?.EventType.Name ?? "null"} applied={applied}");
             return applied;
         }

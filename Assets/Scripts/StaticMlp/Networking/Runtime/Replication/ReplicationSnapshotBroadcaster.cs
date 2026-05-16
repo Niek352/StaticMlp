@@ -8,6 +8,7 @@ namespace StaticMlp.Networking.Replication {
                 Kind = ReplicationSnapshotKind.Cluster,
                 ClusterId = clusterId,
                 ChunkIdx = 0,
+                ChunkIds = CopyClusterChunks(clusterId),
                 Gzip = gzip,
                 Payload = SW.Serializer.CreateClusterSnapshot(
                     clusterId,
@@ -34,6 +35,15 @@ namespace StaticMlp.Networking.Replication {
                     withEntitiesData: true
                 )
             }), NetDelivery.ReliableSequenced);
+        }
+
+        private static uint[] CopyClusterChunks(ushort clusterId) {
+            var chunks = SW.GetClusterChunks(clusterId);
+            var chunkIds = new uint[chunks.Length];
+            for (var i = 0; i < chunks.Length; i++)
+                chunkIds[i] = chunks[i];
+
+            return chunkIds;
         }
     }
 }

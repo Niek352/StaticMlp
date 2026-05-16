@@ -10,6 +10,7 @@ namespace StaticMlp.Networking.Replication {
         public readonly List<ChunkLeaseMessage> ChunkLeases = new();
         public readonly List<EntitySnapshotBatch> EntitySnapshotBatches = new();
         internal readonly List<NetworkEventPacket> Events = new();
+        private int _nextReceiveOrder;
 
         public void Clear() {
             Spawns.Clear();
@@ -19,6 +20,9 @@ namespace StaticMlp.Networking.Replication {
             ChunkLeases.Clear();
             EntitySnapshotBatches.Clear();
             Events.Clear();
+            _nextReceiveOrder = 0;
         }
+
+        internal int NextReceiveOrder() => _nextReceiveOrder++;
     }
 }

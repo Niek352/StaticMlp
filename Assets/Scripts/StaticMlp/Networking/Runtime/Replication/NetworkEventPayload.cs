@@ -15,12 +15,12 @@ namespace StaticMlp.Networking.Replication {
             _writer(ref writer, in _evt);
         }
 
-        public bool TryApplyToClient(NetworkPeerId sourcePeer) {
-            return CW.SendEvent(new NetworkEventFromServer<TEvent>(sourcePeer, in _evt));
+        public bool TryApplyToClient(NetworkPeerId sourcePeer, int receiveOrder) {
+            return CW.SendEvent(new NetworkEventFromServer<TEvent>(sourcePeer, in _evt, receiveOrder));
         }
 
-        public bool TryApplyToServer(NetworkPeerId sourcePeer) {
-            return SW.SendEvent(new NetworkEventFromClient<TEvent>(sourcePeer, in _evt));
+        public bool TryApplyToServer(NetworkPeerId sourcePeer, int receiveOrder) {
+            return SW.SendEvent(new NetworkEventFromClient<TEvent>(sourcePeer, in _evt, receiveOrder));
         }
     }
 }
