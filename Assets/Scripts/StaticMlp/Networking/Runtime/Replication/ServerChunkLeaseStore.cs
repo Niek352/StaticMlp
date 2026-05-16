@@ -31,7 +31,8 @@ namespace StaticMlp.Networking.Replication
             for (var i = 0; i < created.Length; i++)
             {
                 var chunkInfo = SW.FindNextSelfFreeChunk();
-                SW.RegisterChunk(chunkInfo.ChunkIdx, ChunkOwnerType.Other, clusterId: 0);
+                SW.RegisterChunk(chunkInfo.ChunkIdx, ChunkOwnerType.Self, clusterId: 0);
+                SW.ChangeChunkOwner(chunkInfo.ChunkIdx, ChunkOwnerType.Other);
                 created[i] = chunkInfo.ChunkIdx;
             }
 

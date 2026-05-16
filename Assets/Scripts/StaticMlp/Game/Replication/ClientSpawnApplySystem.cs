@@ -1,4 +1,6 @@
+using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking.Ownership;
 
 namespace StaticMlp.Networking.Replication {
     public sealed class ClientSpawnApplySystem : ISystem {
@@ -10,7 +12,22 @@ namespace StaticMlp.Networking.Replication {
                 ReplicationRegistry.ApplyServerSnapshot(
                     spawn.SnapshotPayload,
                     FilteredEntitySnapshotLoadMode.UpsertFromServer);
+                PostLoadSpawn(spawn.Gid);
             }
+        }
+
+        private static void PostLoadSpawn(EntityGID gid) {
+            if (!gid.TryUnpack<ClientCoreWT>(out var entity))
+                throw new Exception($"Spawn snapshot did not create or load entity {gid}.");
+
+            ref readonly var identity = ref entity.Read<NetworkIdentity>();
+            entity.Set<NetworkedTag>();
+            if (!entity.Has<NetworkReplicationState>())
+                entity.Set(new NetworkReplicationState());
+
+            NetArchetypeRegistry.Apply(identity.NetworkArchetypeId, entity);
+            OwnershipTags.ApplyForClient(entity, identity.Owner, identity.Authority);
+            ReplicationRegistry.InitializeClientCoreInterpolatedState(entity);
         }
 
         private static void EnsureRemoteChunk(EntityGID gid) {

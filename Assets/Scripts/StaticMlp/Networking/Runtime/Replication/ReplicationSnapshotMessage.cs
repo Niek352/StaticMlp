@@ -1,5 +1,5 @@
 namespace StaticMlp.Networking.Replication {
-    public sealed class ReplicationSnapshotMessage {
+    public struct ReplicationSnapshotMessage {
         public ReplicationSnapshotKind Kind;
         public ushort ClusterId;
         public uint ChunkIdx;

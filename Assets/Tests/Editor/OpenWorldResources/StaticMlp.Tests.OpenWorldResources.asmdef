@@ -8,7 +8,8 @@
         "Game.Core",
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
         "StaticMlp.Features.OpenWorldGeneration.Logic",
-        "StaticMlp.Features.OpenWorldResources"
+        "StaticMlp.Features.OpenWorldResources",
+        "StaticMlp.Generated"
     ],
     "includePlatforms": [
         "Editor"

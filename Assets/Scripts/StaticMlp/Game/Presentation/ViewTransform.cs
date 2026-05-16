@@ -27,12 +27,8 @@ namespace StaticMlp.Game.Presentation
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new ViewTransform
-            {
-                RenderPosition = new Vector3(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat()),
-                RenderRotation = new Quaternion(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat(),
-                    reader.ReadFloat())
-            });
+            RenderPosition = new Vector3(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());
+            RenderRotation = new Quaternion(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());
         }
     }
 }

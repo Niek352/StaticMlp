@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 
 namespace StaticMlp.Networking.Replication {
-    public sealed class SpawnMessage {
+    public struct SpawnMessage {
         public EntityGID Gid;
         public byte EntityType;
         public ushort NetworkSchemaVersion;

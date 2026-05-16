@@ -6,7 +6,8 @@
         "FFS.StaticEcs",
         "FFS.StaticPack",
         "Ecs.Networking",
-        "Game.Core"
+        "Game.Core",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts"
     ],
     "includePlatforms": [
         "Editor"
