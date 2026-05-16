@@ -7,16 +7,19 @@ namespace StaticMlp.Networking.Replication {
         public readonly ReplicationAudience Audience;
         public readonly NetDelivery Delivery;
         public readonly ushort SendRate;
+        public readonly string Guid;
 
         public ReplicatedComponentAttribute(
             ReplicationAuthority authority,
             NetDelivery delivery,
             ushort sendRate = 20,
-            ReplicationAudience audience = ReplicationAudience.All) {
+            ReplicationAudience audience = ReplicationAudience.All,
+            string guid = null) {
             Authority = authority;
             Audience = audience;
             Delivery = delivery;
             SendRate = sendRate;
+            Guid = guid;
         }
     }
 }

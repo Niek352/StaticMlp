@@ -10,9 +10,10 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
         sendRate: 5,
-        audience: ReplicationAudience.OwnerOnly
+        audience: ReplicationAudience.OwnerOnly,
+        guid: "943d0dd7-7080-4d28-8afc-44a649ac2c01"
     )]
-    public struct ResourcesInventory : IComponent, IComponentConfig<ResourcesInventory>,
+    public partial struct ResourcesInventory : IComponent, IComponentConfig<ResourcesInventory>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
@@ -48,11 +49,8 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new ResourcesInventory
-            {
-                Wood = reader.ReadInt(),
-                Stone = reader.ReadInt()
-            });
+            Wood = reader.ReadInt();
+            Stone = reader.ReadInt();
         }
     }
 }

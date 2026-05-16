@@ -3,6 +3,7 @@
     "rootNamespace": "StaticMlp.Tests.Combat",
     "references": [
         "FFS.StaticEcs",
+        "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core",
         "Code.EcsUi.Mvc",

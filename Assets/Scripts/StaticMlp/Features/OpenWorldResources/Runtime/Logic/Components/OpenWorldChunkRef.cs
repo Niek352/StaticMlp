@@ -22,11 +22,8 @@ namespace StaticMlp.Features.OpenWorldResources
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new OpenWorldChunkRef
-            {
-                X = reader.ReadInt(),
-                Z = reader.ReadInt()
-            });
+            X = reader.ReadInt();
+            Z = reader.ReadInt();
         }
     }
 }

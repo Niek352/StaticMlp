@@ -1,5 +1,4 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Networking.Ownership;
 
 namespace StaticMlp.Networking.Replication {
     public sealed class ClientSpawnApplySystem : ISystem {
@@ -7,23 +6,10 @@ namespace StaticMlp.Networking.Replication {
             ref var inbox = ref CW.GetResource<NetInbox>();
 
             foreach (var spawn in inbox.Spawns) {
-                if (spawn.Gid.TryUnpack<ClientCoreWT>(out _))
-                    continue;
-
                 EnsureRemoteChunk(spawn.Gid);
-                var e = CW.NewEntityByGID(spawn.EntityType, spawn.Gid);
-                e.Set(new NetworkIdentity {
-                    Owner = spawn.Owner,
-                    Authority = spawn.Authority,
-                    NetworkArchetypeId = spawn.NetworkArchetypeId
-                });
-                e.Set<NetworkedTag>();
-                e.Set(new NetworkReplicationState());
-
-                NetArchetypeRegistry.Apply(spawn.NetworkArchetypeId, e);
-                ReplicationRegistry.ApplyInitialState(e, spawn.Components);
-                ReplicationRegistry.InitializeClientCoreInterpolatedState(e);
-                OwnershipTags.ApplyForClient(e, spawn.Owner, spawn.Authority);
+                ReplicationRegistry.ApplyServerSnapshot(
+                    spawn.SnapshotPayload,
+                    FilteredEntitySnapshotLoadMode.UpsertFromServer);
             }
         }
 

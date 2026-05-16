@@ -9,9 +9,10 @@ namespace StaticMlp.Features.Settlement
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "e271ae45-3257-4897-955f-d411a1dac94f"
     )]
-    public struct SettlementAnchorRef : IComponent, IComponentConfig<SettlementAnchorRef>,
+    public partial struct SettlementAnchorRef : IComponent, IComponentConfig<SettlementAnchorRef>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
@@ -36,10 +37,7 @@ namespace StaticMlp.Features.Settlement
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new SettlementAnchorRef
-            {
-                AnchorId = reader.ReadUshort()
-            });
+            AnchorId = reader.ReadUshort();
         }
     }
 }

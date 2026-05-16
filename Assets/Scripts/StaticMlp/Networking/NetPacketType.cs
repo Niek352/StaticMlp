@@ -7,8 +7,9 @@ namespace StaticMlp.Networking {
         OwnershipChanged = 12,
         Snapshot = 13,
         ChunkLease = 14,
-        ComponentBatch = 20,
+        EntitySnapshotBatch = 20,
         NetworkEvent = 30,
+        NetworkEventBatch = 31,
         Ping = 40,
         Pong = 41
     }

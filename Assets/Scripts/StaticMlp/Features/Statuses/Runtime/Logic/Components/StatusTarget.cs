@@ -9,9 +9,10 @@ namespace StaticMlp.Features.Statuses
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 10
+        sendRate: 10,
+        guid: "5f83b1cd-ae0a-4d1a-a6f7-2a7f4a984101"
     )]
-    public struct StatusTarget : IComponent, IComponentConfig<StatusTarget>, ITrackableAdded, ITrackableChanged, ITrackableDeleted
+    public partial struct StatusTarget : IComponent, IComponentConfig<StatusTarget>, ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
         public EntityGID Value;
@@ -28,10 +29,7 @@ namespace StaticMlp.Features.Statuses
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new StatusTarget
-            {
-                Value = new EntityGID(reader.ReadUlong()),
-            });
+            Value = new EntityGID(reader.ReadUlong());
         }
     }
 }

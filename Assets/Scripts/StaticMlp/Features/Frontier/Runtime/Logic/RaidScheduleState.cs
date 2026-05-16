@@ -9,9 +9,10 @@ namespace StaticMlp.Features.Frontier
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "cd4f4133-8327-48f1-a557-1490506cc236"
     )]
-    public struct RaidScheduleState : IComponent, IComponentConfig<RaidScheduleState>,
+    public partial struct RaidScheduleState : IComponent, IComponentConfig<RaidScheduleState>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField] public ushort RaidIdValue;
@@ -34,12 +35,9 @@ namespace StaticMlp.Features.Frontier
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new RaidScheduleState
-            {
-                RaidIdValue = reader.ReadUshort(),
-                Status = (RaidScheduleStatus)reader.ReadByte(),
-                ActivateAtTick = reader.ReadUint()
-            });
+            RaidIdValue = reader.ReadUshort();
+            Status = (RaidScheduleStatus)reader.ReadByte();
+            ActivateAtTick = reader.ReadUint();
         }
     }
 }

@@ -9,9 +9,10 @@ namespace StaticMlp.Features.Progression
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "c6f1d334-a1e4-4472-a7a0-311c3e84fd54"
     )]
-    public struct Stage1ProgressionState : IComponent, IComponentConfig<Stage1ProgressionState>,
+    public partial struct Stage1ProgressionState : IComponent, IComponentConfig<Stage1ProgressionState>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]

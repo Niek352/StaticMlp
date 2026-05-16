@@ -1,23 +1,14 @@
 using System.Collections.Generic;
+using FFS.Libraries.StaticEcs;
 
 namespace StaticMlp.Networking.Replication {
-    public readonly struct ServerRelayItem {
-        public readonly NetworkPeerId SourcePeer;
-        public readonly ComponentDelta Delta;
+    public sealed class ServerRelayBuffer : IResource {
+        public readonly List<ServerRelayItem> Items = new();
 
-        public ServerRelayItem(NetworkPeerId sourcePeer, ComponentDelta delta) {
-            SourcePeer = sourcePeer;
-            Delta = delta;
-        }
-    }
-
-    public static class ServerRelayBuffer {
-        public static readonly List<ServerRelayItem> Items = new();
-
-        public static void Add(NetworkPeerId sourcePeer, ComponentDelta delta) {
-            Items.Add(new ServerRelayItem(sourcePeer, delta));
+        public void Add(NetworkPeerId sourcePeer, byte[] payload, NetDelivery delivery) {
+            Items.Add(new ServerRelayItem(sourcePeer, payload, delivery));
         }
 
-        public static void Clear() => Items.Clear();
+        public void Clear() => Items.Clear();
     }
 }

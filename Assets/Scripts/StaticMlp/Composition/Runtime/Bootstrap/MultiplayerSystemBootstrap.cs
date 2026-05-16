@@ -58,7 +58,7 @@ namespace StaticMlp.Composition
             ClientCoreSys.Add(new ClientSpawnApplySystem(), order: -800);
             ClientCoreSys.Add(new ClientDespawnApplySystem(), order: -790);
             ClientCoreSys.Add(new ClientOwnershipApplySystem(), order: -780);
-            ClientCoreSys.Add(new ClientComponentDeltaApplySystem(), order: -770);
+            ClientCoreSys.Add(new ClientEntitySnapshotApplySystem(), order: -770);
             ClientCoreSys.Add(new ClientNetworkEventApplySystem(), order: -760);
             var systemsBuilder = new ClientCoreSystemsBuilder();
             systemsBuilder.Add(new BindEntityViewSystem(viewFactory), ViewSystemOrder.BindViews);

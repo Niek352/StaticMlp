@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -14,11 +15,13 @@ using UnityEngine;
 namespace StaticMlp.Editor.ReplicationCodeGen {
     [Generator]
     public sealed class ReplicationCodeGenerator : ICodeGenerator {
-        private const string OutputFolder = "Assets/Scripts/StaticMlp/Generated/ReplicationComponents";
+        private const string SharedOutputFolder = "Assets/Scripts/StaticMlp/Generated/ReplicationShared";
         private const string CharacterNetStateFullName = "StaticMlp.Game.Components.CharacterNetState";
 
         public void Execute(GeneratorContext context) {
-            context.OverrideFolderPath(OutputFolder);
+            Directory.CreateDirectory(SharedOutputFolder);
+            DeleteStaleSharedComponentOutputs();
+            context.OverrideFolderPath(SharedOutputFolder);
 
             var diagnostics = new List<string>();
             var components = TypeCache.GetTypesWithAttribute<ReplicatedComponentAttribute>()
@@ -36,10 +39,40 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             if (diagnostics.Count != 0)
                 return;
 
+            context.OverrideFolderPath(SharedOutputFolder);
             context.AddCode("ReplicatedComponentIds.Generated.cs", EmitIds(components));
-            foreach (var component in components)
-                context.AddCode($"{component.Type.Name}.Replication.Generated.cs", EmitComponentReplication(component));
+            foreach (var component in components) {
+                Directory.CreateDirectory(component.GeneratedOutputFolder);
+                WriteGeneratedCode(component.GeneratedOutputFolder, $"{component.Type.Name}.Replication.Generated.cs", EmitComponentReplication(component));
+                if (component.NeedsPartialSerialization) {
+                    WriteGeneratedCode(component.GeneratedOutputFolder, $"{component.Type.Name}.Replication.Partial.Generated.cs", EmitComponentPartial(component));
+                } else {
+                    DeleteGeneratedCode(component.GeneratedOutputFolder, $"{component.Type.Name}.Replication.Partial.Generated.cs");
+                }
+            }
+            context.OverrideFolderPath(SharedOutputFolder);
             context.AddCode("ReplicatedComponentRegistration.Generated.cs", EmitRegistry(components, networkEntities));
+        }
+
+        private static void WriteGeneratedCode(string folder, string fileName, string code) {
+            Directory.CreateDirectory(folder);
+            File.WriteAllText(Path.Combine(folder, fileName), code, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        }
+
+        private static void DeleteGeneratedCode(string folder, string fileName) {
+            var path = Path.Combine(folder, fileName);
+            if (File.Exists(path))
+                File.Delete(path);
+        }
+
+        private static void DeleteStaleSharedComponentOutputs() {
+            if (!Directory.Exists(SharedOutputFolder))
+                return;
+
+            foreach (var path in Directory.GetFiles(SharedOutputFolder, "*.Replication.Generated.cs"))
+                File.Delete(path);
+            foreach (var path in Directory.GetFiles(SharedOutputFolder, "*.Replication.Partial.Generated.cs"))
+                File.Delete(path);
         }
 
         [MenuItem("StaticMlp/Replication/Generate")]
@@ -63,9 +96,14 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             if (!typeof(ITrackableChanged).IsAssignableFrom(type))
                 diagnostics.Add($"{type.FullName}: replicated component must implement ITrackableChanged so dirty deltas can be collected.");
 
-            var guid = TryReadStaticEcsGuid(type);
+            var attributeGuid = TryReadAttributeGuid(type, attribute, diagnostics);
+            var configGuid = TryReadStaticEcsGuid(type);
+            if (attributeGuid.HasValue && configGuid.HasValue && attributeGuid.Value != configGuid.Value)
+                diagnostics.Add($"{type.FullName}: ReplicatedComponentAttribute guid does not match IComponentConfig<T>.Config() guid.");
+
+            var guid = attributeGuid ?? configGuid;
             if (!guid.HasValue)
-                diagnostics.Add($"{type.FullName}: replicated component must expose a stable StaticEcs guid through IComponentConfig<T>.Config().");
+                diagnostics.Add($"{type.FullName}: replicated component must declare a stable guid in ReplicatedComponentAttribute.");
 
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public)
                 .Select(f => FieldInfoFor(f, diagnostics))
@@ -75,6 +113,16 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             if (fields.Count == 0)
                 diagnostics.Add($"{type.FullName}: replicated component has no public replicated fields.");
 
+            var sourcePath = FindSourcePath(type);
+            var hasConfig = SourceDeclaresMethod(sourcePath, "Config");
+            var hasWrite = SourceDeclaresMethod(sourcePath, "Write");
+            var hasRead = SourceDeclaresMethod(sourcePath, "Read");
+            if (sourcePath == null)
+                diagnostics.Add($"{type.FullName}: source script path not found; cannot emit same-assembly generated replication.");
+            var generatedOutputFolder = sourcePath == null ? null : FindSameAssemblyGeneratedFolder(sourcePath);
+            if (generatedOutputFolder == null)
+                diagnostics.Add($"{type.FullName}: nearest asmdef folder not found; cannot emit same-assembly generated replication.");
+
             return new ComponentInfo(
                 type,
                 fields,
@@ -82,8 +130,49 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 attribute.Authority,
                 attribute.Audience,
                 attribute.Delivery,
-                attribute.SendRate
+                attribute.SendRate,
+                guid,
+                generatedOutputFolder,
+                hasConfig,
+                hasWrite,
+                hasRead
             );
+        }
+
+        private static bool SourceDeclaresMethod(string sourcePath, string methodName) {
+            if (sourcePath == null)
+                return false;
+
+            var text = File.ReadAllText(sourcePath);
+            return text.IndexOf($" {methodName}<", StringComparison.Ordinal) >= 0
+                   || text.IndexOf($" {methodName}(", StringComparison.Ordinal) >= 0;
+        }
+
+        private static string FindSourcePath(Type type) {
+            var guids = AssetDatabase.FindAssets($"{type.Name} t:MonoScript");
+            foreach (var guid in guids) {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (Path.GetFileNameWithoutExtension(path) == type.Name)
+                    return path;
+            }
+
+            return null;
+        }
+
+        private static string FindSameAssemblyGeneratedFolder(string sourcePath) {
+            var folder = Path.GetDirectoryName(sourcePath);
+            while (!string.IsNullOrEmpty(folder)) {
+                if (Directory.GetFiles(folder, "*.asmdef").Length != 0)
+                    return Path.Combine(folder, "Generated").Replace('\\', '/');
+
+                var parent = Path.GetDirectoryName(folder);
+                if (parent == folder)
+                    break;
+
+                folder = parent;
+            }
+
+            return null;
         }
 
         private static FieldReplicationInfo FieldInfoFor(FieldInfo field, List<string> diagnostics) {
@@ -107,6 +196,17 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 diagnostics.Add($"{field.DeclaringType.FullName}.{field.Name}: Interpolation.Auto is supported only for float, Vector2, Vector3 and Quaternion.");
 
             return new FieldReplicationInfo(field, attribute, kind);
+        }
+
+        private static Guid? TryReadAttributeGuid(Type type, ReplicatedComponentAttribute attribute, List<string> diagnostics) {
+            if (string.IsNullOrWhiteSpace(attribute.Guid))
+                return null;
+
+            if (Guid.TryParse(attribute.Guid, out var guid))
+                return guid;
+
+            diagnostics.Add($"{type.FullName}: ReplicatedComponentAttribute guid `{attribute.Guid}` is not a valid GUID.");
+            return null;
         }
 
         private static Guid? TryReadStaticEcsGuid(Type type) {
@@ -226,7 +326,6 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             builder.AppendLine("// <auto-generated/>");
             builder.AppendLine("using System;");
             builder.AppendLine("using FFS.Libraries.StaticEcs;");
-            builder.AppendLine("using FFS.Libraries.StaticPack;");
             builder.AppendLine($"using {component.Type.Namespace};");
             foreach (var ns in GetRequiredFieldNamespaces(component))
                 builder.AppendLine($"using {ns};");
@@ -236,58 +335,13 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             builder.AppendLine();
             builder.AppendLine("namespace StaticMlp.Networking.Replication.Generated {");
             builder.AppendLine($"    public static class {replicationName} {{");
-            builder.AppendLine($"        public const ushort TypeId = ReplicatedComponentIds.{component.Type.Name};");
+            builder.AppendLine($"        public const ushort TypeId = {component.TypeId};");
             builder.AppendLine($"        public const ReplicationAuthority Authority = ReplicationAuthority.{component.Authority};");
             builder.AppendLine($"        public const ReplicationAudience Audience = ReplicationAudience.{component.Audience};");
             builder.AppendLine($"        public const NetDelivery Delivery = NetDelivery.{component.Delivery};");
             builder.AppendLine($"        public const ushort SendRate = {component.SendRate};");
             builder.AppendLine("        public const byte LayoutVersion = 1;");
-            builder.AppendLine();
-            builder.AppendLine($"        public static ComponentDelta CreateDelta(EntityGID gid, in {typeName} state) {{");
-            builder.AppendLine($"            var writer = BinaryPackWriter.CreateFromPool({EstimateBufferSize(component)});");
-            foreach (var field in component.Fields)
-                AppendWrite(builder, field);
-            builder.AppendLine("            var bytes = writer.CopyToBytes();");
-            builder.AppendLine("            writer.Dispose();");
-            builder.AppendLine("            return new ComponentDelta(gid, TypeId, bytes);");
-            builder.AppendLine("        }");
-            builder.AppendLine();
-            builder.AppendLine($"        public static {typeName} Read(byte[] payload) {{");
-            builder.AppendLine("            if (payload == null || payload.Length == 0)");
-            builder.AppendLine("                return default;");
-            builder.AppendLine();
-            builder.AppendLine("            var reader = new BinaryPackReader(payload, (uint)payload.Length, 0);");
-            builder.AppendLine($"            return new {typeName} {{");
-            foreach (var field in component.Fields)
-                AppendRead(builder, field);
-            builder.AppendLine("            };");
-            builder.AppendLine("        }");
-            if (NeedsOptionalEntityGidHelper(component)) {
-                builder.AppendLine();
-                builder.AppendLine("        private static EntityGID ReadOptionalEntityGid(ref BinaryPackReader reader) {");
-                builder.AppendLine("            var raw = reader.ReadUlong();");
-                builder.AppendLine("            return raw == 0ul ? default : new EntityGID(raw);");
-                builder.AppendLine("        }");
-            }
             if (component.HasInterpolatedFields) {
-                builder.AppendLine();
-                builder.AppendLine($"        public static void ApplyClientDelta(CW.Entity e, byte[] payload) {{");
-                builder.AppendLine("            var next = Read(payload);");
-                builder.AppendLine($"            if (e.Has<{typeName}>())");
-                builder.AppendLine($"                e.Set(new InterpolatedPrevious<{typeName}>(e.Read<{typeName}>()));");
-                builder.AppendLine("            else");
-                builder.AppendLine($"                e.Set(new InterpolatedPrevious<{typeName}>(next));");
-                builder.AppendLine();
-                builder.AppendLine($"            if (!e.Has<Interpolated<{typeName}>>())");
-                builder.AppendLine($"                e.Set(new Interpolated<{typeName}>(next));");
-                builder.AppendLine();
-                builder.AppendLine("            e.Set(next);");
-                builder.AppendLine($"            e.Set(new InterpolatedClock<{typeName}> {{");
-                builder.AppendLine("                StartedAt = Time.time,");
-                builder.AppendLine("                Duration = SendRate == 0 ? 0f : 1f / SendRate");
-                builder.AppendLine("            });");
-                builder.AppendLine("        }");
-                builder.AppendLine();
                 builder.AppendLine($"        public static void Interpolate(in {typeName} previous, in {typeName} current, ref {typeName} interpolated, float alpha) {{");
                 foreach (var field in component.Fields)
                     AppendInterpolate(builder, field);
@@ -297,6 +351,64 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 foreach (var quantize in component.Fields.Select(x => x.Attribute.Quantize).Where(x => x > 0f).Distinct())
                     AppendQuantize(builder, quantize);
             }
+            builder.AppendLine("    }");
+            builder.AppendLine("}");
+            return builder.ToString();
+        }
+
+        private static string EmitComponentPartial(ComponentInfo component) {
+            var builder = new StringBuilder();
+            var typeName = GetTypeName(component.Type);
+            var interfaceSuffix = component.HasConfig ? string.Empty : $" : IComponentConfig<{typeName}>";
+
+            builder.AppendLine("// <auto-generated/>");
+            builder.AppendLine("using System;");
+            builder.AppendLine("using FFS.Libraries.StaticEcs;");
+            builder.AppendLine("using FFS.Libraries.StaticPack;");
+            foreach (var ns in GetRequiredFieldNamespaces(component))
+                builder.AppendLine($"using {ns};");
+            if (component.Fields.Any(x => x.Kind.NeedsUnityEngine))
+                builder.AppendLine("using UnityEngine;");
+            builder.AppendLine();
+            builder.AppendLine($"namespace {component.Type.Namespace} {{");
+            builder.AppendLine($"    public partial struct {typeName}{interfaceSuffix} {{");
+
+            if (!component.HasConfig) {
+                builder.AppendLine($"        public ComponentTypeConfig<{typeName}> Config() =>");
+                builder.AppendLine($"            new(guid: new Guid(\"{component.Guid.Value}\"));");
+                builder.AppendLine();
+            }
+
+            if (!component.HasWrite) {
+                builder.AppendLine("        public void Write<TWorld>(ref BinaryPackWriter writer, World<TWorld>.Entity self)");
+                builder.AppendLine("            where TWorld : struct, IWorldType {");
+                foreach (var field in component.Fields)
+                    AppendWriteHook(builder, field);
+                builder.AppendLine("        }");
+                if (!component.HasRead)
+                    builder.AppendLine();
+            }
+
+            if (!component.HasRead) {
+                builder.AppendLine("        public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)");
+                builder.AppendLine("            where TWorld : struct, IWorldType {");
+                foreach (var field in component.Fields)
+                    AppendReadHook(builder, field);
+                builder.AppendLine("        }");
+                if (NeedsOptionalEntityGidHelper(component)) {
+                    builder.AppendLine();
+                    builder.AppendLine("        private static EntityGID ReadOptionalEntityGid(ref BinaryPackReader reader) {");
+                    builder.AppendLine("            var raw = reader.ReadUlong();");
+                    builder.AppendLine("            return raw == 0ul ? default : new EntityGID(raw);");
+                    builder.AppendLine("        }");
+                }
+            }
+
+            if (!component.HasWrite && component.Fields.Any(x => x.Attribute.Quantize > 0f)) {
+                foreach (var quantize in component.Fields.Select(x => x.Attribute.Quantize).Where(x => x > 0f).Distinct())
+                    AppendQuantize(builder, quantize);
+            }
+
             builder.AppendLine("    }");
             builder.AppendLine("}");
             return builder.ToString();
@@ -334,8 +446,7 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 builder.AppendLine($"                ReplicationAuthority.{component.Authority},");
                 builder.AppendLine($"                ReplicationAudience.{component.Audience},");
                 builder.AppendLine($"                NetDelivery.{component.Delivery},");
-                builder.AppendLine($"                {component.Type.Name}Replication.CreateDelta,");
-                builder.AppendLine($"                {component.Type.Name}Replication.Read{RegistrationCallbacks(component)});");
+                builder.AppendLine($"                sendRate: {component.Type.Name}Replication.SendRate{RegistrationCallbacks(component)});");
             }
             builder.AppendLine();
             foreach (var entity in networkEntities)
@@ -353,7 +464,7 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 return string.Empty;
 
             var name = component.Type.Name;
-            return $",\n                clientApply: {name}Replication.ApplyClientDelta,\n                registerClientTypes: Register{name}ClientTypes,\n                registerClientSystems: Register{name}ClientSystems,\n                initializeClientState: Initialize{name}ClientState";
+            return $",\n                registerClientTypes: Register{name}ClientTypes,\n                registerClientSystems: Register{name}ClientSystems,\n                initializeClientState: Initialize{name}ClientState";
         }
 
         private static void AppendRegistrationInterpolationHelpers(StringBuilder builder, ComponentInfo component) {
@@ -383,202 +494,6 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             builder.AppendLine("                });");
             builder.AppendLine("            }");
             builder.AppendLine("        }");
-        }
-
-        private static void AppendCollectDirtyByEntityType(
-            StringBuilder builder,
-            string worldAlias,
-            List<ComponentInfo> components,
-            List<NetworkEntityInfo> networkEntities) {
-            var peerParameter = worldAlias == "SW" ? "IReadOnlyList<NetworkPeerId> peers" : "NetworkPeerId peer";
-            var peerArgument = worldAlias == "SW" ? "peers" : "peer";
-            builder.AppendLine($"        public static void CollectDirtyByEntityType({worldAlias}.Entity e, NetOutbox outbox, {peerParameter}) {{");
-            builder.AppendLine("            switch (e.EntityType) {");
-            foreach (var entity in networkEntities) {
-                builder.AppendLine($"                case {entity.EntityTypeId}:");
-                builder.AppendLine($"                    Collect{entity.Type.Name}Dirty(e, outbox, {peerArgument});");
-                builder.AppendLine("                    return;");
-            }
-            builder.AppendLine("            }");
-            builder.AppendLine();
-            builder.AppendLine("            if (e.Has<NetworkIdentity>()) {");
-            builder.AppendLine("                CollectDirtyByNetworkArchetype(e.Read<NetworkIdentity>().NetworkArchetypeId, e, outbox, " + peerArgument + ");");
-            builder.AppendLine("                return;");
-            builder.AppendLine("            }");
-            builder.AppendLine();
-            AppendFallbackDirtyCall(builder, worldAlias, "            ");
-            builder.AppendLine("        }");
-            builder.AppendLine();
-            builder.AppendLine($"        private static void CollectDirtyByNetworkArchetype(ushort networkArchetypeId, {worldAlias}.Entity e, NetOutbox outbox, {peerParameter}) {{");
-            builder.AppendLine("            switch (networkArchetypeId) {");
-            foreach (var entity in networkEntities.Where(x => x.DefaultNetworkArchetypeId != 0)) {
-                builder.AppendLine($"                case {entity.DefaultNetworkArchetypeId}:");
-                builder.AppendLine($"                    Collect{entity.Type.Name}Dirty(e, outbox, {peerArgument});");
-                builder.AppendLine("                    return;");
-            }
-            builder.AppendLine("            }");
-            builder.AppendLine();
-            AppendFallbackDirtyCall(builder, worldAlias, "            ");
-            builder.AppendLine("        }");
-
-            foreach (var entity in networkEntities) {
-                builder.AppendLine();
-                builder.AppendLine($"        private static void Collect{entity.Type.Name}Dirty({worldAlias}.Entity e, NetOutbox outbox, {peerParameter}) {{");
-                var authority = worldAlias == "SW"
-                    ? ReplicationAuthority.Server
-                    : ReplicationAuthority.Owner;
-                foreach (var component in components.Where(x => x.Authority == authority)) {
-                    var name = GetTypeName(component.Type);
-                    builder.AppendLine($"            if (e.Has<{name}>() && e.HasChanged<{name}>()) {{");
-                    if (worldAlias == "SW") {
-                        builder.AppendLine($"                var delta = {component.Type.Name}Replication.CreateDelta(e.GID, e.Read<{name}>());");
-                        builder.AppendLine("                for (var i = 0; i < peers.Count; i++) {");
-                        builder.AppendLine($"                    if (!CanSendToPeer(e, peers[i], {component.Type.Name}Replication.Audience))");
-                        builder.AppendLine("                        continue;");
-                        builder.AppendLine($"                    outbox.EnqueueComponentDelta(peers[i], delta, {component.Type.Name}Replication.Delivery);");
-                        builder.AppendLine("                }");
-                    } else {
-                        builder.AppendLine($"                outbox.EnqueueComponentDelta(peer, {component.Type.Name}Replication.CreateDelta(e.GID, e.Read<{name}>()), {component.Type.Name}Replication.Delivery);");
-                    }
-                    builder.AppendLine("            }");
-                }
-                builder.AppendLine("        }");
-            }
-        }
-
-        private static void AppendFallbackDirtyCall(StringBuilder builder, string worldAlias, string indent) {
-            if (worldAlias == "SW") {
-                builder.AppendLine($"{indent}for (var i = 0; i < peers.Count; i++)");
-                builder.AppendLine($"{indent}    CollectDirty(e, outbox, peers[i]);");
-                return;
-            }
-
-            builder.AppendLine($"{indent}CollectDirty(e, outbox, peer);");
-        }
-
-        private static void AppendInitialState(StringBuilder builder, List<ComponentInfo> components, List<NetworkEntityInfo> networkEntities) {
-            builder.AppendLine("        public static void CollectInitialState(SW.Entity e, NetworkPeerId peer, List<ComponentDelta> components) {");
-            builder.AppendLine("            if (e.Has<NetworkIdentity>())");
-            builder.AppendLine("                components.Add(NetworkIdentityReplication.CreateDelta(e.GID, e.Read<NetworkIdentity>()));");
-            builder.AppendLine();
-            builder.AppendLine("            CollectInitialStateByEntityType(e, peer, components);");
-            builder.AppendLine("        }");
-            builder.AppendLine();
-            builder.AppendLine("        private static void CollectInitialStateByEntityType(SW.Entity e, NetworkPeerId peer, List<ComponentDelta> components) {");
-            builder.AppendLine("            switch (e.EntityType) {");
-            foreach (var entity in networkEntities) {
-                builder.AppendLine($"                case {entity.EntityTypeId}:");
-                builder.AppendLine($"                    Collect{entity.Type.Name}InitialState(e, peer, components);");
-                builder.AppendLine("                    return;");
-            }
-            builder.AppendLine("            }");
-            builder.AppendLine();
-            builder.AppendLine("            if (e.Has<NetworkIdentity>()) {");
-            builder.AppendLine("                CollectInitialStateByNetworkArchetype(e.Read<NetworkIdentity>().NetworkArchetypeId, e, peer, components);");
-            builder.AppendLine("                return;");
-            builder.AppendLine("            }");
-            builder.AppendLine();
-            builder.AppendLine("            CollectInitialStateFallback(e, peer, components);");
-            builder.AppendLine("        }");
-            builder.AppendLine();
-            builder.AppendLine("        private static void CollectInitialStateByNetworkArchetype(ushort networkArchetypeId, SW.Entity e, NetworkPeerId peer, List<ComponentDelta> components) {");
-            builder.AppendLine("            switch (networkArchetypeId) {");
-            foreach (var entity in networkEntities.Where(x => x.DefaultNetworkArchetypeId != 0)) {
-                builder.AppendLine($"                case {entity.DefaultNetworkArchetypeId}:");
-                builder.AppendLine($"                    Collect{entity.Type.Name}InitialState(e, peer, components);");
-                builder.AppendLine("                    return;");
-            }
-            builder.AppendLine("            }");
-            builder.AppendLine();
-            builder.AppendLine("            CollectInitialStateFallback(e, peer, components);");
-            builder.AppendLine("        }");
-
-            foreach (var entity in networkEntities) {
-                builder.AppendLine();
-                builder.AppendLine($"        private static void Collect{entity.Type.Name}InitialState(SW.Entity e, NetworkPeerId peer, List<ComponentDelta> components) {{");
-                foreach (var component in entity.Manifest) {
-                    var name = GetTypeName(component.Type);
-                    builder.AppendLine($"            if (e.Has<{name}>() && CanSendToPeer(e, peer, {component.Type.Name}Replication.Audience))");
-                    builder.AppendLine($"                components.Add({component.Type.Name}Replication.CreateDelta(e.GID, e.Read<{name}>()));");
-                }
-                builder.AppendLine("        }");
-            }
-
-            builder.AppendLine();
-            builder.AppendLine("        private static void CollectInitialStateFallback(SW.Entity e, NetworkPeerId peer, List<ComponentDelta> components) {");
-            foreach (var component in components) {
-                var name = GetTypeName(component.Type);
-                builder.AppendLine();
-                builder.AppendLine($"            if (e.Has<{name}>() && CanSendToPeer(e, peer, {component.Type.Name}Replication.Audience))");
-                builder.AppendLine($"                components.Add({component.Type.Name}Replication.CreateDelta(e.GID, e.Read<{name}>()));");
-            }
-            builder.AppendLine("        }");
-        }
-
-        private static void AppendWrite(StringBuilder builder, FieldReplicationInfo field) {
-            var source = $"state.{field.Field.Name}";
-            var q = field.Attribute.Quantize > 0f ? QuantizeMethod(field.Attribute.Quantize) : null;
-
-            switch (field.Kind.Name) {
-                case "Vector2":
-                    builder.AppendLine($"            writer.WriteFloat({MaybeQuantize(q, $"{source}.x")}, {MaybeQuantize(q, $"{source}.y")});");
-                    break;
-                case "Vector3":
-                    builder.AppendLine($"            writer.WriteFloat({MaybeQuantize(q, $"{source}.x")}, {MaybeQuantize(q, $"{source}.y")}, {MaybeQuantize(q, $"{source}.z")});");
-                    break;
-                case "Quaternion":
-                    builder.AppendLine($"            writer.WriteFloat({MaybeQuantize(q, $"{source}.x")}, {MaybeQuantize(q, $"{source}.y")}, {MaybeQuantize(q, $"{source}.z")}, {MaybeQuantize(q, $"{source}.w")});");
-                    break;
-                case "EntityGID":
-                    builder.AppendLine($"            writer.WriteUlong({source}.Raw);");
-                    break;
-                case "EnumByte":
-                    builder.AppendLine($"            writer.WriteByte((byte){source});");
-                    break;
-                case "EnumUshort":
-                    builder.AppendLine($"            writer.WriteUshort((ushort){source});");
-                    break;
-                case "EnumInt":
-                    builder.AppendLine($"            writer.WriteInt((int){source});");
-                    break;
-                default:
-                    builder.AppendLine($"            writer.{field.Kind.WriteMethod}({MaybeQuantize(q, source)});");
-                    break;
-            }
-        }
-
-        private static void AppendRead(StringBuilder builder, FieldReplicationInfo field) {
-            var comma = ",";
-            var name = field.Field.Name;
-
-            switch (field.Kind.Name) {
-                case "Vector2":
-                    builder.AppendLine($"                {name} = new Vector2(reader.ReadFloat(), reader.ReadFloat()){comma}");
-                    break;
-                case "Vector3":
-                    builder.AppendLine($"                {name} = new Vector3(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat()){comma}");
-                    break;
-                case "Quaternion":
-                    builder.AppendLine($"                {name} = new Quaternion(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat()){comma}");
-                    break;
-                case "EntityGID":
-                    builder.AppendLine(field.Attribute.AllowZeroEntityGid
-                        ? $"                {name} = ReadOptionalEntityGid(ref reader){comma}"
-                        : $"                {name} = new EntityGID(reader.ReadUlong()){comma}");
-                    break;
-                case "EnumByte":
-                    builder.AppendLine($"                {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadByte(){comma}");
-                    break;
-                case "EnumUshort":
-                    builder.AppendLine($"                {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadUshort(){comma}");
-                    break;
-                case "EnumInt":
-                    builder.AppendLine($"                {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadInt(){comma}");
-                    break;
-                default:
-                    builder.AppendLine($"                {name} = reader.{field.Kind.ReadMethod}(){comma}");
-                    break;
-            }
         }
 
         private static void AppendInterpolate(StringBuilder builder, FieldReplicationInfo field) {
@@ -616,9 +531,6 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             builder.AppendLine("        }");
         }
 
-        private static int EstimateBufferSize(ComponentInfo component) {
-            return Math.Max(16, component.Fields.Sum(x => x.Kind.ByteSize));
-        }
 
         private static string MaybeQuantize(string method, string expression) {
             return method == null ? expression : $"{method}({expression})";
@@ -673,7 +585,13 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
             public readonly ReplicationAudience Audience;
             public readonly NetDelivery Delivery;
             public readonly ushort SendRate;
+            public readonly Guid? Guid;
+            public readonly string GeneratedOutputFolder;
+            public readonly bool HasConfig;
+            public readonly bool HasWrite;
+            public readonly bool HasRead;
             public bool HasInterpolatedFields => Fields.Any(x => x.Attribute.Interpolation != ReplicatedFieldInterpolation.None);
+            public bool NeedsPartialSerialization => !HasConfig || !HasWrite || !HasRead;
 
             public ComponentInfo(
                 Type type,
@@ -682,7 +600,12 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 ReplicationAuthority authority,
                 ReplicationAudience audience,
                 NetDelivery delivery,
-                ushort sendRate) {
+                ushort sendRate,
+                Guid? guid,
+                string generatedOutputFolder,
+                bool hasConfig,
+                bool hasWrite,
+                bool hasRead) {
                 Type = type;
                 Fields = fields;
                 TypeId = typeId;
@@ -690,6 +613,76 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 Audience = audience;
                 Delivery = delivery;
                 SendRate = sendRate;
+                Guid = guid;
+                GeneratedOutputFolder = generatedOutputFolder;
+                HasConfig = hasConfig;
+                HasWrite = hasWrite;
+                HasRead = hasRead;
+            }
+        }
+
+        private static void AppendReadHook(StringBuilder builder, FieldReplicationInfo field) {
+            var name = field.Field.Name;
+
+            switch (field.Kind.Name) {
+                case "Vector2":
+                    builder.AppendLine($"            {name} = new Vector2(reader.ReadFloat(), reader.ReadFloat());");
+                    break;
+                case "Vector3":
+                    builder.AppendLine($"            {name} = new Vector3(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());");
+                    break;
+                case "Quaternion":
+                    builder.AppendLine($"            {name} = new Quaternion(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());");
+                    break;
+                case "EntityGID":
+                    builder.AppendLine(field.Attribute.AllowZeroEntityGid
+                        ? $"            {name} = ReadOptionalEntityGid(ref reader);"
+                        : $"            {name} = new EntityGID(reader.ReadUlong());");
+                    break;
+                case "EnumByte":
+                    builder.AppendLine($"            {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadByte();");
+                    break;
+                case "EnumUshort":
+                    builder.AppendLine($"            {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadUshort();");
+                    break;
+                case "EnumInt":
+                    builder.AppendLine($"            {name} = ({GetTypeName(field.Field.FieldType)})reader.ReadInt();");
+                    break;
+                default:
+                    builder.AppendLine($"            {name} = reader.{field.Kind.ReadMethod}();");
+                    break;
+            }
+        }
+
+        private static void AppendWriteHook(StringBuilder builder, FieldReplicationInfo field) {
+            var source = field.Field.Name;
+            var q = field.Attribute.Quantize > 0f ? QuantizeMethod(field.Attribute.Quantize) : null;
+
+            switch (field.Kind.Name) {
+                case "Vector2":
+                    builder.AppendLine($"            writer.WriteFloat({MaybeQuantize(q, $"{source}.x")}, {MaybeQuantize(q, $"{source}.y")});");
+                    break;
+                case "Vector3":
+                    builder.AppendLine($"            writer.WriteFloat({MaybeQuantize(q, $"{source}.x")}, {MaybeQuantize(q, $"{source}.y")}, {MaybeQuantize(q, $"{source}.z")});");
+                    break;
+                case "Quaternion":
+                    builder.AppendLine($"            writer.WriteFloat({MaybeQuantize(q, $"{source}.x")}, {MaybeQuantize(q, $"{source}.y")}, {MaybeQuantize(q, $"{source}.z")}, {MaybeQuantize(q, $"{source}.w")});");
+                    break;
+                case "EntityGID":
+                    builder.AppendLine($"            writer.WriteUlong({source}.Raw);");
+                    break;
+                case "EnumByte":
+                    builder.AppendLine($"            writer.WriteByte((byte){source});");
+                    break;
+                case "EnumUshort":
+                    builder.AppendLine($"            writer.WriteUshort((ushort){source});");
+                    break;
+                case "EnumInt":
+                    builder.AppendLine($"            writer.WriteInt((int){source});");
+                    break;
+                default:
+                    builder.AppendLine($"            writer.{field.Kind.WriteMethod}({MaybeQuantize(q, source)});");
+                    break;
             }
         }
 

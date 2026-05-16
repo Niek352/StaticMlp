@@ -10,9 +10,10 @@ namespace StaticMlp.Features.Settlement
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "0d11fbba-0d66-40e4-973b-c19cdfb4ec03"
     )]
-    public struct ConstructionResources : IComponent, IComponentConfig<ConstructionResources>,
+    public partial struct ConstructionResources : IComponent, IComponentConfig<ConstructionResources>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField] public int WoodRequired;
@@ -39,13 +40,10 @@ namespace StaticMlp.Features.Settlement
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new ConstructionResources
-            {
-                WoodRequired = reader.ReadInt(),
-                StoneRequired = reader.ReadInt(),
-                WoodDelivered = reader.ReadInt(),
-                StoneDelivered = reader.ReadInt()
-            });
+            WoodRequired = reader.ReadInt();
+            StoneRequired = reader.ReadInt();
+            WoodDelivered = reader.ReadInt();
+            StoneDelivered = reader.ReadInt();
         }
     }
 }

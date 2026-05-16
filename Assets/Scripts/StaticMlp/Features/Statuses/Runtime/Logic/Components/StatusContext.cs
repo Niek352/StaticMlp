@@ -9,9 +9,10 @@ namespace StaticMlp.Features.Statuses
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 10
+        sendRate: 10,
+        guid: "0e2fb7fd-8e3c-45fc-a42b-5e197de8d603"
     )]
-    public struct StatusContext : IComponent, IComponentConfig<StatusContext>, ITrackableAdded, ITrackableChanged, ITrackableDeleted
+    public partial struct StatusContext : IComponent, IComponentConfig<StatusContext>, ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
         public EntityGID Source;
@@ -44,14 +45,11 @@ namespace StaticMlp.Features.Statuses
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new StatusContext
-            {
-                Source = new EntityGID(reader.ReadUlong()),
-                RequestId = reader.ReadUint(),
-                RootEffectId = reader.ReadUint(),
-                ChainDepth = reader.ReadByte(),
-                MaxDepth = reader.ReadByte(),
-            });
+            Source = new EntityGID(reader.ReadUlong());
+            RequestId = reader.ReadUint();
+            RootEffectId = reader.ReadUint();
+            ChainDepth = reader.ReadByte();
+            MaxDepth = reader.ReadByte();
         }
     }
 }

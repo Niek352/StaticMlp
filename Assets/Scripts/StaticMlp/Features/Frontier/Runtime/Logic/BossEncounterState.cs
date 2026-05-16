@@ -9,9 +9,10 @@ namespace StaticMlp.Features.Frontier
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "31db70ec-ecdd-4c31-89a6-c85c3507cfe2"
     )]
-    public struct BossEncounterState : IComponent, IComponentConfig<BossEncounterState>,
+    public partial struct BossEncounterState : IComponent, IComponentConfig<BossEncounterState>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField] public ushort BossIdValue;
@@ -32,11 +33,8 @@ namespace StaticMlp.Features.Frontier
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new BossEncounterState
-            {
-                BossIdValue = reader.ReadUshort(),
-                Status = (BossEncounterStatus)reader.ReadByte()
-            });
+            BossIdValue = reader.ReadUshort();
+            Status = (BossEncounterStatus)reader.ReadByte();
         }
     }
 }

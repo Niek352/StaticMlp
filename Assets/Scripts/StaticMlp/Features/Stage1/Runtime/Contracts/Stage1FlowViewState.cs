@@ -9,9 +9,10 @@ namespace StaticMlp.Features.Settlement
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "ce5bcff2-7cdb-4b27-8c53-66c6639e28fa"
     )]
-    public struct Stage1FlowViewState : IComponent, IComponentConfig<Stage1FlowViewState>,
+    public partial struct Stage1FlowViewState : IComponent, IComponentConfig<Stage1FlowViewState>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted, IEquatable<Stage1FlowViewState>
     {
         [ReplicatedField]
@@ -83,16 +84,13 @@ namespace StaticMlp.Features.Settlement
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new Stage1FlowViewState
-            {
-                AnchorId = reader.ReadUshort(),
-                Stage = (Stage1SettlementProgressStage)reader.ReadByte(),
-                Objective = (Stage1FlowObjective)reader.ReadByte(),
-                Hint = (Stage1FlowHint)reader.ReadByte(),
-                CanToggleWorkerAssignment = reader.ReadBool(),
-                CanOpenBuildPreparation = reader.ReadBool(),
-                CanOpenExpeditionSelection = reader.ReadBool()
-            });
+            AnchorId = reader.ReadUshort();
+            Stage = (Stage1SettlementProgressStage)reader.ReadByte();
+            Objective = (Stage1FlowObjective)reader.ReadByte();
+            Hint = (Stage1FlowHint)reader.ReadByte();
+            CanToggleWorkerAssignment = reader.ReadBool();
+            CanOpenBuildPreparation = reader.ReadBool();
+            CanOpenExpeditionSelection = reader.ReadBool();
         }
     }
 }

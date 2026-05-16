@@ -9,6 +9,8 @@ using StaticMlp.Networking.Requests;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Replication.Generated;
 
+//using StaticMlp.Networking.Replication.Generated;
+
 namespace StaticMlp.Composition
 {
     public static class GameplayFeatureDiscovery

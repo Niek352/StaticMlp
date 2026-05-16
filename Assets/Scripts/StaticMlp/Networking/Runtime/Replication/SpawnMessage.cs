@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 
 namespace StaticMlp.Networking.Replication {
@@ -9,6 +8,6 @@ namespace StaticMlp.Networking.Replication {
         public NetworkPeerId Owner;
         public NetworkAuthority Authority;
         public ushort NetworkArchetypeId;
-        public readonly List<ComponentDelta> Components = new();
+        public byte[] SnapshotPayload;
     }
 }

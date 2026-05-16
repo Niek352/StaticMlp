@@ -17,11 +17,9 @@ namespace StaticMlp.Networking {
         }
 
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled) where TWorld : struct, IWorldType {
-            self.Set(new NetworkIdentity {
-                Owner = new NetworkPeerId(reader.ReadUshort()),
-                Authority = (NetworkAuthority)reader.ReadByte(),
-                NetworkArchetypeId = reader.ReadUshort()
-            });
+            Owner = new NetworkPeerId(reader.ReadUshort());
+            Authority = (NetworkAuthority)reader.ReadByte();
+            NetworkArchetypeId = reader.ReadUshort();
         }
     }
 }

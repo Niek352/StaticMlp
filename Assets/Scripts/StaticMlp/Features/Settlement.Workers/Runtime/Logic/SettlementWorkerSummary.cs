@@ -11,9 +11,10 @@ namespace StaticMlp.Features.Settlement.Workers
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "3cc73376-44db-4a4d-8fe3-c42ef153f7c8"
     )]
-    public struct SettlementWorkerSummary : IComponent, IComponentConfig<SettlementWorkerSummary>,
+    public partial struct SettlementWorkerSummary : IComponent, IComponentConfig<SettlementWorkerSummary>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
@@ -57,16 +58,13 @@ namespace StaticMlp.Features.Settlement.Workers
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new SettlementWorkerSummary
-            {
-                AnchorId = reader.ReadUshort(),
-                TotalWorkers = reader.ReadUshort(),
-                AssignedWorkers = reader.ReadUshort(),
-                CampBuilderWorkers = reader.ReadUshort(),
-                CampBuilderAssignedWorkers = reader.ReadUshort(),
-                ActiveTask = (AiTaskType)reader.ReadUshort(),
-                BlockingReason = (SettlementWorkerBlockingReason)reader.ReadByte()
-            });
+            AnchorId = reader.ReadUshort();
+            TotalWorkers = reader.ReadUshort();
+            AssignedWorkers = reader.ReadUshort();
+            CampBuilderWorkers = reader.ReadUshort();
+            CampBuilderAssignedWorkers = reader.ReadUshort();
+            ActiveTask = (AiTaskType)reader.ReadUshort();
+            BlockingReason = (SettlementWorkerBlockingReason)reader.ReadByte();
         }
     }
 }

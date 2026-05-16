@@ -10,9 +10,10 @@ namespace StaticMlp.Features.Settlement.Workers
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "8249f97b-a1dd-4f58-a8e0-f90ac8474588"
     )]
-    public struct SettlementWorkerAssignment : IComponent, IComponentConfig<SettlementWorkerAssignment>,
+    public partial struct SettlementWorkerAssignment : IComponent, IComponentConfig<SettlementWorkerAssignment>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
@@ -37,11 +38,8 @@ namespace StaticMlp.Features.Settlement.Workers
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new SettlementWorkerAssignment
-            {
-                Status = (SettlementWorkerAssignmentStatus)reader.ReadByte(),
-                AnchorId = reader.ReadUshort()
-            });
+            Status = (SettlementWorkerAssignmentStatus)reader.ReadByte();
+            AnchorId = reader.ReadUshort();
         }
     }
 }

@@ -5,7 +5,6 @@ using StaticMlp.Networking.Replication;
 namespace StaticMlp.Networking.Diagnostics {
     public static class NetworkTrafficProfiler {
         private const int MaxSamples = 512;
-        private const int ComponentDeltaHeaderBytes = 14;
 
         private static readonly object Sync = new();
         private static readonly List<Sample> Samples = new(MaxSamples);
@@ -28,26 +27,6 @@ namespace StaticMlp.Networking.Diagnostics {
                 return;
 
             RecordPacket(NetworkTrafficDirection.Received, peer, NetDelivery.Unreliable, payload, true);
-        }
-
-        public static void RecordOutgoingComponentDelta(NetworkPeerId peer, NetDelivery delivery, ComponentDelta delta, string channel) {
-            if (!Enabled)
-                return;
-
-            RecordComponent(NetworkTrafficDirection.Sent, peer, delivery, delta.ComponentTypeId, EncodedDeltaSize(delta), channel);
-        }
-
-        public static void RecordIncomingComponentDelta(NetworkPeerId peer, ComponentDelta delta, string channel) {
-            if (!Enabled)
-                return;
-
-            RecordComponent(
-                NetworkTrafficDirection.Received,
-                peer,
-                ResolveComponentDelivery(delta.ComponentTypeId),
-                delta.ComponentTypeId,
-                EncodedDeltaSize(delta),
-                channel);
         }
 
         public static Snapshot GetSnapshot(double windowSeconds) {
@@ -225,10 +204,6 @@ namespace StaticMlp.Networking.Diagnostics {
         private static void TrimSamplesIfNeeded() {
             if (Samples.Count == MaxSamples)
                 Samples.RemoveAt(0);
-        }
-
-        private static int EncodedDeltaSize(ComponentDelta delta) {
-            return ComponentDeltaHeaderBytes + (delta.Payload?.Length ?? 0);
         }
 
         private static string ResolveComponentName(ushort componentTypeId) {

@@ -13,9 +13,10 @@ namespace StaticMlp.Features.AiBots
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.UnreliableSequenced,
-        sendRate: 10
+        sendRate: 10,
+        guid: "f84abac5-9978-4f04-85e7-3f91c43d8192"
     )]
-    public struct AiNetState : IComponent, IComponentConfig<AiNetState>, ITrackableAdded, ITrackableChanged,
+    public partial struct AiNetState : IComponent, IComponentConfig<AiNetState>, ITrackableAdded, ITrackableChanged,
         ITrackableDeleted
     {
         [ReplicatedField(Compress = true)]
@@ -41,12 +42,9 @@ namespace StaticMlp.Features.AiBots
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new AiNetState
-            {
-                CurrentTask = (AiTaskType)reader.ReadUshort(),
-                LocomotionState = reader.ReadByte(),
-                CombatState = reader.ReadByte()
-            });
+            CurrentTask = (AiTaskType)reader.ReadUshort();
+            LocomotionState = reader.ReadByte();
+            CombatState = reader.ReadByte();
         }
     }
 }

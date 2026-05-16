@@ -10,9 +10,10 @@ namespace StaticMlp.Features.Build
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "641d2d15-83f0-4328-8b35-4063e914bc61"
     )]
-    public struct BossPreparedBuildSnapshot : IComponent, IComponentConfig<BossPreparedBuildSnapshot>,
+    public partial struct BossPreparedBuildSnapshot : IComponent, IComponentConfig<BossPreparedBuildSnapshot>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
@@ -53,13 +54,10 @@ namespace StaticMlp.Features.Build
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new BossPreparedBuildSnapshot
-            {
-                ArchetypeIdValue = reader.ReadUshort(),
-                PrimaryModuleIdValue = reader.ReadUshort(),
-                PreparedAbilityId = (CombatAbilityId)reader.ReadUshort(),
-                FallbackAbilityId = (CombatAbilityId)reader.ReadUshort()
-            });
+            ArchetypeIdValue = reader.ReadUshort();
+            PrimaryModuleIdValue = reader.ReadUshort();
+            PreparedAbilityId = (CombatAbilityId)reader.ReadUshort();
+            FallbackAbilityId = (CombatAbilityId)reader.ReadUshort();
         }
     }
 }

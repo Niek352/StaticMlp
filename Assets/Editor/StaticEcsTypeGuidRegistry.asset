@@ -503,6 +503,15 @@ MonoBehaviour:
       - className: SetSettlementWorkerAssignmentResultEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 998f596e-435b-4b10-b557-03b292444df2
+      current:
+        className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+      history:
+      - className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
     links: []
     linksList: []
     multi: []
@@ -996,6 +1005,15 @@ MonoBehaviour:
       - className: SetSettlementWorkerAssignmentResultEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 998f596e-435b-4b10-b557-03b292444df2
+      current:
+        className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+      history:
+      - className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
     links: []
     linksList: []
     multi: []

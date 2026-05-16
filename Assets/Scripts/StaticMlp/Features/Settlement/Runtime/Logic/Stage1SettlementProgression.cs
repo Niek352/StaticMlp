@@ -9,9 +9,10 @@ namespace StaticMlp.Features.Settlement
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "8d47b71d-f6a0-4ecf-9b4e-b9a3d8fae6c1"
     )]
-    public struct Stage1SettlementProgression : IComponent, IComponentConfig<Stage1SettlementProgression>,
+    public partial struct Stage1SettlementProgression : IComponent, IComponentConfig<Stage1SettlementProgression>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
@@ -51,11 +52,8 @@ namespace StaticMlp.Features.Settlement
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new Stage1SettlementProgression
-            {
-                AnchorId = reader.ReadUshort(),
-                Stage = (Stage1SettlementProgressStage)reader.ReadByte()
-            });
+            AnchorId = reader.ReadUshort();
+            Stage = (Stage1SettlementProgressStage)reader.ReadByte();
         }
     }
 }

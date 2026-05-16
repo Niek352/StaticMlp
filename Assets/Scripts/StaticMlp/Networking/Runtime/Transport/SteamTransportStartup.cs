@@ -26,6 +26,7 @@ namespace StaticMlp.Networking.Transport {
             SW.SetResource(ctx);
             SW.SetResource(new NetInbox());
             SW.SetResource(new NetOutbox());
+            SW.SetResource(new ServerRelayBuffer());
             SW.SetResource(new ServerChunkLeaseStore());
             SteamTransportContext.Log($"Steam server transport started on virtual port {virtualPort}");
             return ctx;

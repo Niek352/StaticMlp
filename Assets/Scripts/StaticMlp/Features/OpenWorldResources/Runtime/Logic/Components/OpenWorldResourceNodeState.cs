@@ -9,9 +9,10 @@ namespace StaticMlp.Features.OpenWorldResources
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "859f7dd8-e326-40be-8ba0-669c9304b3d5"
     )]
-    public struct OpenWorldResourceNodeState : IComponent, IComponentConfig<OpenWorldResourceNodeState>,
+    public partial struct OpenWorldResourceNodeState : IComponent, IComponentConfig<OpenWorldResourceNodeState>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
@@ -37,12 +38,9 @@ namespace StaticMlp.Features.OpenWorldResources
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new OpenWorldResourceNodeState
-            {
-                PlacementId = reader.ReadLong(),
-                KindIdValue = reader.ReadUshort(),
-                RemainingAmount = reader.ReadInt()
-            });
+            PlacementId = reader.ReadLong();
+            KindIdValue = reader.ReadUshort();
+            RemainingAmount = reader.ReadInt();
         }
     }
 }

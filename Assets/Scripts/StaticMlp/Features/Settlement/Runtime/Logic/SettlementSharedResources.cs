@@ -9,9 +9,10 @@ namespace StaticMlp.Features.Settlement
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "1fd72b18-30b4-4f37-ae61-b95f52eafb65"
     )]
-    public struct SettlementSharedResources : IComponent, IComponentConfig<SettlementSharedResources>,
+    public partial struct SettlementSharedResources : IComponent, IComponentConfig<SettlementSharedResources>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
@@ -64,11 +65,8 @@ namespace StaticMlp.Features.Settlement
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new SettlementSharedResources
-            {
-                Wood = reader.ReadInt(),
-                Stone = reader.ReadInt()
-            });
+            Wood = reader.ReadInt();
+            Stone = reader.ReadInt();
         }
     }
 }

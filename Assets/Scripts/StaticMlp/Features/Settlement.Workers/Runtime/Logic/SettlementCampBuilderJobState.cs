@@ -11,9 +11,10 @@ namespace StaticMlp.Features.Settlement.Workers
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "4b90f4d5-861f-4105-a2a5-48d8dbb5f9c8"
     )]
-    public struct SettlementCampBuilderJobState : IComponent, IComponentConfig<SettlementCampBuilderJobState>,
+    public partial struct SettlementCampBuilderJobState : IComponent, IComponentConfig<SettlementCampBuilderJobState>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField]
@@ -53,14 +54,11 @@ namespace StaticMlp.Features.Settlement.Workers
             var assignedWorkerRaw = reader.ReadUlong();
             var targetSiteRaw = reader.ReadUlong();
 
-            self.Set(new SettlementCampBuilderJobState
-            {
-                AnchorId = anchorId,
-                AssignedWorker = assignedWorkerRaw == 0ul ? default : new EntityGID(assignedWorkerRaw),
-                TargetSite = targetSiteRaw == 0ul ? default : new EntityGID(targetSiteRaw),
-                CurrentTask = (AiTaskType)reader.ReadUshort(),
-                BlockingReason = (SettlementWorkerBlockingReason)reader.ReadByte()
-            });
+            AnchorId = anchorId;
+            AssignedWorker = assignedWorkerRaw == 0ul ? default : new EntityGID(assignedWorkerRaw);
+            TargetSite = targetSiteRaw == 0ul ? default : new EntityGID(targetSiteRaw);
+            CurrentTask = (AiTaskType)reader.ReadUshort();
+            BlockingReason = (SettlementWorkerBlockingReason)reader.ReadByte();
         }
     }
 }

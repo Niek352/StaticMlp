@@ -9,9 +9,10 @@ namespace StaticMlp.Features.Frontier
     [ReplicatedComponent(
         authority: ReplicationAuthority.Server,
         delivery: NetDelivery.ReliableSequenced,
-        sendRate: 5
+        sendRate: 5,
+        guid: "8f1e0f0d-e2d6-456c-ae4a-21e661e9620b"
     )]
-    public struct ExpeditionAvailabilityState : IComponent, IComponentConfig<ExpeditionAvailabilityState>,
+    public partial struct ExpeditionAvailabilityState : IComponent, IComponentConfig<ExpeditionAvailabilityState>,
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         [ReplicatedField] public ushort ExpeditionIdValue;
@@ -32,11 +33,8 @@ namespace StaticMlp.Features.Frontier
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
             where TWorld : struct, IWorldType
         {
-            self.Set(new ExpeditionAvailabilityState
-            {
-                ExpeditionIdValue = reader.ReadUshort(),
-                Status = (ExpeditionAvailabilityStatus)reader.ReadByte()
-            });
+            ExpeditionIdValue = reader.ReadUshort();
+            Status = (ExpeditionAvailabilityStatus)reader.ReadByte();
         }
     }
 }

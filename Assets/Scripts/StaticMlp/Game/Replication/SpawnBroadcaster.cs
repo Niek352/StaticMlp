@@ -1,6 +1,5 @@
 using System;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Networking.Diagnostics;
 using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Transport;
 
@@ -30,8 +29,6 @@ namespace StaticMlp.Networking.Replication {
 
             ref var outbox = ref SW.GetResource<NetOutbox>();
             var spawn = CreateSpawn(entity, peer);
-            for (var i = 0; i < spawn.Components.Count; i++)
-                NetworkTrafficProfiler.RecordOutgoingComponentDelta(peer, NetDelivery.ReliableSequenced, spawn.Components[i], "Spawn");
             outbox.Enqueue(peer, PacketCodec.EncodeSpawn(spawn), NetDelivery.ReliableSequenced);
         }
 
@@ -46,7 +43,7 @@ namespace StaticMlp.Networking.Replication {
                 NetworkArchetypeId = identity.NetworkArchetypeId
             };
 
-            ReplicationRegistry.CollectInitialState(entity, targetPeer, spawn.Components);
+            spawn.SnapshotPayload = ReplicationRegistry.CreateInitialStateSnapshot(entity, targetPeer);
             return spawn;
         }
     }
