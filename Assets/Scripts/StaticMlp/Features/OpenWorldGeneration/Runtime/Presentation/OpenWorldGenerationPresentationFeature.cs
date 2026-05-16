@@ -6,6 +6,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
     {
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
+            systems.Add(new ClientOpenWorldChunkUnloadSystem(), GameplaySystemOrder.ClientApplyNetworkState + 45);
             systems.Add(new ClientOpenWorldTerrainStreamingSystem(), GameplaySystemOrder.ClientPresentation - 30);
         }
     }

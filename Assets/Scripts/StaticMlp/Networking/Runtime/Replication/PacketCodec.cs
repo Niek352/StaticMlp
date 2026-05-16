@@ -73,6 +73,18 @@ namespace StaticMlp.Networking.Replication {
             return bytes;
         }
 
+        public static byte[] EncodeChunkLease(ChunkLeaseMessage msg) {
+            var writer = BinaryPackWriter.CreateFromPool();
+            writer.WriteByte((byte)NetPacketType.ChunkLease);
+            writer.WriteUshort((ushort)(msg.ChunkIds?.Length ?? 0));
+            if (msg.ChunkIds != null)
+                for (var i = 0; i < msg.ChunkIds.Length; i++)
+                    writer.WriteUint(msg.ChunkIds[i]);
+            var bytes = writer.CopyToBytes();
+            writer.Dispose();
+            return bytes;
+        }
+
         public static byte[] EncodeComponentBatch(ComponentBatch batch) {
             var writer = BinaryPackWriter.CreateFromPool();
             writer.WriteByte((byte)NetPacketType.ComponentBatch);
@@ -126,6 +138,9 @@ namespace StaticMlp.Networking.Replication {
                 case NetPacketType.Snapshot:
                     inbox.Snapshots.Add(ReadSnapshot(ref reader));
                     return true;
+                case NetPacketType.ChunkLease:
+                    inbox.ChunkLeases.Add(ReadChunkLease(ref reader));
+                    return true;
                 case NetPacketType.ComponentBatch:
                     var batch = ReadComponentBatch(ref reader, sourcePeer);
                     inbox.ComponentBatches.Add(batch);
@@ -164,6 +179,15 @@ namespace StaticMlp.Networking.Replication {
             var length = reader.ReadInt();
             msg.Payload = length > 0 ? reader.ReadBytesAsSpan((uint)length).ToArray() : Array.Empty<byte>();
             return msg;
+        }
+
+        private static ChunkLeaseMessage ReadChunkLease(ref BinaryPackReader reader) {
+            var count = reader.ReadUshort();
+            var chunks = new uint[count];
+            for (var i = 0; i < chunks.Length; i++)
+                chunks[i] = reader.ReadUint();
+
+            return new ChunkLeaseMessage(chunks);
         }
 
         private static ComponentBatch ReadComponentBatch(ref BinaryPackReader reader, NetworkPeerId fallbackSource) {

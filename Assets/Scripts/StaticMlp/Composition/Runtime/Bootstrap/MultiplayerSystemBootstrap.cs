@@ -54,6 +54,7 @@ namespace StaticMlp.Composition
             }
 
             ClientCoreSys.Add(new ClientSnapshotApplySystem(), order: -810);
+            ClientCoreSys.Add(new ClientChunkLeaseApplySystem(), order: -805);
             ClientCoreSys.Add(new ClientSpawnApplySystem(), order: -800);
             ClientCoreSys.Add(new ClientDespawnApplySystem(), order: -790);
             ClientCoreSys.Add(new ClientOwnershipApplySystem(), order: -780);

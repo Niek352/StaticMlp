@@ -6,6 +6,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
     public sealed class OpenWorldGenerationServerRuntime : IResource, IDisposable
     {
         public const int DEFAULT_MAX_CHUNK_GENERATIONS_PER_FRAME = 1;
+        public const int DEFAULT_STATIC_STREAMING_RADIUS_IN_CHUNKS = 4;
 
         private readonly Func<IWorldGenerationService> _generationServiceFactory;
         private IWorldGenerationService _generationService;
@@ -13,8 +14,9 @@ namespace StaticMlp.Features.OpenWorldGeneration
         public OpenWorldGenerationServerRuntime(
             IWorldGenerationService generationService,
             WorldGenerationRequest defaultRequest,
-            int maxChunkGenerationsPerFrame = DEFAULT_MAX_CHUNK_GENERATIONS_PER_FRAME)
-            : this(() => generationService, defaultRequest, maxChunkGenerationsPerFrame)
+            int maxChunkGenerationsPerFrame = DEFAULT_MAX_CHUNK_GENERATIONS_PER_FRAME,
+            int staticStreamingRadiusInChunks = DEFAULT_STATIC_STREAMING_RADIUS_IN_CHUNKS)
+            : this(() => generationService, defaultRequest, maxChunkGenerationsPerFrame, staticStreamingRadiusInChunks)
         {
             _generationService = generationService ?? throw new ArgumentNullException(nameof(generationService));
         }
@@ -22,18 +24,23 @@ namespace StaticMlp.Features.OpenWorldGeneration
         public OpenWorldGenerationServerRuntime(
             Func<IWorldGenerationService> generationServiceFactory,
             WorldGenerationRequest defaultRequest,
-            int maxChunkGenerationsPerFrame = DEFAULT_MAX_CHUNK_GENERATIONS_PER_FRAME)
+            int maxChunkGenerationsPerFrame = DEFAULT_MAX_CHUNK_GENERATIONS_PER_FRAME,
+            int staticStreamingRadiusInChunks = DEFAULT_STATIC_STREAMING_RADIUS_IN_CHUNKS)
         {
             _generationServiceFactory = generationServiceFactory ?? throw new ArgumentNullException(nameof(generationServiceFactory));
             DefaultRequest = defaultRequest;
             if (maxChunkGenerationsPerFrame <= 0)
                 throw new ArgumentOutOfRangeException(nameof(maxChunkGenerationsPerFrame), maxChunkGenerationsPerFrame, "Chunk generation budget must be positive.");
+            if (staticStreamingRadiusInChunks < 0)
+                throw new ArgumentOutOfRangeException(nameof(staticStreamingRadiusInChunks), staticStreamingRadiusInChunks, "Static streaming radius must be non-negative.");
 
             MaxChunkGenerationsPerFrame = maxChunkGenerationsPerFrame;
+            StaticStreamingRadiusInChunks = staticStreamingRadiusInChunks;
         }
 
         public readonly WorldGenerationRequest DefaultRequest;
         public readonly int MaxChunkGenerationsPerFrame;
+        public readonly int StaticStreamingRadiusInChunks;
 
         public IWorldGenerationService GenerationService => _generationService ??= _generationServiceFactory();
 

@@ -1,3 +1,4 @@
+using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking.Diagnostics;
 using StaticMlp.Networking.Ownership;
@@ -18,7 +19,8 @@ namespace StaticMlp.Networking.Replication {
             if (!SW.IsWorldInitialized || !SW.HasResource<NetOutbox>())
                 return;
 
-            foreach (var e in SW.Query<All<NetworkedTag, NetworkIdentity>>().Entities())
+            ReadOnlySpan<ushort> clusters = stackalloc ushort[] { 0 };
+            foreach (var e in SW.Query<All<NetworkedTag, NetworkIdentity>>().Entities(clusters: clusters))
                 SendSpawn(e, peer);
         }
 

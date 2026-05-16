@@ -3,7 +3,10 @@
     "rootNamespace": "StaticMlp.Features.OpenWorldGeneration",
     "references": [
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
-        "FFS.StaticEcs"
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking",
+        "Game.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

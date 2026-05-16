@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Game;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -7,14 +8,16 @@ namespace StaticMlp.Features.OpenWorldResources
 {
     public sealed class OpenWorldResourceNodeFactory : NetEntityFactory<OpenWorldResourceNodeNetworkEntity>, IResource
     {
-        public EntityGID Spawn(in OpenWorldResourceNodeSpawnSpec spec)
+        public EntityGID Spawn(in OpenWorldResourceNodeSpawnSpec spec, WorldChunkBounds bounds)
         {
+            var clusterId = OpenWorldSpatialClusterIds.ToClusterId(spec.ChunkId, bounds);
             var entity = CreateEntity(
                 new NetworkPeerId(0),
                 NetworkAuthority.Server,
-                OpenWorldResourceNetworkArchetypeIds.ResourceNode);
+                OpenWorldResourceNetworkArchetypeIds.ResourceNode,
+                clusterId);
             Configure(entity, spec);
-            SendEntity(entity);
+            CompleteEntityCreation(entity);
             return entity;
         }
 

@@ -228,7 +228,7 @@ namespace StaticMlp.Composition
                 return;
 
             Log("Creating server world");
-            MultiplayerWorldBootstrap.CreateServer(DefaultWorldConfig(),
+            MultiplayerWorldBootstrap.CreateServer(ServerWorldConfig(),
                 NetworkEventRegistry.RegisterServerWorldTypes,
                 ecsTypeAssemblies: GameplayAssemblies());
             SW.SetResource(new SimulationTime
@@ -268,7 +268,7 @@ namespace StaticMlp.Composition
                 return;
 
             Log("Creating client world");
-            MultiplayerWorldBootstrap.CreateClientCore(DefaultWorldConfig(),
+            MultiplayerWorldBootstrap.CreateClientCore(ClientWorldConfig(),
                 RegisterClientCoreGeneratedTypes, ecsTypeAssemblies: GameplayAssemblies());
 
             if (transportBackend == TransportBackend.Steam) {
@@ -325,10 +325,21 @@ namespace StaticMlp.Composition
             }
         }
 
-        private static WorldConfig DefaultWorldConfig()
+        private static WorldConfig ServerWorldConfig()
         {
             return new WorldConfig
             {
+                Independent = true,
+                TrackCreated = true,
+                TrackingBufferSize = 64
+            };
+        }
+
+        private static WorldConfig ClientWorldConfig()
+        {
+            return new WorldConfig
+            {
+                Independent = false,
                 TrackCreated = true,
                 TrackingBufferSize = 64
             };

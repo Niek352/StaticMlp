@@ -60,7 +60,7 @@ namespace StaticMlp.Features.Effects
             float impactRadius,
             float impactLifetime)
         {
-            var entity = ClientOnlyEntities.New(ClientCombatClusters.ClientOnly, ClientCombatClusters.ClientOnlyChunk);
+            var entity = ClientOnlyEntities.New();
             entity.Set(new ViewPath(PROJECTILE_VIEW_PATH));
             entity.Set(new CombatProjectileVisualState
             {
@@ -78,7 +78,7 @@ namespace StaticMlp.Features.Effects
 
         public static void SpawnEffect(CombatEffectVisualType effectType, Vector3 position, float radius, float lifetime)
         {
-            var entity = ClientOnlyEntities.New(ClientCombatClusters.ClientOnly, ClientCombatClusters.ClientOnlyChunk);
+            var entity = ClientOnlyEntities.New();
             entity.Set(new ViewPath(EFFECT_VIEW_PATH));
             entity.Set(new CombatEffectVisualState
             {

@@ -118,6 +118,23 @@ namespace StaticMlp.Tests.Architecture
             Assert.That(offenders, Is.Empty);
         }
 
+        [Test]
+        public void SpatialStreaming_DoesNotUseLogicalClusterConstants()
+        {
+            var forbiddenTokens = new[]
+            {
+                "NETWORKED_ENTITY_" + "CLUSTER = 1",
+                "RegisterCluster" + "(1)",
+                "ClientOnly" + "Chunk"
+            };
+            var offenders = EnumerateProjectFiles("Assets/Scripts/StaticMlp", "*.cs")
+                .Where(file => forbiddenTokens.Any(token => File.ReadAllText(file.FullPath).Contains(token)))
+                .Select(file => file.RelativePath)
+                .ToArray();
+
+            Assert.That(offenders, Is.Empty);
+        }
+
         private static SourceFile[] EnumerateProjectFiles(string relativeRoot, params string[] patterns)
         {
             var root = Path.Combine(ProjectRoot(), relativeRoot.Replace('/', Path.DirectorySeparatorChar));

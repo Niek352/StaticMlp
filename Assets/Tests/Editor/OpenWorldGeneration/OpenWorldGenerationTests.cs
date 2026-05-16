@@ -238,6 +238,44 @@ namespace StaticMlp.Tests.OpenWorldGeneration
             Assert.That(WorldChunkId.FromWorldPosition(0f, 127.99f, 128f), Is.EqualTo(new WorldChunkId(0, 0)));
         }
 
+        [Test]
+        public void SpatialClusterIds_MapChunksRowMajorInsideBounds()
+        {
+            var bounds = new WorldChunkBounds(-1, 1, -2, -1);
+
+            Assert.That(OpenWorldSpatialClusterIds.ToClusterId(new WorldChunkId(-1, -2), bounds), Is.EqualTo(OpenWorldSpatialClusterIds.FIRST_CLUSTER_ID));
+            Assert.That(OpenWorldSpatialClusterIds.ToClusterId(new WorldChunkId(0, -2), bounds), Is.EqualTo(OpenWorldSpatialClusterIds.FIRST_CLUSTER_ID + 1));
+            Assert.That(OpenWorldSpatialClusterIds.ToClusterId(new WorldChunkId(1, -1), bounds), Is.EqualTo(OpenWorldSpatialClusterIds.FIRST_CLUSTER_ID + 5));
+        }
+
+        [Test]
+        public void SpatialClusterIds_RoundTripClusterAndChunk()
+        {
+            var bounds = new WorldChunkBounds(-3, 2, -4, 1);
+            var chunkId = new WorldChunkId(2, -1);
+            var clusterId = OpenWorldSpatialClusterIds.ToClusterId(chunkId, bounds);
+
+            Assert.That(OpenWorldSpatialClusterIds.ToChunkId(clusterId, bounds), Is.EqualTo(chunkId));
+        }
+
+        [Test]
+        public void SpatialClusterIds_WhenChunkOutsideBounds_Throws()
+        {
+            var bounds = new WorldChunkBounds(0, 1, 0, 1);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                OpenWorldSpatialClusterIds.ToClusterId(new WorldChunkId(2, 0), bounds));
+        }
+
+        [Test]
+        public void SpatialClusterIds_WhenBoundsExceedUshortCapacity_Throws()
+        {
+            var bounds = new WorldChunkBounds(0, ushort.MaxValue, 0, 0);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                OpenWorldSpatialClusterIds.ToClusterId(new WorldChunkId(0, 0), bounds));
+        }
+
         [TestCase(0, 65)]
         [TestCase(1, 33)]
         [TestCase(2, 17)]

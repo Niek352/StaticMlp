@@ -27,7 +27,7 @@ namespace StaticMlp.Features.Buildings
             if (!BuildingPresentationCatalog.TryGet(definition.Id, out var presentation))
                 throw new InvalidOperationException($"Missing presentation catalog entry for building {definition.Id}.");
 
-            var created = ClientOnlyEntities.New(ClientBuildingClusters.ClientOnly, ClientBuildingClusters.ClientOnlyChunk);
+            var created = ClientOnlyEntities.New();
             created.Set<PlacementPreviewTag>();
             created.Set(new PlacementPreview
             {

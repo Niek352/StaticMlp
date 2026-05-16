@@ -6,6 +6,7 @@ namespace StaticMlp.Networking {
         Despawn = 11,
         OwnershipChanged = 12,
         Snapshot = 13,
+        ChunkLease = 14,
         ComponentBatch = 20,
         NetworkEvent = 30,
         Ping = 40,

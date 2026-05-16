@@ -25,6 +25,7 @@ namespace StaticMlp.Networking.Transport {
             CW.SetResource(ctx);
             CW.SetResource(new NetInbox());
             CW.SetResource(new NetOutbox());
+            CW.SetResource(new ClientLocalChunkLease());
             UtpTransportContext.Log("Client transport resources registered");
             return ctx;
         }
@@ -54,6 +55,7 @@ namespace StaticMlp.Networking.Transport {
             SW.SetResource(ctx);
             SW.SetResource(new NetInbox());
             SW.SetResource(new NetOutbox());
+            SW.SetResource(new ServerChunkLeaseStore());
             UtpTransportContext.Log("Server transport resources registered");
             return ctx;
         }

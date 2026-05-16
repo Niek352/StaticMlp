@@ -26,6 +26,7 @@ namespace StaticMlp.Networking.Transport {
             SW.SetResource(ctx);
             SW.SetResource(new NetInbox());
             SW.SetResource(new NetOutbox());
+            SW.SetResource(new ServerChunkLeaseStore());
             SteamTransportContext.Log($"Steam server transport started on virtual port {virtualPort}");
             return ctx;
         }
@@ -46,6 +47,7 @@ namespace StaticMlp.Networking.Transport {
             CW.SetResource(ctx);
             CW.SetResource(new NetInbox());
             CW.SetResource(new NetOutbox());
+            CW.SetResource(new ClientLocalChunkLease());
             SteamTransportContext.Log($"Steam client transport connecting to steamId={(ulong)hostSteamId} on virtual port {virtualPort}");
             return ctx;
         }

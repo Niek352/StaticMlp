@@ -4,19 +4,16 @@ namespace StaticMlp.Networking.Replication
 {
     public static class ClientOnlyEntities
     {
-        public static CW.Entity New(ushort clusterId, uint chunkId)
+        public static CW.Entity New()
         {
-            EnsureStorage(clusterId, chunkId);
-            return CW.NewEntityInChunk<Default>(chunkId);
-        }
+            var lease = CW.GetResource<ClientLocalChunkLease>();
+            for (var i = 0; i < lease.Count; i++)
+            {
+                if (CW.TryNewEntityInChunk<Default>(out var entity, chunkIdx: lease.GetChunkId(i)))
+                    return entity;
+            }
 
-        public static void EnsureStorage(ushort clusterId, uint chunkId)
-        {
-            if (!CW.ClusterIsRegistered(clusterId))
-                CW.RegisterCluster(clusterId);
-
-            if (!CW.ChunkIsRegistered(chunkId))
-                CW.RegisterChunk(chunkId, ChunkOwnerType.Self, clusterId);
+            throw new System.InvalidOperationException("Client local chunk lease is missing free entity slots.");
         }
     }
 }

@@ -11,13 +11,13 @@ namespace StaticMlp.Game
     public abstract class NetEntityFactory<TNetworkEntityType>
         where TNetworkEntityType : struct, INetworkEntityType
     {
-        internal const ushort NETWORKED_ENTITY_CLUSTER = 1;
         protected bool _debugTrackCreation;
 
         protected World<ServerWT>.Entity CreateEntity(
             NetworkPeerId owner,
             NetworkAuthority authority,
-            ushort networkArchetypeId)
+            ushort networkArchetypeId,
+            ushort clusterId = 0)
         {
 #if FFS_ECS_DEBUG
             if (_debugTrackCreation)
@@ -25,7 +25,7 @@ namespace StaticMlp.Game
             _debugTrackCreation = true;
 #endif
             
-            var entity = SW.NewEntity<TNetworkEntityType>(NETWORKED_ENTITY_CLUSTER);
+            var entity = SW.NewEntity<TNetworkEntityType>(clusterId);
             InitializeNetworkEntity(entity, owner, authority, networkArchetypeId);
             OwnershipTags.ApplyForServer(entity, authority);
             return entity;
@@ -33,13 +33,18 @@ namespace StaticMlp.Game
 
         protected void SendEntity(World<ServerWT>.Entity entity)
         {
+            CompleteEntityCreation(entity);
+            SpawnBroadcaster.SendSpawn(entity);
+        }
+
+        protected void CompleteEntityCreation(World<ServerWT>.Entity entity)
+        {
 #if FFS_ECS_DEBUG
             if (!_debugTrackCreation)
                 throw new Exception($"Tried to create before creating an actual world-space");
             _debugTrackCreation = false;
             ValidateManifestComponents(entity);
 #endif
-            SpawnBroadcaster.SendSpawn(entity);
         }
 
         internal static void InitializeNetworkEntity(

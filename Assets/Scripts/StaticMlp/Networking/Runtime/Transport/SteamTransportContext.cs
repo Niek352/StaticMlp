@@ -94,7 +94,8 @@ namespace StaticMlp.Networking.Transport {
 
             Log($"Steam peer connected: peer={peer}, steamId={steamId}");
             Send(peer, PacketCodec.EncodeWelcome(peer), NetDelivery.ReliableSequenced);
-            ReplicationSnapshotBroadcaster.SendClusterSnapshot(peer, 0);
+            var lease = SW.GetResource<ServerChunkLeaseStore>().GetOrCreate(peer);
+            Send(peer, PacketCodec.EncodeChunkLease(new ChunkLeaseMessage(lease)), NetDelivery.ReliableSequenced);
         }
 
         public void HandleServerDisconnected(Connection connection, ConnectionInfo info) {

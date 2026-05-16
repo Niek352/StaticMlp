@@ -1,7 +1,11 @@
 {
     "name": "StaticMlp.Features.OpenWorldGeneration.Contracts",
     "rootNamespace": "StaticMlp.Features.OpenWorldGeneration",
-    "references": [],
+    "references": [
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

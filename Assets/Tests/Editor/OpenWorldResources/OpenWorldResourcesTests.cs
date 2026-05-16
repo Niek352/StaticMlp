@@ -5,9 +5,11 @@ using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.OpenWorldResources;
+using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
+using StaticMlp.Networking.Transport;
 
 namespace StaticMlp.Tests.OpenWorldResources
 {
@@ -48,6 +50,24 @@ namespace StaticMlp.Tests.OpenWorldResources
                 ref readonly var chunkRef = ref entity.Read<OpenWorldChunkRef>();
                 Assert.That(chunkRef.X, Is.EqualTo(0));
                 Assert.That(chunkRef.Z, Is.EqualTo(0));
+            }
+
+            Assert.That(count, Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void ServerSeedSystem_SpawnedResourceNodesUseSpatialCluster()
+        {
+            using var scope = new OpenWorldResourcesServerWorldScope();
+
+            scope.RunSeedSystem();
+
+            var count = 0;
+            foreach (var entity in SW.Query<All<OpenWorldResourceNodeTag, OpenWorldChunkRef>>().Entities())
+            {
+                count++;
+                Assert.That(entity.ClusterId, Is.EqualTo(scope.ClusterId));
+                Assert.That(entity.GID.ClusterId, Is.EqualTo(scope.ClusterId));
             }
 
             Assert.That(count, Is.GreaterThan(0));
@@ -109,6 +129,152 @@ namespace StaticMlp.Tests.OpenWorldResources
         }
 
         [Test]
+        public void ClientOnlyEntities_New_UsesLeasedSelfChunkInDependentClientWorld()
+        {
+            const uint leasedChunk = 321;
+            if (CW.Status != WorldStatus.NotCreated)
+                CW.Destroy();
+
+            try
+            {
+                CW.Create(new WorldConfig
+                {
+                    Independent = false,
+                    TrackCreated = true,
+                    TrackingBufferSize = 64
+                });
+                CW.Types().RegisterAll(typeof(ClientCoreWT).Assembly);
+                CW.Initialize();
+                CW.SetResource(new ClientLocalChunkLease());
+                CW.GetResource<ClientLocalChunkLease>().Replace(new[] { leasedChunk });
+                CW.RegisterChunk(leasedChunk, ChunkOwnerType.Self, clusterId: 0);
+
+                var entity = ClientOnlyEntities.New();
+
+                Assert.That(entity.GID.Chunk, Is.EqualTo(leasedChunk));
+                Assert.That(CW.GetChunkOwner(leasedChunk), Is.EqualTo(ChunkOwnerType.Self));
+            }
+            finally
+            {
+                if (CW.Status != WorldStatus.NotCreated)
+                    CW.Destroy();
+            }
+        }
+
+        [Test]
+        public void ClientSpawnApplySystem_RemoteSpawnRegistersOtherChunkInDependentClientWorld()
+        {
+            NetArchetypeRegistry.Clear();
+            var gid = CreateServerGid(out var entityType);
+
+            if (CW.Status != WorldStatus.NotCreated)
+                CW.Destroy();
+
+            try
+            {
+                CW.Create(new WorldConfig
+                {
+                    Independent = false,
+                    TrackCreated = true,
+                    TrackingBufferSize = 64
+                });
+                CW.Types().RegisterAll(typeof(ClientCoreWT).Assembly, typeof(OpenWorldResourcesGameplayFeature).Assembly);
+                CW.Initialize();
+                CW.SetResource(new NetInbox());
+                NetArchetypeRegistry.RegisterClient(999, _ => { });
+                CW.GetResource<NetInbox>().Spawns.Add(new SpawnMessage
+                {
+                    Gid = gid,
+                    EntityType = entityType,
+                    Owner = new NetworkPeerId(1),
+                    Authority = NetworkAuthority.Server,
+                    NetworkArchetypeId = 999
+                });
+
+                new ClientSpawnApplySystem().Update();
+
+                Assert.That(CW.ChunkIsRegistered(gid.Chunk), Is.True);
+                Assert.That(CW.GetChunkOwner(gid.Chunk), Is.EqualTo(ChunkOwnerType.Other));
+            }
+            finally
+            {
+                NetArchetypeRegistry.Clear();
+                if (CW.Status != WorldStatus.NotCreated)
+                    CW.Destroy();
+            }
+        }
+
+        [Test]
+        public void SendExistingSpawns_ExcludesSpatialClusters()
+        {
+            if (SW.Status != WorldStatus.NotCreated)
+                SW.Destroy();
+
+            try
+            {
+                var bounds = new WorldChunkBounds(0, 0, 0, 0);
+                var spatialCluster = OpenWorldSpatialClusterIds.ToClusterId(new WorldChunkId(0, 0), bounds);
+
+                SW.Create(WorldConfig.Default());
+                SW.Types().RegisterAll(typeof(ServerWT).Assembly);
+                SW.Initialize();
+                SW.RegisterCluster(spatialCluster);
+                SW.SetResource(new NetOutbox());
+
+                CreateNetworkedEntity(SW.NewEntity<Default>());
+                CreateNetworkedEntity(SW.NewEntity<Default>(spatialCluster));
+
+                SpawnBroadcaster.SendExistingSpawns(new NetworkPeerId(1));
+
+                Assert.That(SW.GetResource<NetOutbox>().Packets.Count, Is.EqualTo(1));
+            }
+            finally
+            {
+                if (SW.Status != WorldStatus.NotCreated)
+                    SW.Destroy();
+            }
+        }
+
+        [Test]
+        public void ServerStreaming_LoadsResourceChunkAndSendsSnapshot()
+        {
+            using var scope = new OpenWorldStreamingServerWorldScope(new WorldChunkBounds(0, 0, 0, 0));
+
+            scope.UpdateStreaming();
+
+            Assert.That(CountResourceNodes(), Is.GreaterThan(0));
+            Assert.That(SW.GetResource<NetOutbox>().Packets.Count, Is.EqualTo(1));
+            Assert.That(SW.ClusterIsRegistered(scope.ClusterId(new WorldChunkId(0, 0))), Is.True);
+        }
+
+        [Test]
+        public void ServerStreaming_UnloadsChunkAfterPeerLeavesInterest()
+        {
+            using var scope = new OpenWorldStreamingServerWorldScope(new WorldChunkBounds(0, 1, 0, 0));
+            var firstChunk = new WorldChunkId(0, 0);
+            var secondChunk = new WorldChunkId(1, 0);
+            var firstCluster = scope.ClusterId(firstChunk);
+
+            scope.UpdateStreaming();
+            SW.GetResource<NetOutbox>().Clear();
+            scope.SetPlayerChunk(secondChunk);
+            scope.UpdateStreaming();
+
+            Assert.That(SW.GetResource<NetOutbox>().NetworkEventPackets.Count, Is.EqualTo(1));
+            Assert.That(SW.GetClusterLoadedChunks(firstCluster).Length, Is.EqualTo(0));
+
+            var loadedSecondChunkNodes = 0;
+            foreach (var entity in SW.Query<All<OpenWorldResourceNodeTag, OpenWorldChunkRef>>().Entities())
+            {
+                ref readonly var chunkRef = ref entity.Read<OpenWorldChunkRef>();
+                if (chunkRef.X == secondChunk.X && chunkRef.Z == secondChunk.Z)
+                    loadedSecondChunkNodes++;
+            }
+
+            Assert.That(loadedSecondChunkNodes, Is.GreaterThan(0));
+        }
+
+        [Test]
         public void OpenWorldGenerationPresentation_DoesNotCreateResourceNodeEntities()
         {
             var root = Path.Combine(ProjectRoot(), "Assets", "Scripts", "StaticMlp", "Features", "OpenWorldGeneration", "Runtime", "Presentation");
@@ -155,6 +321,38 @@ namespace StaticMlp.Tests.OpenWorldResources
             throw new InvalidOperationException("Expected at least one resource node.");
         }
 
+        private static EntityGID CreateServerGid(out byte entityType)
+        {
+            if (SW.Status != WorldStatus.NotCreated)
+                SW.Destroy();
+
+            try
+            {
+                SW.Create(WorldConfig.Default());
+                SW.Types().RegisterAll(typeof(ServerWT).Assembly);
+                SW.Initialize();
+                var entity = SW.NewEntity<Default>();
+                entityType = entity.EntityType;
+                return entity.GID;
+            }
+            finally
+            {
+                if (SW.Status != WorldStatus.NotCreated)
+                    SW.Destroy();
+            }
+        }
+
+        private static void CreateNetworkedEntity(SW.Entity entity)
+        {
+            entity.Set(new NetworkIdentity
+            {
+                Owner = new NetworkPeerId(0),
+                Authority = NetworkAuthority.Server,
+                NetworkArchetypeId = 0
+            });
+            entity.Set<NetworkedTag>();
+        }
+
         private static string ProjectRoot()
         {
             var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
@@ -179,6 +377,7 @@ namespace StaticMlp.Tests.OpenWorldResources
 
         private sealed class OpenWorldResourcesServerWorldScope : IDisposable
         {
+            private readonly WorldChunkId _chunkId = new(0, 0);
             private readonly WorldGenerationRequest _request;
 
             public OpenWorldResourcesServerWorldScope()
@@ -194,33 +393,132 @@ namespace StaticMlp.Tests.OpenWorldResources
                     0,
                     false,
                     4f);
+                ClusterId = OpenWorldSpatialClusterIds.ToClusterId(_chunkId, _request.Bounds);
 
                 SW.Create(WorldConfig.Default());
                 SW.Types().RegisterAll(
                     typeof(ServerWT).Assembly,
+                    typeof(OpenWorldChunkLoadRequested).Assembly,
                     typeof(OpenWorldGenerationServerRuntime).Assembly,
                     typeof(OpenWorldResourcesGameplayFeature).Assembly);
                 SW.Initialize();
-                SW.RegisterCluster(1);
+                SW.RegisterCluster(ClusterId);
                 SW.SetResource(new OpenWorldGenerationServerRuntime(new SimpleWorldGenerationService(), _request, 1));
                 SW.SetResource(new OpenWorldResourceNodeFactory());
                 SW.SetResource(new OpenWorldResourceNodeDeltaStore());
             }
 
+            public ushort ClusterId { get; }
+
             public GeneratedChunkData GenerateRequestedChunk()
             {
-                return SW.GetResource<OpenWorldGenerationServerRuntime>().GenerationService.GenerateChunk(new WorldChunkId(0, 0), _request);
+                return SW.GetResource<OpenWorldGenerationServerRuntime>().GenerationService.GenerateChunk(_chunkId, _request);
             }
 
             public void RunSeedSystem()
             {
                 var system = new ServerOpenWorldResourceNodeSeedSystem();
                 system.Init();
+                SW.SendEvent(new OpenWorldChunkLoadRequested(_chunkId, ClusterId));
                 system.Update();
+                system.Destroy();
+                SW.Tick();
             }
 
             public void Dispose()
             {
+                if (SW.Status != WorldStatus.NotCreated)
+                    SW.Destroy();
+            }
+        }
+
+        private sealed class OpenWorldStreamingServerWorldScope : IDisposable
+        {
+            private readonly ServerOpenWorldResourceNodeSeedSystem _resourceSeedSystem = new();
+            private readonly ServerOpenWorldChunkInterestSystem _interestSystem = new();
+            private readonly ServerOpenWorldChunkSnapshotSystem _snapshotSystem = new();
+            private readonly WorldGenerationRequest _request;
+            private readonly EntityGID _player;
+            private readonly NetworkPeerId _peer = new(1);
+
+            public OpenWorldStreamingServerWorldScope(WorldChunkBounds bounds)
+            {
+                if (SW.Status != WorldStatus.NotCreated)
+                    SW.Destroy();
+
+                _request = new WorldGenerationRequest(
+                    new WorldGenerationSeed(12345),
+                    bounds,
+                    128f,
+                    64,
+                    0,
+                    false,
+                    4f);
+
+                NetworkEventRegistry.Clear();
+                OpenWorldGenerationNetworkEvents.Register();
+                ServerPeerRegistry.Clear();
+                ServerPeerRegistry.Add(_peer);
+
+                SW.Create(WorldConfig.Default());
+                SW.Types().RegisterAll(
+                    typeof(ServerWT).Assembly,
+                    typeof(CharacterNetState).Assembly,
+                    typeof(OpenWorldChunkLoadRequested).Assembly,
+                    typeof(OpenWorldGenerationServerRuntime).Assembly,
+                    typeof(OpenWorldResourcesGameplayFeature).Assembly);
+                SW.Initialize();
+                SW.SetResource(new OpenWorldGenerationServerRuntime(new SimpleWorldGenerationService(), _request, 8, 0));
+                SW.SetResource(new OpenWorldChunkStreamingState());
+                SW.SetResource(new OpenWorldResourceNodeFactory());
+                SW.SetResource(new OpenWorldResourceNodeDeltaStore());
+                SW.SetResource(new NetOutbox());
+
+                var player = SW.NewEntity<Default>();
+                player.Set<PlayerTag>();
+                player.Set(new NetworkIdentity
+                {
+                    Owner = _peer,
+                    Authority = NetworkAuthority.Owner,
+                    NetworkArchetypeId = 0
+                });
+                player.Set(new CharacterNetState
+                {
+                    Position = new WorldChunkId(0, 0).GetWorldCenter(_request.ChunkWorldSize),
+                    Rotation = UnityEngine.Quaternion.identity
+                });
+                _player = player.GID;
+                _resourceSeedSystem.Init();
+            }
+
+            public ushort ClusterId(WorldChunkId chunkId)
+            {
+                return OpenWorldSpatialClusterIds.ToClusterId(chunkId, _request.Bounds);
+            }
+
+            public void SetPlayerChunk(WorldChunkId chunkId)
+            {
+                if (!_player.TryUnpack<ServerWT>(out var player))
+                    throw new InvalidOperationException("Streaming test player is not loaded.");
+
+                ref var state = ref player.Mut<CharacterNetState>();
+                state.Position = chunkId.GetWorldCenter(_request.ChunkWorldSize);
+            }
+
+            public void UpdateStreaming()
+            {
+                _interestSystem.Update();
+                _resourceSeedSystem.Update();
+                _snapshotSystem.Update();
+                SW.Tick();
+            }
+
+            public void Dispose()
+            {
+                _resourceSeedSystem.Destroy();
+                ServerPeerRegistry.Clear();
+                NetworkEventRegistry.Clear();
+
                 if (SW.Status != WorldStatus.NotCreated)
                     SW.Destroy();
             }
