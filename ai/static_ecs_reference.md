@@ -44,6 +44,7 @@ Any loaded assembly with a concrete parameterless `GameplayFeature` is passed to
 - `Ref<T>()` assumes the component exists; check `Has<T>()` if uncertain.
 - Use `Read<T>()` and `in` for read-only access.
 - Query filters are `All<>`, `None<>`, and `Any<>`; combine with `And<>` or `Or<>`.
+- If a query logically targets one concrete entity type or network archetype, include `EntityIs<T>` or `EntityIsAny<...>` unless the query is intentionally generic. Entity type filters prune chunks before per-entity masks.
 - Default query mode is Strict; do not modify filtered component/tag types on other entities during iteration.
 - Use `EntitiesFlexible()` only when that flexibility is actually needed.
 - During `ForParallel`, only modify the current entity and do not perform structural changes.

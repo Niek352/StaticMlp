@@ -34,6 +34,7 @@ Each feature should be understandable as an isolated module with explicit runtim
 - Client gameplay reads and writes `LocalOwned` entities.
 - Remote presentation reads `RemoteOwned` entities and applies visuals without simulating gameplay.
 - Server gameplay reads `ServerOwned` or validated `ClientOwned` entities.
+- Queries scoped to a concrete entity or network archetype must include `EntityIs<T>` or `EntityIsAny<...>`, unless the system is explicitly meant to be generic across entity types.
 - Interactions without direct ownership should go through typed replicated events, not hidden cross-feature calls.
 - Interactions without feature state ownership should also go through StaticEcs events. The requesting feature writes the event; the owning feature reads it, validates invariants, applies `Mut<T>()`, then emits a result or fact event when needed.
 

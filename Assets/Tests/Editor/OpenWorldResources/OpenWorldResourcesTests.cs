@@ -3,13 +3,16 @@ using System.IO;
 using System.Linq;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
+using StaticMlp.Features.EcsViews;
 using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.OpenWorldResources;
 using StaticMlp.Game.Components;
+using StaticMlp.Game.Presentation;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Replication.Generated;
+using StaticMlp.Networking.Requests;
 using StaticMlp.Networking.Transport;
 
 namespace StaticMlp.Tests.OpenWorldResources
@@ -103,6 +106,8 @@ namespace StaticMlp.Tests.OpenWorldResources
         {
             using var scope = new OpenWorldResourcesServerWorldScope();
             scope.RunSeedSystem();
+            SW.Tick();
+
             var entity = FirstResourceNode();
             var placementId = entity.Read<OpenWorldResourceNodeState>().PlacementId;
             ref var state = ref entity.Mut<OpenWorldResourceNodeState>();
@@ -127,6 +132,17 @@ namespace StaticMlp.Tests.OpenWorldResources
             new ServerOpenWorldResourceNodeDeltaCaptureSystem().Update();
 
             Assert.That(SW.GetResource<OpenWorldResourceNodeDeltaStore>().IsDepleted(placementId), Is.False);
+        }
+
+        [Test]
+        public void DeltaCaptureSystem_WhenResourceNodesAreFreshlySpawned_DoesNotRecordDepletion()
+        {
+            using var scope = new OpenWorldResourcesServerWorldScope();
+            scope.RunSeedSystem();
+
+            new ServerOpenWorldResourceNodeDeltaCaptureSystem().Update();
+
+            Assert.That(SW.GetResource<OpenWorldResourceNodeDeltaStore>().DepletedPlacementCount, Is.EqualTo(0));
         }
 
         [Test]
@@ -317,6 +333,82 @@ namespace StaticMlp.Tests.OpenWorldResources
             Assert.That(offenders, Is.Empty);
         }
 
+        [Test]
+        public void ResourceNodeClientArchetype_AddsPresentationViewWiring()
+        {
+            using var scope = new OpenWorldResourcesClientPresentationWorldScope();
+
+            new OpenWorldResourcesGameplayFeature().RegisterPrefabs();
+            new OpenWorldResourcesPresentationFeature().RegisterPrefabs();
+            var entity = CW.NewEntity<Default>();
+
+            NetArchetypeRegistry.Apply(OpenWorldResourceNetworkArchetypeIds.ResourceNode, entity);
+
+            Assert.That(entity.Has<OpenWorldResourceNodeTag>(), Is.True);
+            Assert.That(entity.Has<ViewPath>(), Is.True);
+            Assert.That(entity.Read<ViewPath>().Value, Is.EqualTo("Views/OpenWorldResources/OpenWorldResourceNodeView"));
+            Assert.That(entity.Has<ViewTransform>(), Is.True);
+            Assert.That(entity.Has<OpenWorldResourceNodeViewState>(), Is.True);
+        }
+
+        [Test]
+        public void ClientResourceNodeViewStateSystem_BuildsViewStateFromReplicatedResourceNode()
+        {
+            using var scope = new OpenWorldResourcesClientPresentationWorldScope();
+            var entity = CW.NewEntity<Default>();
+            entity.Set<OpenWorldResourceNodeTag>();
+            entity.Set(new OpenWorldResourceNodeState
+            {
+                PlacementId = 123,
+                KindIdValue = 2,
+                RemainingAmount = 7
+            });
+            entity.Set(new OpenWorldResourceNodeTransform
+            {
+                Position = new UnityEngine.Vector3(3f, 4f, 5f),
+                YawDegrees = 45f,
+                Scale = 1.7f
+            });
+            entity.Set(new ViewTransform
+            {
+                RenderRotation = UnityEngine.Quaternion.identity
+            });
+            entity.Set(new OpenWorldResourceNodeViewState());
+
+            new ClientOpenWorldResourceNodeViewStateSystem().Update();
+
+            ref readonly var viewTransform = ref entity.Read<ViewTransform>();
+            Assert.That(viewTransform.RenderPosition, Is.EqualTo(new UnityEngine.Vector3(3f, 4f, 5f)));
+            Assert.That(UnityEngine.Quaternion.Angle(viewTransform.RenderRotation, UnityEngine.Quaternion.Euler(0f, 45f, 0f)), Is.LessThan(0.001f));
+
+            ref readonly var viewState = ref entity.Read<OpenWorldResourceNodeViewState>();
+            Assert.That(viewState.KindIdValue, Is.EqualTo(2));
+            Assert.That(viewState.RemainingAmount, Is.EqualTo(7));
+            Assert.That(viewState.Scale, Is.EqualTo(1.7f));
+        }
+
+        [Test]
+        public void DeltaCaptureSystem_QueryFiltersResourceNodeEntityTypeAndIgnoresAddedState()
+        {
+            var path = Path.Combine(
+                ProjectRoot(),
+                "Assets",
+                "Scripts",
+                "StaticMlp",
+                "Features",
+                "OpenWorldResources",
+                "Runtime",
+                "Logic",
+                "Systems",
+                "Server",
+                "ServerOpenWorldResourceNodeDeltaCaptureSystem.cs");
+            var text = File.ReadAllText(path);
+
+            Assert.That(text, Does.Contain($"EntityIs<{nameof(OpenWorldResourceNodeNetworkEntity)}>"));
+            Assert.That(text, Does.Contain($"AllChanged<{nameof(OpenWorldResourceNodeState)}>"));
+            Assert.That(text, Does.Contain($"NoneAdded<{nameof(OpenWorldResourceNodeState)}>"));
+        }
+
         private static int CountResourceNodes()
         {
             var count = 0;
@@ -471,6 +563,39 @@ namespace StaticMlp.Tests.OpenWorldResources
             {
                 if (SW.Status != WorldStatus.NotCreated)
                     SW.Destroy();
+            }
+        }
+
+        private sealed class OpenWorldResourcesClientPresentationWorldScope : IDisposable
+        {
+            public OpenWorldResourcesClientPresentationWorldScope()
+            {
+                NetArchetypeRegistry.Clear();
+                ProjectionRegistry.Clear();
+
+                if (CW.Status != WorldStatus.NotCreated)
+                    CW.Destroy();
+
+                new OpenWorldResourcesGameplayFeature().RegisterNetworkEvents();
+
+                CW.Create(WorldConfig.Default());
+                CW.Types().RegisterAll(
+                    typeof(ClientCoreWT).Assembly,
+                    typeof(ViewPath).Assembly,
+                    typeof(ViewTransform).Assembly,
+                    typeof(OpenWorldResourcesGameplayFeature).Assembly,
+                    typeof(OpenWorldResourcesPresentationFeature).Assembly);
+                ProjectionRegistry.RegisterClientWorldTypes();
+                CW.Initialize();
+            }
+
+            public void Dispose()
+            {
+                NetArchetypeRegistry.Clear();
+                ProjectionRegistry.Clear();
+
+                if (CW.Status != WorldStatus.NotCreated)
+                    CW.Destroy();
             }
         }
 

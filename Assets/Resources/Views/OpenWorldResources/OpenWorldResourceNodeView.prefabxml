@@ -1,0 +1,7 @@
+<UnityPrefab>
+    <GameObject name="OpenWorldResourceNodeView">
+        <EntityView />
+        <TransformViewComponent />
+        <OpenWorldResourceNodeViewPart />
+    </GameObject>
+</UnityPrefab>
