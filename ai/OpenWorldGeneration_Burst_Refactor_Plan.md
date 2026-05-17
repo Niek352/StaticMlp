@@ -1,5 +1,7 @@
 # План рефакторинга: LayerProcGen → LayerProcGenLite (Option B)
 
+Update 2026-05-17: references in this historical plan to `ServerOpenWorldResourceNodeSeedSystem` and static resource node spawning are superseded. Generated resource placements now feed `ServerOpenWorldResourcePlacementIndexSystem`, `OpenWorldPlacementIndexStore`, and `OpenWorldChunkOverlayStore`; static resources are not replicated network entities by default.
+
 **Цель:** Заменить managed `LayerProcGen` с его `Thread.Sleep`, process-wide singletons и синхронным `GenerateChunk` на узкий Burst-friendly job pipeline (`LayerProcGenLite`), полностью интегрированный в StaticEcs ECS event flow.
 
 **Подход:** Не адаптировать существующий `LayerProcGen.Burst` proof-of-concept, а написать новый backend с нуля, заимствуя из Burst решения только `ChunkId` math, noise utilities и идею dependency graph.

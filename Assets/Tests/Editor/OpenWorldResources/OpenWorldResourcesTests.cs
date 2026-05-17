@@ -20,145 +20,168 @@ namespace StaticMlp.Tests.OpenWorldResources
     public sealed class OpenWorldResourcesTests
     {
         [Test]
-        public void ServerSeedSystem_CreatesAuthoritativeResourceNodesFromGeneratedPlacements()
+        public void ServerPlacementIndexSystem_RegistersGeneratedResourcePlacements()
         {
             using var scope = new OpenWorldResourcesServerWorldScope();
-            var expected = scope.GenerateRequestedChunk().ResourcePlacements.Length;
+            var generated = scope.GenerateRequestedChunk();
+            var expected = generated.ResourcePlacements.Length;
 
-            scope.RunSeedSystem();
+            scope.RunPlacementIndexSystem();
 
             Assert.That(expected, Is.GreaterThan(0));
-            Assert.That(CountResourceNodes(), Is.EqualTo(expected));
-            var authoritativeCount = 0;
-            foreach (var entity in SW.Query<All<OpenWorldResourceNodeTag, OpenWorldResourceNodeState, OpenWorldResourceNodeTransform, ServerOwned>>().Entities())
+            var index = SW.GetResource<OpenWorldPlacementIndexStore>();
+            Assert.That(index.TryGetChunkPlacements(scope.ChunkId, out var placements), Is.True);
+            Assert.That(placements.Length, Is.EqualTo(expected));
+            Assert.That(index.TryGetPlacement(generated.ResourcePlacements[0].PlacementId, out var resolved), Is.True);
+            Assert.That(resolved, Is.EqualTo(generated.ResourcePlacements[0]));
+            Assert.That(CountResourceNodes(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ServerPlacementIndexSystem_WhenRerun_ReplacesPlacementFactsWithoutNetworkEntities()
+        {
+            using var scope = new OpenWorldResourcesServerWorldScope();
+
+            scope.RunPlacementIndexSystem();
+            var firstCount = SW.GetResource<OpenWorldPlacementIndexStore>().PlacementCount;
+            scope.RunPlacementIndexSystem();
+
+            Assert.That(SW.GetResource<OpenWorldPlacementIndexStore>().PlacementCount, Is.EqualTo(firstCount));
+            Assert.That(CountResourceNodes(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void OverlayStore_RegisterPlacement_CanResolveChunkByPlacementId()
+        {
+            using var scope = new OpenWorldResourcesServerWorldScope();
+            var placementId = scope.GenerateRequestedChunk().ResourcePlacements[0].PlacementId;
+
+            scope.RunPlacementIndexSystem();
+
+            var overlayStore = SW.GetResource<OpenWorldChunkOverlayStore>();
+            Assert.That(overlayStore.TryGetChunkId(placementId, out var chunkId), Is.True);
+            Assert.That(chunkId, Is.EqualTo(scope.ChunkId));
+        }
+
+        [Test]
+        public void OverlayStore_ApplyDepleted_IncrementsRevisionAndRecordsDirtyDelta()
+        {
+            using var scope = new OpenWorldResourcesServerWorldScope();
+            var placement = scope.GenerateRequestedChunk().ResourcePlacements[0];
+            var overlayStore = SW.GetResource<OpenWorldChunkOverlayStore>();
+
+            var changed = overlayStore.TryApplyResourceState(scope.ChunkId, new OpenWorldResourceOverlayState
             {
-                authoritativeCount++;
-                ref readonly var identity = ref entity.Read<NetworkIdentity>();
-                Assert.That(identity.Authority, Is.EqualTo(NetworkAuthority.Server));
-                Assert.That(identity.NetworkArchetypeId, Is.EqualTo(OpenWorldResourceNetworkArchetypeIds.ResourceNode));
-            }
-            Assert.That(authoritativeCount, Is.EqualTo(expected));
+                PlacementId = placement.PlacementId,
+                KindIdValue = placement.KindId.Value,
+                RemainingAmount = 0,
+                Flags = OpenWorldResourceOverlayFlags.Depleted
+            });
+
+            Assert.That(changed, Is.True);
+            Assert.That(overlayStore.IsDepleted(placement.PlacementId), Is.True);
+            Assert.That(overlayStore.TryGet(scope.ChunkId, out var overlay), Is.True);
+            Assert.That(overlay.Revision, Is.EqualTo(1));
+            Assert.That(overlay.DirtyResourceDeltas.Count, Is.EqualTo(1));
+            Assert.That(CountResourceNodes(), Is.EqualTo(0));
         }
 
         [Test]
-        public void ServerSeedSystem_SpawnedResourceNodesIncludeChunkRef()
+        public void OverlayStore_ApplySameState_DoesNotIncrementRevision()
         {
             using var scope = new OpenWorldResourcesServerWorldScope();
-
-            scope.RunSeedSystem();
-
-            var count = 0;
-            foreach (var entity in SW.Query<All<OpenWorldResourceNodeTag, OpenWorldChunkRef>>().Entities())
+            var placement = scope.GenerateRequestedChunk().ResourcePlacements[0];
+            var state = new OpenWorldResourceOverlayState
             {
-                count++;
-                ref readonly var chunkRef = ref entity.Read<OpenWorldChunkRef>();
-                Assert.That(chunkRef.X, Is.EqualTo(0));
-                Assert.That(chunkRef.Z, Is.EqualTo(0));
-            }
+                PlacementId = placement.PlacementId,
+                KindIdValue = placement.KindId.Value,
+                RemainingAmount = 0,
+                Flags = OpenWorldResourceOverlayFlags.Depleted
+            };
+            var overlayStore = SW.GetResource<OpenWorldChunkOverlayStore>();
 
-            Assert.That(count, Is.GreaterThan(0));
+            Assert.That(overlayStore.TryApplyResourceState(scope.ChunkId, state), Is.True);
+            Assert.That(overlayStore.TryApplyResourceState(scope.ChunkId, state), Is.False);
+            Assert.That(overlayStore.TryGet(scope.ChunkId, out var overlay), Is.True);
+            Assert.That(overlay.Revision, Is.EqualTo(1));
+            Assert.That(overlay.DirtyResourceDeltas.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public void ServerSeedSystem_SpawnedResourceNodesUseSpatialCluster()
+        public void OverlayStore_ClearDirty_RemovesDirtyDeltasButKeepsState()
         {
             using var scope = new OpenWorldResourcesServerWorldScope();
-
-            scope.RunSeedSystem();
-
-            var count = 0;
-            foreach (var entity in SW.Query<All<OpenWorldResourceNodeTag, OpenWorldChunkRef>>().Entities())
+            var placement = scope.GenerateRequestedChunk().ResourcePlacements[0];
+            var overlayStore = SW.GetResource<OpenWorldChunkOverlayStore>();
+            overlayStore.TryApplyResourceState(scope.ChunkId, new OpenWorldResourceOverlayState
             {
-                count++;
-                Assert.That(entity.ClusterId, Is.EqualTo(scope.ClusterId));
-                Assert.That(entity.GID.ClusterId, Is.EqualTo(scope.ClusterId));
-            }
+                PlacementId = placement.PlacementId,
+                KindIdValue = placement.KindId.Value,
+                RemainingAmount = 0,
+                Flags = OpenWorldResourceOverlayFlags.Depleted
+            });
 
-            Assert.That(count, Is.GreaterThan(0));
+            var overlay = overlayStore.GetOrCreate(scope.ChunkId);
+            overlay.ClearDirty();
+
+            Assert.That(overlay.DirtyResourceDeltas.Count, Is.EqualTo(0));
+            Assert.That(overlay.TryGetResource(placement.PlacementId, out var state), Is.True);
+            Assert.That(state.Flags, Is.EqualTo(OpenWorldResourceOverlayFlags.Depleted));
         }
 
         [Test]
-        public void ServerSeedSystem_WhenRerun_DoesNotDuplicatePlacements()
+        public void PlacementIndex_RegisterChunkPlacements_ReplacesExistingChunkPlacements()
         {
-            using var scope = new OpenWorldResourcesServerWorldScope();
+            var index = new OpenWorldPlacementIndexStore();
+            var chunkId = new WorldChunkId(0, 0);
+            var first = new ResourcePlacement(101, new ResourcePlacementKindId(1), chunkId, UnityEngine.Vector3.zero, 0f, 1f);
+            var second = new ResourcePlacement(202, new ResourcePlacementKindId(2), chunkId, UnityEngine.Vector3.one, 0f, 1f);
 
-            scope.RunSeedSystem();
-            var firstCount = CountResourceNodes();
-            scope.RunSeedSystem();
+            index.RegisterChunkPlacements(chunkId, new[] { first });
+            index.RegisterChunkPlacements(chunkId, new[] { second });
 
-            Assert.That(CountResourceNodes(), Is.EqualTo(firstCount));
+            Assert.That(index.TryGetPlacement(first.PlacementId, out _), Is.False);
+            Assert.That(index.TryGetPlacement(second.PlacementId, out var resolved), Is.True);
+            Assert.That(resolved, Is.EqualTo(second));
+            Assert.That(index.PlacementCount, Is.EqualTo(1));
         }
 
         [Test]
-        public void ServerSeedSystem_DepletedPlacementIds_AreNotRespawned()
+        public void PlacementIndex_TryGetUnknownPlacement_ReturnsFalse()
         {
-            using var scope = new OpenWorldResourcesServerWorldScope();
-            var depletedPlacementId = scope.GenerateRequestedChunk().ResourcePlacements[0].PlacementId;
-            SW.GetResource<OpenWorldResourceNodeDeltaStore>().RecordDepleted(depletedPlacementId);
+            var index = new OpenWorldPlacementIndexStore();
 
-            scope.RunSeedSystem();
-
-            Assert.That(AnyResourceNodeWithPlacementId(depletedPlacementId), Is.False);
+            Assert.That(index.TryGetPlacement(123456, out _), Is.False);
         }
 
         [Test]
-        public void DeltaCaptureSystem_WhenResourceNodeIsDepleted_RecordsPlacementId()
+        public void ClientResourceProxyIndex_CanResolveProxyByPlacementId()
         {
-            using var scope = new OpenWorldResourcesServerWorldScope();
-            scope.RunSeedSystem();
-            SW.Tick();
+            var index = new ClientOpenWorldResourceProxyIndex();
+            var gid = new EntityGID(1, 1, 0);
 
-            var entity = FirstResourceNode();
-            var placementId = entity.Read<OpenWorldResourceNodeState>().PlacementId;
-            ref var state = ref entity.Mut<OpenWorldResourceNodeState>();
-            state.RemainingAmount = 0;
+            index.Register(777, gid);
 
-            new ServerOpenWorldResourceNodeDeltaCaptureSystem().Update();
-
-            Assert.That(SW.GetResource<OpenWorldResourceNodeDeltaStore>().IsDepleted(placementId), Is.True);
+            Assert.That(index.TryGet(777, out var resolved), Is.True);
+            Assert.That(resolved, Is.EqualTo(gid));
         }
 
         [Test]
-        public void DeltaCaptureSystem_WhenResourceNodeStateIsUnchanged_DoesNotRescanDepletedNodes()
+        public void OverlayStore_DoesNotStoreGeneratedMeshOrHeightmapData()
         {
-            using var scope = new OpenWorldResourcesServerWorldScope();
-            scope.RunSeedSystem();
-            var entity = FirstResourceNode();
-            var placementId = entity.Read<OpenWorldResourceNodeState>().PlacementId;
-            ref var state = ref entity.Mut<OpenWorldResourceNodeState>();
-            state.RemainingAmount = 0;
-            SW.Tick();
-
-            new ServerOpenWorldResourceNodeDeltaCaptureSystem().Update();
-
-            Assert.That(SW.GetResource<OpenWorldResourceNodeDeltaStore>().IsDepleted(placementId), Is.False);
-        }
-
-        [Test]
-        public void DeltaCaptureSystem_WhenResourceNodesAreFreshlySpawned_DoesNotRecordDepletion()
-        {
-            using var scope = new OpenWorldResourcesServerWorldScope();
-            scope.RunSeedSystem();
-
-            new ServerOpenWorldResourceNodeDeltaCaptureSystem().Update();
-
-            Assert.That(SW.GetResource<OpenWorldResourceNodeDeltaStore>().DepletedPlacementCount, Is.EqualTo(0));
-        }
-
-        [Test]
-        public void DeltaStore_DoesNotStoreGeneratedMeshOrHeightmapData()
-        {
-            var storedTypes = typeof(OpenWorldResourceNodeDeltaStore)
+            var storedTypes = typeof(OpenWorldChunkOverlayStore)
                 .GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public)
                 .Select(field => field.FieldType)
-                .Concat(typeof(OpenWorldResourceNodeDeltaStore)
+                .Concat(typeof(OpenWorldChunkOverlay)
+                    .GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public)
+                    .Select(field => field.FieldType))
+                .Concat(typeof(OpenWorldChunkOverlayStore)
                     .GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public)
                     .Select(property => property.PropertyType))
                 .ToArray();
 
-            Assert.That(storedTypes, Does.Not.Contain(typeof(GeneratedChunkData).ToString()));
-            Assert.That(storedTypes, Does.Not.Contain(typeof(TerrainMeshData).ToString()));
-            Assert.That(storedTypes.Any(type => type.IsArray), Is.False);
+            Assert.That(storedTypes.Any(type => type == typeof(GeneratedChunkData)), Is.False);
+            Assert.That(storedTypes.Any(type => type == typeof(TerrainMeshData)), Is.False);
         }
 
         [Test]
@@ -275,7 +298,11 @@ namespace StaticMlp.Tests.OpenWorldResources
 
             scope.UpdateStreaming();
 
-            Assert.That(CountResourceNodes(), Is.GreaterThan(0));
+            Assert.That(CountResourceNodes(), Is.EqualTo(0));
+            Assert.That(
+                SW.GetResource<OpenWorldPlacementIndexStore>().TryGetChunkPlacements(new WorldChunkId(0, 0), out var placements),
+                Is.True);
+            Assert.That(placements.Length, Is.GreaterThan(0));
             Assert.That(SW.GetResource<NetOutbox>().Packets.Count, Is.EqualTo(1));
             Assert.That(DecodeFirstOutboxSnapshot().Kind, Is.EqualTo(ReplicationSnapshotKind.ClusterEntities));
             Assert.That(SW.ClusterIsRegistered(scope.ClusterId(new WorldChunkId(0, 0))), Is.True);
@@ -303,15 +330,11 @@ namespace StaticMlp.Tests.OpenWorldResources
             Assert.That(outbox.Packets.Count, Is.EqualTo(1));
             Assert.That(SW.GetClusterLoadedChunks(firstCluster).Length, Is.EqualTo(0));
 
-            var loadedSecondChunkNodes = 0;
-            foreach (var entity in SW.Query<All<OpenWorldResourceNodeTag, OpenWorldChunkRef>>().Entities())
-            {
-                ref readonly var chunkRef = ref entity.Read<OpenWorldChunkRef>();
-                if (chunkRef.X == secondChunk.X && chunkRef.Z == secondChunk.Z)
-                    loadedSecondChunkNodes++;
-            }
-
-            Assert.That(loadedSecondChunkNodes, Is.GreaterThan(0));
+            Assert.That(
+                SW.GetResource<OpenWorldPlacementIndexStore>().TryGetChunkPlacements(secondChunk, out var secondChunkPlacements),
+                Is.True);
+            Assert.That(secondChunkPlacements.Length, Is.GreaterThan(0));
+            Assert.That(CountResourceNodes(), Is.EqualTo(0));
         }
 
         [Test]
@@ -334,7 +357,7 @@ namespace StaticMlp.Tests.OpenWorldResources
         }
 
         [Test]
-        public void ResourceNodeClientArchetype_AddsPresentationViewWiring()
+        public void StaticResourceNodeClientArchetype_IsNotRegisteredByDefault()
         {
             using var scope = new OpenWorldResourcesClientPresentationWorldScope();
 
@@ -344,11 +367,10 @@ namespace StaticMlp.Tests.OpenWorldResources
 
             NetArchetypeRegistry.Apply(OpenWorldResourceNetworkArchetypeIds.ResourceNode, entity);
 
-            Assert.That(entity.Has<OpenWorldResourceNodeTag>(), Is.True);
-            Assert.That(entity.Has<ViewPath>(), Is.True);
-            Assert.That(entity.Read<ViewPath>().Value, Is.EqualTo("Views/OpenWorldResources/OpenWorldResourceNodeView"));
-            Assert.That(entity.Has<ViewTransform>(), Is.True);
-            Assert.That(entity.Has<OpenWorldResourceNodeViewState>(), Is.True);
+            Assert.That(entity.Has<OpenWorldResourceNodeTag>(), Is.False);
+            Assert.That(entity.Has<ViewPath>(), Is.False);
+            Assert.That(entity.Has<ViewTransform>(), Is.False);
+            Assert.That(entity.Has<OpenWorldResourceNodeViewState>(), Is.False);
         }
 
         [Test]
@@ -388,7 +410,7 @@ namespace StaticMlp.Tests.OpenWorldResources
         }
 
         [Test]
-        public void DeltaCaptureSystem_QueryFiltersResourceNodeEntityTypeAndIgnoresAddedState()
+        public void PlacementIndexSystem_DoesNotSpawnResourceNodeNetworkEntities()
         {
             var path = Path.Combine(
                 ProjectRoot(),
@@ -401,12 +423,12 @@ namespace StaticMlp.Tests.OpenWorldResources
                 "Logic",
                 "Systems",
                 "Server",
-                "ServerOpenWorldResourceNodeDeltaCaptureSystem.cs");
+                "ServerOpenWorldResourcePlacementIndexSystem.cs");
             var text = File.ReadAllText(path);
 
-            Assert.That(text, Does.Contain($"EntityIs<{nameof(OpenWorldResourceNodeNetworkEntity)}>"));
-            Assert.That(text, Does.Contain($"AllChanged<{nameof(OpenWorldResourceNodeState)}>"));
-            Assert.That(text, Does.Contain($"NoneAdded<{nameof(OpenWorldResourceNodeState)}>"));
+            Assert.That(text, Does.Not.Contain(nameof(OpenWorldResourceNodeFactory)));
+            Assert.That(text, Does.Not.Contain(nameof(OpenWorldResourceNodeNetworkEntity)));
+            Assert.That(text, Does.Not.Contain("SW.Query"));
         }
 
         private static int CountResourceNodes()
@@ -529,10 +551,11 @@ namespace StaticMlp.Tests.OpenWorldResources
                 SW.Initialize();
                 SW.RegisterCluster(ClusterId);
                 SW.SetResource(new OpenWorldGenerationServerRuntime(_request, 1));
-                SW.SetResource(new OpenWorldResourceNodeFactory());
-                SW.SetResource(new OpenWorldResourceNodeDeltaStore());
+                SW.SetResource(new OpenWorldPlacementIndexStore());
+                SW.SetResource(new OpenWorldChunkOverlayStore());
             }
 
+            public WorldChunkId ChunkId => _chunkId;
             public ushort ClusterId { get; }
 
             public GeneratedChunkData GenerateRequestedChunk()
@@ -540,9 +563,9 @@ namespace StaticMlp.Tests.OpenWorldResources
                 return new SimpleWorldGenerationService().GenerateChunk(_chunkId, _request);
             }
 
-            public void RunSeedSystem()
+            public void RunPlacementIndexSystem()
             {
-                var system = new ServerOpenWorldResourceNodeSeedSystem();
+                var system = new ServerOpenWorldResourcePlacementIndexSystem();
                 system.Init();
                 var generated = GenerateRequestedChunk();
                 SW.SendEvent(new OpenWorldChunkGenerationCompleted(
@@ -601,7 +624,7 @@ namespace StaticMlp.Tests.OpenWorldResources
 
         private sealed class OpenWorldStreamingServerWorldScope : IDisposable
         {
-            private readonly ServerOpenWorldResourceNodeSeedSystem _resourceSeedSystem = new();
+            private readonly ServerOpenWorldResourcePlacementIndexSystem _resourcePlacementIndexSystem = new();
             private readonly ServerOpenWorldChunkInterestSystem _interestSystem = new();
             private readonly ServerOpenWorldChunkGenerationBridgeSystem _generationBridgeSystem = new();
             private readonly ServerOpenWorldChunkGenerationSystem _generationSystem = new();
@@ -651,8 +674,8 @@ namespace StaticMlp.Tests.OpenWorldResources
                     _request.SkirtDepth));
                 SW.SetResource(new OpenWorldChunkStreamingState());
                 SW.SetResource(new OpenWorldServerChunkGeometryRuntime());
-                SW.SetResource(new OpenWorldResourceNodeFactory());
-                SW.SetResource(new OpenWorldResourceNodeDeltaStore());
+                SW.SetResource(new OpenWorldPlacementIndexStore());
+                SW.SetResource(new OpenWorldChunkOverlayStore());
                 SW.SetResource(new NetOutbox());
 
                 var player = SW.NewEntity<Default>();
@@ -671,7 +694,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                 _player = player.GID;
                 _generationBridgeSystem.Init();
                 _generationSystem.Init();
-                _resourceSeedSystem.Init();
+                _resourcePlacementIndexSystem.Init();
                 _geometryStoreSystem.Init();
                 _generationCompleteSystem.Init();
             }
@@ -697,7 +720,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                     _interestSystem.Update();
                     _generationBridgeSystem.Update();
                     _generationSystem.Update();
-                    _resourceSeedSystem.Update();
+                    _resourcePlacementIndexSystem.Update();
                     _geometryStoreSystem.Update();
                     _generationCompleteSystem.Update();
                     _snapshotSystem.Update();
@@ -709,7 +732,7 @@ namespace StaticMlp.Tests.OpenWorldResources
             {
                 _generationCompleteSystem.Destroy();
                 _geometryStoreSystem.Destroy();
-                _resourceSeedSystem.Destroy();
+                _resourcePlacementIndexSystem.Destroy();
                 _generationSystem.Destroy();
                 _generationBridgeSystem.Destroy();
                 ServerPeerRegistry.Clear();

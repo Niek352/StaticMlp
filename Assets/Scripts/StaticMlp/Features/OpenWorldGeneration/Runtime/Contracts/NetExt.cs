@@ -1,7 +1,6 @@
-﻿using StaticMlp.Features.OpenWorldGeneration;
-using StaticMlp.Networking.Replication;
+﻿using StaticMlp.Networking.Replication;
 
-namespace StaticMlp.Generated
+namespace StaticMlp.Features.OpenWorldGeneration
 {
     public static class NetExt
     {

@@ -15,7 +15,6 @@ using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Game.Systems;
 using StaticMlp.Networking.Requests;
 using System;
-using StaticMlp.Generated;
 using UnityEngine;
 
 namespace StaticMlp.Networking.Replication.Generated {

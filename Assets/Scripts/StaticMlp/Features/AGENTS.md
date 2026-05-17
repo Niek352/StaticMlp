@@ -53,3 +53,14 @@ Each feature should be understandable as an isolated module with explicit runtim
 - Then inspect `Components` and `Events`.
 - Then inspect `Systems/Client` and `Systems/Server`.
 - Open feature-specific `AGENTS.md` files when they exist.
+
+## Feature Notes
+
+- `OpenWorldGeneration` has a local `AGENTS.md`. Read it before changing deterministic chunk generation, LayerProcLite schedulers/jobs, spatial cluster streaming, server chunk snapshots, or client terrain presentation.
+- `OpenWorldResources` has a local `AGENTS.md`. Read it before changing placement indexing, chunk overlays, resource proxy views, legacy replicated resource nodes, or investigating open-world host spikes.
+
+## Profiling Notes
+
+- If a StaticEcs profiler marker shows `2 instances on Main Thread` in one Unity frame, verify whether the systems pipeline updated twice or the same system type was registered twice before optimizing the system body.
+- Current open-world host spike evidence points first at `ServerWT_ServerOpenWorldResourceNodeDeltaCaptureSystem` and `ServerWT_ServerOpenWorldChunkSnapshotSystem`; reported client markers around placement preview, remote interpolation, and terrain streaming are secondary.
+- For external readers: the historical open-world spike was mainly a replicated-object synchronization spike. The corrected model keeps deterministic static resources out of generic entity snapshots and synchronizes sparse mutable state through chunk overlays keyed by `PlacementId`. It should not be interpreted as terrain mesh generation being the main bottleneck unless terrain generation markers prove that separately.

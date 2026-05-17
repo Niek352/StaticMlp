@@ -207,6 +207,31 @@ public override void RegisterPrefabs() {
 Keep `NetworkArchetypeId` values stable. Treat them as protocol ids, not as scene or prefab instance ids.
 Do not put `ViewPath`, `View`, or `IViewComponent` state in server recipes.
 
+## Deterministic Static Objects
+
+Do not use the network-entity spawning recipe for every deterministic static object in a large world chunk.
+
+Use network entities for dynamic actors:
+
+- players, NPCs, projectiles, vehicles;
+- moving dropped items;
+- falling physics trees;
+- construction or special interactables that need ordinary replicated lifecycle.
+
+Use deterministic base + sparse overlay for static placements:
+
+1. Generate placement facts from `WorldDescriptor + ChunkId`.
+2. Store generated facts in a feature-owned placement index.
+3. Use a stable `PlacementId`, not `EntityGID`, as the server authority reference.
+4. Store mutable state in a chunk overlay resource.
+5. Send absolute overlay on first enter or baseline mismatch.
+6. Send delta overlay only against an acked revision.
+7. Create client-only proxy entities for visuals; do not add `NetworkIdentity`.
+8. Send client interaction commands by `PlacementId`.
+9. Validate server-side against placement index, overlay state, player range, tool rules, and server physics/collision where needed.
+
+This is the default for wilderness trees, rocks, bushes, ore nodes, and pure visual foliage.
+
 ## Server-Owned Door Example
 
 State:

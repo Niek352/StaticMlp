@@ -135,6 +135,30 @@ Feature systems should talk in typed gameplay commands and replicated state, not
 
 Feature gameplay should not read `NetInbox`, write `NetOutbox`, hardcode server peer `0`, create `NetworkIdentity`, call `OwnershipTags`, or call spawn/despawn broadcasters directly. Those are replication/lifecycle concerns.
 
+## Deterministic Static World Networking
+
+Deterministic static world data should not become generic network entities by default.
+
+Use this split for large open-world chunks:
+
+```text
+deterministic base = seed/version/catalog + chunk id + generated placement facts
+sparse overlay     = authoritative mutable state keyed by stable PlacementId
+dynamic actors     = ordinary replicated ECS entities
+```
+
+Static trees, rocks, bushes, ore nodes, foliage, and other deterministic objects should be generated locally from the same descriptor and referenced by stable placement ids. The server stores generated facts in a placement index and stores mutable state, such as depleted amount or respawn tick, in a chunk overlay with revisions.
+
+Replicate overlay state with typed reliable events:
+
+- absolute overlay for first enter, missing baseline, or mismatch;
+- delta overlay only relative to a revision the client has acknowledged;
+- ack/request events to track peer known revisions.
+
+Do not put `NetworkIdentity` on every deterministic static placement. Create a network entity only after an object becomes a real dynamic actor, such as a falling physics tree, moving dropped item, special interactable, or construction object with ordinary replicated lifecycle.
+
+Client visuals for static placements should be client-only ECS entities or passive views. They must not participate in generic replication and must not become authoritative gameplay state.
+
 ## Feature Domain Boundaries
 
 Feature domain code should describe gameplay concepts and rules. Keep it free from protocol ids, network archetype ids, prefab/view paths, transport resources, Unity view objects, and input/UI state.

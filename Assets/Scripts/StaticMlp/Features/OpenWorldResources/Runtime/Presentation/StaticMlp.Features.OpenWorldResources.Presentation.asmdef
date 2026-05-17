@@ -6,7 +6,8 @@
         "Ecs.Networking",
         "Game.Core",
         "StaticMlp.Features.EcsViews",
-        "StaticMlp.Features.OpenWorldResources"
+        "StaticMlp.Features.OpenWorldResources",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

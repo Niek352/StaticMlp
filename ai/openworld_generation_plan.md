@@ -1,5 +1,7 @@
 # OpenWorldGeneration Roadmap
 
+Update 2026-05-17: static open-world resource placements are no longer treated as replicated resource-node entities by default. The current networking model is deterministic placement facts + `OpenWorldPlacementIndexStore` + `OpenWorldChunkOverlayStore` + client-only proxies. The older resource-node network entity path is legacy compatibility for explicit dynamic/special cases only.
+
 Дата статуса: 2026-05-14
 
 ## Текущий этап

@@ -1,8 +1,10 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
+using System;
 
 namespace StaticMlp.Features.OpenWorldResources
 {
+    [Obsolete("Temp")]
     public sealed class ServerOpenWorldResourceNodeDeltaCaptureSystem : ISystem
     {
         public void Update()

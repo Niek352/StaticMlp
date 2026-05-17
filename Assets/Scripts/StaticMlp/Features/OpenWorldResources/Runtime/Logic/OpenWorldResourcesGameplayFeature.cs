@@ -10,13 +10,19 @@ namespace StaticMlp.Features.OpenWorldResources
     {
         public override void RegisterNetworkEvents()
         {
-            ProjectionRegistry.Register<OpenWorldResourceNodeState>();
-            ProjectionRegistry.Register<OpenWorldResourceNodeTransform>();
+            OpenWorldChunkOverlayEventCodec.Register();
+
+            if (OpenWorldResourcesCompatibility.UseLegacyReplicatedResourceNodes)
+            {
+                ProjectionRegistry.Register<OpenWorldResourceNodeState>();
+                ProjectionRegistry.Register<OpenWorldResourceNodeTransform>();
+            }
         }
 
         public override void RegisterPrefabs()
         {
-            //OpenWorldResourcesReplicationRegistration.Register();
+            if (!OpenWorldResourcesCompatibility.UseLegacyReplicatedResourceNodes)
+                return;
 
             NetArchetypeRegistry.RegisterClient(OpenWorldResourceNetworkArchetypeIds.ResourceNode, e =>
             {
@@ -31,14 +37,27 @@ namespace StaticMlp.Features.OpenWorldResources
 
         public override void RegisterServerResources()
         {
-            SW.SetResource(new OpenWorldResourceNodeFactory());
-            SW.SetResource(new OpenWorldResourceNodeDeltaStore());
+            var dirtyQueue = new OpenWorldChunkOverlayDirtyQueue();
+            SW.SetResource(new OpenWorldPlacementIndexStore());
+            SW.SetResource(new OpenWorldChunkOverlayStore(dirtyQueue));
+            SW.SetResource(new OpenWorldPeerChunkOverlayState());
+            SW.SetResource(dirtyQueue);
+
+            if (OpenWorldResourcesCompatibility.UseLegacyReplicatedResourceNodes)
+            {
+                SW.SetResource(new OpenWorldResourceNodeFactory());
+                SW.SetResource(new OpenWorldResourceNodeDeltaStore());
+            }
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
-            systems.Add(new ServerOpenWorldResourceNodeSeedSystem(), GameplaySystemOrder.ServerConnectionGameplay + 35);
-            systems.Add(new ServerOpenWorldResourceNodeDeltaCaptureSystem(), GameplaySystemOrder.CollectReplication - 30);
+            systems.Add(new ServerOpenWorldResourcePlacementIndexSystem(), GameplaySystemOrder.ServerConnectionGameplay + 35);
+            systems.Add(new ServerOpenWorldChunkOverlayRequestSystem(), GameplaySystemOrder.Gameplay - 50);
+            systems.Add(new ServerOpenWorldChunkOverlaySendSystem(), GameplaySystemOrder.Gameplay - 45);
+
+            if (OpenWorldResourcesCompatibility.UseLegacyReplicatedResourceNodes)
+                systems.Add(new ServerOpenWorldResourceNodeDeltaCaptureSystem(), GameplaySystemOrder.CollectReplication - 30);
         }
     }
 }
