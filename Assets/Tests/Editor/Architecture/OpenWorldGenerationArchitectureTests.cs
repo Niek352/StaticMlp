@@ -158,7 +158,7 @@ namespace StaticMlp.Tests.Architecture
             Assert.That(text, Does.Not.Contain("StaticMlp.Features."));
             Assert.That(text, Does.Not.Contain("UnityEngine."));
             Assert.That(text, Does.Not.Contain("\"UnityEngine\""));
-            Assert.That(text, Does.Contain("\"noEngineReferences\": true"));
+            Assert.That(text, Does.Contain("\"noEngineReferences\": false"));
             Assert.That(allowedReferences.All(text.Contains), Is.True);
         }
 

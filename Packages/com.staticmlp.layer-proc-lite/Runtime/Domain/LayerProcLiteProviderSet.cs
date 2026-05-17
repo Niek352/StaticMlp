@@ -51,11 +51,34 @@ namespace StaticMlp.LayerProcLite
             LayerProcLiteWorldBounds bounds)
             where TData : class, ILayerProcLiteChunkData
         {
-            var chunks = GetOverlapping<TData>(layerId, level, bounds);
-            if (chunks.Length != 1)
-                throw new InvalidOperationException($"Provider layer {layerId.Value} level {level} expected exactly one overlapping chunk, got {chunks.Length}.");
+            var groupIndex = FindGroup(layerId, level);
+            if (groupIndex < 0)
+                throw new InvalidOperationException($"Provider layer {layerId.Value} level {level} was not declared for this chunk.");
 
-            return chunks[0].Data;
+            var group = _groups[groupIndex];
+            if (!group.DeclaredBounds.Contains(bounds))
+                throw new InvalidOperationException(
+                    $"Provider layer {layerId.Value} level {level} requested bounds outside declared dependency padding.");
+
+            var count = 0;
+            TData result = null;
+            for (var i = 0; i < group.Chunks.Length; i++)
+            {
+                var chunk = group.Chunks[i];
+                if (!chunk.Bounds.Overlaps(bounds))
+                    continue;
+
+                if (chunk.Data is not TData data)
+                    throw new InvalidOperationException($"Provider layer {layerId.Value} level {level} data is not {typeof(TData).Name}.");
+
+                result = data;
+                count++;
+            }
+
+            if (count != 1)
+                throw new InvalidOperationException($"Provider layer {layerId.Value} level {level} expected exactly one overlapping chunk, got {count}.");
+
+            return result;
         }
 
         private int FindGroup(LayerProcLiteLayerId layerId, int level)

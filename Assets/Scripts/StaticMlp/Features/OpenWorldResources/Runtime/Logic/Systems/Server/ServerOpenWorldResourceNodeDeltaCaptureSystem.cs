@@ -8,7 +8,7 @@ namespace StaticMlp.Features.OpenWorldResources
         public void Update()
         {
             var deltaStore = SW.GetResource<OpenWorldResourceNodeDeltaStore>();
-            foreach (var entity in SW.Query<All<OpenWorldResourceNodeTag, OpenWorldResourceNodeState>>().Entities())
+            foreach (var entity in SW.Query<All<OpenWorldResourceNodeTag, OpenWorldResourceNodeState>, AllChanged<OpenWorldResourceNodeState>>().Entities())
             {
                 ref readonly var state = ref entity.Read<OpenWorldResourceNodeState>();
                 if (state.RemainingAmount <= 0)

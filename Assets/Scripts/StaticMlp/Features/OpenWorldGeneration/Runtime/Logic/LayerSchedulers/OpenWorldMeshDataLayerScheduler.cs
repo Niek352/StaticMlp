@@ -69,7 +69,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 HeightLayout = height.Layout,
                 PaddedHeights = height.PaddedHeights.AsReadOnly(),
                 Surfaces = surface.Surfaces.AsReadOnly(),
-                MeshBuffers = new LayerProcLiteNativeMeshBuffers(
+                MeshBuffers = new OpenWorldNativeMeshBuffers(
                     vertices,
                     normals,
                     tangents,

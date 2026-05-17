@@ -36,9 +36,6 @@ namespace StaticMlp.Features.OpenWorldGeneration
                         HEIGHTMAP_RESOLUTION),
                     new LayerProcLiteDependency(OpenWorldGenerationLayerIds.Height, 0, 0f),
                     new LayerProcLiteDependency(OpenWorldGenerationLayerIds.Surface, 0, 0f)))
-                .RegisterLayer(CreateMeshOutputLayer(OpenWorldGenerationLayerIds.VisualMesh, config.ChunkWorldSize))
-                .RegisterLayer(CreateMeshOutputLayer(OpenWorldGenerationLayerIds.PhysicsMesh, config.ChunkWorldSize))
-                .RegisterLayer(CreateMeshOutputLayer(OpenWorldGenerationLayerIds.NavMeshSource, config.ChunkWorldSize))
                 .RegisterLayer(new LayerProcLiteLayerDefinition(
                     OpenWorldGenerationLayerIds.Placements,
                     config.ChunkWorldSize,
@@ -49,19 +46,13 @@ namespace StaticMlp.Features.OpenWorldGeneration
         public static LayerProcLiteLayerId[] ToOutputLayerIds(GenerationOutputMask outputs)
         {
             var count = 0;
-            if (outputs.HasFlag(GenerationOutputMask.VisualMesh)) count++;
-            if (outputs.HasFlag(GenerationOutputMask.PhysicsMesh)) count++;
-            if (outputs.HasFlag(GenerationOutputMask.NavMeshSourceMesh)) count++;
+            if (HasMeshOutput(outputs)) count++;
             if (outputs.HasFlag(GenerationOutputMask.Placements)) count++;
 
             var layers = new LayerProcLiteLayerId[count];
             var index = 0;
-            if (outputs.HasFlag(GenerationOutputMask.VisualMesh))
-                layers[index++] = OpenWorldGenerationLayerIds.VisualMesh;
-            if (outputs.HasFlag(GenerationOutputMask.PhysicsMesh))
-                layers[index++] = OpenWorldGenerationLayerIds.PhysicsMesh;
-            if (outputs.HasFlag(GenerationOutputMask.NavMeshSourceMesh))
-                layers[index++] = OpenWorldGenerationLayerIds.NavMeshSource;
+            if (HasMeshOutput(outputs))
+                layers[index++] = OpenWorldGenerationLayerIds.MeshData;
             if (outputs.HasFlag(GenerationOutputMask.Placements))
                 layers[index] = OpenWorldGenerationLayerIds.Placements;
 
@@ -78,15 +69,9 @@ namespace StaticMlp.Features.OpenWorldGeneration
             return layers;
         }
 
-        private static LayerProcLiteLayerDefinition CreateMeshOutputLayer(
-            LayerProcLiteLayerId layerId,
-            float chunkWorldSize)
+        private static bool HasMeshOutput(GenerationOutputMask outputs)
         {
-            return new LayerProcLiteLayerDefinition(
-                layerId,
-                chunkWorldSize,
-                new OpenWorldMeshOutputLayerScheduler(),
-                new LayerProcLiteDependency(OpenWorldGenerationLayerIds.MeshData, 0, 0f));
+            return (outputs & (GenerationOutputMask.VisualMesh | GenerationOutputMask.PhysicsMesh | GenerationOutputMask.NavMeshSourceMesh)) != 0;
         }
     }
 }

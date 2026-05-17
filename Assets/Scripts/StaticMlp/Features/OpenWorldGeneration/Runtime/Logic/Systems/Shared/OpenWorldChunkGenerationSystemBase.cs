@@ -12,8 +12,8 @@ namespace StaticMlp.Features.OpenWorldGeneration
     {
         private EventReceiver<TWorld, OpenWorldChunkGenerationRequested> _requests;
         private OpenWorldChunkGenerationRuntime _runtime;
-        private Dictionary<LayerProcLiteGenerationRequestKey, PendingChunkGeneration> _pending;
-        private List<LayerProcLiteGenerationRequestKey> _keysToRemove;
+        private Dictionary<OpenWorldGenerationRequestKey, PendingChunkGeneration> _pending;
+        private List<OpenWorldGenerationRequestKey> _keysToRemove;
         private List<OpenWorldChunkGenerationCompleted> _completed;
 
         protected abstract EventReceiver<TWorld, OpenWorldChunkGenerationRequested> RegisterReceiver();
@@ -25,8 +25,8 @@ namespace StaticMlp.Features.OpenWorldGeneration
         {
             _requests = RegisterReceiver();
             _runtime = GetRuntime();
-            _pending = new Dictionary<LayerProcLiteGenerationRequestKey, PendingChunkGeneration>(64);
-            _keysToRemove = new List<LayerProcLiteGenerationRequestKey>(16);
+            _pending = new Dictionary<OpenWorldGenerationRequestKey, PendingChunkGeneration>(64);
+            _keysToRemove = new List<OpenWorldGenerationRequestKey>(16);
             _completed = new List<OpenWorldChunkGenerationCompleted>(16);
         }
 
@@ -158,7 +158,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
             SpawnPlacement[] spawnPlacements = Array.Empty<SpawnPlacement>();
 
             if (HasMeshOutput(pending.Outputs))
-                mesh = BuildManagedMesh(GetMeshOutputData(pending).MeshData);
+                mesh = BuildManagedMesh(GetLayerData<OpenWorldMeshChunkData>(pending, OpenWorldGenerationLayerIds.MeshData));
 
             if (pending.Outputs.HasFlag(GenerationOutputMask.Placements))
             {
@@ -185,18 +185,6 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 pending.Outputs.HasFlag(GenerationOutputMask.NavMeshSourceMesh) ? mesh : null,
                 resourcePlacements,
                 spawnPlacements);
-        }
-
-        private OpenWorldMeshOutputChunkData GetMeshOutputData(PendingChunkGeneration pending)
-        {
-            if (pending.Outputs.HasFlag(GenerationOutputMask.VisualMesh))
-                return GetLayerData<OpenWorldMeshOutputChunkData>(pending, OpenWorldGenerationLayerIds.VisualMesh);
-            if (pending.Outputs.HasFlag(GenerationOutputMask.PhysicsMesh))
-                return GetLayerData<OpenWorldMeshOutputChunkData>(pending, OpenWorldGenerationLayerIds.PhysicsMesh);
-            if (pending.Outputs.HasFlag(GenerationOutputMask.NavMeshSourceMesh))
-                return GetLayerData<OpenWorldMeshOutputChunkData>(pending, OpenWorldGenerationLayerIds.NavMeshSource);
-
-            throw new InvalidOperationException("Mesh output data requested without a mesh output layer.");
         }
 
         private TData GetLayerData<TData>(PendingChunkGeneration pending, LayerProcLiteLayerId layerId)
@@ -277,12 +265,13 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 throw new ArgumentOutOfRangeException(nameof(request.ChunkId), request.ChunkId, "Requested chunk is outside generation bounds.");
         }
 
-        private static LayerProcLiteGenerationRequestKey CreateRequestKey(in OpenWorldChunkGenerationRequested request, float waterLevel)
+        private static OpenWorldGenerationRequestKey CreateRequestKey(in OpenWorldChunkGenerationRequested request, float waterLevel)
         {
-            return new LayerProcLiteGenerationRequestKey(
+            return new OpenWorldGenerationRequestKey(
                 new LayerProcLiteChunkId(request.ChunkId.X, request.ChunkId.Z),
                 request.Request.Lod,
                 OpenWorldGenerationLayerCatalog.ToLayerMask(request.Outputs),
+                request.Outputs,
                 ComputeSettingsHash(request.Request, waterLevel));
         }
 
@@ -342,7 +331,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 (byte)rgba);
         }
 
-        private sealed class PendingChunkGeneration
+        private readonly struct PendingChunkGeneration
         {
             public PendingChunkGeneration(
                 WorldChunkId chunkId,

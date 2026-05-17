@@ -2,9 +2,9 @@ using System;
 using Unity.Collections;
 using Unity.Mathematics;
 
-namespace StaticMlp.LayerProcLite
+namespace StaticMlp.Features.OpenWorldGeneration
 {
-    public struct LayerProcLiteNativeMeshBuffers
+    public struct OpenWorldNativeMeshBuffers
     {
         public NativeArray<float3> Vertices;
         public NativeArray<float3> Normals;
@@ -13,7 +13,7 @@ namespace StaticMlp.LayerProcLite
         public NativeArray<uint> VertexColorsRgba;
         public NativeArray<int> Triangles;
 
-        public LayerProcLiteNativeMeshBuffers(
+        public OpenWorldNativeMeshBuffers(
             NativeArray<float3> vertices,
             NativeArray<float3> normals,
             NativeArray<float4> tangents,

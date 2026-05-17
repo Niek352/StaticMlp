@@ -20,7 +20,7 @@ namespace StaticMlp.Features.OpenWorldGeneration.Jobs
         [ReadOnly] public NativeArray<float>.ReadOnly PaddedHeights;
         [ReadOnly] public NativeArray<OpenWorldNativeSurfaceSample>.ReadOnly Surfaces;
 
-        public LayerProcLiteNativeMeshBuffers MeshBuffers;
+        public OpenWorldNativeMeshBuffers MeshBuffers;
         public NativeArray<float> OutMinY;
         public NativeArray<float> OutMaxY;
 

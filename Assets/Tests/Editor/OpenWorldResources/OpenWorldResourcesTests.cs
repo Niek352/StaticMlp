@@ -114,6 +114,22 @@ namespace StaticMlp.Tests.OpenWorldResources
         }
 
         [Test]
+        public void DeltaCaptureSystem_WhenResourceNodeStateIsUnchanged_DoesNotRescanDepletedNodes()
+        {
+            using var scope = new OpenWorldResourcesServerWorldScope();
+            scope.RunSeedSystem();
+            var entity = FirstResourceNode();
+            var placementId = entity.Read<OpenWorldResourceNodeState>().PlacementId;
+            ref var state = ref entity.Mut<OpenWorldResourceNodeState>();
+            state.RemainingAmount = 0;
+            SW.Tick();
+
+            new ServerOpenWorldResourceNodeDeltaCaptureSystem().Update();
+
+            Assert.That(SW.GetResource<OpenWorldResourceNodeDeltaStore>().IsDepleted(placementId), Is.False);
+        }
+
+        [Test]
         public void DeltaStore_DoesNotStoreGeneratedMeshOrHeightmapData()
         {
             var storedTypes = typeof(OpenWorldResourceNodeDeltaStore)
@@ -245,6 +261,7 @@ namespace StaticMlp.Tests.OpenWorldResources
 
             Assert.That(CountResourceNodes(), Is.GreaterThan(0));
             Assert.That(SW.GetResource<NetOutbox>().Packets.Count, Is.EqualTo(1));
+            Assert.That(DecodeFirstOutboxSnapshot().Kind, Is.EqualTo(ReplicationSnapshotKind.ClusterEntities));
             Assert.That(SW.ClusterIsRegistered(scope.ClusterId(new WorldChunkId(0, 0))), Is.True);
             Assert.That(
                 SW.GetResource<OpenWorldServerChunkGeometryRuntime>().TryGet(new WorldChunkId(0, 0), out var geometry),
@@ -326,6 +343,15 @@ namespace StaticMlp.Tests.OpenWorldResources
                 return entity;
 
             throw new InvalidOperationException("Expected at least one resource node.");
+        }
+
+        private static ReplicationSnapshotMessage DecodeFirstOutboxSnapshot()
+        {
+            var inbox = new NetInbox();
+            var packet = SW.GetResource<NetOutbox>().Packets[0];
+            Assert.That(PacketCodec.Decode(new NetworkPeerId(0), packet.Payload, inbox), Is.True);
+            Assert.That(inbox.Snapshots.Count, Is.EqualTo(1));
+            return inbox.Snapshots[0];
         }
 
         private static EntityGID CreateServerGid(out byte entityType)
@@ -477,6 +503,7 @@ namespace StaticMlp.Tests.OpenWorldResources
 
                 NetworkEventRegistry.Clear();
                 ReplicatedNetworkEventRegistry.RegisterNetworkEvents();
+                ReplicatedComponentRegistration.RegisterReplicationComponents();
                 ServerPeerRegistry.Clear();
                 ServerPeerRegistry.Add(_peer);
 
@@ -562,6 +589,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                 _generationBridgeSystem.Destroy();
                 ServerPeerRegistry.Clear();
                 NetworkEventRegistry.Clear();
+                ReplicationRegistry.Clear();
 
                 if (SW.Status != WorldStatus.NotCreated)
                     SW.Destroy();

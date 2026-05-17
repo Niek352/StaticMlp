@@ -1,8 +1,11 @@
 using System;
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.OpenWorldGeneration.Jobs;
 using NUnit.Framework;
 using StaticMlp.Features.OpenWorldGeneration;
+using StaticMlp.Game.Bootstrap;
 using StaticMlp.LayerProcLite;
+using StaticMlp.Networking;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -186,17 +189,103 @@ namespace StaticMlp.Tests.OpenWorldGeneration
         }
 
         [Test]
-        public void LayerProcLite_RequestKey_DistinguishesLodAndLayerMask()
+        public void OpenWorldGenerationRequestKey_DistinguishesLodAndLayerMask()
         {
             var chunkId = new LayerProcLiteChunkId(2, -3);
-            var visualLayers = LayerProcLiteLayerMask.From(OpenWorldGenerationLayerIds.VisualMesh);
-            var physicsLayers = LayerProcLiteLayerMask.From(OpenWorldGenerationLayerIds.PhysicsMesh);
-            var visual = new LayerProcLiteGenerationRequestKey(chunkId, 0, visualLayers, 99);
-            var physics = new LayerProcLiteGenerationRequestKey(chunkId, 0, physicsLayers, 99);
-            var lod = new LayerProcLiteGenerationRequestKey(chunkId, 1, visualLayers, 99);
+            var meshLayers = LayerProcLiteLayerMask.From(OpenWorldGenerationLayerIds.MeshData);
+            var placementLayers = LayerProcLiteLayerMask.From(OpenWorldGenerationLayerIds.Placements);
+            var mesh = new OpenWorldGenerationRequestKey(chunkId, 0, meshLayers, GenerationOutputMask.VisualMesh, 99);
+            var placements = new OpenWorldGenerationRequestKey(chunkId, 0, placementLayers, GenerationOutputMask.Placements, 99);
+            var lod = new OpenWorldGenerationRequestKey(chunkId, 1, meshLayers, GenerationOutputMask.VisualMesh, 99);
+            var physics = new OpenWorldGenerationRequestKey(chunkId, 0, meshLayers, GenerationOutputMask.PhysicsMesh, 99);
 
-            Assert.That(visual, Is.Not.EqualTo(physics));
-            Assert.That(visual, Is.Not.EqualTo(lod));
+            Assert.That(mesh, Is.Not.EqualTo(placements));
+            Assert.That(mesh, Is.Not.EqualTo(lod));
+            Assert.That(mesh, Is.Not.EqualTo(physics));
+        }
+
+        [Test]
+        public void OpenWorldGenerationFeature_OnHost_ReusesServerGenerationRuntimeForClient()
+        {
+            DestroyOpenWorldTestWorlds();
+            OpenWorldChunkGenerationRuntime serverRuntime = null;
+            OpenWorldChunkGenerationRuntime clientRuntime = null;
+
+            try
+            {
+                RegisterHostOpenWorldFeature(out serverRuntime, out clientRuntime);
+
+                Assert.That(clientRuntime, Is.SameAs(serverRuntime));
+            }
+            finally
+            {
+                DisposeDistinctRuntimes(serverRuntime, clientRuntime);
+                DestroyOpenWorldTestWorlds();
+            }
+        }
+
+        [Test]
+        public void OpenWorldGenerationFeature_OnClientOnly_CreatesClientGenerationRuntime()
+        {
+            DestroyOpenWorldTestWorlds();
+            OpenWorldChunkGenerationRuntime clientRuntime = null;
+
+            try
+            {
+                CreateOpenWorldClientWorld();
+                RegisterClientOpenWorldFeature(new OpenWorldGenerationGameplayFeature());
+                clientRuntime = CW.GetResource<OpenWorldChunkGenerationRuntime>();
+
+                Assert.That(SW.Status, Is.EqualTo(WorldStatus.NotCreated));
+                Assert.That(clientRuntime, Is.Not.Null);
+                Assert.That(clientRuntime.LayerRuntime, Is.Not.Null);
+            }
+            finally
+            {
+                clientRuntime?.Dispose();
+                DestroyOpenWorldTestWorlds();
+            }
+        }
+
+        [Test]
+        public void HostSharedGenerationRuntime_WhenServerAndClientRequestSameChunk_ReusesLayerRuntimeChunkGraph()
+        {
+            DestroyOpenWorldTestWorlds();
+            OpenWorldChunkGenerationRuntime serverRuntime = null;
+            OpenWorldChunkGenerationRuntime clientRuntime = null;
+            var serverDependency = default(LayerProcLiteTopDependencyId);
+            var clientDependency = default(LayerProcLiteTopDependencyId);
+            var hasServerDependency = false;
+            var hasClientDependency = false;
+
+            try
+            {
+                RegisterHostOpenWorldFeature(out serverRuntime, out clientRuntime);
+                var request = CreateRequest(new WorldGenerationSeed(12345), 0, true);
+                var chunkId = new WorldChunkId(0, 0);
+
+                serverDependency = AddVisualMeshTopDependency(serverRuntime, chunkId, request);
+                hasServerDependency = true;
+                var chunksAfterServerRequest = serverRuntime.LayerRuntime.ChunkCount;
+
+                clientDependency = AddVisualMeshTopDependency(clientRuntime, chunkId, request);
+                hasClientDependency = true;
+
+                Assert.That(clientRuntime.LayerRuntime, Is.SameAs(serverRuntime.LayerRuntime));
+                Assert.That(chunksAfterServerRequest, Is.GreaterThan(0));
+                Assert.That(clientRuntime.LayerRuntime.ChunkCount, Is.EqualTo(chunksAfterServerRequest));
+                Assert.That(clientRuntime.LayerRuntime.ActiveTopDependencyCount, Is.EqualTo(2));
+            }
+            finally
+            {
+                if (hasClientDependency)
+                    clientRuntime.LayerRuntime.RemoveTopDependency(clientDependency);
+                if (hasServerDependency)
+                    serverRuntime.LayerRuntime.RemoveTopDependency(serverDependency);
+
+                DisposeDistinctRuntimes(serverRuntime, clientRuntime);
+                DestroyOpenWorldTestWorlds();
+            }
         }
 
         [Test]
@@ -219,57 +308,6 @@ namespace StaticMlp.Tests.OpenWorldGeneration
 
             Assert.That(second, Is.EqualTo(first));
             Assert.That(LayerProcLiteDeterministicHash.Unit(first), Is.InRange(0f, 1f));
-        }
-
-        [Test]
-        public void LayerProcLitePlanBuilder_OrdersDependenciesBeforeDependents()
-        {
-            var height = new LayerProcLiteLayerId(0);
-            var surface = new LayerProcLiteLayerId(1);
-            var mesh = new LayerProcLiteLayerId(2);
-
-            var steps = new LayerProcLitePlanBuilder()
-                .Add(new LayerProcLiteLayerDescriptor(height))
-                .Add(new LayerProcLiteLayerDescriptor(surface, new LayerProcLiteDependency(height, 1, 0f)))
-                .Add(new LayerProcLiteLayerDescriptor(mesh, new LayerProcLiteDependency(surface, 0, 0f)))
-                .Build(LayerProcLiteLayerMask.From(mesh));
-
-            Assert.That(steps[0].LayerId, Is.EqualTo(height));
-            Assert.That(steps[1].LayerId, Is.EqualTo(surface));
-            Assert.That(steps[2].LayerId, Is.EqualTo(mesh));
-        }
-
-        [Test]
-        public void LayerProcLitePlanBuilder_DetectsCycles()
-        {
-            var a = new LayerProcLiteLayerId(0);
-            var b = new LayerProcLiteLayerId(1);
-
-            var builder = new LayerProcLitePlanBuilder()
-                .Add(new LayerProcLiteLayerDescriptor(a, new LayerProcLiteDependency(b, 0, 0f)))
-                .Add(new LayerProcLiteLayerDescriptor(b, new LayerProcLiteDependency(a, 0, 0f)));
-
-            Assert.Throws<InvalidOperationException>(() => builder.Build(LayerProcLiteLayerMask.From(a)));
-        }
-
-        [Test]
-        public void LayerProcLitePlanBuilder_ExpandsDependencyWindowsTransitively()
-        {
-            var height = new LayerProcLiteLayerId(0);
-            var surface = new LayerProcLiteLayerId(1);
-            var mesh = new LayerProcLiteLayerId(2);
-
-            var steps = new LayerProcLitePlanBuilder()
-                .Add(new LayerProcLiteLayerDescriptor(height))
-                .Add(new LayerProcLiteLayerDescriptor(surface, new LayerProcLiteDependency(height, 1, 2f)))
-                .Add(new LayerProcLiteLayerDescriptor(mesh, new LayerProcLiteDependency(surface, 2, 3f)))
-                .Build(LayerProcLiteLayerMask.From(mesh));
-
-            Assert.That(steps[0].Window.PaddingSamples, Is.EqualTo(3));
-            Assert.That(steps[0].Window.EffectDistanceWorld, Is.EqualTo(5f));
-            Assert.That(steps[1].Window.PaddingSamples, Is.EqualTo(2));
-            Assert.That(steps[1].Window.EffectDistanceWorld, Is.EqualTo(3f));
-            Assert.That(steps[2].Window.PaddingSamples, Is.EqualTo(0));
         }
 
         [Test]
@@ -451,17 +489,21 @@ namespace StaticMlp.Tests.OpenWorldGeneration
         }
 
         [Test]
-        public void OpenWorldLayerCatalog_MapsOutputsToOpenWorldLayerIds()
+        public void OpenWorldLayerCatalog_MapsMeshOutputsToSingleMeshDataLayer()
         {
+            var layerIds = OpenWorldGenerationLayerCatalog.ToOutputLayerIds(
+                GenerationOutputMask.VisualMesh
+                | GenerationOutputMask.PhysicsMesh
+                | GenerationOutputMask.NavMeshSourceMesh
+                | GenerationOutputMask.Placements);
             var layers = OpenWorldGenerationLayerCatalog.ToLayerMask(
                 GenerationOutputMask.VisualMesh
                 | GenerationOutputMask.PhysicsMesh
                 | GenerationOutputMask.NavMeshSourceMesh
                 | GenerationOutputMask.Placements);
 
-            Assert.That(layers.Contains(OpenWorldGenerationLayerIds.VisualMesh), Is.True);
-            Assert.That(layers.Contains(OpenWorldGenerationLayerIds.PhysicsMesh), Is.True);
-            Assert.That(layers.Contains(OpenWorldGenerationLayerIds.NavMeshSource), Is.True);
+            Assert.That(layerIds, Is.EqualTo(new[] { OpenWorldGenerationLayerIds.MeshData, OpenWorldGenerationLayerIds.Placements }));
+            Assert.That(layers.Contains(OpenWorldGenerationLayerIds.MeshData), Is.True);
             Assert.That(layers.Contains(OpenWorldGenerationLayerIds.Placements), Is.True);
         }
 
@@ -497,7 +539,7 @@ namespace StaticMlp.Tests.OpenWorldGeneration
         }
 
         [Test]
-        public void OpenWorldLayerCatalog_MeshOutputsShareMeshDataProvider()
+        public void OpenWorldLayerCatalog_MeshDataTopDependenciesShareGeneratedChunk()
         {
             using var config = OpenWorldChunkGenerationRuntime.CreateDefault();
             var runtime = config.LayerRuntime;
@@ -510,15 +552,15 @@ namespace StaticMlp.Tests.OpenWorldGeneration
                 config.AddSkirts,
                 config.SkirtDepth);
             var bounds = new LayerProcLiteWorldBounds(0f, 0f, 128f, 128f);
-            var visual = runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
-                OpenWorldGenerationLayerIds.VisualMesh,
+            var first = runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                OpenWorldGenerationLayerIds.MeshData,
                 0,
                 bounds,
                 0,
                 0,
                 settings));
-            var physics = runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
-                OpenWorldGenerationLayerIds.PhysicsMesh,
+            var second = runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                OpenWorldGenerationLayerIds.MeshData,
                 0,
                 bounds,
                 0,
@@ -532,10 +574,10 @@ namespace StaticMlp.Tests.OpenWorldGeneration
             Assert.That(runtime.ContainsChunk(meshDataKey), Is.True);
             Assert.That(runtime.GetRetainCount(meshDataKey), Is.EqualTo(2));
 
-            runtime.RemoveTopDependency(visual);
+            runtime.RemoveTopDependency(first);
             Assert.That(runtime.GetRetainCount(meshDataKey), Is.EqualTo(1));
 
-            runtime.RemoveTopDependency(physics);
+            runtime.RemoveTopDependency(second);
             Assert.That(runtime.ContainsChunk(meshDataKey), Is.False);
         }
 
@@ -746,6 +788,105 @@ namespace StaticMlp.Tests.OpenWorldGeneration
             config.LogDebugStreaming = false;
             config.MaxChunkLoadsPerFrame = 256;
             return config;
+        }
+
+        private static void RegisterHostOpenWorldFeature(
+            out OpenWorldChunkGenerationRuntime serverRuntime,
+            out OpenWorldChunkGenerationRuntime clientRuntime)
+        {
+            var feature = new OpenWorldGenerationGameplayFeature();
+            CreateOpenWorldServerWorld();
+            feature.RegisterServerResources();
+            serverRuntime = SW.GetResource<OpenWorldChunkGenerationRuntime>();
+
+            CreateOpenWorldClientWorld();
+            RegisterClientOpenWorldFeature(feature);
+            clientRuntime = CW.GetResource<OpenWorldChunkGenerationRuntime>();
+        }
+
+        private static void RegisterClientOpenWorldFeature(OpenWorldGenerationGameplayFeature feature)
+        {
+            ClientCoreSys.Create();
+            try
+            {
+                feature.RegisterClientCoreSystems(new ClientCoreSystemsBuilder());
+            }
+            finally
+            {
+                ClientCoreSys.Destroy();
+            }
+        }
+
+        private static void CreateOpenWorldServerWorld()
+        {
+            SW.Create(WorldConfig.Default());
+            SW.Types().RegisterAll(
+                typeof(ServerWT).Assembly,
+                typeof(OpenWorldGenerationGameplayFeature).Assembly,
+                typeof(OpenWorldChunkGenerationRequested).Assembly);
+            SW.Initialize();
+        }
+
+        private static void CreateOpenWorldClientWorld()
+        {
+            CW.Create(WorldConfig.Default());
+            CW.Types().RegisterAll(
+                typeof(ClientCoreWT).Assembly,
+                typeof(OpenWorldGenerationGameplayFeature).Assembly,
+                typeof(OpenWorldChunkGenerationRequested).Assembly);
+            CW.Initialize();
+        }
+
+        private static LayerProcLiteTopDependencyId AddVisualMeshTopDependency(
+            OpenWorldChunkGenerationRuntime runtime,
+            WorldChunkId chunkId,
+            WorldGenerationRequest request)
+        {
+            var minX = chunkId.X * request.ChunkWorldSize;
+            var minZ = chunkId.Z * request.ChunkWorldSize;
+            var settings = new OpenWorldLayerGenerationSettings(
+                (uint)request.Seed.Value,
+                request.ChunkWorldSize,
+                runtime.WaterLevel,
+                request.BaseQuadCount,
+                request.Lod,
+                request.AddSkirts,
+                request.SkirtDepth);
+
+            return runtime.LayerRuntime.AddTopDependency(
+                new LayerProcLiteTopDependencyRequest(
+                    OpenWorldGenerationLayerIds.MeshData,
+                    0,
+                    new LayerProcLiteWorldBounds(
+                        minX,
+                        minZ,
+                        minX + request.ChunkWorldSize,
+                        minZ + request.ChunkWorldSize),
+                    request.Lod,
+                    0,
+                    settings));
+        }
+
+        private static void DisposeDistinctRuntimes(
+            OpenWorldChunkGenerationRuntime first,
+            OpenWorldChunkGenerationRuntime second)
+        {
+            if (ReferenceEquals(first, second))
+            {
+                first?.Dispose();
+                return;
+            }
+
+            first?.Dispose();
+            second?.Dispose();
+        }
+
+        private static void DestroyOpenWorldTestWorlds()
+        {
+            if (CW.Status != WorldStatus.NotCreated)
+                CW.Destroy();
+            if (SW.Status != WorldStatus.NotCreated)
+                SW.Destroy();
         }
 
         private static bool AnyHeightDifferent(TerrainMeshData first, TerrainMeshData second)

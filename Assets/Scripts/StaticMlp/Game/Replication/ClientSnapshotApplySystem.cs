@@ -15,6 +15,9 @@ namespace StaticMlp.Networking.Replication {
                     case ReplicationSnapshotKind.Chunk:
                         ApplyChunkSnapshot(snapshot);
                         break;
+                    case ReplicationSnapshotKind.ClusterEntities:
+                        ApplyClusterEntitiesSnapshot(snapshot);
+                        break;
                 }
             }
         }
@@ -26,6 +29,20 @@ namespace StaticMlp.Networking.Replication {
             RegisterClusterChunks(snapshot);
             DestroyExistingClusterEntities(snapshot);
             CW.Serializer.LoadClusterSnapshot(snapshot.Payload);
+            MarkClusterAsRemote(snapshot.ClusterId);
+            PostLoadCluster(snapshot.ClusterId);
+        }
+
+        private static void ApplyClusterEntitiesSnapshot(in ReplicationSnapshotMessage snapshot) {
+            if (!CW.ClusterIsRegistered(snapshot.ClusterId))
+                CW.RegisterCluster(snapshot.ClusterId);
+
+            RegisterClusterChunks(snapshot);
+            CW.DestroyAllEntitiesInCluster(snapshot.ClusterId);
+            ReplicationRegistry.ApplyServerSnapshot(
+                snapshot.Payload,
+                FilteredEntitySnapshotLoadMode.UpsertFromServer,
+                snapshot.Gzip);
             MarkClusterAsRemote(snapshot.ClusterId);
             PostLoadCluster(snapshot.ClusterId);
         }

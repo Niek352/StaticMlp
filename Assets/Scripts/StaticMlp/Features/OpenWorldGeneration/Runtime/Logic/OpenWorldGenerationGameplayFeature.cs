@@ -26,9 +26,17 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
-            CW.SetResource(OpenWorldChunkGenerationRuntime.CreateDefault());
+            CW.SetResource(CreateClientGenerationRuntime());
             
             systems.Add(new ClientOpenWorldChunkGenerationSystem(), GameplaySystemOrder.ClientPresentation - 40);
+        }
+
+        private static OpenWorldChunkGenerationRuntime CreateClientGenerationRuntime()
+        {
+            if (SW.IsWorldInitialized && SW.HasResource<OpenWorldChunkGenerationRuntime>())
+                return SW.GetResource<OpenWorldChunkGenerationRuntime>();
+
+            return OpenWorldChunkGenerationRuntime.CreateDefault();
         }
     }
 }

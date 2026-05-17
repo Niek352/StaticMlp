@@ -19,6 +19,11 @@ namespace StaticMlp.Networking.Replication {
                 )
             }), NetDelivery.ReliableSequenced);
         }
+        
+        public static void SendPrebuiltSnapshotPacket(NetworkPeerId peer, byte[] packet) {
+            ref var outbox = ref SW.GetResource<NetOutbox>();
+            outbox.Enqueue(peer, packet, NetDelivery.ReliableSequenced);
+        }
 
         public static void SendChunkSnapshot(NetworkPeerId peer, uint chunkIdx, bool gzip = true) {
             var clusterId = SW.GetChunkClusterId(chunkIdx);
@@ -37,7 +42,7 @@ namespace StaticMlp.Networking.Replication {
             }), NetDelivery.ReliableSequenced);
         }
 
-        private static uint[] CopyClusterChunks(ushort clusterId) {
+        public static uint[] CopyClusterChunks(ushort clusterId) {
             var chunks = SW.GetClusterChunks(clusterId);
             var chunkIds = new uint[chunks.Length];
             for (var i = 0; i < chunks.Length; i++)

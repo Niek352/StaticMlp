@@ -126,14 +126,26 @@ namespace StaticMlp.Networking.Replication {
             return writer.CreateSnapshot();
         }
 
-        public static void ApplyServerSnapshot(byte[] payload, FilteredEntitySnapshotLoadMode mode) {
+        public static byte[] CreatePublicClusterStateSnapshot(ushort clusterId, bool gzip) {
+            using var writer = SW.Serializer.CreateFilteredEntitiesSnapshotWriter(
+                guid => guid == NetworkIdentityGuid || CanWritePublicInitialComponent(guid));
+
+            ReadOnlySpan<ushort> clusters = stackalloc ushort[] { clusterId };
+            foreach (var e in SW.Query<All<NetworkedTag, NetworkIdentity>>().Entities(clusters: clusters))
+                writer.Write(e);
+
+            return writer.CreateSnapshot(gzip);
+        }
+
+        public static void ApplyServerSnapshot(byte[] payload, FilteredEntitySnapshotLoadMode mode, bool gzip = false) {
             CW.Serializer.LoadFilteredEntitiesSnapshot(
                 payload,
                 new FilteredEntitySnapshotReadOptions<ClientCoreWT>(
                     mode,
                     CanClientReadServerComponent,
                     beforeApplyComponent: OnClientBeforeApplyComponent,
-                    afterApplyComponent: OnClientAfterApplyComponent));
+                    afterApplyComponent: OnClientAfterApplyComponent),
+                gzip);
         }
 
         public static void ApplyClientOwnerSnapshot(byte[] payload, NetworkPeerId sourcePeer) {
@@ -215,6 +227,11 @@ namespace StaticMlp.Networking.Replication {
             return ComponentHandlersByGuid.TryGetValue(guid, out var handler)
                    && handler.Has(e)
                    && CanSendToPeer(e, peer, handler.Audience);
+        }
+
+        private static bool CanWritePublicInitialComponent(Guid guid) {
+            return ComponentHandlersByGuid.TryGetValue(guid, out var handler)
+                   && handler.Audience == ReplicationAudience.All;
         }
 
         private static bool CanClientReadServerComponent(CW.Entity entity, Guid guid) {
