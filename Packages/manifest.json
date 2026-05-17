@@ -2,6 +2,7 @@
   "dependencies": {
     "com.annulusgames.unity-codegen": "https://github.com/AnnulusGames/UnityCodeGen.git?path=/Assets/UnityCodeGen",
     "com.codewriter.unity-prefab-xml": "https://github.com/codewriter-packages/Unity-Prefab-XML.git",
+    "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#beta",
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.felid-force-studios.static-pack": "https://github.com/Felid-Force-Studios/StaticPack.git",
     "com.staticmlp.layer-proc-lite": "file:com.staticmlp.layer-proc-lite",

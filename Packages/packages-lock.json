@@ -13,6 +13,16 @@
       "source": "embedded",
       "dependencies": {}
     },
+    "com.coplaydev.unity-mcp": {
+      "version": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#beta",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2",
+        "com.unity.test-framework": "1.1.31"
+      },
+      "hash": "b98193db05e9a2906f491f244ccdd1766283cab3"
+    },
     "com.cysharp.unitask": {
       "version": "file:com.cysharp.unitask",
       "depth": 0,
