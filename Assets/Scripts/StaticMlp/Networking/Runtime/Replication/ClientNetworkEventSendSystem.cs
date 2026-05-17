@@ -36,7 +36,7 @@ namespace StaticMlp.Networking.Replication
                 outbox.EnqueueNetworkEvent(in packet);
             }
             
-            Debug.Log($"[ClientNetworkEventSend] canSend={canSend} LocalPeerId={NetworkRuntime.LocalPeerId.Value} eventCount={i}");
+            //Debug.Log($"[ClientNetworkEventSend] canSend={canSend} LocalPeerId={NetworkRuntime.LocalPeerId.Value} eventCount={i}");
         }
     }
 }

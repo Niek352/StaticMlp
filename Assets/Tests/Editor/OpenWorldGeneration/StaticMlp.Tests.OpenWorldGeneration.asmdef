@@ -5,7 +5,11 @@
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
         "StaticMlp.Features.OpenWorldGeneration.Logic",
         "StaticMlp.Features.OpenWorldGeneration.Presentation",
-        "StaticMlp.Features.OpenWorldGeneration.LayerProcGen"
+        "StaticMlp.LayerProcLite",
+        "Unity.Collections",
+        "Unity.Jobs",
+        "FFS.StaticEcs",
+        "Unity.Mathematics"
     ],
     "includePlatforms": [
         "Editor"

@@ -11,11 +11,8 @@ namespace StaticMlp.Networking.Transport {
             outbox.FlushEntitySnapshotBatches();
             outbox.FlushNetworkEventBatches();
 
-            UnityEngine.Debug.Log($"[ServerTransportSend] Packets to send={outbox.Packets.Count}");
-            foreach (var packet in outbox.Packets) {
-                UnityEngine.Debug.Log($"[ServerTransportSend] Sending to peer={packet.Peer.Value} size={packet.Payload.Length} delivery={packet.Delivery}");
+            foreach (var packet in outbox.Packets)
                 ctx.Send(packet.Peer, packet.Payload, packet.Delivery);
-            }
 
             outbox.Clear();
         }

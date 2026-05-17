@@ -12,7 +12,7 @@ namespace StaticMlp.Features.Player
     {
         private readonly float _speed;
 
-        public LocalPlayerMovementSystem(float speed = 50f)
+        public LocalPlayerMovementSystem(float speed = 3.5f)
         {
             _speed = speed;
         }
@@ -21,13 +21,9 @@ namespace StaticMlp.Features.Player
         {
             var inputState = CW.GetResource<ClientInputState>();
             var cameraState = CW.GetResource<ClientCameraState>();
-            var playerCount = CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().EntitiesCount();
-            if (playerCount == 0)
-                Debug.Log("[LocalPlayerMovement] No LocalOwned+PlayerTag+CharacterNetState found");
 
             foreach (var e in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities())
             {
-                Debug.Log($"[LocalPlayerMovement] Processing entity {e.GID.Raw}");
                 ref var state = ref ReplicationMut.Mut<CharacterNetState>(e);
 
                 var input = inputState.ReadVector2(CoreInputActions.Move);

@@ -1,6 +1,11 @@
 using System;
+using StaticMlp.Features.OpenWorldGeneration.Jobs;
 using NUnit.Framework;
 using StaticMlp.Features.OpenWorldGeneration;
+using StaticMlp.LayerProcLite;
+using Unity.Collections;
+using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace StaticMlp.Tests.OpenWorldGeneration
@@ -101,49 +106,6 @@ namespace StaticMlp.Tests.OpenWorldGeneration
         }
 
         [Test]
-        public void LayerProcGenGenerateChunk_Placements_WhenSeedAndChunkMatch_AreDeterministic()
-        {
-            using var service = new LayerProcGenWorldGenerationService();
-            var request = CreateRequest(new WorldGenerationSeed(12345), 0, false);
-
-            var first = service.GenerateChunk(new WorldChunkId(-7, -8), request);
-            var second = service.GenerateChunk(new WorldChunkId(-7, -8), request);
-
-            Assert.That(first.ResourcePlacements, Is.Not.Empty);
-            Assert.That(first.SpawnPlacements, Is.Not.Empty);
-            AssertResourcePlacementsEqual(first.ResourcePlacements, second.ResourcePlacements);
-            AssertSpawnPlacementsEqual(first.SpawnPlacements, second.SpawnPlacements);
-        }
-
-        [Test]
-        public void LayerProcGenGenerateChunk_WhenSeedAndChunkMatch_IsDeterministic()
-        {
-            using var service = new LayerProcGenWorldGenerationService();
-            var request = CreateRequest(new WorldGenerationSeed(11), 0, false);
-
-            var first = service.GenerateChunk(new WorldChunkId(2, -3), request).TerrainMesh;
-            var second = service.GenerateChunk(new WorldChunkId(2, -3), request).TerrainMesh;
-
-            Assert.That(second.Vertices.Length, Is.EqualTo(first.Vertices.Length));
-            for (var i = 0; i < first.Vertices.Length; i++)
-                Assert.That(second.Vertices[i], Is.EqualTo(first.Vertices[i]));
-        }
-
-        [Test]
-        public void LayerProcGenGenerateChunk_WhenSeedChanges_ChangesHeightOutput()
-        {
-            TerrainMeshData first;
-            using (var service = new LayerProcGenWorldGenerationService())
-                first = service.GenerateChunk(new WorldChunkId(0, 0), CreateRequest(new WorldGenerationSeed(11), 0, false)).TerrainMesh;
-
-            TerrainMeshData second;
-            using (var service = new LayerProcGenWorldGenerationService())
-                second = service.GenerateChunk(new WorldChunkId(0, 0), CreateRequest(new WorldGenerationSeed(12), 0, false)).TerrainMesh;
-
-            Assert.That(AnyHeightDifferent(first, second), Is.True);
-        }
-
-        [Test]
         public void GenerateChunk_NeighborChunks_ShareBorderHeights()
         {
             var service = new SimpleWorldGenerationService();
@@ -175,59 +137,6 @@ namespace StaticMlp.Tests.OpenWorldGeneration
                 var rightHeight = right.Vertices[GridIndex(0, z, rightQuads)].y;
                 Assert.That(Mathf.Abs(leftHeight - rightHeight), Is.LessThan(0.0001f));
             }
-        }
-
-        [Test]
-        public void LayerProcGenGenerateChunk_NeighborChunks_ShareBorderHeights()
-        {
-            using var service = new LayerProcGenWorldGenerationService();
-            var request = CreateRequest(new WorldGenerationSeed(42), 0, false);
-            var left = service.GenerateChunk(new WorldChunkId(0, 0), request).TerrainMesh;
-            var right = service.GenerateChunk(new WorldChunkId(1, 0), request).TerrainMesh;
-            const int quads = 64;
-
-            for (var z = 0; z <= quads; z++)
-            {
-                var leftHeight = left.Vertices[GridIndex(quads, z, quads)].y;
-                var rightHeight = right.Vertices[GridIndex(0, z, quads)].y;
-                Assert.That(Mathf.Abs(leftHeight - rightHeight), Is.LessThan(0.0001f));
-            }
-        }
-
-        [Test]
-        public void LayerProcGenGenerateChunk_NeighborChunksAtDifferentLods_ShareMatchingBorderHeights()
-        {
-            using var service = new LayerProcGenWorldGenerationService();
-            var left = service.GenerateChunk(new WorldChunkId(0, 0), CreateRequest(new WorldGenerationSeed(42), 0, false)).TerrainMesh;
-            var right = service.GenerateChunk(new WorldChunkId(1, 0), CreateRequest(new WorldGenerationSeed(42), 1, false)).TerrainMesh;
-            const int leftQuads = 64;
-            const int rightQuads = 32;
-
-            for (var z = 0; z <= rightQuads; z++)
-            {
-                var leftHeight = left.Vertices[GridIndex(leftQuads, z * 2, leftQuads)].y;
-                var rightHeight = right.Vertices[GridIndex(0, z, rightQuads)].y;
-                Assert.That(Mathf.Abs(leftHeight - rightHeight), Is.LessThan(0.0001f));
-            }
-        }
-
-        [Test]
-        public void LayerProcGenGenerateChunk_AdjacentChunks_DoNotCreateNearBorderHeightSteps()
-        {
-            AssertLayerProcGenNearBorderContinuity(new WorldGenerationSeed(11), new WorldChunkId(0, 0), SeamAxis.PositiveX);
-            AssertLayerProcGenNearBorderContinuity(new WorldGenerationSeed(42), new WorldChunkId(-1, 0), SeamAxis.PositiveX);
-            AssertLayerProcGenNearBorderContinuity(new WorldGenerationSeed(12345), new WorldChunkId(-2, -1), SeamAxis.PositiveX);
-            AssertLayerProcGenNearBorderContinuity(new WorldGenerationSeed(11), new WorldChunkId(0, 0), SeamAxis.PositiveZ);
-            AssertLayerProcGenNearBorderContinuity(new WorldGenerationSeed(42), new WorldChunkId(0, -1), SeamAxis.PositiveZ);
-            AssertLayerProcGenNearBorderContinuity(new WorldGenerationSeed(12345), new WorldChunkId(-2, -2), SeamAxis.PositiveZ);
-        }
-
-        [Test]
-        public void LayerProcGenGenerateChunk_InteriorNormals_DoNotCreateAbruptCreases()
-        {
-            AssertLayerProcGenInteriorNormalContinuity(new WorldGenerationSeed(11), new WorldChunkId(0, 0));
-            AssertLayerProcGenInteriorNormalContinuity(new WorldGenerationSeed(42), new WorldChunkId(-1, 0));
-            AssertLayerProcGenInteriorNormalContinuity(new WorldGenerationSeed(12345), new WorldChunkId(-2, -1));
         }
 
         [Test]
@@ -276,6 +185,442 @@ namespace StaticMlp.Tests.OpenWorldGeneration
                 OpenWorldSpatialClusterIds.ToClusterId(new WorldChunkId(0, 0), bounds));
         }
 
+        [Test]
+        public void LayerProcLite_RequestKey_DistinguishesLodAndLayerMask()
+        {
+            var chunkId = new LayerProcLiteChunkId(2, -3);
+            var visualLayers = LayerProcLiteLayerMask.From(OpenWorldGenerationLayerIds.VisualMesh);
+            var physicsLayers = LayerProcLiteLayerMask.From(OpenWorldGenerationLayerIds.PhysicsMesh);
+            var visual = new LayerProcLiteGenerationRequestKey(chunkId, 0, visualLayers, 99);
+            var physics = new LayerProcLiteGenerationRequestKey(chunkId, 0, physicsLayers, 99);
+            var lod = new LayerProcLiteGenerationRequestKey(chunkId, 1, visualLayers, 99);
+
+            Assert.That(visual, Is.Not.EqualTo(physics));
+            Assert.That(visual, Is.Not.EqualTo(lod));
+        }
+
+        [Test]
+        public void LayerProcLite_GridLayout_AddsInputPadding()
+        {
+            var layout = new LayerProcLiteGridLayout(17, 1);
+
+            Assert.That(layout.OutputSampleCount, Is.EqualTo(17 * 17));
+            Assert.That(layout.InputSampleCount, Is.EqualTo(19 * 19));
+            Assert.That(layout.ToInputIndex(0, 0), Is.EqualTo(20));
+        }
+
+        [Test]
+        public void LayerProcLite_DeterministicHash_IsStable()
+        {
+            var chunkId = new LayerProcLiteChunkId(-2, 5);
+
+            var first = LayerProcLiteDeterministicHash.Hash(123u, chunkId, 11, 7);
+            var second = LayerProcLiteDeterministicHash.Hash(123u, chunkId, 11, 7);
+
+            Assert.That(second, Is.EqualTo(first));
+            Assert.That(LayerProcLiteDeterministicHash.Unit(first), Is.InRange(0f, 1f));
+        }
+
+        [Test]
+        public void LayerProcLitePlanBuilder_OrdersDependenciesBeforeDependents()
+        {
+            var height = new LayerProcLiteLayerId(0);
+            var surface = new LayerProcLiteLayerId(1);
+            var mesh = new LayerProcLiteLayerId(2);
+
+            var steps = new LayerProcLitePlanBuilder()
+                .Add(new LayerProcLiteLayerDescriptor(height))
+                .Add(new LayerProcLiteLayerDescriptor(surface, new LayerProcLiteDependency(height, 1, 0f)))
+                .Add(new LayerProcLiteLayerDescriptor(mesh, new LayerProcLiteDependency(surface, 0, 0f)))
+                .Build(LayerProcLiteLayerMask.From(mesh));
+
+            Assert.That(steps[0].LayerId, Is.EqualTo(height));
+            Assert.That(steps[1].LayerId, Is.EqualTo(surface));
+            Assert.That(steps[2].LayerId, Is.EqualTo(mesh));
+        }
+
+        [Test]
+        public void LayerProcLitePlanBuilder_DetectsCycles()
+        {
+            var a = new LayerProcLiteLayerId(0);
+            var b = new LayerProcLiteLayerId(1);
+
+            var builder = new LayerProcLitePlanBuilder()
+                .Add(new LayerProcLiteLayerDescriptor(a, new LayerProcLiteDependency(b, 0, 0f)))
+                .Add(new LayerProcLiteLayerDescriptor(b, new LayerProcLiteDependency(a, 0, 0f)));
+
+            Assert.Throws<InvalidOperationException>(() => builder.Build(LayerProcLiteLayerMask.From(a)));
+        }
+
+        [Test]
+        public void LayerProcLitePlanBuilder_ExpandsDependencyWindowsTransitively()
+        {
+            var height = new LayerProcLiteLayerId(0);
+            var surface = new LayerProcLiteLayerId(1);
+            var mesh = new LayerProcLiteLayerId(2);
+
+            var steps = new LayerProcLitePlanBuilder()
+                .Add(new LayerProcLiteLayerDescriptor(height))
+                .Add(new LayerProcLiteLayerDescriptor(surface, new LayerProcLiteDependency(height, 1, 2f)))
+                .Add(new LayerProcLiteLayerDescriptor(mesh, new LayerProcLiteDependency(surface, 2, 3f)))
+                .Build(LayerProcLiteLayerMask.From(mesh));
+
+            Assert.That(steps[0].Window.PaddingSamples, Is.EqualTo(3));
+            Assert.That(steps[0].Window.EffectDistanceWorld, Is.EqualTo(5f));
+            Assert.That(steps[1].Window.PaddingSamples, Is.EqualTo(2));
+            Assert.That(steps[1].Window.EffectDistanceWorld, Is.EqualTo(3f));
+            Assert.That(steps[2].Window.PaddingSamples, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void LayerProcLiteNativeGrid_UsesPaddedLayout()
+        {
+            var layout = new LayerProcLiteGridLayout(3, 1);
+            var values = new NativeArray<int>(layout.InputSampleCount, Allocator.Temp);
+
+            try
+            {
+                var grid = new LayerProcLiteNativeGrid<int>(values, layout);
+
+                grid.SetOutput(0, 0, 42);
+
+                Assert.That(values[layout.ToInputIndex(0, 0)], Is.EqualTo(42));
+            }
+            finally
+            {
+                values.Dispose();
+            }
+        }
+
+        [Test]
+        public void LayerProcLiteRuntime_ConvertsNegativeBoundsToProviderChunkKeys()
+        {
+            var layer = new LayerProcLiteLayerId(0);
+            var scheduler = new CountingLayerScheduler();
+            using var runtime = new LayerProcLiteRuntime()
+                .RegisterLayer(new LayerProcLiteLayerDefinition(layer, 10f, scheduler));
+
+            var id = runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                layer,
+                0,
+                new LayerProcLiteWorldBounds(-10.1f, -0.1f, 0.1f, 10.1f)));
+
+            Assert.That(scheduler.ScheduleCount, Is.EqualTo(9));
+            Assert.That(runtime.ContainsChunk(new LayerProcLiteChunkKey(layer, 0, new LayerProcLiteChunkId(-2, -1))), Is.True);
+            Assert.That(runtime.ContainsChunk(new LayerProcLiteChunkKey(layer, 0, new LayerProcLiteChunkId(0, 1))), Is.True);
+
+            runtime.RemoveTopDependency(id);
+            Assert.That(runtime.ChunkCount, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void LayerProcLiteRuntime_OverlappingTopDependenciesDedupeAndRelease()
+        {
+            var layer = new LayerProcLiteLayerId(0);
+            var scheduler = new CountingLayerScheduler();
+            using var runtime = new LayerProcLiteRuntime()
+                .RegisterLayer(new LayerProcLiteLayerDefinition(layer, 10f, scheduler));
+            var request = new LayerProcLiteTopDependencyRequest(
+                layer,
+                0,
+                new LayerProcLiteWorldBounds(0f, 0f, 10f, 10f));
+            var key = new LayerProcLiteChunkKey(layer, 0, new LayerProcLiteChunkId(0, 0));
+
+            var first = runtime.AddTopDependency(request);
+            var second = runtime.AddTopDependency(request);
+
+            Assert.That(scheduler.ScheduleCount, Is.EqualTo(1));
+            Assert.That(runtime.GetRetainCount(key), Is.EqualTo(2));
+
+            runtime.RemoveTopDependency(first);
+            Assert.That(runtime.ContainsChunk(key), Is.True);
+            Assert.That(runtime.GetRetainCount(key), Is.EqualTo(1));
+
+            runtime.RemoveTopDependency(second);
+            Assert.That(runtime.ContainsChunk(key), Is.False);
+            Assert.That(scheduler.DisposeCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void LayerProcLiteRuntime_MovingTopDependencyReleasesOldChunks()
+        {
+            var layer = new LayerProcLiteLayerId(0);
+            var scheduler = new CountingLayerScheduler();
+            using var runtime = new LayerProcLiteRuntime()
+                .RegisterLayer(new LayerProcLiteLayerDefinition(layer, 10f, scheduler));
+            var oldKey = new LayerProcLiteChunkKey(layer, 0, new LayerProcLiteChunkId(0, 0));
+            var newKey = new LayerProcLiteChunkKey(layer, 0, new LayerProcLiteChunkId(1, 0));
+            var id = runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                layer,
+                0,
+                new LayerProcLiteWorldBounds(0f, 0f, 10f, 10f)));
+
+            runtime.SetTopDependency(id, new LayerProcLiteTopDependencyRequest(
+                layer,
+                0,
+                new LayerProcLiteWorldBounds(10f, 0f, 20f, 10f)));
+
+            Assert.That(runtime.ContainsChunk(oldKey), Is.False);
+            Assert.That(runtime.ContainsChunk(newKey), Is.True);
+            Assert.That(runtime.GetRetainCount(newKey), Is.EqualTo(1));
+            Assert.That(scheduler.ScheduleCount, Is.EqualTo(2));
+            Assert.That(scheduler.DisposeCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void LayerProcLiteRuntime_ExpandsProviderBoundsFromEffectDistance()
+        {
+            var provider = new LayerProcLiteLayerId(0);
+            var consumer = new LayerProcLiteLayerId(1);
+            var providerScheduler = new CountingLayerScheduler();
+            var consumerScheduler = new CountingLayerScheduler();
+            using var runtime = new LayerProcLiteRuntime()
+                .RegisterLayer(new LayerProcLiteLayerDefinition(provider, 10f, providerScheduler))
+                .RegisterLayer(new LayerProcLiteLayerDefinition(
+                    consumer,
+                    10f,
+                    consumerScheduler,
+                    new LayerProcLiteDependency(provider, 0, 0, 0, 10f)));
+
+            runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                consumer,
+                0,
+                new LayerProcLiteWorldBounds(0f, 0f, 10f, 10f)));
+
+            Assert.That(providerScheduler.ScheduleCount, Is.EqualTo(9));
+            Assert.That(consumerScheduler.ScheduleCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void LayerProcLiteRuntime_DetectsLayerLevelCycles()
+        {
+            var a = new LayerProcLiteLayerId(0);
+            var b = new LayerProcLiteLayerId(1);
+            using var runtime = new LayerProcLiteRuntime()
+                .RegisterLayer(new LayerProcLiteLayerDefinition(a, 10f, new CountingLayerScheduler(), new LayerProcLiteDependency(b, 0, 0f)))
+                .RegisterLayer(new LayerProcLiteLayerDefinition(b, 10f, new CountingLayerScheduler(), new LayerProcLiteDependency(a, 0, 0f)));
+
+            Assert.Throws<InvalidOperationException>(() =>
+                runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                    a,
+                    0,
+                    new LayerProcLiteWorldBounds(0f, 0f, 10f, 10f))));
+        }
+
+        [Test]
+        public void LayerProcLiteRuntime_AllowsSpecificProviderLevelDependency()
+        {
+            var layer = new LayerProcLiteLayerId(0);
+            var scheduler = new CountingLayerScheduler();
+            using var runtime = new LayerProcLiteRuntime()
+                .RegisterLayer(new LayerProcLiteLayerDefinition(
+                    layer,
+                    10f,
+                    2,
+                    scheduler,
+                    new LayerProcLiteDependency(layer, 1, 0, 0, 0f)));
+
+            runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                layer,
+                1,
+                new LayerProcLiteWorldBounds(0f, 0f, 10f, 10f)));
+
+            Assert.That(runtime.ContainsChunk(new LayerProcLiteChunkKey(layer, 0, new LayerProcLiteChunkId(0, 0))), Is.True);
+            Assert.That(runtime.ContainsChunk(new LayerProcLiteChunkKey(layer, 1, new LayerProcLiteChunkId(0, 0))), Is.True);
+            Assert.That(scheduler.ScheduleCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void LayerProcLiteProviderSet_WhenAccessExceedsDeclaredBounds_Throws()
+        {
+            var provider = new LayerProcLiteLayerId(0);
+            var consumer = new LayerProcLiteLayerId(1);
+            using var runtime = new LayerProcLiteRuntime()
+                .RegisterLayer(new LayerProcLiteLayerDefinition(provider, 10f, new CountingLayerScheduler()))
+                .RegisterLayer(new LayerProcLiteLayerDefinition(
+                    consumer,
+                    10f,
+                    new OutOfBoundsProviderScheduler(provider),
+                    new LayerProcLiteDependency(provider, 0, 0, 0, 1f)));
+
+            Assert.Throws<InvalidOperationException>(() =>
+                runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                    consumer,
+                    0,
+                    new LayerProcLiteWorldBounds(0f, 0f, 10f, 10f))));
+        }
+
+        [Test]
+        public void OpenWorldLayerCatalog_MapsOutputsToOpenWorldLayerIds()
+        {
+            var layers = OpenWorldGenerationLayerCatalog.ToLayerMask(
+                GenerationOutputMask.VisualMesh
+                | GenerationOutputMask.PhysicsMesh
+                | GenerationOutputMask.NavMeshSourceMesh
+                | GenerationOutputMask.Placements);
+
+            Assert.That(layers.Contains(OpenWorldGenerationLayerIds.VisualMesh), Is.True);
+            Assert.That(layers.Contains(OpenWorldGenerationLayerIds.PhysicsMesh), Is.True);
+            Assert.That(layers.Contains(OpenWorldGenerationLayerIds.NavMeshSource), Is.True);
+            Assert.That(layers.Contains(OpenWorldGenerationLayerIds.Placements), Is.True);
+        }
+
+        [Test]
+        public void OpenWorldLayerCatalog_SurfaceTopDependencySchedulesPaddedHeightProvider()
+        {
+            using var config = OpenWorldChunkGenerationRuntime.CreateDefault();
+            var runtime = config.LayerRuntime;
+            var settings = new OpenWorldLayerGenerationSettings(
+                (uint)config.Seed.Value,
+                config.ChunkWorldSize,
+                config.WaterLevel,
+                config.BaseQuadCount,
+                0,
+                config.AddSkirts,
+                config.SkirtDepth);
+            var id = runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                OpenWorldGenerationLayerIds.Surface,
+                0,
+                new LayerProcLiteWorldBounds(0f, 0f, 128f, 128f),
+                0,
+                0,
+                settings));
+            var heightKey = new LayerProcLiteChunkKey(
+                OpenWorldGenerationLayerIds.Height,
+                0,
+                new LayerProcLiteChunkId(0, 0));
+
+            Assert.That(runtime.ContainsChunk(heightKey), Is.True);
+            Assert.That(runtime.GetRetainCount(heightKey), Is.EqualTo(1));
+
+            runtime.RemoveTopDependency(id);
+        }
+
+        [Test]
+        public void OpenWorldLayerCatalog_MeshOutputsShareMeshDataProvider()
+        {
+            using var config = OpenWorldChunkGenerationRuntime.CreateDefault();
+            var runtime = config.LayerRuntime;
+            var settings = new OpenWorldLayerGenerationSettings(
+                (uint)config.Seed.Value,
+                config.ChunkWorldSize,
+                config.WaterLevel,
+                config.BaseQuadCount,
+                0,
+                config.AddSkirts,
+                config.SkirtDepth);
+            var bounds = new LayerProcLiteWorldBounds(0f, 0f, 128f, 128f);
+            var visual = runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                OpenWorldGenerationLayerIds.VisualMesh,
+                0,
+                bounds,
+                0,
+                0,
+                settings));
+            var physics = runtime.AddTopDependency(new LayerProcLiteTopDependencyRequest(
+                OpenWorldGenerationLayerIds.PhysicsMesh,
+                0,
+                bounds,
+                0,
+                0,
+                settings));
+            var meshDataKey = new LayerProcLiteChunkKey(
+                OpenWorldGenerationLayerIds.MeshData,
+                0,
+                new LayerProcLiteChunkId(0, 0));
+
+            Assert.That(runtime.ContainsChunk(meshDataKey), Is.True);
+            Assert.That(runtime.GetRetainCount(meshDataKey), Is.EqualTo(2));
+
+            runtime.RemoveTopDependency(visual);
+            Assert.That(runtime.GetRetainCount(meshDataKey), Is.EqualTo(1));
+
+            runtime.RemoveTopDependency(physics);
+            Assert.That(runtime.ContainsChunk(meshDataKey), Is.False);
+        }
+
+        [Test]
+        public void OpenWorldJobs_SurfaceNormals_AreContinuousAcrossChunkSeam()
+        {
+            const int resolution = 33;
+            const float chunkWorldSize = 128f;
+            var heightStep = new LayerProcLitePlanStep(
+                OpenWorldGenerationLayerIds.Height,
+                LayerProcLiteLayerMask.None,
+                new LayerProcLiteWindow(OpenWorldGenerationLayerCatalog.SURFACE_HEIGHT_PADDING_SAMPLES, 0f));
+            var surfaceStep = new LayerProcLitePlanStep(
+                OpenWorldGenerationLayerIds.Surface,
+                LayerProcLiteLayerMask.From(OpenWorldGenerationLayerIds.Height),
+                LayerProcLiteWindow.None);
+            var layout = new LayerProcLiteGridLayout(resolution, heightStep.Window.PaddingSamples);
+            var leftHeights = new NativeArray<float>(layout.InputSampleCount, Allocator.TempJob);
+            var rightHeights = new NativeArray<float>(layout.InputSampleCount, Allocator.TempJob);
+            var leftSurfaces = new NativeArray<OpenWorldNativeSurfaceSample>(layout.OutputSampleCount, Allocator.TempJob);
+            var rightSurfaces = new NativeArray<OpenWorldNativeSurfaceSample>(layout.OutputSampleCount, Allocator.TempJob);
+
+            try
+            {
+                var leftHeightJob = new OpenWorldHeightmapGenerationJob
+                {
+                    Step = heightStep,
+                    ChunkId = new LayerProcLiteChunkId(0, 0),
+                    WorldSeed = 42,
+                    ChunkWorldSize = chunkWorldSize,
+                    OutputResolution = resolution,
+                    PaddedHeights = leftHeights
+                }.Schedule(layout.InputSampleCount, 16);
+                var rightHeightJob = new OpenWorldHeightmapGenerationJob
+                {
+                    Step = heightStep,
+                    ChunkId = new LayerProcLiteChunkId(1, 0),
+                    WorldSeed = 42,
+                    ChunkWorldSize = chunkWorldSize,
+                    OutputResolution = resolution,
+                    PaddedHeights = rightHeights
+                }.Schedule(layout.InputSampleCount, 16);
+                var leftSurfaceJob = new OpenWorldSurfaceSamplingJob
+                {
+                    Step = surfaceStep,
+                    ChunkId = new LayerProcLiteChunkId(0, 0),
+                    WorldSeed = 42,
+                    ChunkWorldSize = chunkWorldSize,
+                    OutputResolution = resolution,
+                    HeightLayout = layout,
+                    WaterLevel = -7f,
+                    PaddedHeights = leftHeights.AsReadOnly(),
+                    Surfaces = leftSurfaces
+                }.Schedule(layout.OutputSampleCount, 16, leftHeightJob);
+                var rightSurfaceJob = new OpenWorldSurfaceSamplingJob
+                {
+                    Step = surfaceStep,
+                    ChunkId = new LayerProcLiteChunkId(1, 0),
+                    WorldSeed = 42,
+                    ChunkWorldSize = chunkWorldSize,
+                    OutputResolution = resolution,
+                    HeightLayout = layout,
+                    WaterLevel = -7f,
+                    PaddedHeights = rightHeights.AsReadOnly(),
+                    Surfaces = rightSurfaces
+                }.Schedule(layout.OutputSampleCount, 16, rightHeightJob);
+
+                JobHandle.CombineDependencies(leftSurfaceJob, rightSurfaceJob).Complete();
+
+                for (var z = 0; z < resolution; z++)
+                {
+                    var left = leftSurfaces[LayerProcLiteGrid.ToIndex(resolution - 1, z, resolution)].Normal;
+                    var right = rightSurfaces[LayerProcLiteGrid.ToIndex(0, z, resolution)].Normal;
+                    Assert.That(math.distance(left, right), Is.LessThan(0.0001f));
+                }
+            }
+            finally
+            {
+                leftHeights.Dispose();
+                rightHeights.Dispose();
+                leftSurfaces.Dispose();
+                rightSurfaces.Dispose();
+            }
+        }
+
         [TestCase(0, 65)]
         [TestCase(1, 33)]
         [TestCase(2, 17)]
@@ -296,25 +641,6 @@ namespace StaticMlp.Tests.OpenWorldGeneration
             var request = CreateRequest(new WorldGenerationSeed(1), 0, false);
 
             Assert.Throws<System.ArgumentOutOfRangeException>(() => service.GenerateChunk(new WorldChunkId(8, 0), request));
-        }
-
-        [Test]
-        public void LayerProcGenGenerateChunk_WhenChunkOutsideBounds_Throws()
-        {
-            using var service = new LayerProcGenWorldGenerationService();
-            var request = CreateRequest(new WorldGenerationSeed(1), 0, false);
-
-            Assert.Throws<System.ArgumentOutOfRangeException>(() => service.GenerateChunk(new WorldChunkId(8, 0), request));
-        }
-
-        [Test]
-        public void LayerProcGenGenerateChunk_WhenRequestSettingsChange_Throws()
-        {
-            using var service = new LayerProcGenWorldGenerationService();
-            service.GenerateChunk(new WorldChunkId(0, 0), CreateRequest(new WorldGenerationSeed(1), 0, false));
-
-            Assert.Throws<System.InvalidOperationException>(() =>
-                service.GenerateChunk(new WorldChunkId(0, 0), CreateRequest(new WorldGenerationSeed(2), 0, false)));
         }
 
         [Test]
@@ -356,29 +682,6 @@ namespace StaticMlp.Tests.OpenWorldGeneration
                 Assert.That(snapshot.CountLod(0), Is.EqualTo(9));
                 Assert.That(snapshot.Chunks[0].ChunkId, Is.EqualTo(new WorldChunkId(-1, -1)));
                 Assert.That(snapshot.Chunks[0].WorldOrigin, Is.EqualTo(new Vector3(-128f, 0f, -128f)));
-            }
-            finally
-            {
-                runtime.Dispose();
-            }
-        }
-
-        [Test]
-        public void TerrainRuntime_StreamAround_RespectsMaxChunkLoadsPerFrame()
-        {
-            var config = CreateRuntimeConfig("OpenWorldTerrainFrameBudgetTest");
-            config.Bounds = new WorldChunkBounds(-1, 1, -1, 1);
-            config.ViewRadiusInChunks = 1;
-            config.MaxChunkLoadsPerFrame = 2;
-            var runtime = OpenWorldTerrainRuntime.Create(config);
-
-            try
-            {
-                runtime.StreamAround(Vector3.zero);
-                Assert.That(runtime.CreateDebugSnapshot().LoadedChunkCount, Is.EqualTo(2));
-
-                runtime.StreamAround(Vector3.zero);
-                Assert.That(runtime.CreateDebugSnapshot().LoadedChunkCount, Is.EqualTo(4));
             }
             finally
             {
@@ -546,81 +849,6 @@ namespace StaticMlp.Tests.OpenWorldGeneration
             Assert.That(position.y, Is.EqualTo(sample.Height));
         }
 
-        private static void AssertLayerProcGenNearBorderContinuity(
-            WorldGenerationSeed seed,
-            WorldChunkId chunkId,
-            SeamAxis axis)
-        {
-            using var service = new LayerProcGenWorldGenerationService();
-            var request = CreateRequest(seed, 0, false);
-            var current = service.GenerateChunk(chunkId, request).TerrainMesh;
-            var neighborId = axis == SeamAxis.PositiveX
-                ? new WorldChunkId(chunkId.X + 1, chunkId.Z)
-                : new WorldChunkId(chunkId.X, chunkId.Z + 1);
-            var neighbor = service.GenerateChunk(neighborId, request).TerrainMesh;
-
-            if (axis == SeamAxis.PositiveX)
-                AssertPositiveXNearBorderContinuity(current, neighbor);
-            else
-                AssertPositiveZNearBorderContinuity(current, neighbor);
-        }
-
-        private static void AssertPositiveXNearBorderContinuity(TerrainMeshData left, TerrainMeshData right)
-        {
-            for (var z = 0; z <= LOD0_QUADS; z++)
-            {
-                var leftInteriorHeight = left.Vertices[GridIndex(LOD0_QUADS - 1, z, LOD0_QUADS)].y;
-                var leftBorderHeight = left.Vertices[GridIndex(LOD0_QUADS, z, LOD0_QUADS)].y;
-                var rightBorderHeight = right.Vertices[GridIndex(0, z, LOD0_QUADS)].y;
-                var rightInteriorHeight = right.Vertices[GridIndex(1, z, LOD0_QUADS)].y;
-
-                Assert.That(Mathf.Abs(leftBorderHeight - rightBorderHeight), Is.LessThan(0.0001f));
-                Assert.That(Mathf.Abs(leftBorderHeight - leftInteriorHeight), Is.LessThan(MAX_NEAR_BORDER_HEIGHT_STEP));
-                Assert.That(Mathf.Abs(rightInteriorHeight - rightBorderHeight), Is.LessThan(MAX_NEAR_BORDER_HEIGHT_STEP));
-            }
-        }
-
-        private static void AssertPositiveZNearBorderContinuity(TerrainMeshData lower, TerrainMeshData upper)
-        {
-            for (var x = 0; x <= LOD0_QUADS; x++)
-            {
-                var lowerInteriorHeight = lower.Vertices[GridIndex(x, LOD0_QUADS - 1, LOD0_QUADS)].y;
-                var lowerBorderHeight = lower.Vertices[GridIndex(x, LOD0_QUADS, LOD0_QUADS)].y;
-                var upperBorderHeight = upper.Vertices[GridIndex(x, 0, LOD0_QUADS)].y;
-                var upperInteriorHeight = upper.Vertices[GridIndex(x, 1, LOD0_QUADS)].y;
-
-                Assert.That(Mathf.Abs(lowerBorderHeight - upperBorderHeight), Is.LessThan(0.0001f));
-                Assert.That(Mathf.Abs(lowerBorderHeight - lowerInteriorHeight), Is.LessThan(MAX_NEAR_BORDER_HEIGHT_STEP));
-                Assert.That(Mathf.Abs(upperInteriorHeight - upperBorderHeight), Is.LessThan(MAX_NEAR_BORDER_HEIGHT_STEP));
-            }
-        }
-
-        private static void AssertLayerProcGenInteriorNormalContinuity(WorldGenerationSeed seed, WorldChunkId chunkId)
-        {
-            using var service = new LayerProcGenWorldGenerationService();
-            var mesh = service.GenerateChunk(chunkId, CreateRequest(seed, 0, false)).TerrainMesh;
-
-            for (var z = 0; z <= LOD0_QUADS; z++)
-            {
-                for (var x = 0; x <= LOD0_QUADS; x++)
-                {
-                    var current = mesh.Normals[GridIndex(x, z, LOD0_QUADS)];
-
-                    if (x < LOD0_QUADS)
-                    {
-                        var right = mesh.Normals[GridIndex(x + 1, z, LOD0_QUADS)];
-                        Assert.That(Vector3.Angle(current, right), Is.LessThan(MAX_INTERIOR_NORMAL_ANGLE));
-                    }
-
-                    if (z < LOD0_QUADS)
-                    {
-                        var up = mesh.Normals[GridIndex(x, z + 1, LOD0_QUADS)];
-                        Assert.That(Vector3.Angle(current, up), Is.LessThan(MAX_INTERIOR_NORMAL_ANGLE));
-                    }
-                }
-            }
-        }
-
         private static int GridIndex(int x, int z, int quads)
         {
             return z * (quads + 1) + x;
@@ -630,6 +858,54 @@ namespace StaticMlp.Tests.OpenWorldGeneration
         {
             PositiveX,
             PositiveZ
+        }
+
+        private sealed class CountingLayerScheduler : ILayerProcLiteLayerScheduler
+        {
+            public int ScheduleCount;
+            public int DisposeCount;
+
+            public LayerProcLiteScheduleResult Schedule(in LayerProcLiteScheduleContext context)
+            {
+                ScheduleCount++;
+                return new LayerProcLiteScheduleResult(default, new CountingChunkData(this));
+            }
+        }
+
+        private sealed class OutOfBoundsProviderScheduler : ILayerProcLiteLayerScheduler
+        {
+            private readonly LayerProcLiteLayerId _providerLayerId;
+
+            public OutOfBoundsProviderScheduler(LayerProcLiteLayerId providerLayerId)
+            {
+                _providerLayerId = providerLayerId;
+            }
+
+            public LayerProcLiteScheduleResult Schedule(in LayerProcLiteScheduleContext context)
+            {
+                context.Providers.GetOverlapping<CountingChunkData>(
+                    _providerLayerId,
+                    0,
+                    context.Bounds.Expanded(2f));
+
+                return new LayerProcLiteScheduleResult(default, new CountingChunkData(null));
+            }
+        }
+
+        private sealed class CountingChunkData : ILayerProcLiteChunkData
+        {
+            private readonly CountingLayerScheduler _scheduler;
+
+            public CountingChunkData(CountingLayerScheduler scheduler)
+            {
+                _scheduler = scheduler;
+            }
+
+            public void Dispose()
+            {
+                if (_scheduler != null)
+                    _scheduler.DisposeCount++;
+            }
         }
 
         private sealed class FlatSurfaceSampler : ISurfaceSampler

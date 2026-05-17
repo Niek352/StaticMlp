@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace StaticMlp.Features.OpenWorldGeneration
 {
+    [Obsolete("Use OpenWorldChunkGenerationSystem instead")]
     public static class TerrainMeshBuilder
     {
         private static readonly Vector4 DEFAULT_TANGENT = new(1f, 0f, 0f, 1f);

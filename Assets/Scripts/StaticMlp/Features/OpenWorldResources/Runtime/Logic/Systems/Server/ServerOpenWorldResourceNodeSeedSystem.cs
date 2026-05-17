@@ -6,33 +6,35 @@ namespace StaticMlp.Features.OpenWorldResources
 {
     public sealed class ServerOpenWorldResourceNodeSeedSystem : ISystem
     {
-        private EventReceiver<ServerWT, OpenWorldChunkLoadRequested> _requests;
+        private EventReceiver<ServerWT, OpenWorldChunkGenerationCompleted> _completed;
 
         public void Init()
         {
-            _requests = SW.RegisterEventReceiver<OpenWorldChunkLoadRequested>();
+            _completed = SW.RegisterEventReceiver<OpenWorldChunkGenerationCompleted>();
         }
 
         public void Destroy()
         {
-            SW.DeleteEventReceiver(ref _requests);
+            SW.DeleteEventReceiver(ref _completed);
         }
 
         public void Update()
         {
-            var runtime = SW.GetResource<OpenWorldGenerationServerRuntime>();
             var factory = SW.GetResource<OpenWorldResourceNodeFactory>();
             var deltaStore = SW.GetResource<OpenWorldResourceNodeDeltaStore>();
+            var bounds = SW.GetResource<OpenWorldGenerationServerRuntime>().DefaultRequest.Bounds;
 
-            foreach (var request in _requests)
+            foreach (var evt in _completed)
             {
-                var chunk = runtime.GenerationService.GenerateChunk(request.Value.ChunkId, runtime.DefaultRequest);
-                SpawnChunkResourceNodes(chunk, factory, deltaStore, runtime.DefaultRequest.Bounds);
+                if (evt.Value.ResourcePlacements.Length == 0)
+                    continue;
+
+                SpawnChunkResourceNodes(evt.Value, factory, deltaStore, bounds);
             }
         }
 
         private static void SpawnChunkResourceNodes(
-            GeneratedChunkData chunk,
+            OpenWorldChunkGenerationCompleted chunk,
             OpenWorldResourceNodeFactory factory,
             OpenWorldResourceNodeDeltaStore deltaStore,
             WorldChunkBounds bounds)

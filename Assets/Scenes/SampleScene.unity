@@ -641,7 +641,7 @@ MonoBehaviour:
   steamVirtualPort: 0
   connectSteamId: 76561198873497439
   steamLobbyMaxMembers: 4
-  debugPingLatencyMs: 0
+  debugPingLatencyMs: 200
   serverTickRateHz: 30
   showMultiplayerUi: 1
   multiplayerUiResourcePath: Views/MultiplayerStatusUi

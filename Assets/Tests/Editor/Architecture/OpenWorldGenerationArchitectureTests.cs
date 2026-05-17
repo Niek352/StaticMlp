@@ -84,15 +84,157 @@ namespace StaticMlp.Tests.Architecture
         }
 
         [Test]
-        public void LayerProcGenReferences_AreLimitedToFutureAdapterFolder()
+        public void LayerProcGenReferences_AreRemovedFromRuntimeCode()
         {
             var offenders = EnumerateProjectFiles(FEATURES_ROOT, "*.cs", "*.asmdef")
                 .Where(file => File.ReadAllText(file.FullPath).Contains(LPG_NAMESPACE))
-                .Where(file => file.RelativePath.IndexOf("/Runtime/Logic/LayerProcGen/", StringComparison.Ordinal) < 0)
                 .Select(file => file.RelativePath)
                 .ToArray();
 
             Assert.That(offenders, Is.Empty);
+        }
+
+        [Test]
+        public void PackageManifest_UsesLayerProcLiteAndNotLayerProcGen()
+        {
+            var manifestPath = Path.Combine(ProjectRoot(), "Packages", "manifest.json");
+            var text = File.ReadAllText(manifestPath);
+
+            Assert.That(text, Does.Contain("com.staticmlp.layer-proc-lite"));
+            Assert.That(text, Does.Not.Contain("com.layer-proc-gen"));
+        }
+
+        [Test]
+        public void LayerProcLitePackage_DoesNotReferenceOpenWorldGenerationFeature()
+        {
+            var files = EnumerateProjectFiles("Packages/com.staticmlp.layer-proc-lite", "*.cs", "*.asmdef", "*.json");
+            var offenders = files
+                .Where(file => File.ReadAllText(file.FullPath).Contains("StaticMlp.Features.OpenWorldGeneration"))
+                .Select(file => file.RelativePath)
+                .ToArray();
+
+            Assert.That(offenders, Is.Empty);
+        }
+
+        [Test]
+        public void LayerProcLitePackage_DoesNotContainGameSpecificTerrainSemantics()
+        {
+            var forbiddenTokens = new[]
+            {
+                "Biome",
+                "Water",
+                "Wetness",
+                "OpenWorld",
+                "Resource",
+                "Spawn",
+                "SurfaceSample",
+                "HeightProfile",
+                "TerrainMeshGeneration",
+                "VisualMesh",
+                "PhysicsMesh",
+                "NavMeshSource"
+            };
+            var offenders = EnumerateProjectFiles("Packages/com.staticmlp.layer-proc-lite", "*.cs", "*.asmdef", "*.json")
+                .Where(file => forbiddenTokens.Any(token => File.ReadAllText(file.FullPath).Contains(token)))
+                .Select(file => file.RelativePath)
+                .ToArray();
+
+            Assert.That(offenders, Is.Empty);
+        }
+
+        [Test]
+        public void LayerProcLiteAsmdef_DependsOnlyOnLowLevelUnityNativeAssemblies()
+        {
+            var asmdefPath = Path.Combine(ProjectRoot(), "Packages", "com.staticmlp.layer-proc-lite", "Runtime", "StaticMlp.LayerProcLite.asmdef");
+            var text = File.ReadAllText(asmdefPath);
+            var allowedReferences = new[]
+            {
+                "\"Unity.Burst\"",
+                "\"Unity.Collections\"",
+                "\"Unity.Jobs\"",
+                "\"Unity.Mathematics\""
+            };
+
+            Assert.That(text, Does.Not.Contain("StaticMlp.Features."));
+            Assert.That(text, Does.Not.Contain("UnityEngine."));
+            Assert.That(text, Does.Not.Contain("\"UnityEngine\""));
+            Assert.That(text, Does.Contain("\"noEngineReferences\": true"));
+            Assert.That(allowedReferences.All(text.Contains), Is.True);
+        }
+
+        [Test]
+        public void LayerProcLitePackage_DoesNotUseUnityEngineObjectContracts()
+        {
+            var forbiddenTokens = new[]
+            {
+                "UnityEngine",
+                "GameObject",
+                "NavMeshSurface",
+                "Color32",
+                "UnityEngine.Bounds"
+            };
+            var offenders = EnumerateProjectFiles("Packages/com.staticmlp.layer-proc-lite", "*.cs", "*.asmdef")
+                .Where(file => forbiddenTokens.Any(token => File.ReadAllText(file.FullPath).Contains(token)))
+                .Select(file => file.RelativePath)
+                .ToArray();
+
+            Assert.That(offenders, Is.Empty);
+        }
+
+        [Test]
+        public void OpenWorldGeneration_UsesLayerSchedulersAndGameOwnedSurfaceSamples()
+        {
+            var jobsRoot = Path.Combine(
+                ProjectRoot(),
+                OPEN_WORLD_ROOT.Replace('/', Path.DirectorySeparatorChar),
+                "Runtime",
+                "Logic",
+                "Jobs");
+            var schedulersRoot = Path.Combine(
+                ProjectRoot(),
+                OPEN_WORLD_ROOT.Replace('/', Path.DirectorySeparatorChar),
+                "Runtime",
+                "Logic",
+                "LayerSchedulers");
+            var heightJob = File.ReadAllText(Path.Combine(jobsRoot, "OpenWorldHeightmapGenerationJob.cs"));
+            var surfaceJob = File.ReadAllText(Path.Combine(jobsRoot, "OpenWorldSurfaceSamplingJob.cs"));
+            var meshJob = File.ReadAllText(Path.Combine(jobsRoot, "OpenWorldTerrainMeshGenerationJob.cs"));
+            var placementJob = File.ReadAllText(Path.Combine(jobsRoot, "ResourcePlacementGenerationJob.cs"));
+            var schedulerFiles = Directory.EnumerateFiles(schedulersRoot, "*.cs", SearchOption.TopDirectoryOnly)
+                .Select(Path.GetFileName)
+                .ToArray();
+
+            Assert.That(heightJob, Does.Contain("LayerProcLitePlanStep"));
+            Assert.That(surfaceJob, Does.Contain("LayerProcLitePlanStep"));
+            Assert.That(meshJob, Does.Contain("LayerProcLitePlanStep"));
+            Assert.That(placementJob, Does.Contain("OpenWorldNativeSurfaceSample"));
+            Assert.That(placementJob, Does.Not.Contain("LayerProcLite" + "SurfaceSample"));
+            Assert.That(schedulerFiles, Does.Contain("OpenWorldHeightLayerScheduler.cs"));
+            Assert.That(schedulerFiles, Does.Contain("OpenWorldSurfaceLayerScheduler.cs"));
+            Assert.That(schedulerFiles, Does.Contain("OpenWorldMeshDataLayerScheduler.cs"));
+            Assert.That(schedulerFiles, Does.Contain("OpenWorldPlacementLayerScheduler.cs"));
+        }
+
+        [Test]
+        public void OpenWorldChunkGenerationSystemBase_IsThinLayerRuntimeBridge()
+        {
+            var systemPath = Path.Combine(
+                ProjectRoot(),
+                OPEN_WORLD_ROOT.Replace('/', Path.DirectorySeparatorChar),
+                "Runtime",
+                "Logic",
+                "Systems",
+                "Shared",
+                "OpenWorldChunkGenerationSystemBase.cs");
+            var text = File.ReadAllText(systemPath);
+
+            Assert.That(text, Does.Contain("LayerRuntime.AddTopDependency"));
+            Assert.That(text, Does.Contain("LayerRuntime.Tick"));
+            Assert.That(text, Does.Not.Contain("new OpenWorldHeightmapGenerationJob"));
+            Assert.That(text, Does.Not.Contain("new OpenWorldSurfaceSamplingJob"));
+            Assert.That(text, Does.Not.Contain("new OpenWorldTerrainMeshGenerationJob"));
+            Assert.That(text, Does.Not.Contain("new ResourcePlacementGenerationJob"));
+            Assert.That(text, Does.Not.Contain("JobHandle.CombineDependencies"));
         }
 
         [Test]

@@ -246,6 +246,10 @@ namespace StaticMlp.Tests.OpenWorldResources
             Assert.That(CountResourceNodes(), Is.GreaterThan(0));
             Assert.That(SW.GetResource<NetOutbox>().Packets.Count, Is.EqualTo(1));
             Assert.That(SW.ClusterIsRegistered(scope.ClusterId(new WorldChunkId(0, 0))), Is.True);
+            Assert.That(
+                SW.GetResource<OpenWorldServerChunkGeometryRuntime>().TryGet(new WorldChunkId(0, 0), out var geometry),
+                Is.True);
+            Assert.That(geometry.PhysicsMesh, Is.Not.Null);
         }
 
         [Test]
@@ -406,7 +410,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                     typeof(OpenWorldResourcesGameplayFeature).Assembly);
                 SW.Initialize();
                 SW.RegisterCluster(ClusterId);
-                SW.SetResource(new OpenWorldGenerationServerRuntime(new SimpleWorldGenerationService(), _request, 1));
+                SW.SetResource(new OpenWorldGenerationServerRuntime(_request, 1));
                 SW.SetResource(new OpenWorldResourceNodeFactory());
                 SW.SetResource(new OpenWorldResourceNodeDeltaStore());
             }
@@ -415,14 +419,23 @@ namespace StaticMlp.Tests.OpenWorldResources
 
             public GeneratedChunkData GenerateRequestedChunk()
             {
-                return SW.GetResource<OpenWorldGenerationServerRuntime>().GenerationService.GenerateChunk(_chunkId, _request);
+                return new SimpleWorldGenerationService().GenerateChunk(_chunkId, _request);
             }
 
             public void RunSeedSystem()
             {
                 var system = new ServerOpenWorldResourceNodeSeedSystem();
                 system.Init();
-                SW.SendEvent(new OpenWorldChunkLoadRequested(_chunkId, ClusterId));
+                var generated = GenerateRequestedChunk();
+                SW.SendEvent(new OpenWorldChunkGenerationCompleted(
+                    _chunkId,
+                    _request.Lod,
+                    GenerationOutputMask.Placements,
+                    null,
+                    null,
+                    null,
+                    generated.ResourcePlacements,
+                    generated.SpawnPlacements));
                 system.Update();
                 system.Destroy();
                 SW.Tick();
@@ -439,6 +452,10 @@ namespace StaticMlp.Tests.OpenWorldResources
         {
             private readonly ServerOpenWorldResourceNodeSeedSystem _resourceSeedSystem = new();
             private readonly ServerOpenWorldChunkInterestSystem _interestSystem = new();
+            private readonly ServerOpenWorldChunkGenerationBridgeSystem _generationBridgeSystem = new();
+            private readonly ServerOpenWorldChunkGenerationSystem _generationSystem = new();
+            private readonly ServerOpenWorldChunkGeometryStoreSystem _geometryStoreSystem = new();
+            private readonly ServerOpenWorldChunkGenerationCompleteSystem _generationCompleteSystem = new();
             private readonly ServerOpenWorldChunkSnapshotSystem _snapshotSystem = new();
             private readonly WorldGenerationRequest _request;
             private readonly EntityGID _player;
@@ -471,8 +488,17 @@ namespace StaticMlp.Tests.OpenWorldResources
                     typeof(OpenWorldGenerationServerRuntime).Assembly,
                     typeof(OpenWorldResourcesGameplayFeature).Assembly);
                 SW.Initialize();
-                SW.SetResource(new OpenWorldGenerationServerRuntime(new SimpleWorldGenerationService(), _request, 8, 0));
+                SW.SetResource(new OpenWorldGenerationServerRuntime(_request, 8, 0));
+                SW.SetResource(new OpenWorldChunkGenerationRuntime(
+                    _request.Seed,
+                    _request.Bounds,
+                    _request.ChunkWorldSize,
+                    -7f,
+                    _request.BaseQuadCount,
+                    _request.AddSkirts,
+                    _request.SkirtDepth));
                 SW.SetResource(new OpenWorldChunkStreamingState());
+                SW.SetResource(new OpenWorldServerChunkGeometryRuntime());
                 SW.SetResource(new OpenWorldResourceNodeFactory());
                 SW.SetResource(new OpenWorldResourceNodeDeltaStore());
                 SW.SetResource(new NetOutbox());
@@ -491,7 +517,11 @@ namespace StaticMlp.Tests.OpenWorldResources
                     Rotation = UnityEngine.Quaternion.identity
                 });
                 _player = player.GID;
+                _generationBridgeSystem.Init();
+                _generationSystem.Init();
                 _resourceSeedSystem.Init();
+                _geometryStoreSystem.Init();
+                _generationCompleteSystem.Init();
             }
 
             public ushort ClusterId(WorldChunkId chunkId)
@@ -510,15 +540,26 @@ namespace StaticMlp.Tests.OpenWorldResources
 
             public void UpdateStreaming()
             {
-                _interestSystem.Update();
-                _resourceSeedSystem.Update();
-                _snapshotSystem.Update();
-                SW.Tick();
+                for (var i = 0; i < 16; i++)
+                {
+                    _interestSystem.Update();
+                    _generationBridgeSystem.Update();
+                    _generationSystem.Update();
+                    _resourceSeedSystem.Update();
+                    _geometryStoreSystem.Update();
+                    _generationCompleteSystem.Update();
+                    _snapshotSystem.Update();
+                    SW.Tick();
+                }
             }
 
             public void Dispose()
             {
+                _generationCompleteSystem.Destroy();
+                _geometryStoreSystem.Destroy();
                 _resourceSeedSystem.Destroy();
+                _generationSystem.Destroy();
+                _generationBridgeSystem.Destroy();
                 ServerPeerRegistry.Clear();
                 NetworkEventRegistry.Clear();
 

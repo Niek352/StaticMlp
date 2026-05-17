@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking.Diagnostics;
-using UnityEngine;
 
 namespace StaticMlp.Networking.Replication {
     public sealed class NetOutbox : IResource {
@@ -27,14 +26,12 @@ namespace StaticMlp.Networking.Replication {
 
         public void EnqueueEntitySnapshot(NetworkPeerId peer, byte[] payload, NetDelivery delivery) {
             var payloadSize = payload?.Length ?? 0;
-            Debug.Log($"[NetOutbox] EnqueueEntitySnapshot peer={peer.Value} size={payloadSize} delivery={delivery}");
             var batch = GetOrCreateEntitySnapshotBatch(peer, delivery, ENTITY_SNAPSHOT_ENTRY_HEADER_BYTES + payloadSize);
             batch.Batch.Payloads.Add(payload);
             batch.EncodedSize += ENTITY_SNAPSHOT_ENTRY_HEADER_BYTES + payloadSize;
         }
 
         internal void EnqueueNetworkEvent(in NetworkEventPacket packet) {
-            Debug.Log($"[NetOutbox] EnqueueNetworkEvent typeId={packet.EventTypeId} target={packet.TargetPeer.Value} delivery={packet.Delivery}");
             var batch = GetOrCreateNetworkEventBatch(
                 packet.TargetPeer,
                 packet.Delivery,

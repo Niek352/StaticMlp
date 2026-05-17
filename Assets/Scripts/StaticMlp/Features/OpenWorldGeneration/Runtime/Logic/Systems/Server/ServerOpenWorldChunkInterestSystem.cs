@@ -101,17 +101,23 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 if (loaded.Contains(chunkId))
                     continue;
 
-                var requiresServerLoad = !state.ServerHasLoadedChunk(chunkId);
+                var serverLoaded = state.ServerHasLoadedChunk(chunkId);
+                var serverLoading = state.ServerIsLoadingChunk(chunkId);
+                var requiresServerLoad = !serverLoaded && !serverLoading;
                 if (requiresServerLoad && remainingServerLoads <= 0)
                     continue;
 
                 var clusterId = OpenWorldSpatialClusterIds.ToClusterId(chunkId, runtime.DefaultRequest.Bounds);
-                ActivateServerChunk(chunkId, clusterId, state);
-                loaded.Add(chunkId);
-                state.QueueSnapshot(peer, chunkId, clusterId);
-
                 if (requiresServerLoad)
+                {
+                    ActivateServerChunk(chunkId, clusterId, state);
                     remainingServerLoads--;
+                }
+
+                loaded.Add(chunkId);
+
+                if (serverLoaded)
+                    state.QueueSnapshot(peer, chunkId, clusterId);
             }
 
             return remainingServerLoads;
@@ -119,7 +125,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
         private static void ActivateServerChunk(WorldChunkId chunkId, ushort clusterId, OpenWorldChunkStreamingState state)
         {
-            if (state.ServerHasLoadedChunk(chunkId))
+            if (state.ServerHasLoadedChunk(chunkId) || state.ServerIsLoadingChunk(chunkId))
                 return;
 
             if (!SW.ClusterIsRegistered(clusterId))
@@ -135,7 +141,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 SW.SendEvent(new OpenWorldChunkLoadRequested(chunkId, clusterId));
             }
 
-            state.MarkServerLoaded(chunkId);
+            state.MarkServerLoading(chunkId);
         }
 
         private static void UnloadServerChunkIfUnused(
@@ -147,6 +153,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 return;
 
             var clusterId = OpenWorldSpatialClusterIds.ToClusterId(chunkId, bounds);
+            SW.GetResource<OpenWorldServerChunkGeometryRuntime>().Remove(chunkId);
             state.SetSnapshot(chunkId, null);
             SW.SetActiveCluster(clusterId, false);
             //TODO:Rework in future

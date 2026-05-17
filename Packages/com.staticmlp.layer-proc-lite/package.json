@@ -1,0 +1,13 @@
+{
+  "name": "com.staticmlp.layer-proc-lite",
+  "displayName": "LayerProcLite",
+  "version": "0.1.0",
+  "unity": "2022.3",
+  "description": "Lightweight unmanaged Burst/job-friendly layer procedural generation core for StaticMlp.",
+  "keywords": [
+    "procedural",
+    "generation",
+    "burst",
+    "jobs"
+  ]
+}

@@ -9,6 +9,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
         private readonly Dictionary<NetworkPeerId, HashSet<WorldChunkId>> _loadedChunksByPeer = new();
         private readonly Dictionary<WorldChunkId, byte[]> _snapshotsByChunk = new();
         private readonly HashSet<WorldChunkId> _serverLoadedChunks = new();
+        private readonly HashSet<WorldChunkId> _serverLoadingChunks = new();
 
         public readonly List<PendingSnapshot> PendingSnapshots = new();
 
@@ -47,14 +48,33 @@ namespace StaticMlp.Features.OpenWorldGeneration
             return _serverLoadedChunks.Contains(chunkId);
         }
 
+        public bool ServerIsLoadingChunk(WorldChunkId chunkId)
+        {
+            return _serverLoadingChunks.Contains(chunkId);
+        }
+
+        public void MarkServerLoading(WorldChunkId chunkId)
+        {
+            _serverLoadingChunks.Add(chunkId);
+        }
+
         public void MarkServerLoaded(WorldChunkId chunkId)
         {
+            _serverLoadingChunks.Remove(chunkId);
             _serverLoadedChunks.Add(chunkId);
         }
 
         public void MarkServerUnloaded(WorldChunkId chunkId)
         {
+            _serverLoadingChunks.Remove(chunkId);
             _serverLoadedChunks.Remove(chunkId);
+        }
+
+        public void CopyPeersWithChunk(WorldChunkId chunkId, List<NetworkPeerId> peers)
+        {
+            foreach (var pair in _loadedChunksByPeer)
+                if (pair.Value.Contains(chunkId))
+                    peers.Add(pair.Key);
         }
 
         public bool TryGetSnapshot(WorldChunkId chunkId, out byte[] snapshot)

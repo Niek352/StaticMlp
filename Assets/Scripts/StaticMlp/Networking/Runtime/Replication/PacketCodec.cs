@@ -129,7 +129,6 @@ namespace StaticMlp.Networking.Replication {
                     case NetPacketType.Welcome:
                         var welcomePeer = new NetworkPeerId(reader.ReadUshort());
                         NetworkRuntime.LocalPeerId = welcomePeer;
-                        Debug.Log($"[PacketCodec] Decoded Welcome peer={welcomePeer.Value}");
                         return true;
                     case NetPacketType.Spawn:
                         inbox.Spawns.Add(ReadSpawn(ref reader));
@@ -155,7 +154,6 @@ namespace StaticMlp.Networking.Replication {
                     case NetPacketType.EntitySnapshotBatch:
                         var batch = ReadEntitySnapshotBatch(ref reader, sourcePeer);
                         inbox.EntitySnapshotBatches.Add(batch);
-                        Debug.Log($"[PacketCodec] Decoded EntitySnapshotBatch source={sourcePeer.Value} payloads={batch.Payloads.Count}");
                         return true;
                     case NetPacketType.NetworkEvent:
                         return TryReadNetworkEvent(ref reader, sourcePeer, inbox);

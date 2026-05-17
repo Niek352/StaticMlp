@@ -2,6 +2,7 @@ using System;
 
 namespace StaticMlp.Features.OpenWorldGeneration
 {
+    [Obsolete("Replaced by OpenWorldChunkGenerationSystem")]
     public sealed class SimpleWorldGenerationService : IWorldGenerationService
     {
         public GeneratedChunkData GenerateChunk(WorldChunkId chunkId, WorldGenerationRequest request)

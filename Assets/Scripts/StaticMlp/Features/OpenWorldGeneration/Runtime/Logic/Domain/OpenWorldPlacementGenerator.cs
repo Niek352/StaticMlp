@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace StaticMlp.Features.OpenWorldGeneration
 {
+    [Obsolete("Use OpenWorldChunkGenerationSystem instead")]
     public static class OpenWorldPlacementGenerator
     {
         public const float MAX_WATER_MASK = 0.35f;

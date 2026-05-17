@@ -38,12 +38,6 @@
       "dependencies": {},
       "hash": "9533a6c7019459d4bf9084057f6047172b9e96aa"
     },
-    "com.layer-proc-gen": {
-      "version": "file:Z:/_UnityProjects/LayerProcGen",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {}
-    },
     "com.projectdawn.navigation": {
       "version": "file:com.projectdawn.navigation",
       "depth": 0,
@@ -53,6 +47,12 @@
         "com.unity.entities": "1.0.14",
         "com.unity.modules.ui": "1.0.0"
       }
+    },
+    "com.staticmlp.layer-proc-lite": {
+      "version": "file:com.staticmlp.layer-proc-lite",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.ai.navigation": {
       "version": "2.0.12",

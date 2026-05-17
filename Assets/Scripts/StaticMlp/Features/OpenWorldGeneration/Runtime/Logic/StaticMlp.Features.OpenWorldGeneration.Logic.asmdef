@@ -6,7 +6,12 @@
         "FFS.StaticEcs",
         "FFS.StaticPack",
         "Ecs.Networking",
-        "Game.Core"
+        "Game.Core",
+        "StaticMlp.LayerProcLite",
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Jobs",
+        "Unity.Mathematics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

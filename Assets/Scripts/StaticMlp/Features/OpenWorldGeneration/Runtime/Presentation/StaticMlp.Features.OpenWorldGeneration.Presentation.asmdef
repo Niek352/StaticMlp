@@ -7,8 +7,7 @@
         "Game.Core",
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
-        "StaticMlp.Features.OpenWorldGeneration.Logic",
-        "StaticMlp.Features.OpenWorldGeneration.LayerProcGen"
+        "StaticMlp.Features.OpenWorldGeneration.Logic"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
