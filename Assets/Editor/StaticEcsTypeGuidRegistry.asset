@@ -372,6 +372,15 @@ MonoBehaviour:
       - className: OpenWorldResourceNodeTransform
         namespaceName: StaticMlp.Features.OpenWorldResources
         assembly: StaticMlp.Features.OpenWorldResources
+    - guid: 27e11c20-b722-493e-aa56-1727a24a01e3
+      current:
+        className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -874,6 +883,15 @@ MonoBehaviour:
       - className: OpenWorldResourceNodeTransform
         namespaceName: StaticMlp.Features.OpenWorldResources
         assembly: StaticMlp.Features.OpenWorldResources
+    - guid: 27e11c20-b722-493e-aa56-1727a24a01e3
+      current:
+        className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47

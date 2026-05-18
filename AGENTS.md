@@ -60,6 +60,7 @@ Gameplay systems should only:
 - Cross-feature writes must go through `IEvent`: the foreign feature sends the request or fact, and the owner feature system applies the state mutation.
 - Do not create vague extraction buckets such as `Helper`, `Utility`, or generic static orchestration classes.
 - Allowed extracted logic intents are explicit `Domain/Rules` and explicit `Spawner` abstractions.
+- `StaticMlp.Features.Settlement` owns settlement resource ids, resource families, resource catalog validation, and settlement storage; other features may read stable resource contracts from `Settlement.Contracts` but must not create a parallel `Resources` or `DesignLock` feature.
 
 ## ECS And Replication
 

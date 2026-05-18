@@ -4,7 +4,8 @@ Short operational rules for `StaticMlp.Features.AiBots`. Keep this file small; p
 
 ## Purpose
 
-- `AiBots` owns server-authoritative NPC behavior, navigation coordination, spawn setup, and the thin replicated state used by client presentation.
+- `AiBots` owns server-authoritative generic AI-agent behavior, navigation coordination, spawn setup, and the thin replicated state used by client presentation.
+- `AiBots` does not own product-level NPC logic. NPC class, acquisition path, definition identity, roster records, incubation, rescue, extraction, specialist unlocks, and NPC economy contracts belong to `StaticMlp.Features.Npc` or the feature that owns the concrete gameplay state.
 - Bots are gameplay actors first. Client visuals should mirror replicated state, not simulate decisions locally.
 
 ## Read First
@@ -42,6 +43,9 @@ Short operational rules for `StaticMlp.Features.AiBots`. Keep this file small; p
 
 ## Boundaries
 
+- Do not add NPC roster, acquisition, incubation, specialist, companion, or NPC economy source-of-truth state to `AiBots`.
+- Do not treat `AiAgentTag` as proof that an entity is a product-level NPC. Use `NpcTag` or `NpcIdentity` from `StaticMlp.Features.Npc` when a system needs NPC identity.
+- Do not make `AiBots` depend on `StaticMlp.Features.Npc`; `AiBots` remains the lower-level generic behavior layer.
 - Do not put Unity Transport calls, packet serialization, or raw network inbox logic into this feature's gameplay systems.
 - Do not store `Entity` across frames; use `EntityGID` in blackboard data, events, spawn relationships, and navigation lookups.
 - Fail fast when required resources such as `AiActionCatalog`, `AiNavigationRuntime`, or `Stage1FrontierSeed` are missing or null.
