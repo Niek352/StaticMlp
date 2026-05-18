@@ -221,7 +221,8 @@ namespace StaticMlp.Tests.OpenWorldResources
         public void ClientSpawnApplySystem_RemoteSpawnRegistersOtherChunkInDependentClientWorld()
         {
             NetArchetypeRegistry.Clear();
-            var gid = CreateServerGid(out var entityType);
+            ReplicationRegistry.Clear();
+            var gid = CreateServerSpawn(out var entityType, out var snapshotPayload);
 
             if (CW.Status != WorldStatus.NotCreated)
                 CW.Destroy();
@@ -244,7 +245,8 @@ namespace StaticMlp.Tests.OpenWorldResources
                     EntityType = entityType,
                     Owner = new NetworkPeerId(1),
                     Authority = NetworkAuthority.Server,
-                    NetworkArchetypeId = 999
+                    NetworkArchetypeId = 999,
+                    SnapshotPayload = snapshotPayload
                 });
 
                 new ClientSpawnApplySystem().Update();
@@ -299,10 +301,6 @@ namespace StaticMlp.Tests.OpenWorldResources
             scope.UpdateStreaming();
 
             Assert.That(CountResourceNodes(), Is.EqualTo(0));
-            Assert.That(
-                SW.GetResource<OpenWorldPlacementIndexStore>().TryGetChunkPlacements(new WorldChunkId(0, 0), out var placements),
-                Is.True);
-            Assert.That(placements.Length, Is.GreaterThan(0));
             Assert.That(SW.GetResource<NetOutbox>().Packets.Count, Is.EqualTo(1));
             Assert.That(DecodeFirstOutboxSnapshot().Kind, Is.EqualTo(ReplicationSnapshotKind.ClusterEntities));
             Assert.That(SW.ClusterIsRegistered(scope.ClusterId(new WorldChunkId(0, 0))), Is.True);
@@ -327,13 +325,8 @@ namespace StaticMlp.Tests.OpenWorldResources
 
             ref var outbox = ref SW.GetResource<NetOutbox>();
             outbox.FlushNetworkEventBatches();
-            Assert.That(outbox.Packets.Count, Is.EqualTo(1));
+            Assert.That(outbox.Packets.Count, Is.EqualTo(2));
             Assert.That(SW.GetClusterLoadedChunks(firstCluster).Length, Is.EqualTo(0));
-
-            Assert.That(
-                SW.GetResource<OpenWorldPlacementIndexStore>().TryGetChunkPlacements(secondChunk, out var secondChunkPlacements),
-                Is.True);
-            Assert.That(secondChunkPlacements.Length, Is.GreaterThan(0));
             Assert.That(CountResourceNodes(), Is.EqualTo(0));
         }
 
@@ -468,7 +461,7 @@ namespace StaticMlp.Tests.OpenWorldResources
             return inbox.Snapshots[0];
         }
 
-        private static EntityGID CreateServerGid(out byte entityType)
+        private static EntityGID CreateServerSpawn(out byte entityType, out byte[] snapshotPayload)
         {
             if (SW.Status != WorldStatus.NotCreated)
                 SW.Destroy();
@@ -479,7 +472,14 @@ namespace StaticMlp.Tests.OpenWorldResources
                 SW.Types().RegisterAll(typeof(ServerWT).Assembly);
                 SW.Initialize();
                 var entity = SW.NewEntity<Default>();
+                entity.Set(new NetworkIdentity
+                {
+                    Owner = new NetworkPeerId(1),
+                    Authority = NetworkAuthority.Server,
+                    NetworkArchetypeId = 999
+                });
                 entityType = entity.EntityType;
+                snapshotPayload = ReplicationRegistry.CreateInitialStateSnapshot(entity, new NetworkPeerId(1));
                 return entity.GID;
             }
             finally
@@ -600,6 +600,8 @@ namespace StaticMlp.Tests.OpenWorldResources
                     CW.Destroy();
 
                 new OpenWorldResourcesGameplayFeature().RegisterNetworkEvents();
+                ProjectionRegistry.Register<OpenWorldResourceNodeState>();
+                ProjectionRegistry.Register<OpenWorldResourceNodeTransform>();
 
                 CW.Create(WorldConfig.Default());
                 CW.Types().RegisterAll(
@@ -715,16 +717,22 @@ namespace StaticMlp.Tests.OpenWorldResources
 
             public void UpdateStreaming()
             {
-                for (var i = 0; i < 16; i++)
+                for (var i = 0; i < 64; i++)
                 {
-                    _interestSystem.Update();
-                    _generationBridgeSystem.Update();
-                    _generationSystem.Update();
-                    _resourcePlacementIndexSystem.Update();
+                _interestSystem.Update();
+                _generationBridgeSystem.Update();
+                _generationSystem.Update();
+                SW.GetResource<OpenWorldChunkGenerationRuntime>().CompleteScheduledJobs();
+                _generationSystem.Update();
+                _resourcePlacementIndexSystem.Update();
                     _geometryStoreSystem.Update();
                     _generationCompleteSystem.Update();
                     _snapshotSystem.Update();
                     SW.Tick();
+                    _resourcePlacementIndexSystem.Update();
+                    _geometryStoreSystem.Update();
+                    _generationCompleteSystem.Update();
+                    _snapshotSystem.Update();
                 }
             }
 

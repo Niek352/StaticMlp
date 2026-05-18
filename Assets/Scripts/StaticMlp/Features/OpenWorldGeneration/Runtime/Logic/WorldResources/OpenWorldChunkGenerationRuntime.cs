@@ -49,6 +49,11 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 6f);
         }
 
+        public void CompleteScheduledJobs()
+        {
+            LayerRuntime.CompleteScheduledJobs();
+        }
+
         public void Dispose()
         {
             LayerRuntime.Dispose();

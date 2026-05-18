@@ -41,7 +41,7 @@ namespace StaticMlp.Features.AiBots
             body.transform.localScale = _bodyScale;
             _bodyMaterial = RuntimeVisualMaterial.Create(_bodyColor);
             body.GetComponent<Renderer>().sharedMaterial = _bodyMaterial;
-            Destroy(body.GetComponent<Collider>());
+            DestroyRuntimeObject(body.GetComponent<Collider>());
 
             var head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             head.name = "Head";
@@ -50,7 +50,7 @@ namespace StaticMlp.Features.AiBots
             head.transform.localScale = _headScale;
             _headMaterial = RuntimeVisualMaterial.Create(_accentColor);
             head.GetComponent<Renderer>().sharedMaterial = _headMaterial;
-            Destroy(head.GetComponent<Collider>());
+            DestroyRuntimeObject(head.GetComponent<Collider>());
 
             EnsureHealthBar();
             ApplyHealthBar(1f, isDead: false);
@@ -81,7 +81,7 @@ namespace StaticMlp.Features.AiBots
                 return;
             }
 
-            Destroy(_visualRoot);
+            DestroyRuntimeObject(_visualRoot);
             _visualRoot = null;
             DestroyHealthBar();
             DestroyRuntimeMaterials();
@@ -102,7 +102,7 @@ namespace StaticMlp.Features.AiBots
             background.transform.localScale = _healthBarBackgroundScale;
             var backgroundCollider = background.GetComponent<Collider>();
             if (backgroundCollider != null)
-                Destroy(backgroundCollider);
+                DestroyRuntimeObject(backgroundCollider);
 
             _healthBarBackgroundMaterial = RuntimeVisualMaterial.Create(_healthBarBackgroundColor);
             background.GetComponent<Renderer>().sharedMaterial = _healthBarBackgroundMaterial;
@@ -112,7 +112,7 @@ namespace StaticMlp.Features.AiBots
             _healthBarFillObject.transform.SetParent(_healthBarRoot.transform, worldPositionStays: false);
             var fillCollider = _healthBarFillObject.GetComponent<Collider>();
             if (fillCollider != null)
-                Destroy(fillCollider);
+                DestroyRuntimeObject(fillCollider);
 
             _healthBarFillMaterial = RuntimeVisualMaterial.Create(_healthBarHighColor);
             _healthBarFillObject.GetComponent<Renderer>().sharedMaterial = _healthBarFillMaterial;
@@ -152,7 +152,7 @@ namespace StaticMlp.Features.AiBots
             if (_healthBarRoot == null)
                 return;
 
-            Destroy(_healthBarRoot);
+            DestroyRuntimeObject(_healthBarRoot);
             _healthBarRoot = null;
             _healthBarFillObject = null;
         }
@@ -170,8 +170,19 @@ namespace StaticMlp.Features.AiBots
             if (material == null)
                 return;
 
-            Destroy(material);
+            DestroyRuntimeObject(material);
             material = null;
+        }
+
+        private static void DestroyRuntimeObject(Object target)
+        {
+            if (target == null)
+                return;
+
+            if (Application.isPlaying)
+                Destroy(target);
+            else
+                DestroyImmediate(target);
         }
     }
 }

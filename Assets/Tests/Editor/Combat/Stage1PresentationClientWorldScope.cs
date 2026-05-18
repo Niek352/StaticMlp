@@ -44,6 +44,7 @@ namespace StaticMlp.Tests.Combat
             CW.Create(WorldConfig.Default());
             CW.Types().RegisterAll(
                 typeof(ClientCoreWT).Assembly,
+                typeof(SettlementAnchorRef).Assembly,
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
                 typeof(SettlementPresentationFeature).Assembly,
                 typeof(SettlementWorkersGameplayFeature).Assembly,
@@ -54,6 +55,7 @@ namespace StaticMlp.Tests.Combat
                 typeof(FrontierPresentationFeature).Assembly,
                 typeof(ProgressionLogicFeature).Assembly,
                 typeof(ProgressionPresentationFeature).Assembly,
+                typeof(Stage1FlowViewState).Assembly,
                 typeof(Stage1CampAnchorGameplayFeature).Assembly,
                 typeof(PlayerTag).Assembly);
             ProjectionRegistry.RegisterClientWorldTypes();

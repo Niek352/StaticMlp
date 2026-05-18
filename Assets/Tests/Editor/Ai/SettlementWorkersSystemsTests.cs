@@ -40,7 +40,7 @@ namespace StaticMlp.Tests.Ai
         }
 
         [Test]
-        public void CampBuilderJobSystem_BuildsSummaryAndAdvancesWorkerAssignedStage()
+        public void CampBuilderJobSystem_BuildsSummaryWithoutMutatingStage()
         {
             using var scope = new AiTestServerWorldScope();
             var anchorId = SettlementAnchorCatalog.HomeCampId;
@@ -50,7 +50,7 @@ namespace StaticMlp.Tests.Ai
 
             new ServerSettlementWorkerCampBuilderJobSystem().Update();
 
-            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.WorkerAssigned));
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.CampRepaired));
 
             ref readonly var job = ref anchor.Read<SettlementCampBuilderJobState>();
             Assert.That(job.AssignedWorker, Is.EqualTo(worker.GID));

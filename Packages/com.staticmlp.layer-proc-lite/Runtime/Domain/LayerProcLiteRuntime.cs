@@ -81,6 +81,8 @@ namespace StaticMlp.LayerProcLite
 
         public void Tick()
         {
+            JobHandle.ScheduleBatchedJobs();
+
             foreach (var entry in _chunks.Values)
             {
                 if (entry.State != LayerProcLiteChunkState.Scheduled || !entry.Handle.IsCompleted)
@@ -145,11 +147,10 @@ namespace StaticMlp.LayerProcLite
 
         public void Dispose()
         {
+            CompleteScheduledJobs();
+
             foreach (var entry in _chunks.Values)
-            {
-                entry.Handle.Complete();
                 entry.Data.Dispose();
-            }
 
             _chunks.Clear();
             _topDependencies.Clear();
@@ -339,11 +340,13 @@ namespace StaticMlp.LayerProcLite
                     _releaseKeys.Add(pair.Key);
             }
 
+            if (_releaseKeys.Count > 0)
+                CompleteScheduledJobs();
+
             for (var i = 0; i < _releaseKeys.Count; i++)
             {
                 var key = _releaseKeys[i];
                 var entry = _chunks[key];
-                entry.Handle.Complete();
                 entry.Data.Dispose();
                 _chunks.Remove(key);
             }
@@ -355,6 +358,16 @@ namespace StaticMlp.LayerProcLite
         {
             combined = hasDependencyHandle ? JobHandle.CombineDependencies(combined, dependency) : dependency;
             hasDependencyHandle = true;
+        }
+
+        public void CompleteScheduledJobs()
+        {
+            foreach (var entry in _chunks.Values)
+            {
+                entry.Handle.Complete();
+                if (entry.State == LayerProcLiteChunkState.Scheduled)
+                    entry.State = LayerProcLiteChunkState.Ready;
+            }
         }
 
         private sealed class ChunkEntry

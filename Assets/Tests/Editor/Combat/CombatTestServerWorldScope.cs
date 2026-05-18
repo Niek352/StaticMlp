@@ -36,6 +36,7 @@ namespace StaticMlp.Tests.Combat
             ServerPeerRegistry.Clear();
             NetworkEventRegistry.Clear();
             ReplicatedNetworkEventRegistry.RegisterNetworkEvents();
+            ReplicatedComponentRegistration.RegisterReplicationComponents();
             new BuildLogicFeature().RegisterNetworkEvents();
             new CombatLogicFeature().RegisterNetworkEvents();
             new FrontierLogicFeature().RegisterNetworkEvents();
@@ -46,12 +47,18 @@ namespace StaticMlp.Tests.Combat
                 typeof(BuildLogicFeature).Assembly,
                 typeof(BuildingsGameplayFeature).Assembly,
                 typeof(CombatLogicFeature).Assembly,
+                typeof(EffectProcessedTag).Assembly,
                 typeof(EffectsLogicFeature).Assembly,
                 typeof(FrontierLogicFeature).Assembly,
                 typeof(Health).Assembly,
+                typeof(ProgressFlagAppliedEvent).Assembly,
                 typeof(ProgressionLogicFeature).Assembly,
+                typeof(SettlementAnchorRef).Assembly,
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
+                typeof(SettlementWorkersGameplayFeature).Assembly,
+                typeof(Stage1FlowViewState).Assembly,
                 typeof(Stage1CampAnchorGameplayFeature).Assembly,
+                typeof(PoisonStatus).Assembly,
                 typeof(StatusesLogicFeature).Assembly,
                 typeof(CharacterNetState).Assembly,
                 typeof(AiAgentTag).Assembly);
@@ -63,6 +70,7 @@ namespace StaticMlp.Tests.Combat
                 FixedStepSeconds = DEFAULT_FIXED_STEP_SECONDS,
             });
             SW.SetResource(new CombatDebugLogBuffer());
+            SW.SetResource(new NetOutbox());
             SW.SetResource(new CombatConfig());
             SW.SetResource(Stage1FrontierSeedManifest.CreateResource());
             SW.SetResource(Stage1ProgressionSeedManifest.CreateResource());
@@ -158,6 +166,12 @@ namespace StaticMlp.Tests.Combat
         {
             var entity = SW.NewEntity<Default>();
             entity.Set<MonsterTag>();
+            entity.Set(new NetworkIdentity
+            {
+                Owner = new NetworkPeerId(1),
+                Authority = NetworkAuthority.Server,
+                NetworkArchetypeId = 0
+            });
             entity.Set(new CharacterNetState
             {
                 Position = position,
