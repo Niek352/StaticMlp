@@ -703,6 +703,7 @@ namespace StaticMlp.Tests.OpenWorldGeneration
         [Test]
         public void TerrainRuntime_DebugSnapshot_ReportsLoadedChunksAndColliderState()
         {
+            DestroyOpenWorldTestWorlds();
             var config = CreateRuntimeConfig("OpenWorldTerrainDebugSnapshotTest");
             config.Bounds = new WorldChunkBounds(-1, 1, -1, 1);
             config.ViewRadiusInChunks = 1;
@@ -711,6 +712,7 @@ namespace StaticMlp.Tests.OpenWorldGeneration
 
             try
             {
+                CreateOpenWorldClientWorld();
                 runtime.StreamAround(Vector3.zero);
 
                 var snapshot = runtime.CreateDebugSnapshot();
@@ -728,26 +730,41 @@ namespace StaticMlp.Tests.OpenWorldGeneration
             finally
             {
                 runtime.Dispose();
+                DestroyOpenWorldTestWorlds();
             }
         }
 
         [Test]
         public void TerrainRuntime_Dispose_DestroysRootChunksAndMeshesInEditMode()
         {
+            DestroyOpenWorldTestWorlds();
             const string rootName = "OpenWorldTerrainCleanupTest";
             var config = CreateRuntimeConfig(rootName);
             config.Bounds = new WorldChunkBounds(0, 0, 0, 0);
             config.ViewRadiusInChunks = 0;
             var runtime = OpenWorldTerrainRuntime.Create(config);
-            runtime.StreamAround(Vector3.zero);
+            var disposed = false;
 
-            Assert.That(GameObject.Find(rootName), Is.Not.Null);
-            Assert.That(UnityEngine.Object.FindObjectsOfType<TerrainChunkView>(), Is.Not.Empty);
+            try
+            {
+                CreateOpenWorldClientWorld();
+                runtime.StreamAround(Vector3.zero);
 
-            runtime.Dispose();
+                Assert.That(GameObject.Find(rootName), Is.Not.Null);
+                Assert.That(UnityEngine.Object.FindObjectsOfType<TerrainChunkView>(), Is.Not.Empty);
 
-            Assert.That(GameObject.Find(rootName), Is.Null);
-            Assert.That(UnityEngine.Object.FindObjectsOfType<TerrainChunkView>(), Is.Empty);
+                runtime.Dispose();
+                disposed = true;
+
+                Assert.That(GameObject.Find(rootName), Is.Null);
+                Assert.That(UnityEngine.Object.FindObjectsOfType<TerrainChunkView>(), Is.Empty);
+            }
+            finally
+            {
+                if (!disposed)
+                    runtime.Dispose();
+                DestroyOpenWorldTestWorlds();
+            }
         }
 
         [Test]

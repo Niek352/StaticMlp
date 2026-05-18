@@ -25,6 +25,7 @@ namespace StaticMlp.Tests.Combat
 
             NetworkEventRegistry.Clear();
             ReplicatedNetworkEventRegistry.RegisterNetworkEvents();
+            ReplicatedComponentRegistration.RegisterReplicationComponents();
             new BuildLogicFeature().RegisterNetworkEvents();
             new CombatLogicFeature().RegisterNetworkEvents();
             CW.Create(WorldConfig.Default());
@@ -37,11 +38,16 @@ namespace StaticMlp.Tests.Combat
                 typeof(EffectsPresentationFeature).Assembly,
                 typeof(ViewPath).Assembly,
                 typeof(Health).Assembly,
+                typeof(PoisonStatus).Assembly,
                 typeof(StatusesLogicFeature).Assembly,
                 typeof(StatusesPresentationFeature).Assembly,
                 typeof(CharacterNetState).Assembly);
             NetworkEventRegistry.RegisterClientWorldTypes();
             CW.Initialize();
+            const uint clientLocalChunk = 321;
+            CW.SetResource(new ClientLocalChunkLease());
+            CW.GetResource<ClientLocalChunkLease>().Replace(new[] { clientLocalChunk });
+            CW.RegisterChunk(clientLocalChunk, ChunkOwnerType.Self, clusterId: 0);
             CW.SetResource(new GameTime());
             CW.SetResource(new CombatConfig());
             CW.SetResource(new StatusesConfig());
