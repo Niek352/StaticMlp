@@ -1,0 +1,23 @@
+{
+    "name": "StaticMlp.Tests.Build",
+    "rootNamespace": "StaticMlp.Tests.Build",
+    "references": [
+        "Game.Core",
+        "StaticMlp.Features.Build.Contracts",
+        "StaticMlp.Features.Build.Logic"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

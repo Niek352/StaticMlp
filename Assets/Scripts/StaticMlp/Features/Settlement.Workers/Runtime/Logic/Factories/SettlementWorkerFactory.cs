@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Npc;
 using StaticMlp.Game;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -21,8 +22,19 @@ namespace StaticMlp.Features.Settlement.Workers
 
         private static void Configure(SW.Entity entity, in SettlementWorkerSpawnSpec spec)
         {
+            var npcDefinitionId = SettlementWorkerNpcProfileCatalog.Get(spec.RoleId);
+            var npcDefinition = NpcDefinitionCatalog.Get(npcDefinitionId);
+
             entity.Set<AiAgentTag>();
             entity.Set<SettlementWorkerTag>();
+            entity.Set<NpcTag>();
+            entity.Set(new NpcIdentity
+            {
+                DefinitionId = npcDefinition.Id.Value,
+                Class = npcDefinition.Class,
+                AcquisitionPath = NpcAcquisitionPath.Seeded,
+                Roles = npcDefinition.Roles
+            });
             entity.Set(new SettlementWorkerIdentity
             {
                 HomeAnchorId = spec.HomeAnchorId.Value,

@@ -16,7 +16,8 @@
         "StaticMlp.Features.Settlement.Logic",
         "StaticMlp.Features.Settlement.Workers.Contracts",
         "StaticMlp.Features.Shared.Logic",
-        "StaticMlp.Features.Stage1.Contracts"
+        "StaticMlp.Features.Stage1.Contracts",
+        "StaticMlp.Features.Npc.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

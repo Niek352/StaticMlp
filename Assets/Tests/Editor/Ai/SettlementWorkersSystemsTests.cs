@@ -1,5 +1,7 @@
+using System;
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Npc;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking.Requests;
@@ -103,6 +105,36 @@ namespace StaticMlp.Tests.Ai
             Assert.That(buildExecutor.GetType().Namespace, Is.EqualTo("StaticMlp.Features.Settlement.Workers"));
             Assert.That(deliveryExecutor.GetType().Namespace, Is.EqualTo("StaticMlp.Features.Settlement.Workers"));
             Assert.That(followLeaderExecutor.GetType().Namespace, Is.EqualTo("StaticMlp.Features.AiActions"));
+        }
+
+        [Test]
+        public void SpawnedWorker_HasNpcTag()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var worker = scope.CreateWorker(SettlementAnchorCatalog.HomeCampId, Vector3.zero);
+
+            Assert.That(worker.Has<NpcTag>(), Is.True);
+        }
+
+        [Test]
+        public void SpawnedWorker_HasNpcIdentity()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var worker = scope.CreateWorker(SettlementAnchorCatalog.HomeCampId, Vector3.zero);
+
+            Assert.That(worker.Has<NpcIdentity>(), Is.True);
+
+            ref readonly var identity = ref worker.Read<NpcIdentity>();
+            Assert.That(identity.DefinitionId, Is.EqualTo(NpcDefinitionCatalog.SeededCampBuilderId.Value));
+            Assert.That(identity.Class, Is.EqualTo(NpcClass.Companion));
+            Assert.That(identity.AcquisitionPath, Is.EqualTo(NpcAcquisitionPath.Seeded));
+            Assert.That(identity.Roles, Is.EqualTo(NpcRoleFlags.Builder));
+        }
+
+        [Test]
+        public void MissingWorkerToNpcMapping_Throws()
+        {
+            Assert.Throws<InvalidOperationException>(() => SettlementWorkerNpcProfileCatalog.Get(new WorkerRoleId(999)));
         }
     }
 }

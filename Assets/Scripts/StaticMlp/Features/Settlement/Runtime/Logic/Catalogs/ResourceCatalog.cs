@@ -12,15 +12,22 @@ namespace StaticMlp.Features.Settlement
         {
             new(
                 WoodId,
+                ResourceFamily.Raw,
                 ResourceUsageFlags.Construction | ResourceUsageFlags.ExpeditionReward,
                 isSettlementStored: true,
                 startingSettlementAmount: 50),
             new(
                 StoneId,
+                ResourceFamily.Raw,
                 ResourceUsageFlags.Construction | ResourceUsageFlags.ExpeditionReward,
                 isSettlementStored: true,
                 startingSettlementAmount: 25)
         };
+
+        static ResourceCatalog()
+        {
+            ResourceCatalogValidator.Validate(Definitions);
+        }
 
         public static IReadOnlyList<ResourceDefinition> All => Definitions;
 

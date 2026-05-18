@@ -4,6 +4,7 @@ using StaticMlp.Features.AiActions;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.Npc;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Features.Shared;
@@ -34,7 +35,8 @@ namespace StaticMlp.Tests.Ai
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
                 typeof(SettlementWorkersGameplayFeature).Assembly,
                 typeof(Health).Assembly,
-                typeof(CharacterNetState).Assembly);
+                typeof(CharacterNetState).Assembly,
+                typeof(NpcGameplayFeature).Assembly);
             SW.Initialize();
 
             Catalog = AiActionCatalog.Discover(new AiTaskExecutionTransitions());
@@ -130,7 +132,18 @@ namespace StaticMlp.Tests.Ai
             SettlementWorkerAssignmentStatus status = SettlementWorkerAssignmentStatus.Unassigned)
         {
             var entity = CreateBot(position, SettlementWorkerBehaviorIds.PEACEFUL_BUILDER);
+            var npcDefinitionId = SettlementWorkerNpcProfileCatalog.Get(WorkerRoleCatalog.CampBuilderId);
+            var npcDefinition = NpcDefinitionCatalog.Get(npcDefinitionId);
+
             entity.Set<SettlementWorkerTag>();
+            entity.Set<NpcTag>();
+            entity.Set(new NpcIdentity
+            {
+                DefinitionId = npcDefinition.Id.Value,
+                Class = npcDefinition.Class,
+                AcquisitionPath = NpcAcquisitionPath.Seeded,
+                Roles = npcDefinition.Roles
+            });
             entity.Set(new SettlementWorkerIdentity
             {
                 HomeAnchorId = anchorId.Value,

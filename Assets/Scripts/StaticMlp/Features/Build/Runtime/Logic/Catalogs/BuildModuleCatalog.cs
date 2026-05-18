@@ -13,15 +13,20 @@ namespace StaticMlp.Features.Build
         {
             new(
                 PoisonArrowModuleId,
-                BuildModuleSlotType.PrimaryAbility,
+                EquipmentSlotKind.Combat,
                 BuildArchetypeCatalog.PoisonArcherId,
                 CombatAbilityId.PoisonArrow),
             new(
                 FireFlaskModuleId,
-                BuildModuleSlotType.PrimaryAbility,
+                EquipmentSlotKind.Combat,
                 BuildArchetypeCatalog.FireBomberId,
                 CombatAbilityId.FireFlask)
         };
+
+        static BuildModuleCatalog()
+        {
+            SlotRules.ValidateModuleCatalog(Definitions);
+        }
 
         public static IReadOnlyList<BuildModuleDefinition> All => Definitions;
 

@@ -6,6 +6,7 @@
         "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core",
+        "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Settlement.Logic"
     ],
     "includePlatforms": [],
