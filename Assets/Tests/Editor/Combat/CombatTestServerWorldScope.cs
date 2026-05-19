@@ -8,6 +8,7 @@ using StaticMlp.Features.Combat;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
+using StaticMlp.Features.Npc;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Features.Progression;
@@ -43,6 +44,7 @@ namespace StaticMlp.Tests.Combat
             new Stage1CampAnchorGameplayFeature().RegisterNetworkEvents();
             SW.Create(WorldConfig.Default());
             SW.Types().RegisterAll(
+                typeof(NpcTag).Assembly,
                 typeof(ServerWT).Assembly,
                 typeof(LoadoutLogicFeature).Assembly,
                 typeof(BuildingsGameplayFeature).Assembly,
