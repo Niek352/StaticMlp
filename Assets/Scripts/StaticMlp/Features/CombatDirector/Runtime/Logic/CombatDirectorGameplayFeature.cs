@@ -11,6 +11,7 @@ namespace StaticMlp.Features.CombatDirector
         {
             ProjectionRegistry.Register<DirectorState>();
             ProjectionRegistry.Register<EnemyArchetype>();
+            ProjectionRegistry.Register<EnemySpawnSource>();
         }
 
         public override void RegisterServerResources()

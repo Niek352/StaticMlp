@@ -68,7 +68,8 @@ namespace StaticMlp.Features.CombatDirector
                 spawnedEntity.Set(new EnemySpawnSource
                 {
                     SourceEntity = spawnRequest.SourceEntity,
-                    SourceType = spawnRequest.SourceType
+                    SourceType = spawnRequest.SourceType,
+                    SpawnPosition = spawnRequest.SpawnPosition
                 });
                 SW.SendEvent(new EnemySpawnedEvent(spawnedGid, spawnRequest.Role, spawnRequest.SourceType));
             }

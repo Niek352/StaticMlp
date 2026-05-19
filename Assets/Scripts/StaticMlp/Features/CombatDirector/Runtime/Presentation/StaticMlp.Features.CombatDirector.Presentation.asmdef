@@ -1,0 +1,22 @@
+{
+    "name": "StaticMlp.Features.CombatDirector.Presentation",
+    "rootNamespace": "StaticMlp.Features.CombatDirector",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "Unity.Mathematics",
+        "StaticMlp.Features.CombatDirector.Contracts",
+        "StaticMlp.Features.EcsViews",
+        "StaticMlp.Features.Effects.Presentation"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

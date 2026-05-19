@@ -82,6 +82,54 @@ Reason:
 - Run Unity compile checks.
 - Run the Combat Director editor tests in Unity.
 
+# Task 7 Summary - Client Presentation And View Systems
+
+## Completed
+
+- Added `StaticMlp.Features.CombatDirector.Presentation` with client-only presentation systems:
+  - `DirectorTelegraphReceiveSystem`
+  - `SpawnSourceVfxSystem`
+  - `EnemyViewBindSystem`
+  - `EnemySpawnAudioSystem`
+- Promoted `EnemySpawnSource` into Combat Director contracts and made it replicated spawn-origin metadata on spawned enemy entities.
+- Extended spawned enemy metadata with `SpawnPosition` so clients can play source VFX/audio without networking static spawn-source entities.
+- Registered `EnemySpawnSource` for client projection alongside `DirectorState` and `EnemyArchetype`.
+- Added client-only presentation state for:
+  - spawn-source telegraph pulses
+  - enemy role view state
+  - director phase audio transition tracking
+- Reused the existing Effects presentation visual pipeline for source pulses instead of adding prefab assets.
+
+## Architecture Deviation
+
+- Did not replicate raw `SpawnSource` entities for the MVP telegraph path.
+- The client infers the spawn/source pulse from replicated `EnemySpawnSource` metadata attached to the spawned enemy.
+
+Reason:
+
+- Existing `SpawnSource` entities are server-side gameplay/navigation entities and are not currently network entities with `NetworkIdentity`.
+- Making every static source networked would be a broader ownership and replication change than task 7 needs.
+- Spawn-origin metadata on the already-networked enemy entity gives presentation the source type and position while keeping gameplay authority on the server.
+
+## Intentional Scope Limit
+
+- Enemy role visual variation is exposed as `EnemyRoleViewState`; existing bot prefabs do not yet contain a role-specific view part.
+- Spawn VFX uses the existing generic combat effect view path and maps Burrow/Rift to existing effect variants.
+- Audio stingers are generated procedural clips because the project currently has no stable audio asset/config pipeline.
+- No prefab, prefab XML, Canvas, or inspector wiring assets were created.
+
+## Verification
+
+- Ran `git diff --check` on the touched Combat Director paths.
+- Client-side runtime behavior remains manual/visual verification because the project does not have a dedicated client presentation harness for view binding, VFX, and audio playback.
+
+## Manual Follow-Up Required
+
+- Run Unity compile checks.
+- Run `StaticMlp/Replication/Generate` so `EnemySpawnSource` gets generated replication registration.
+- Run the Combat Director editor tests in Unity.
+- Verify in play mode that enemy spawns produce bot views, source VFX pulses, and spawn/Peak audio stingers.
+
 # Task 5 Summary - Spawn Source Selection And Spawn Request Build
 
 ## Completed
