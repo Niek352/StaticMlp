@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
@@ -32,7 +32,7 @@ namespace StaticMlp.Features.Combat
         private static void UpdatePlayer(CW.Entity player, CombatConfig config, float now)
         {
             ref var state = ref player.Mut<PassiveAutoAttackState>();
-            var abilityId = player.Read<PreparedBuildSnapshot>().PreparedAbilityId;
+            var abilityId = player.Read<PreparedLoadoutSnapshot>().PreparedAbilityId;
             if (state.CurrentTarget.Raw == 0ul || !state.CurrentTarget.TryUnpack<ClientCoreWT>(out _))
             {
                 if (player.Has<PassiveAutoAttackIntent>())

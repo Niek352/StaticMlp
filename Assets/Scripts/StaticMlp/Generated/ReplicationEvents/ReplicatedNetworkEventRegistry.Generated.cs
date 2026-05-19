@@ -4,11 +4,11 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
-using StaticMlp.Features.Build;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Npc;
 using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.Settlement;
@@ -27,18 +27,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 18,
                 WriteCommandBotEvent,
                 ReadCommandBotEvent);
-            NetworkEventRegistry.Register<PrepareBossRequestEvent>(
-                ReplicatedNetworkEventIds.PrepareBossRequestEvent,
-                NetDelivery.ReliableSequenced,
-                16,
-                WritePrepareBossRequestEvent,
-                ReadPrepareBossRequestEvent);
-            NetworkEventRegistry.Register<PrepareBuildCommand>(
-                ReplicatedNetworkEventIds.PrepareBuildCommand,
-                NetDelivery.ReliableSequenced,
-                16,
-                WritePrepareBuildCommand,
-                ReadPrepareBuildCommand);
             NetworkEventRegistry.Register<BuildConstructionRequestEvent>(
                 ReplicatedNetworkEventIds.BuildConstructionRequestEvent,
                 NetDelivery.ReliableSequenced,
@@ -105,6 +93,18 @@ namespace StaticMlp.Networking.Replication.Generated {
                 16,
                 WriteStartExpeditionRequestEvent,
                 ReadStartExpeditionRequestEvent);
+            NetworkEventRegistry.Register<PrepareBossRequestEvent>(
+                ReplicatedNetworkEventIds.PrepareBossRequestEvent,
+                NetDelivery.ReliableSequenced,
+                16,
+                WritePrepareBossRequestEvent,
+                ReadPrepareBossRequestEvent);
+            NetworkEventRegistry.Register<PrepareLoadoutCommand>(
+                ReplicatedNetworkEventIds.PrepareLoadoutCommand,
+                NetDelivery.ReliableSequenced,
+                16,
+                WritePrepareLoadoutCommand,
+                ReadPrepareLoadoutCommand);
             NetworkEventRegistry.Register<ExtractNpcRequestEvent>(
                 ReplicatedNetworkEventIds.ExtractNpcRequestEvent,
                 NetDelivery.ReliableSequenced,
@@ -166,28 +166,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 Bot = reader.ReadEntityGid(),
                 CommandType = reader.ReadUshort(),
                 Target = reader.ReadEntityGid(),
-            };
-        }
-
-        private static void WritePrepareBossRequestEvent(ref NetworkWriter writer, in PrepareBossRequestEvent evt) {
-            writer.WriteUshort(evt.AnchorIdValue);
-        }
-
-        private static PrepareBossRequestEvent ReadPrepareBossRequestEvent(ref NetworkReader reader) {
-            return new PrepareBossRequestEvent {
-                AnchorIdValue = reader.ReadUshort(),
-            };
-        }
-
-        private static void WritePrepareBuildCommand(ref NetworkWriter writer, in PrepareBuildCommand evt) {
-            writer.WriteUshort(evt.AnchorId.Value);
-            writer.WriteUshort(evt.PrimaryModuleId.Value);
-        }
-
-        private static PrepareBuildCommand ReadPrepareBuildCommand(ref NetworkReader reader) {
-            return new PrepareBuildCommand {
-                AnchorId = new SettlementAnchorId(reader.ReadUshort()),
-                PrimaryModuleId = new BuildModuleId(reader.ReadUshort()),
             };
         }
 
@@ -350,6 +328,28 @@ namespace StaticMlp.Networking.Replication.Generated {
             return new StartExpeditionRequestEvent {
                 AnchorId = reader.ReadUshort(),
                 ExpeditionId = reader.ReadUshort(),
+            };
+        }
+
+        private static void WritePrepareBossRequestEvent(ref NetworkWriter writer, in PrepareBossRequestEvent evt) {
+            writer.WriteUshort(evt.AnchorIdValue);
+        }
+
+        private static PrepareBossRequestEvent ReadPrepareBossRequestEvent(ref NetworkReader reader) {
+            return new PrepareBossRequestEvent {
+                AnchorIdValue = reader.ReadUshort(),
+            };
+        }
+
+        private static void WritePrepareLoadoutCommand(ref NetworkWriter writer, in PrepareLoadoutCommand evt) {
+            writer.WriteUshort(evt.AnchorId.Value);
+            writer.WriteUshort(evt.PrimaryModuleId.Value);
+        }
+
+        private static PrepareLoadoutCommand ReadPrepareLoadoutCommand(ref NetworkReader reader) {
+            return new PrepareLoadoutCommand {
+                AnchorId = new SettlementAnchorId(reader.ReadUshort()),
+                PrimaryModuleId = new LoadoutModuleId(reader.ReadUshort()),
             };
         }
 

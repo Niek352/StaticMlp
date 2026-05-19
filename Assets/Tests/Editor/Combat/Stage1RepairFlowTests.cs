@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Progression;
@@ -90,8 +90,8 @@ namespace StaticMlp.Tests.Combat
             Assert.That(anchor.Has<ThreatState>(), Is.True);
             Assert.That(anchor.Has<RaidScheduleState>(), Is.True);
             Assert.That(anchor.Has<BossEncounterState>(), Is.True);
-            Assert.That(anchor.Has<BossBuildPreparationState>(), Is.True);
-            Assert.That(anchor.Has<BossPreparedBuildSnapshot>(), Is.True);
+            Assert.That(anchor.Has<BossLoadoutPreparationState>(), Is.True);
+            Assert.That(anchor.Has<BossPreparedLoadoutSnapshot>(), Is.True);
             Assert.That(anchor.Has<SettlementAnchorLocation>(), Is.True);
         }
 
@@ -199,7 +199,7 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
-        public void ServerStage1FlowSystem_WhenBuildPreparedEventReceived_AdvancesToBuildPrepared()
+        public void ServerStage1FlowSystem_WhenLoadoutPreparedEventReceived_AdvancesToLoadoutPrepared()
         {
             using var scope = new CombatTestServerWorldScope();
             var anchor = scope.CreateSettlementAnchor(
@@ -209,15 +209,15 @@ namespace StaticMlp.Tests.Combat
 
             var flowSystem = new ServerStage1FlowSystem();
             flowSystem.Init();
-            SW.SendEvent(new Stage1BuildPreparedEvent(SettlementAnchorCatalog.HomeCampId));
+            SW.SendEvent(new Stage1LoadoutPreparedEvent(SettlementAnchorCatalog.HomeCampId));
             flowSystem.Update();
             flowSystem.Destroy();
 
-            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.BuildPrepared));
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.LoadoutPrepared));
         }
 
         [Test]
-        public void ServerFrontierExpeditionAvailabilitySystem_WhenPreparedBuildSnapshotExists_DoesNotAdvanceStage()
+        public void ServerFrontierExpeditionAvailabilitySystem_WhenPreparedLoadoutSnapshotExists_DoesNotAdvanceStage()
         {
             using var scope = new CombatTestServerWorldScope();
             var anchor = scope.CreateSettlementAnchor(
@@ -226,14 +226,14 @@ namespace StaticMlp.Tests.Combat
                 Stage1SettlementProgressStage.WorkerAssigned);
             scope.CreatePlayer(new NetworkPeerId(1), Vector3.zero);
 
-            new ServerPreparedBuildSnapshotSystem().Update();
+            new ServerPreparedLoadoutSnapshotSystem().Update();
             new ServerFrontierExpeditionAvailabilitySystem().Update();
 
             Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.WorkerAssigned));
         }
 
         [Test]
-        public void ClientStage1HudStateSystem_WhenCampIsRepaired_ShowsAssignWorkerAndKeepsBuildPreparationClosed()
+        public void ClientStage1HudStateSystem_WhenCampIsRepaired_ShowsAssignWorkerAndKeepsLoadoutPreparationClosed()
         {
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
@@ -245,7 +245,7 @@ namespace StaticMlp.Tests.Combat
             ref readonly var hud = ref CW.GetResource<Stage1HudState>();
             Assert.That(hud.Objective, Is.Not.EqualTo(Stage1ObjectiveKind.RepairCamp));
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.AssignWorker));
-            Assert.That(hud.CanOpenBuildPreparation, Is.False);
+            Assert.That(hud.CanOpenLoadoutPreparation, Is.False);
             Assert.That(hud.CanOpenExpeditionSelection, Is.False);
         }
 

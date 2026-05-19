@@ -14,7 +14,7 @@ namespace StaticMlp.Features.Frontier
             {
                 ref readonly var progression = ref anchor.Read<Stage1SettlementProgression>();
                 var shouldBeAvailable =
-                    progression.Stage == Stage1SettlementProgressStage.BuildPrepared
+                    progression.Stage == Stage1SettlementProgressStage.LoadoutPrepared
                     && anchor.Read<ActiveExpeditionState>().Status == ExpeditionActivityStatus.None
                     && anchor.Read<ThreatState>().Phase != ThreatPhase.RaidPending
                     && anchor.Read<ThreatState>().Phase != ThreatPhase.RaidActive

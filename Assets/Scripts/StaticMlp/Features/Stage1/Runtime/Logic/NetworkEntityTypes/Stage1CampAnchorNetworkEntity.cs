@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
@@ -19,8 +19,8 @@ namespace StaticMlp.Features.Stage1
         typeof(ThreatState),
         typeof(RaidScheduleState),
         typeof(BossEncounterState),
-        typeof(BossBuildPreparationState),
-        typeof(BossPreparedBuildSnapshot))]
+        typeof(BossLoadoutPreparationState),
+        typeof(BossPreparedLoadoutSnapshot))]
     public struct Stage1CampAnchorNetworkEntity : INetworkEntityType
     {
         public byte Id() => 8;

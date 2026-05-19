@@ -456,7 +456,7 @@ namespace StaticMlp.Editor.ReplicationCodeGen
 
             private static bool IsUshortValueObject(Type type) {
                 if (type.FullName != "StaticMlp.Features.Settlement.SettlementAnchorId" &&
-                    type.FullName != "StaticMlp.Features.Build.BuildModuleId")
+                    type.FullName != "StaticMlp.Features.Loadout.LoadoutModuleId")
                     return false;
 
                 var value = type.GetField("Value", BindingFlags.Instance | BindingFlags.Public);

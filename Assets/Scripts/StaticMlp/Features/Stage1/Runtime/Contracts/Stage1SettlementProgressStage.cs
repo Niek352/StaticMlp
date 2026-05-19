@@ -7,6 +7,6 @@ namespace StaticMlp.Features.Settlement
         RepairResourcesReady = 2,
         CampRepaired = 3,
         WorkerAssigned = 4,
-        BuildPrepared = 5,
+        LoadoutPrepared = 5,
     }
 }

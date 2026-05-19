@@ -6,7 +6,7 @@
         "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core",
-        "StaticMlp.Features.Build.Logic",
+        "StaticMlp.Features.Loadout.Logic",
         "StaticMlp.Features.Combat.Contracts",
         "StaticMlp.Features.Shared.Logic",
         "StaticMlp.Features.Effects.Contracts",

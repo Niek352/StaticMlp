@@ -14,11 +14,11 @@ Design Lock не должен реализовывать полноценный 
 
 - NPC Economy.
 - Combat Director.
-- Build/Equipment system.
+- Loadout/Equipment system.
 - Vertical Slice.
 - Production-ready expansion.
 
-Главный результат scope: проект получает единый “source of truth” по NPC-классам, ресурсным семействам, способам получения NPC, слотам Build/Equipment и правилам server-authoritative ECS.
+Главный результат scope: проект получает единый “source of truth” по NPC-классам, ресурсным семействам, способам получения NPC, слотам Loadout/Equipment и правилам server-authoritative ECS.
 
 ## 2. Макро-решения, которые нужно зафиксировать
 
@@ -68,7 +68,7 @@ Design Lock не должен реализовывать полноценный 
 4. **Progression** — Boss cores, biome sigils, blueprint plates, memory shards.
 5. **Stability / Maintenance** — Repair kits, medicine, filters, antidotes, insulation, ammunition.
 
-### 2.4 Build/Equipment slots-only rule
+### 2.4 Loadout/Equipment slots-only rule
 
 Игрок может хранить библиотеку найденных предметов, но активировать только лимитированную конфигурацию.
 
@@ -76,7 +76,7 @@ Design Lock не должен реализовывать полноценный 
 
 - 3 Combat modules.
 - 2 Utility modules.
-- 2 Build signals.
+- 2 Base signals.
 - 4 Base infrastructure effects.
 
 Никакой бесконечной суммы пассивок в MVP. Все эффекты должны проходить через slot activation.
@@ -131,7 +131,7 @@ public enum EquipmentSlotKind : byte
 {
     Combat = 1,
     Utility = 2,
-    BuildSignal = 3,
+    BaseSignal = 3,
     BaseInfrastructure = 4
 }
 

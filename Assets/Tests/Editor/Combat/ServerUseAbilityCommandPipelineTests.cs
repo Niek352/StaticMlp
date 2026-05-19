@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
@@ -116,11 +116,11 @@ namespace StaticMlp.Tests.Combat
             scope.SetSimulationTime(120);
             var sourcePeer = new NetworkPeerId(23);
             var source = scope.CreatePlayer(sourcePeer, Vector3.zero);
-            source.Set(new OwnerBuildSelection
+            source.Set(new OwnerLoadoutSelection
             {
-                PrimaryModuleId = BuildModuleCatalog.FireFlaskModuleId
+                PrimaryModuleId = LoadoutModuleCatalog.FireFlaskModuleId
             });
-            source.Set(Stage1BuildRules.CreatePreparedSnapshot(source.Read<OwnerBuildSelection>()));
+            source.Set(Stage1LoadoutRules.CreatePreparedSnapshot(source.Read<OwnerLoadoutSelection>()));
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
             SW.GetResource<StatusEntityFactory>().SpawnOiled(target, target.GID, new AddStatusSpec
             {
@@ -165,17 +165,17 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
-        public void Update_RejectsAbilityOutsidePreparedBuildSnapshot()
+        public void Update_RejectsAbilityOutsidePreparedLoadoutSnapshot()
         {
             using var scope = new CombatTestServerWorldScope();
             scope.SetSimulationTime(120);
             var sourcePeer = new NetworkPeerId(25);
             var source = scope.CreatePlayer(sourcePeer, Vector3.zero);
-            source.Set(new OwnerBuildSelection
+            source.Set(new OwnerLoadoutSelection
             {
-                PrimaryModuleId = BuildModuleCatalog.FireFlaskModuleId
+                PrimaryModuleId = LoadoutModuleCatalog.FireFlaskModuleId
             });
-            source.Set(Stage1BuildRules.CreatePreparedSnapshot(source.Read<OwnerBuildSelection>()));
+            source.Set(Stage1LoadoutRules.CreatePreparedSnapshot(source.Read<OwnerLoadoutSelection>()));
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
             var receive = new ServerReceiveCombatCommandsSystem();
 

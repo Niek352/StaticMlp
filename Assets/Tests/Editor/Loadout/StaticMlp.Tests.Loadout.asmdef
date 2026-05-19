@@ -1,0 +1,23 @@
+{
+    "name": "StaticMlp.Tests.Loadout",
+    "rootNamespace": "StaticMlp.Tests.Loadout",
+    "references": [
+        "Game.Core",
+        "StaticMlp.Features.Loadout.Contracts",
+        "StaticMlp.Features.Loadout.Logic"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

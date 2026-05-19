@@ -84,6 +84,7 @@ namespace StaticMlp.Features.Player
             if (CW.Status != WorldStatus.Initialized)
                 return;
 
+            
             var config = CW.GetResource<ClientCameraConfig>();
             config.YawSensitivity = yawSensitivity;
             config.PitchSensitivity = pitchSensitivity;

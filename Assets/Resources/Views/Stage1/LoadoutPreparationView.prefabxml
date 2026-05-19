@@ -1,0 +1,189 @@
+<UnityPrefab>
+    <GameObject name="BuildPreparationView" id="Root">
+        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+        <Canvas m_RenderMode="ScreenSpaceOverlay" m_SortingOrder="90" />
+        <CanvasScaler m_UiScaleMode="ScaleWithScreenSize" m_ReferenceResolution="1920, 1080" m_ScreenMatchMode="MatchWidthOrHeight" m_MatchWidthOrHeight="0.5" />
+        <GraphicRaycaster />
+        <LoadoutPreparationView
+            panelRoot="#Panel"
+            poisonArrowButton="#PoisonArrowButton"
+            fireFlaskButton="#FireFlaskButton"
+            confirmButton="#ConfirmButton"
+            closeButton="#CloseButton"
+            summaryLabel="#SummaryLabelText" />
+
+        <GameObject name="Backdrop">
+            <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+            <Image m_Color="#091117B8" m_RaycastTarget="true" />
+        </GameObject>
+
+        <GameObject name="Panel" id="Panel" active="false">
+            <RectTransform m_SizeDelta="520, 400" />
+            <Image m_Color="#162127F4" m_RaycastTarget="true" />
+            <VerticalLayoutGroup
+                m_Padding.m_Left="18"
+                m_Padding.m_Right="18"
+                m_Padding.m_Top="18"
+                m_Padding.m_Bottom="18"
+                m_Spacing="12"
+                m_ChildControlWidth="true"
+                
+                m_ChildForceExpandWidth="true"
+                m_ChildForceExpandHeight="false" />
+
+            <GameObject name="Title">
+                <RectTransform m_SizeDelta="0, 34" />
+                <TextMeshProUGUI
+                    m_text="Build Preparation"
+                    m_fontSize="24"
+                    m_fontStyle="Bold"
+                    m_fontColor="#F3F6EF"
+                    m_HorizontalAlignment="Center"
+                    m_VerticalAlignment="Middle"
+                    m_RaycastTarget="false" />
+                <LayoutElement m_PreferredHeight="34" />
+            </GameObject>
+
+            <GameObject name="SummaryLabel">
+                <RectTransform m_SizeDelta="0, 140" />
+                <Image m_Color="#22313A" m_RaycastTarget="false" />
+
+                <GameObject name="Text" id="SummaryLabelText">
+                    <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="-24, -20" />
+                    <TextMeshProUGUI
+                        m_text="Build Preparation&#10;Available: False&#10;Boss committed: False&#10;Selected: None"
+                        m_fontSize="16"
+                        m_fontColor="#D5E2D3"
+                        m_HorizontalAlignment="Left"
+                        m_VerticalAlignment="Top"
+                        m_TextWrappingMode="Normal"
+                        m_overflowMode="Truncate"
+                        m_RaycastTarget="false" />
+                </GameObject>
+
+                <LayoutElement m_PreferredHeight="140" />
+            </GameObject>
+
+            <GameObject name="SelectionHint">
+                <RectTransform m_SizeDelta="0, 22" />
+                <TextMeshProUGUI
+                    m_text="Choose the primary boss module"
+                    m_fontSize="15"
+                    m_fontColor="#AFC6B1"
+                    m_HorizontalAlignment="Left"
+                    m_VerticalAlignment="Middle"
+                    m_RaycastTarget="false" />
+                <LayoutElement m_PreferredHeight="22" />
+            </GameObject>
+
+            <GameObject name="PoisonArrowButton" id="PoisonArrowButton">
+                <RectTransform m_SizeDelta="0, 48" />
+                <Image m_Color="#4B7750" m_RaycastTarget="true" />
+                <Button
+                    m_Transition="ColorTint"
+                    m_Colors.m_NormalColor="#FFFFFF"
+                    m_Colors.m_HighlightedColor="#E8F2E4"
+                    m_Colors.m_PressedColor="#C4D8BD"
+                    m_Colors.m_DisabledColor="#6A7585AA"
+                    m_Colors.m_FadeDuration="0.08" />
+                <LayoutElement m_PreferredHeight="48" />
+
+                <GameObject name="Label">
+                    <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="-24, 0" />
+                    <TextMeshProUGUI
+                        m_text="Poison Archer"
+                        m_fontSize="17"
+                        m_fontStyle="Bold"
+                        m_fontColor="#FFFFFF"
+                        m_HorizontalAlignment="Center"
+                        m_VerticalAlignment="Middle"
+                        m_RaycastTarget="false" />
+                </GameObject>
+            </GameObject>
+
+            <GameObject name="FireFlaskButton" id="FireFlaskButton">
+                <RectTransform m_SizeDelta="0, 48" />
+                <Image m_Color="#8B5237" m_RaycastTarget="true" />
+                <Button
+                    m_Transition="ColorTint"
+                    m_Colors.m_NormalColor="#FFFFFF"
+                    m_Colors.m_HighlightedColor="#F7E8DF"
+                    m_Colors.m_PressedColor="#E0C3B3"
+                    m_Colors.m_DisabledColor="#6A7585AA"
+                    m_Colors.m_FadeDuration="0.08" />
+                <LayoutElement m_PreferredHeight="48" />
+
+                <GameObject name="Label">
+                    <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="-24, 0" />
+                    <TextMeshProUGUI
+                        m_text="Fire Bomber"
+                        m_fontSize="17"
+                        m_fontStyle="Bold"
+                        m_fontColor="#FFFFFF"
+                        m_HorizontalAlignment="Center"
+                        m_VerticalAlignment="Middle"
+                        m_RaycastTarget="false" />
+                </GameObject>
+            </GameObject>
+
+            <GameObject name="BottomRow">
+                <RectTransform m_SizeDelta="0, 42" />
+                <HorizontalLayoutGroup
+                    m_Spacing="12"
+                    m_ChildControlWidth="true"
+                    
+                    m_ChildForceExpandWidth="true"
+                    m_ChildForceExpandHeight="false" />
+                <LayoutElement m_PreferredHeight="42" />
+
+                <GameObject name="ConfirmButton" id="ConfirmButton">
+                    <RectTransform m_SizeDelta="0, 42" />
+                    <Image m_Color="#2F6A93" m_RaycastTarget="true" />
+                    <Button
+                        m_Transition="ColorTint"
+                        m_Colors.m_NormalColor="#FFFFFF"
+                        m_Colors.m_HighlightedColor="#E4F2FA"
+                        m_Colors.m_PressedColor="#BED6E5"
+                        m_Colors.m_DisabledColor="#6A7585AA"
+                        m_Colors.m_FadeDuration="0.08" />
+
+                    <GameObject name="Label">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+                        <TextMeshProUGUI
+                            m_text="Confirm"
+                            m_fontSize="16"
+                            m_fontStyle="Bold"
+                            m_fontColor="#FFFFFF"
+                            m_HorizontalAlignment="Center"
+                            m_VerticalAlignment="Middle"
+                            m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+
+                <GameObject name="CloseButton" id="CloseButton">
+                    <RectTransform m_SizeDelta="0, 42" />
+                    <Image m_Color="#445560" m_RaycastTarget="true" />
+                    <Button
+                        m_Transition="ColorTint"
+                        m_Colors.m_NormalColor="#FFFFFF"
+                        m_Colors.m_HighlightedColor="#E8EEF1"
+                        m_Colors.m_PressedColor="#CBD8DE"
+                        m_Colors.m_DisabledColor="#6A7585AA"
+                        m_Colors.m_FadeDuration="0.08" />
+
+                    <GameObject name="Label">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+                        <TextMeshProUGUI
+                            m_text="Close"
+                            m_fontSize="16"
+                            m_fontStyle="Bold"
+                            m_fontColor="#FFFFFF"
+                            m_HorizontalAlignment="Center"
+                            m_VerticalAlignment="Middle"
+                            m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+            </GameObject>
+        </GameObject>
+    </GameObject>
+</UnityPrefab>

@@ -39,7 +39,7 @@ namespace StaticMlp.Features.Stage1
                 Objective = ResolveObjective(progression.Stage, in progressionState, in availability, in expedition, in threat, in boss),
                 Hint = ResolveHint(progression.Stage),
                 CanToggleWorkerAssignment = progression.Stage >= Stage1SettlementProgressStage.CampRepaired,
-                CanOpenBuildPreparation =
+                CanOpenLoadoutPreparation =
                     progression.Stage >= Stage1SettlementProgressStage.WorkerAssigned
                     && boss.Status != BossEncounterStatus.Active
                     && boss.Status != BossEncounterStatus.Defeated,
@@ -82,7 +82,7 @@ namespace StaticMlp.Features.Stage1
             if (stage < Stage1SettlementProgressStage.WorkerAssigned)
                 return Stage1FlowObjective.AssignWorker;
 
-            if (stage < Stage1SettlementProgressStage.BuildPrepared)
+            if (stage < Stage1SettlementProgressStage.LoadoutPrepared)
                 return Stage1FlowObjective.PrepareBuild;
 
             if (availability.Status == ExpeditionAvailabilityStatus.Available)

@@ -1,5 +1,5 @@
 using System;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 
 namespace StaticMlp.Features.Progression
 {
@@ -7,10 +7,10 @@ namespace StaticMlp.Features.Progression
     {
         private static readonly ProgressFlagId[] STARTING_FLAGS = Array.Empty<ProgressFlagId>();
 
-        private static readonly BuildModuleId[] STARTING_UNLOCKED_MODULES =
+        private static readonly LoadoutModuleId[] STARTING_UNLOCKED_MODULES =
         {
-            BuildModuleCatalog.PoisonArrowModuleId,
-            BuildModuleCatalog.FireFlaskModuleId
+            LoadoutModuleCatalog.PoisonArrowModuleId,
+            LoadoutModuleCatalog.FireFlaskModuleId
         };
 
         private static readonly RewardPackageId[] STARTING_AVAILABLE_REWARDS = Array.Empty<RewardPackageId>();

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
@@ -44,8 +44,8 @@ namespace StaticMlp.Features.Combat
 
             if (source.Has<PlayerTag>())
             {
-                ref readonly var preparedBuild = ref source.Read<PreparedBuildSnapshot>();
-                if (!Stage1BuildRules.IsAbilityPrepared(preparedBuild, data.AbilityId))
+                ref readonly var preparedBuild = ref source.Read<PreparedLoadoutSnapshot>();
+                if (!Stage1LoadoutRules.IsAbilityPrepared(preparedBuild, data.AbilityId))
                 {
                     request.Destroy();
                     return;

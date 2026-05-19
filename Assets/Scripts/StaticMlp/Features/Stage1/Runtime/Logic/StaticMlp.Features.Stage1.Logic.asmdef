@@ -7,7 +7,7 @@
         "Game.Core",
         "StaticMlp.Features.Stage1.Contracts",
         "StaticMlp.Features.Settlement.Contracts",
-        "StaticMlp.Features.Build.Logic",
+        "StaticMlp.Features.Loadout.Logic",
         "StaticMlp.Features.Frontier.Logic",
         "StaticMlp.Features.Progression.Logic",
         "StaticMlp.Features.Settlement.Logic",

@@ -1,0 +1,19 @@
+{
+    "name": "StaticMlp.Features.Loadout.Contracts",
+    "rootNamespace": "StaticMlp.Features.Loadout",
+    "references": [
+        "FFS.StaticEcs",
+        "Game.Core",
+        "StaticMlp.Features.Settlement.Contracts",
+        "Ecs.Networking"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
@@ -30,7 +30,7 @@ namespace StaticMlp.Features.Progression
         private static void Handle(in NetworkEventFromClient<PrepareBossRequestEvent> request)
         {
             if (!ServerPeerPlayers.TryGetPlayer(request.SourcePeer, out var player)
-                || !player.Has<PreparedBuildSnapshot>())
+                || !player.Has<PreparedLoadoutSnapshot>())
             {
                 return;
             }
@@ -43,16 +43,16 @@ namespace StaticMlp.Features.Progression
                 return;
             }
 
-            ref var buildState = ref ReplicationMut.Mut<BossBuildPreparationState>(anchor);
-            if (buildState.Status == BossBuildPreparationStatus.Committed)
+            ref var buildState = ref ReplicationMut.Mut<BossLoadoutPreparationState>(anchor);
+            if (buildState.Status == BossLoadoutPreparationStatus.Committed)
             {
                 progression.GrantBossPreparationTokens(1);
                 return;
             }
 
-            ref var committedSnapshot = ref ReplicationMut.Mut<BossPreparedBuildSnapshot>(anchor);
-            committedSnapshot.Apply(player.Read<PreparedBuildSnapshot>());
-            buildState.Status = BossBuildPreparationStatus.Committed;
+            ref var committedSnapshot = ref ReplicationMut.Mut<BossPreparedLoadoutSnapshot>(anchor);
+            committedSnapshot.Apply(player.Read<PreparedLoadoutSnapshot>());
+            buildState.Status = BossLoadoutPreparationStatus.Committed;
 
             if (progression.HasFlag(ProgressFlagCatalog.BossUnlockedId))
                 return;

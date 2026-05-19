@@ -1,0 +1,29 @@
+{
+    "name": "StaticMlp.Features.Loadout.Presentation",
+    "rootNamespace": "StaticMlp.Features.Loadout",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "Code.EcsUi.Mvc",
+        "UniTask",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
+        "StaticMlp.Features.Loadout.Contracts",
+        "StaticMlp.Features.Loadout.Logic",
+        "StaticMlp.Features.Progression.Logic",
+        "StaticMlp.Features.Settlement.Contracts",
+        "StaticMlp.Features.Stage1.Contracts",
+        "StaticMlp.Features.Settlement.Logic",
+        "StaticMlp.Features.Progression.Contracts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

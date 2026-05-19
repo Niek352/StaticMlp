@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Statuses;
@@ -76,11 +76,11 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestClientWorldScope();
             var player = scope.CreateLocalPlayer(Vector3.zero);
-            player.Set(new OwnerBuildSelection
+            player.Set(new OwnerLoadoutSelection
             {
-                PrimaryModuleId = BuildModuleCatalog.FireFlaskModuleId
+                PrimaryModuleId = LoadoutModuleCatalog.FireFlaskModuleId
             });
-            player.Set(Stage1BuildRules.CreatePreparedSnapshot(player.Read<OwnerBuildSelection>()));
+            player.Set(Stage1LoadoutRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
             scope.CreateMonster(new Vector3(9.5f, 0f, 0f));
             scope.SetGameTime(4.5f);
             var system = new ClientPassiveAutoAttackTargetingSystem();

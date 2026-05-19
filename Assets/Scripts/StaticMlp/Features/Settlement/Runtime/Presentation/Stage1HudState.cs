@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement.Workers;
@@ -17,7 +17,7 @@ namespace StaticMlp.Features.Settlement
         public ushort TotalWorkers;
         public ushort AssignedWorkers;
         public SettlementWorkerBlockingReason WorkerBlockingReason;
-        public BuildModuleId PreparedPrimaryModuleId;
+        public LoadoutModuleId PreparedPrimaryModuleId;
         public bool HasPreparedBuild;
         public ExpeditionAvailabilityStatus ExpeditionAvailability;
         public ExpeditionActivityStatus ExpeditionActivity;
@@ -29,7 +29,7 @@ namespace StaticMlp.Features.Settlement
         public bool HasBossUnlocked;
         public byte BossPreparationTokens;
         public BossEncounterStatus BossEncounterStatus;
-        public bool CanOpenBuildPreparation;
+        public bool CanOpenLoadoutPreparation;
         public bool CanOpenExpeditionSelection;
     }
 }

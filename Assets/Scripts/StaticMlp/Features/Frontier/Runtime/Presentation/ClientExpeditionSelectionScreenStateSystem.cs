@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
@@ -43,9 +43,9 @@ namespace StaticMlp.Features.Frontier
                 }
             }
 
-            foreach (var player in CW.Query<All<PreparedBuildSnapshot>>().Entities())
+            foreach (var player in CW.Query<All<PreparedLoadoutSnapshot>>().Entities())
             {
-                next.PreparedPrimaryModuleId = player.Read<PreparedBuildSnapshot>().PrimaryModuleId;
+                next.PreparedPrimaryModuleId = player.Read<PreparedLoadoutSnapshot>().PrimaryModuleId;
                 break;
             }
 

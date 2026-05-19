@@ -1,6 +1,6 @@
 using System;
 using Code.EcsUi.Mvc;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 
@@ -19,12 +19,12 @@ namespace StaticMlp.Features.Frontier
 
         public override ViewLayer Layer => ViewLayer.Fullscreen;
 
-        public static string DescribePreparedBuild(BuildModuleId moduleId)
+        public static string DescribePreparedBuild(LoadoutModuleId moduleId)
         {
-            if (moduleId == BuildModuleCatalog.PoisonArrowModuleId)
+            if (moduleId == LoadoutModuleCatalog.PoisonArrowModuleId)
                 return "Poison Archer";
 
-            if (moduleId == BuildModuleCatalog.FireFlaskModuleId)
+            if (moduleId == LoadoutModuleCatalog.FireFlaskModuleId)
                 return "Fire Bomber";
 
             return "Not prepared";

@@ -8,7 +8,7 @@
         "Game.Core",
         "StaticMlp.Features.AiActions",
         "StaticMlp.Features.AiBots",
-        "StaticMlp.Features.Build.Logic",
+        "StaticMlp.Features.Loadout.Logic",
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.Buildings.Contracts",

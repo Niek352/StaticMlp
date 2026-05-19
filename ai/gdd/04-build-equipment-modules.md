@@ -1,4 +1,4 @@
-# Codex Research — Scope 04 — Build/Equipment Modules
+# Codex Research — Scope 04 — Loadout/Equipment Modules
 
 > Назначение документа: research/implementation plan для Codex.
 > Проект: co-op open world survival-builder на ECS.
@@ -16,7 +16,7 @@ MVP:
 - Slot-limited active loadout.
 - 3 Combat modules.
 - 2 Utility modules.
-- 2 BuildSignal modules.
+- 2 BaseSignal modules.
 - 4 BaseInfrastructure modules.
 - Server-side validation.
 - ECS effect application.
@@ -44,7 +44,7 @@ MVP:
 - shield pulse.
 - extraction speed.
 
-### BuildSignal module
+### BaseSignal module
 
 Связывает бой/экспедицию с базой:
 
@@ -106,9 +106,9 @@ public struct ModuleEffectRequest : IComponent
     public float3 Position;
 }
 
-public struct BuildSignal : IComponent
+public struct BaseSignal : IComponent
 {
-    public BuildSignalType Type;
+    public BaseSignalType Type;
     public PlayerId Owner;
     public float3 Position;
     public float Duration;
@@ -143,7 +143,7 @@ public struct BuildSignal : IComponent
 
 ### Mine Garden
 
-- Slot: Combat/BuildSignal.
+- Slot: Combat/BaseSignal.
 - Effect: places explosive mines in chokepoints/resource nodes.
 - ECS: `MinePlacementRequest`, `ArmedMine`, `ExplosionEffect`, `NodeCrackHarvestEffect`.
 
@@ -155,7 +155,7 @@ public struct BuildSignal : IComponent
 
 ### Boombox Beacon
 
-- Slot: BuildSignal.
+- Slot: BaseSignal.
 - Effect:
   - combat: attracts pressure packs to killzone.
   - economy: boosts work rhythm in radius.

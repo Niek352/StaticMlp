@@ -2,8 +2,6 @@
 namespace StaticMlp.Networking.Replication.Generated {
     public static class ReplicatedNetworkEventIds {
         public const ushort CommandBotEvent = 56001;
-        public const ushort PrepareBossRequestEvent = 58022;
-        public const ushort PrepareBuildCommand = 58021;
         public const ushort BuildConstructionRequestEvent = 31658;
         public const ushort BuildConstructionResultEvent = 31659;
         public const ushort DepositConstructionResourcesRequestEvent = 32403;
@@ -15,6 +13,8 @@ namespace StaticMlp.Networking.Replication.Generated {
         public const ushort UseAbilityCommand = 57022;
         public const ushort StartBossEncounterRequestEvent = 40182;
         public const ushort StartExpeditionRequestEvent = 40181;
+        public const ushort PrepareBossRequestEvent = 58022;
+        public const ushort PrepareLoadoutCommand = 58021;
         public const ushort ExtractNpcRequestEvent = 28748;
         public const ushort ExtractNpcResultEvent = 33151;
         public const ushort RescueNpcRequestEvent = 47012;

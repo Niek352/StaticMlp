@@ -1,6 +1,6 @@
 using System;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 
 namespace StaticMlp.Features.Progression
 {
@@ -8,7 +8,7 @@ namespace StaticMlp.Features.Progression
     {
         public Stage1ProgressionSeed(
             ProgressFlagId[] startingFlags,
-            BuildModuleId[] startingUnlockedModules,
+            LoadoutModuleId[] startingUnlockedModules,
             RewardPackageId[] startingAvailableRewards)
         {
             StartingFlags = CloneOrEmpty(startingFlags);
@@ -17,7 +17,7 @@ namespace StaticMlp.Features.Progression
         }
 
         public ProgressFlagId[] StartingFlags { get; }
-        public BuildModuleId[] StartingUnlockedModules { get; }
+        public LoadoutModuleId[] StartingUnlockedModules { get; }
         public RewardPackageId[] StartingAvailableRewards { get; }
 
         private static T[] CloneOrEmpty<T>(T[] source)

@@ -31,7 +31,7 @@ namespace StaticMlp.Features.Settlement
         public bool CanToggleWorkerAssignment;
 
         [ReplicatedField]
-        public bool CanOpenBuildPreparation;
+        public bool CanOpenLoadoutPreparation;
 
         [ReplicatedField]
         public bool CanOpenExpeditionSelection;
@@ -45,7 +45,7 @@ namespace StaticMlp.Features.Settlement
                    && Objective == other.Objective
                    && Hint == other.Hint
                    && CanToggleWorkerAssignment == other.CanToggleWorkerAssignment
-                   && CanOpenBuildPreparation == other.CanOpenBuildPreparation
+                   && CanOpenLoadoutPreparation == other.CanOpenLoadoutPreparation
                    && CanOpenExpeditionSelection == other.CanOpenExpeditionSelection;
         }
 
@@ -62,7 +62,7 @@ namespace StaticMlp.Features.Settlement
                 (byte)Objective,
                 (byte)Hint,
                 CanToggleWorkerAssignment,
-                CanOpenBuildPreparation,
+                CanOpenLoadoutPreparation,
                 CanOpenExpeditionSelection);
         }
 
@@ -77,7 +77,7 @@ namespace StaticMlp.Features.Settlement
             writer.WriteByte((byte)Objective);
             writer.WriteByte((byte)Hint);
             writer.WriteBool(CanToggleWorkerAssignment);
-            writer.WriteBool(CanOpenBuildPreparation);
+            writer.WriteBool(CanOpenLoadoutPreparation);
             writer.WriteBool(CanOpenExpeditionSelection);
         }
 
@@ -89,7 +89,7 @@ namespace StaticMlp.Features.Settlement
             Objective = (Stage1FlowObjective)reader.ReadByte();
             Hint = (Stage1FlowHint)reader.ReadByte();
             CanToggleWorkerAssignment = reader.ReadBool();
-            CanOpenBuildPreparation = reader.ReadBool();
+            CanOpenLoadoutPreparation = reader.ReadBool();
             CanOpenExpeditionSelection = reader.ReadBool();
         }
     }

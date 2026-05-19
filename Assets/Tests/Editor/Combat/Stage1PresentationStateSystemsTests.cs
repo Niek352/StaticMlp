@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Progression;
@@ -32,19 +32,19 @@ namespace StaticMlp.Tests.Combat
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.RepairCamp));
             Assert.That(hud.Wood, Is.EqualTo(50));
             Assert.That(hud.Stone, Is.EqualTo(25));
-            Assert.That(hud.CanOpenBuildPreparation, Is.False);
+            Assert.That(hud.CanOpenLoadoutPreparation, Is.False);
             Assert.That(hud.CanOpenExpeditionSelection, Is.False);
         }
 
         [Test]
-        public void HudState_WhenBuildPreparedAndExpeditionAvailable_ShowsStartExpeditionObjective()
+        public void HudState_WhenLoadoutPreparedAndExpeditionAvailable_ShowsStartExpeditionObjective()
         {
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(
-                stage: Stage1SettlementProgressStage.BuildPrepared,
+                stage: Stage1SettlementProgressStage.LoadoutPrepared,
                 expeditionAvailability: ExpeditionAvailabilityStatus.Available);
             scope.CreateSharedResources(wood: 70, stone: 30);
-            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             scope.RefreshProjections();
 
             new ClientStage1HudStateSystem().Update();
@@ -53,7 +53,7 @@ namespace StaticMlp.Tests.Combat
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.StartExpedition));
             Assert.That(hud.Wood, Is.EqualTo(70));
             Assert.That(hud.Stone, Is.EqualTo(30));
-            Assert.That(hud.PreparedPrimaryModuleId, Is.EqualTo(BuildModuleCatalog.FireFlaskModuleId));
+            Assert.That(hud.PreparedPrimaryModuleId, Is.EqualTo(LoadoutModuleCatalog.FireFlaskModuleId));
             Assert.That(hud.ExpeditionAvailability, Is.EqualTo(ExpeditionAvailabilityStatus.Available));
         }
 
@@ -62,12 +62,12 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new Stage1PresentationClientWorldScope();
             var anchor = scope.CreateAnchor(
-                stage: Stage1SettlementProgressStage.BuildPrepared,
+                stage: Stage1SettlementProgressStage.LoadoutPrepared,
                 threatPhase: ThreatPhase.RaidPending,
                 raidStatus: RaidScheduleStatus.Pending);
             anchor.Set(new Stage1ProgressionState(SettlementAnchorCatalog.HomeCampId, 0));
             scope.CreateSharedResources();
-            scope.CreateLocalPlayer(BuildModuleCatalog.PoisonArrowModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.PoisonArrowModuleId);
             scope.RefreshProjections();
 
             new ClientStage1HudStateSystem().Update();
@@ -87,7 +87,7 @@ namespace StaticMlp.Tests.Combat
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
             scope.CreateSharedResources();
-            scope.CreateLocalPlayer(BuildModuleCatalog.PoisonArrowModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.PoisonArrowModuleId);
             var site = scope.CreateConstructionSite(
                 ConstructionPhase.ReadyToBuild,
                 woodRequired: 10,
@@ -168,7 +168,7 @@ namespace StaticMlp.Tests.Combat
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
             scope.CreateSharedResources();
-            scope.CreateLocalPlayer(BuildModuleCatalog.PoisonArrowModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.PoisonArrowModuleId);
             scope.CreateWorker(
                 assigned: false,
                 blockingReason: SettlementWorkerBlockingReason.NoAssignment,
@@ -189,67 +189,67 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
-        public void BuildPreparationScreenState_UsesLocalSelectionAndBossCommitGate()
+        public void LoadoutPreparationScreenState_UsesLocalSelectionAndBossCommitGate()
         {
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkerAssigned);
-            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             var bossPreparation = CW.NewEntity<Default>();
-            bossPreparation.Set(new BossBuildPreparationState
+            bossPreparation.Set(new BossLoadoutPreparationState
             {
-                Status = BossBuildPreparationStatus.Committed
+                Status = BossLoadoutPreparationStatus.Committed
             });
 
-            new ClientBuildPreparationScreenStateSystem().Update();
+            new ClientLoadoutPreparationScreenStateSystem().Update();
 
-            ref readonly var state = ref CW.GetResource<BuildPreparationScreenState>();
+            ref readonly var state = ref CW.GetResource<LoadoutPreparationScreenState>();
             Assert.That(state.IsAvailable, Is.True);
-            Assert.That(state.SelectedPrimaryModuleId, Is.EqualTo(BuildModuleCatalog.FireFlaskModuleId));
+            Assert.That(state.SelectedPrimaryModuleId, Is.EqualTo(LoadoutModuleCatalog.FireFlaskModuleId));
             Assert.That(state.FireFlaskSelected, Is.True);
             Assert.That(state.IsBossCommitted, Is.True);
             Assert.That(state.CanConfirm, Is.False);
         }
 
         [Test]
-        public void BuildPreparationScreenState_WhenWorkerIsNotAssignedYet_StaysClosedFromFlowViewState()
+        public void LoadoutPreparationScreenState_WhenWorkerIsNotAssignedYet_StaysClosedFromFlowViewState()
         {
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
-            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             scope.RefreshProjections();
 
-            new ClientBuildPreparationScreenStateSystem().Update();
+            new ClientLoadoutPreparationScreenStateSystem().Update();
 
-            ref readonly var state = ref CW.GetResource<BuildPreparationScreenState>();
+            ref readonly var state = ref CW.GetResource<LoadoutPreparationScreenState>();
             Assert.That(state.IsAvailable, Is.False);
         }
 
         [Test]
-        public void BuildPreparationController_WhenConfirmInvoked_SendsPrepareBuildCommand()
+        public void LoadoutPreparationController_WhenConfirmInvoked_SendsPrepareLoadoutCommand()
         {
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkerAssigned);
-            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             CW.SetResource(new NetOutbox());
             NetworkRuntime.LocalPeerId = new NetworkPeerId(1);
 
-            new ClientBuildPresentationBootstrapSystem().Init();
-            new ClientBuildPreparationScreenStateSystem().Update();
+            new ClientLoadoutPresentationBootstrapSystem().Init();
+            new ClientLoadoutPreparationScreenStateSystem().Update();
 
-            var controller = new BuildPreparationController(
+            var controller = new LoadoutPreparationController(
                 () => null,
-                new ControllerResourceBridgeSystem<BuildPreparationController, BuildPreparationScreenState>());
+                new ControllerResourceBridgeSystem<LoadoutPreparationController, LoadoutPreparationScreenState>());
             var sendSystem = new ClientNetworkEventSendSystem();
             sendSystem.Init();
 
             InvokePrivate(controller, "ConfirmBuild");
-            new ClientBuildSelectionSystem().Update();
+            new ClientLoadoutSelectionSystem().Update();
             sendSystem.Update();
 
-            foreach (var player in CW.Query<All<ClientBuildSelectionSyncState>>().Entities())
+            foreach (var player in CW.Query<All<ClientLoadoutSelectionSyncState>>().Entities())
             {
-                Assert.That(player.Read<ClientBuildSelectionSyncState>().LastSentPrimaryModuleId, Is.EqualTo(BuildModuleCatalog.FireFlaskModuleId));
-                Assert.That(player.Read<ClientBuildSelectionSyncState>().ShouldCommitSelection, Is.False);
+                Assert.That(player.Read<ClientLoadoutSelectionSyncState>().LastSentPrimaryModuleId, Is.EqualTo(LoadoutModuleCatalog.FireFlaskModuleId));
+                Assert.That(player.Read<ClientLoadoutSelectionSyncState>().ShouldCommitSelection, Is.False);
                 break;
             }
 
@@ -260,31 +260,31 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
-        public void BuildPreparationController_WhenBossPreparationIsAvailable_SendsPrepareBossRequest()
+        public void LoadoutPreparationController_WhenBossPreparationIsAvailable_SendsPrepareBossRequest()
         {
             using var scope = new Stage1PresentationClientWorldScope();
-            var anchor = scope.CreateAnchor(stage: Stage1SettlementProgressStage.BuildPrepared);
+            var anchor = scope.CreateAnchor(stage: Stage1SettlementProgressStage.LoadoutPrepared);
             ref var progression = ref anchor.Mut<Stage1ProgressionState>();
             progression.ApplyFlag(ProgressFlagCatalog.CounterattackDefendedId);
             progression.GrantBossPreparationTokens(1);
-            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             scope.RefreshProjections();
             CW.SetResource(new NetOutbox());
             NetworkRuntime.LocalPeerId = new NetworkPeerId(1);
 
-            new ClientBuildPresentationBootstrapSystem().Init();
-            new ClientBuildPreparationScreenStateSystem().Update();
+            new ClientLoadoutPresentationBootstrapSystem().Init();
+            new ClientLoadoutPreparationScreenStateSystem().Update();
 
-            var controller = new BuildPreparationController(
+            var controller = new LoadoutPreparationController(
                 () => null,
-                new ControllerResourceBridgeSystem<BuildPreparationController, BuildPreparationScreenState>());
+                new ControllerResourceBridgeSystem<LoadoutPreparationController, LoadoutPreparationScreenState>());
             var sendSystem = new ClientNetworkEventSendSystem();
             sendSystem.Init();
 
             InvokePrivate(controller, "ConfirmBuild");
             sendSystem.Update();
 
-            ref readonly var state = ref CW.GetResource<BuildPreparationScreenState>();
+            ref readonly var state = ref CW.GetResource<LoadoutPreparationScreenState>();
             Assert.That(state.CanPrepareBoss, Is.True);
             ref var outbox = ref CW.GetResource<NetOutbox>();
             outbox.FlushNetworkEventBatches();
@@ -297,16 +297,16 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(
-                stage: Stage1SettlementProgressStage.BuildPrepared,
+                stage: Stage1SettlementProgressStage.LoadoutPrepared,
                 expeditionAvailability: ExpeditionAvailabilityStatus.Available);
-            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             scope.RefreshProjections();
 
             new ClientExpeditionSelectionScreenStateSystem().Update();
 
             ref readonly var state = ref CW.GetResource<ExpeditionSelectionScreenState>();
             Assert.That(state.CanStart, Is.True);
-            Assert.That(state.PreparedPrimaryModuleId, Is.EqualTo(BuildModuleCatalog.FireFlaskModuleId));
+            Assert.That(state.PreparedPrimaryModuleId, Is.EqualTo(LoadoutModuleCatalog.FireFlaskModuleId));
             Assert.That(state.RewardPackageId, Is.EqualTo(RewardPackageCatalog.RecoveredWarCacheId));
         }
 
@@ -315,9 +315,9 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(
-                stage: Stage1SettlementProgressStage.BuildPrepared,
+                stage: Stage1SettlementProgressStage.LoadoutPrepared,
                 expeditionAvailability: ExpeditionAvailabilityStatus.Available);
-            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             scope.RefreshProjections();
             CW.SetResource(new NetOutbox());
             NetworkRuntime.LocalPeerId = new NetworkPeerId(1);
@@ -345,9 +345,9 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(
-                stage: Stage1SettlementProgressStage.BuildPrepared,
+                stage: Stage1SettlementProgressStage.LoadoutPrepared,
                 bossStatus: BossEncounterStatus.Available);
-            scope.CreateLocalPlayer(BuildModuleCatalog.FireFlaskModuleId);
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             scope.RefreshProjections();
             CW.SetResource(new NetOutbox());
             NetworkRuntime.LocalPeerId = new NetworkPeerId(1);
@@ -377,7 +377,7 @@ namespace StaticMlp.Tests.Combat
         public void RewardPopup_WhenNewRewardAppears_OpensExactlyOnce()
         {
             using var scope = new Stage1PresentationClientWorldScope();
-            var anchor = scope.CreateAnchor(stage: Stage1SettlementProgressStage.BuildPrepared);
+            var anchor = scope.CreateAnchor(stage: Stage1SettlementProgressStage.LoadoutPrepared);
             anchor.Set(new Stage1ProgressionState(SettlementAnchorCatalog.HomeCampId, 0));
             ref var progression = ref anchor.Mut<Stage1ProgressionState>();
             progression.MarkRewardApplied(RewardPackageCatalog.RecoveredWarCacheId);
@@ -405,7 +405,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new Stage1PresentationClientWorldScope();
             scope.CreateAnchor(
-                stage: Stage1SettlementProgressStage.BuildPrepared,
+                stage: Stage1SettlementProgressStage.LoadoutPrepared,
                 threatPhase: ThreatPhase.RaidPending,
                 raidStatus: RaidScheduleStatus.Pending);
             scope.RefreshProjections();

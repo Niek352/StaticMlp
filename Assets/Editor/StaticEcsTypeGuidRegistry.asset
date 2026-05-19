@@ -290,22 +290,28 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Frontier.Logic
     - guid: 4a6ac13f-d0a4-4180-b15a-c544f665fafd
       current:
-        className: BossBuildPreparationState
-        namespaceName: StaticMlp.Features.Build
-        assembly: StaticMlp.Features.Build.Logic
+        className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
       history:
       - className: BossBuildPreparationState
-        namespaceName: StaticMlp.Features.Build
-        assembly: StaticMlp.Features.Build.Logic
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      - className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
     - guid: 641d2d15-83f0-4328-8b35-4063e914bc61
       current:
-        className: BossPreparedBuildSnapshot
-        namespaceName: StaticMlp.Features.Build
-        assembly: StaticMlp.Features.Build.Logic
+        className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
       history:
       - className: BossPreparedBuildSnapshot
-        namespaceName: StaticMlp.Features.Build
-        assembly: StaticMlp.Features.Build.Logic
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      - className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
     - guid: 31db70ec-ecdd-4c31-89a6-c85c3507cfe2
       current:
         className: BossEncounterState
@@ -894,22 +900,28 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Frontier.Logic
     - guid: 4a6ac13f-d0a4-4180-b15a-c544f665fafd
       current:
-        className: BossBuildPreparationState
-        namespaceName: StaticMlp.Features.Build
-        assembly: StaticMlp.Features.Build.Logic
+        className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
       history:
       - className: BossBuildPreparationState
-        namespaceName: StaticMlp.Features.Build
-        assembly: StaticMlp.Features.Build.Logic
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      - className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
     - guid: 641d2d15-83f0-4328-8b35-4063e914bc61
       current:
-        className: BossPreparedBuildSnapshot
-        namespaceName: StaticMlp.Features.Build
-        assembly: StaticMlp.Features.Build.Logic
+        className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
       history:
       - className: BossPreparedBuildSnapshot
-        namespaceName: StaticMlp.Features.Build
-        assembly: StaticMlp.Features.Build.Logic
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      - className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
     - guid: 31db70ec-ecdd-4c31-89a6-c85c3507cfe2
       current:
         className: BossEncounterState

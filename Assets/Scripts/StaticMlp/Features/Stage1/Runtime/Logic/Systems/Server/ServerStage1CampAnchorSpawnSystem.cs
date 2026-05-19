@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;

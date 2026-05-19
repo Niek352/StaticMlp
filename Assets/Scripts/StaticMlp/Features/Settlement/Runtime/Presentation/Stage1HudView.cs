@@ -79,7 +79,7 @@ namespace StaticMlp.Features.Settlement
                 $"Boss flags: Unlocked={state.HasBossUnlocked} Tokens={state.BossPreparationTokens}" +
                 hintLine;
 
-            buildButton.interactable = state.CanOpenBuildPreparation;
+            buildButton.interactable = state.CanOpenLoadoutPreparation;
             expeditionButton.interactable = state.CanOpenExpeditionSelection;
         }
 

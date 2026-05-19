@@ -9,13 +9,13 @@ namespace StaticMlp.Features.Stage1
     {
         private EventReceiver<ServerWT, Stage1RepairCompletedEvent> _repairCompleted;
         private EventReceiver<ServerWT, Stage1WorkerAssignmentAcceptedEvent> _workerAssigned;
-        private EventReceiver<ServerWT, Stage1BuildPreparedEvent> _buildPrepared;
+        private EventReceiver<ServerWT, Stage1LoadoutPreparedEvent> _buildPrepared;
 
         public void Init()
         {
             _repairCompleted = SW.RegisterEventReceiver<Stage1RepairCompletedEvent>();
             _workerAssigned = SW.RegisterEventReceiver<Stage1WorkerAssignmentAcceptedEvent>();
-            _buildPrepared = SW.RegisterEventReceiver<Stage1BuildPreparedEvent>();
+            _buildPrepared = SW.RegisterEventReceiver<Stage1LoadoutPreparedEvent>();
         }
 
         public void Destroy()
@@ -36,7 +36,7 @@ namespace StaticMlp.Features.Stage1
                 AdvanceFromFact(evt.Value.AnchorId, Stage1SettlementProgressStage.CampRepaired, Stage1SettlementProgressStage.WorkerAssigned);
 
             foreach (var evt in _buildPrepared)
-                AdvanceFromFact(evt.Value.AnchorId, Stage1SettlementProgressStage.WorkerAssigned, Stage1SettlementProgressStage.BuildPrepared);
+                AdvanceFromFact(evt.Value.AnchorId, Stage1SettlementProgressStage.WorkerAssigned, Stage1SettlementProgressStage.LoadoutPrepared);
         }
 
         private static void AdvanceAutomaticStages()

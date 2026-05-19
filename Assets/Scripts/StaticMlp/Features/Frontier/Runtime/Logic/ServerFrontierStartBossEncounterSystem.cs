@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Systems.Server;
@@ -31,7 +31,7 @@ namespace StaticMlp.Features.Frontier
         private static void Handle(in NetworkEventFromClient<StartBossEncounterRequestEvent> request)
         {
             if (!ServerPeerPlayers.TryGetPlayer(request.SourcePeer, out var player)
-                || !player.Has<PreparedBuildSnapshot>())
+                || !player.Has<PreparedLoadoutSnapshot>())
             {
                 return;
             }
@@ -42,12 +42,12 @@ namespace StaticMlp.Features.Frontier
             ref readonly var threat = ref anchor.Read<ThreatState>();
             ref readonly var raidSchedule = ref anchor.Read<RaidScheduleState>();
             ref readonly var bossState = ref anchor.Read<BossEncounterState>();
-            ref readonly var bossBuildState = ref anchor.Read<BossBuildPreparationState>();
+            ref readonly var bossBuildState = ref anchor.Read<BossLoadoutPreparationState>();
 
             if (!progression.HasFlag(ProgressFlagCatalog.BossUnlockedId)
                 || bossState.Status != BossEncounterStatus.Available
                 || bossState.BossIdValue != request.Value.BossId
-                || bossBuildState.Status != BossBuildPreparationStatus.Committed
+                || bossBuildState.Status != BossLoadoutPreparationStatus.Committed
                 || activeExpedition.Status == ExpeditionActivityStatus.Active
                 || threat.Phase == ThreatPhase.RaidPending
                 || threat.Phase == ThreatPhase.RaidActive

@@ -1,7 +1,7 @@
 using System;
 using Code.EcsUi.Mvc;
 using Cysharp.Threading.Tasks;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Networking;
 
@@ -43,12 +43,12 @@ namespace StaticMlp.Features.Settlement
             };
         }
 
-        public static string DescribeBuild(BuildModuleId moduleId)
+        public static string DescribeBuild(LoadoutModuleId moduleId)
         {
-            if (moduleId == BuildModuleCatalog.PoisonArrowModuleId)
+            if (moduleId == LoadoutModuleCatalog.PoisonArrowModuleId)
                 return "Poison Archer";
 
-            if (moduleId == BuildModuleCatalog.FireFlaskModuleId)
+            if (moduleId == LoadoutModuleCatalog.FireFlaskModuleId)
                 return "Fire Bomber";
 
             return "Not prepared";
@@ -61,7 +61,7 @@ namespace StaticMlp.Features.Settlement
 
         protected override void OnViewInstantiated()
         {
-            View.Bind(OpenBuildPreparation, OpenExpeditionSelection, CloseHud);
+            View.Bind(OpenLoadoutPreparation, OpenExpeditionSelection, CloseHud);
         }
 
         public override void Dispose()
@@ -72,9 +72,9 @@ namespace StaticMlp.Features.Settlement
             base.Dispose();
         }
 
-        private void OpenBuildPreparation()
+        private void OpenLoadoutPreparation()
         {
-            _mvcManager.ShowAsync(BuildPreparationController.IssueCommand()).Forget();
+            _mvcManager.ShowAsync(LoadoutPreparationController.IssueCommand()).Forget();
         }
 
         private void OpenExpeditionSelection()

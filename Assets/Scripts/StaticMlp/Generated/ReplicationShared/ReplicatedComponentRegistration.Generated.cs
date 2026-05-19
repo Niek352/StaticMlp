@@ -5,8 +5,8 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 using StaticMlp.Features.AiBots;
-using StaticMlp.Features.Build;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Npc;
 using StaticMlp.Features.OpenWorldResources;
 using StaticMlp.Features.Progression;
@@ -28,20 +28,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ReplicationAudience.All,
                 NetDelivery.UnreliableSequenced,
                 sendRate: AiNetStateReplication.SendRate);
-
-            ReplicationRegistry.RegisterComponent<BossBuildPreparationState>(
-                ReplicatedComponentIds.BossBuildPreparationState,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                sendRate: BossBuildPreparationStateReplication.SendRate);
-
-            ReplicationRegistry.RegisterComponent<BossPreparedBuildSnapshot>(
-                ReplicatedComponentIds.BossPreparedBuildSnapshot,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                sendRate: BossPreparedBuildSnapshotReplication.SendRate);
 
             ReplicationRegistry.RegisterComponent<ActiveExpeditionState>(
                 ReplicatedComponentIds.ActiveExpeditionState,
@@ -77,6 +63,20 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ReplicationAudience.All,
                 NetDelivery.ReliableSequenced,
                 sendRate: ThreatStateReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<BossLoadoutPreparationState>(
+                ReplicatedComponentIds.BossLoadoutPreparationState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: BossLoadoutPreparationStateReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<BossPreparedLoadoutSnapshot>(
+                ReplicatedComponentIds.BossPreparedLoadoutSnapshot,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: BossPreparedLoadoutSnapshotReplication.SendRate);
 
             ReplicationRegistry.RegisterComponent<NpcIdentity>(
                 ReplicatedComponentIds.NpcIdentity,

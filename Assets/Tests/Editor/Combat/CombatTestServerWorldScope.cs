@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Combat;
@@ -37,14 +37,14 @@ namespace StaticMlp.Tests.Combat
             NetworkEventRegistry.Clear();
             ReplicatedNetworkEventRegistry.RegisterNetworkEvents();
             ReplicatedComponentRegistration.RegisterReplicationComponents();
-            new BuildLogicFeature().RegisterNetworkEvents();
+            new LoadoutLogicFeature().RegisterNetworkEvents();
             new CombatLogicFeature().RegisterNetworkEvents();
             new FrontierLogicFeature().RegisterNetworkEvents();
             new Stage1CampAnchorGameplayFeature().RegisterNetworkEvents();
             SW.Create(WorldConfig.Default());
             SW.Types().RegisterAll(
                 typeof(ServerWT).Assembly,
-                typeof(BuildLogicFeature).Assembly,
+                typeof(LoadoutLogicFeature).Assembly,
                 typeof(BuildingsGameplayFeature).Assembly,
                 typeof(CombatLogicFeature).Assembly,
                 typeof(EffectProcessedTag).Assembly,
@@ -157,8 +157,8 @@ namespace StaticMlp.Tests.Combat
                 Current = 100f,
                 Max = 100f
             });
-            entity.Set(Stage1BuildRules.DefaultSelection());
-            entity.Set(Stage1BuildRules.CreatePreparedSnapshot(entity.Read<OwnerBuildSelection>()));
+            entity.Set(Stage1LoadoutRules.DefaultSelection());
+            entity.Set(Stage1LoadoutRules.CreatePreparedSnapshot(entity.Read<OwnerLoadoutSelection>()));
             return entity;
         }
 
@@ -189,7 +189,7 @@ namespace StaticMlp.Tests.Combat
         public SW.Entity CreateSettlementAnchor(
             SettlementAnchorId anchorId,
             Vector3 position,
-            Stage1SettlementProgressStage stage = Stage1SettlementProgressStage.BuildPrepared)
+            Stage1SettlementProgressStage stage = Stage1SettlementProgressStage.LoadoutPrepared)
         {
             var entity = SW.NewEntity<Default>();
             entity.Set(new Stage1SettlementProgression
@@ -214,7 +214,7 @@ namespace StaticMlp.Tests.Combat
                             ? Stage1FlowHint.AssignWorker
                             : Stage1FlowHint.None,
                 CanToggleWorkerAssignment = stage >= Stage1SettlementProgressStage.CampRepaired,
-                CanOpenBuildPreparation = stage >= Stage1SettlementProgressStage.WorkerAssigned
+                CanOpenLoadoutPreparation = stage >= Stage1SettlementProgressStage.WorkerAssigned
             });
             entity.Set(new Stage1ProgressionState(anchorId, 0u));
             entity.Set(new SettlementAnchorLocation(position, Quaternion.identity));
@@ -248,11 +248,11 @@ namespace StaticMlp.Tests.Combat
                 BossIdValue = BossCatalog.RaiderChiefId.Value,
                 Status = BossEncounterStatus.Unavailable
             });
-            entity.Set(new BossBuildPreparationState
+            entity.Set(new BossLoadoutPreparationState
             {
-                Status = BossBuildPreparationStatus.None
+                Status = BossLoadoutPreparationStatus.None
             });
-            entity.Set(new BossPreparedBuildSnapshot());
+            entity.Set(new BossPreparedLoadoutSnapshot());
             return entity;
         }
 

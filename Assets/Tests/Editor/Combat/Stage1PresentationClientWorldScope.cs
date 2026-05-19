@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Player;
@@ -34,7 +34,7 @@ namespace StaticMlp.Tests.Combat
 
             new SettlementSharedResourcesGameplayFeature().RegisterNetworkEvents();
             new SettlementWorkersGameplayFeature().RegisterNetworkEvents();
-            new BuildLogicFeature().RegisterNetworkEvents();
+            new LoadoutLogicFeature().RegisterNetworkEvents();
             new BuildingsGameplayFeature().RegisterNetworkEvents();
             new FrontierLogicFeature().RegisterNetworkEvents();
             new ProgressionLogicFeature().RegisterNetworkEvents();
@@ -48,8 +48,8 @@ namespace StaticMlp.Tests.Combat
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
                 typeof(SettlementPresentationFeature).Assembly,
                 typeof(SettlementWorkersGameplayFeature).Assembly,
-                typeof(BuildLogicFeature).Assembly,
-                typeof(BuildPresentationFeature).Assembly,
+                typeof(LoadoutLogicFeature).Assembly,
+                typeof(LoadoutPresentationFeature).Assembly,
                 typeof(BuildingsGameplayFeature).Assembly,
                 typeof(FrontierLogicFeature).Assembly,
                 typeof(FrontierPresentationFeature).Assembly,
@@ -131,7 +131,7 @@ namespace StaticMlp.Tests.Combat
             return entity;
         }
 
-        public CW.Entity CreateLocalPlayer(BuildModuleId moduleId)
+        public CW.Entity CreateLocalPlayer(LoadoutModuleId moduleId)
         {
             var player = CW.NewEntity<Default>();
             player.Set<LocalOwned>();
@@ -141,12 +141,12 @@ namespace StaticMlp.Tests.Combat
                 Position = Vector3.zero,
                 Rotation = Quaternion.identity
             });
-            player.Set(new OwnerBuildSelection
+            player.Set(new OwnerLoadoutSelection
             {
                 PrimaryModuleId = moduleId
             });
-            player.Set(Stage1BuildRules.CreatePreparedSnapshot(player.Read<OwnerBuildSelection>()));
-            player.Set(new ClientBuildSelectionSyncState());
+            player.Set(Stage1LoadoutRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
+            player.Set(new ClientLoadoutSelectionSyncState());
             return player;
         }
 
@@ -243,7 +243,7 @@ namespace StaticMlp.Tests.Combat
                 Objective = ResolveObjective(stage, expeditionAvailability, expeditionActivity, threatPhase, bossStatus),
                 Hint = ResolveHint(stage),
                 CanToggleWorkerAssignment = stage >= Stage1SettlementProgressStage.CampRepaired,
-                CanOpenBuildPreparation = stage >= Stage1SettlementProgressStage.WorkerAssigned
+                CanOpenLoadoutPreparation = stage >= Stage1SettlementProgressStage.WorkerAssigned
                                          && bossStatus != BossEncounterStatus.Active
                                          && bossStatus != BossEncounterStatus.Defeated,
                 CanOpenExpeditionSelection = (expeditionAvailability == ExpeditionAvailabilityStatus.Available
@@ -282,7 +282,7 @@ namespace StaticMlp.Tests.Combat
             if (stage < Stage1SettlementProgressStage.WorkerAssigned)
                 return Stage1FlowObjective.AssignWorker;
 
-            if (stage < Stage1SettlementProgressStage.BuildPrepared)
+            if (stage < Stage1SettlementProgressStage.LoadoutPrepared)
                 return Stage1FlowObjective.PrepareBuild;
 
             if (expeditionAvailability == ExpeditionAvailabilityStatus.Available)

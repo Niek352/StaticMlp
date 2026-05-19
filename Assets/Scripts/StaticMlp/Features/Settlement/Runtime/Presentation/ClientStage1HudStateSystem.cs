@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement.Workers;
@@ -23,7 +23,7 @@ namespace StaticMlp.Features.Settlement
                 SettlementStage = flow.Stage,
                 Wood = resources.Wood,
                 Stone = resources.Stone,
-                CanOpenBuildPreparation = flow.CanOpenBuildPreparation,
+                CanOpenLoadoutPreparation = flow.CanOpenLoadoutPreparation,
                 CanOpenExpeditionSelection = flow.CanOpenExpeditionSelection,
             };
 
@@ -136,11 +136,11 @@ namespace StaticMlp.Features.Settlement
             }
         }
 
-        private static bool TryReadPreparedBuild(out PreparedBuildSnapshot snapshot)
+        private static bool TryReadPreparedBuild(out PreparedLoadoutSnapshot snapshot)
         {
-            foreach (var player in CW.Query<All<PreparedBuildSnapshot>>().Entities())
+            foreach (var player in CW.Query<All<PreparedLoadoutSnapshot>>().Entities())
             {
-                snapshot = player.Read<PreparedBuildSnapshot>();
+                snapshot = player.Read<PreparedLoadoutSnapshot>();
                 return true;
             }
 

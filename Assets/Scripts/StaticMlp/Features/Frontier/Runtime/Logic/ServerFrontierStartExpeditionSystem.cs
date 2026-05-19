@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
@@ -30,7 +30,7 @@ namespace StaticMlp.Features.Frontier
         private static void Handle(in NetworkEventFromClient<StartExpeditionRequestEvent> request)
         {
             if (!ServerPeerPlayers.TryGetPlayer(request.SourcePeer, out var player)
-                || !player.Has<PreparedBuildSnapshot>())
+                || !player.Has<PreparedLoadoutSnapshot>())
             {
                 return;
             }
@@ -44,7 +44,7 @@ namespace StaticMlp.Features.Frontier
             ref readonly var threat = ref anchor.Read<ThreatState>();
             ref readonly var raidSchedule = ref anchor.Read<RaidScheduleState>();
 
-            if (progression.Stage != Stage1SettlementProgressStage.BuildPrepared
+            if (progression.Stage != Stage1SettlementProgressStage.LoadoutPrepared
                 || availability.Status != ExpeditionAvailabilityStatus.Available
                 || availability.ExpeditionIdValue != expeditionId.Value
                 || activeExpedition.Status == ExpeditionActivityStatus.Active

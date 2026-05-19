@@ -1,6 +1,6 @@
 using System;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Build;
+using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
@@ -73,11 +73,11 @@ namespace StaticMlp.Features.Stage1
                 BossIdValue = BossCatalog.RaiderChiefId.Value,
                 Status = BossEncounterStatus.Unavailable
             });
-            entity.Set(new BossBuildPreparationState
+            entity.Set(new BossLoadoutPreparationState
             {
-                Status = BossBuildPreparationStatus.None
+                Status = BossLoadoutPreparationStatus.None
             });
-            entity.Set(new BossPreparedBuildSnapshot());
+            entity.Set(new BossPreparedLoadoutSnapshot());
         }
     }
 }
