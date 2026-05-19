@@ -4,7 +4,8 @@
     "references": [
         "FFS.StaticEcs",
         "Game.Core",
-        "StaticMlp.Features.AiNavigation.Contracts"
+        "StaticMlp.Features.AiNavigation.Contracts",
+        "StaticMlp.Features.Frontier.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
