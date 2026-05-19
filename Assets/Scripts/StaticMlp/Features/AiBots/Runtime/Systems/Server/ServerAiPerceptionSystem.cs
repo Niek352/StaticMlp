@@ -18,6 +18,11 @@ namespace StaticMlp.Features.AiBots
             foreach (var bot in SW.Query<All<ServerOwned, AiAgentTag, SW.Multi<AiBlackboardEntry>, CharacterNetState>>().Entities())
             {
                 ref readonly var botState = ref bot.Read<CharacterNetState>();
+                if (AiBlackboardAccess.TryGetEntity(bot, AiCoreVariableIds.Enemy, out var assignedEnemy)
+                    && TryTrackAssignedEnemy(bot, assignedEnemy, botState.Position, deltaTime))
+                {
+                    continue;
+                }
 
                 EntityGID nearestEnemy = default;
                 var nearestDistance = float.MaxValue;
@@ -50,6 +55,30 @@ namespace StaticMlp.Features.AiBots
                 AiBlackboardAccess.Remove(bot, AiCoreVariableIds.Enemy);
                 AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.EnemyDistance, 999f);
             }
+        }
+
+        private static bool TryTrackAssignedEnemy(
+            SW.Entity bot,
+            EntityGID assignedEnemy,
+            Vector3 botPosition,
+            float deltaTime)
+        {
+            if (!assignedEnemy.TryUnpack<ServerWT>(out var enemy) || !enemy.Has<CharacterNetState>())
+            {
+                AiBlackboardAccess.Remove(bot, AiCoreVariableIds.Enemy);
+                AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.EnemyDistance, 999f);
+                return false;
+            }
+
+            ref readonly var enemyState = ref enemy.Read<CharacterNetState>();
+            var distance = Vector3.Distance(botPosition, enemyState.Position);
+            AiBlackboardAccess.SetFloat(bot, AiCoreVariableIds.EnemyDistance, distance);
+            AiBlackboardAccess.SetVector(bot, AiCoreVariableIds.LastKnownEnemyPosition, enemyState.Position);
+            AiBlackboardAccess.SetFloat(
+                bot,
+                AiCoreVariableIds.Fear,
+                MathF.Min(1f, AiBlackboardAccess.GetFloat(bot, AiCoreVariableIds.Fear) + deltaTime * 0.35f));
+            return true;
         }
     }
 }

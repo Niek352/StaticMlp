@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Combat;
+using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using Unity.Mathematics;
 using UnityEngine;
@@ -39,6 +40,8 @@ namespace StaticMlp.Features.CombatDirector
             ref readonly var spawnRequest = ref request.Read<SpawnRequest>();
             var definition = catalog.Get(spawnRequest.Role);
             var directorEntity = ReadDirectorEntity(spawnRequest.CellId);
+            ref readonly var cell = ref directorEntity.Read<CombatCell>();
+            var initialTarget = SelectInitialTarget(in cell, spawnRequest.SpawnPosition);
             ref var budget = ref directorEntity.Mut<ThreatBudget>();
             var totalCost = definition.BudgetCost * spawnRequest.Count;
             if (budget.Current < totalCost)
@@ -55,7 +58,8 @@ namespace StaticMlp.Features.CombatDirector
                     health01: 1f,
                     hunger: 0f,
                     fear: 0f,
-                    leader: default));
+                    leader: default,
+                    initialEnemy: initialTarget));
 
                 if (!spawnedGid.TryUnpack<ServerWT>(out var spawnedEntity))
                     throw new InvalidOperationException("Spawned enemy could not be unpacked in server world.");
@@ -76,6 +80,30 @@ namespace StaticMlp.Features.CombatDirector
 
             budget.Current -= totalCost;
             request.Destroy();
+        }
+
+        private static EntityGID SelectInitialTarget(in CombatCell cell, float3 spawnPosition)
+        {
+            var found = false;
+            var bestDistanceSq = float.MaxValue;
+            EntityGID target = default;
+
+            foreach (var player in SW.Query<All<PlayerTag, CharacterNetState>>().Entities())
+            {
+                var position = player.Read<CharacterNetState>().Position;
+                if (math.distancesq(position, cell.Center) > cell.Radius * cell.Radius)
+                    continue;
+
+                var distanceSq = math.distancesq(position, spawnPosition);
+                if (found && distanceSq >= bestDistanceSq)
+                    continue;
+
+                target = player.GID;
+                bestDistanceSq = distanceSq;
+                found = true;
+            }
+
+            return target;
         }
 
         private static SW.Entity ReadDirectorEntity(int cellId)

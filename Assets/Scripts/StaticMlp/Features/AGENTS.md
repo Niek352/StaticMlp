@@ -38,6 +38,7 @@ Rules for `StaticMlp.Features.*` modules. This file inherits the root `AGENTS.md
 
 - `AiBots/AGENTS.md`: generic active AI-agent behavior, navigation requests, bot spawning, and thin replicated AI presentation summaries.
 - `AiTaskExecution/AGENTS.md`: server-side execution of already selected bot tasks.
+- `CombatDirector/AGENTS.md`: encounter pressure, combat cells, threat budget, phase transitions, spawn sources, and enemy spawn requests.
 - `Npc/AGENTS.md`: product/domain NPC identity, class, acquisition path, roles, roster, and future NPC economy contracts.
 - `OpenWorldGeneration/AGENTS.md`: deterministic chunk generation, LayerProcLite scheduling, spatial cluster streaming, server snapshots, and client terrain presentation.
 - `OpenWorldResources/AGENTS.md`: placement indexing, chunk overlays, resource proxy views, legacy replicated resource nodes, and open-world host-spike profiling notes.

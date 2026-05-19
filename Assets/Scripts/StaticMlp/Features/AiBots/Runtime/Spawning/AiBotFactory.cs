@@ -40,6 +40,7 @@ namespace StaticMlp.Features.AiBots
                 _spec.Hunger,
                 _spec.Fear,
                 _spec.Leader));
+            ApplyInitialEnemy(entity, _spec.InitialEnemy);
         }
 
         private static Vector3 ResolveTerrainPosition(Vector3 position)
@@ -94,6 +95,24 @@ namespace StaticMlp.Features.AiBots
                 LocomotionState = 0,
                 CombatState = 0
             });
+        }
+
+        private static void ApplyInitialEnemy(SW.Entity entity, EntityGID target)
+        {
+            if (target.Raw == 0UL)
+                return;
+
+            if (!target.TryUnpack<ServerWT>(out var targetEntity) || !targetEntity.Has<CharacterNetState>())
+                throw new System.InvalidOperationException("Initial AI enemy target must be an available server entity with CharacterNetState.");
+
+            ref readonly var targetState = ref targetEntity.Read<CharacterNetState>();
+            ref readonly var botState = ref entity.Read<CharacterNetState>();
+            AiBlackboardAccess.SetEntity(entity, AiCoreVariableIds.Enemy, target);
+            AiBlackboardAccess.SetVector(entity, AiCoreVariableIds.LastKnownEnemyPosition, targetState.Position);
+            AiBlackboardAccess.SetFloat(
+                entity,
+                AiCoreVariableIds.EnemyDistance,
+                (targetState.Position - botState.Position).magnitude);
         }
     }
 }

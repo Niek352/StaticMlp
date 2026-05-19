@@ -3,6 +3,7 @@ using NUnit.Framework;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.CombatDirector;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.OpenWorldResources;
 using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Game;
@@ -12,6 +13,7 @@ using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Replication.Generated;
 using UnityEngine;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Shared;
 
 namespace StaticMlp.Tests.CombatDirector
 {
@@ -273,6 +275,81 @@ namespace StaticMlp.Tests.CombatDirector
         }
 
         [Test]
+        public void SpawnSourcePlacementSeedSystem_OpenWorldSpawnPlacements_CreateActiveSources()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            var system = new SpawnSourcePlacementSeedSystem();
+            var chunkId = new WorldChunkId(0, 0);
+
+            system.Init();
+            try
+            {
+                SendChunkCompleted(chunkId, new[]
+                {
+                    new SpawnPlacement(new SpawnPlacementKindId(1), chunkId, new Vector3(20f, 0f, 0f), 0f, 1f),
+                    new SpawnPlacement(new SpawnPlacementKindId(2), chunkId, new Vector3(35f, 0f, 0f), 0f, 1.1f)
+                });
+
+                system.Update();
+
+                var burrows = 0;
+                var rifts = 0;
+                foreach (var source in SW.Query<All<SpawnSource, SpawnSourcePlacementRef>>().Entities())
+                {
+                    ref readonly var placement = ref source.Read<SpawnSourcePlacementRef>();
+                    ref readonly var spawnSource = ref source.Read<SpawnSource>();
+
+                    Assert.That(placement.ChunkId, Is.EqualTo(chunkId));
+                    Assert.That(spawnSource.IsActive, Is.True);
+                    Assert.That(spawnSource.Radius, Is.GreaterThan(0f));
+
+                    if (spawnSource.Type == SpawnSourceType.Burrow)
+                        burrows++;
+                    else if (spawnSource.Type == SpawnSourceType.Rift)
+                        rifts++;
+                }
+
+                Assert.That(burrows, Is.EqualTo(1));
+                Assert.That(rifts, Is.EqualTo(1));
+            }
+            finally
+            {
+                system.Destroy();
+            }
+        }
+
+        [Test]
+        public void SpawnSourcePlacementSeedSystem_RepeatedChunkGeneration_ReplacesChunkSources()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            var system = new SpawnSourcePlacementSeedSystem();
+            var chunkId = new WorldChunkId(1, 0);
+
+            system.Init();
+            try
+            {
+                SendChunkCompleted(chunkId, new[]
+                {
+                    new SpawnPlacement(new SpawnPlacementKindId(1), chunkId, new Vector3(20f, 0f, 0f), 0f, 1f)
+                });
+                system.Update();
+
+                SendChunkCompleted(chunkId, new[]
+                {
+                    new SpawnPlacement(new SpawnPlacementKindId(1), chunkId, new Vector3(25f, 0f, 0f), 0f, 1f),
+                    new SpawnPlacement(new SpawnPlacementKindId(2), chunkId, new Vector3(35f, 0f, 0f), 0f, 1f)
+                });
+                system.Update();
+
+                Assert.That(scope.CountSpawnSources(chunkId), Is.EqualTo(2));
+            }
+            finally
+            {
+                system.Destroy();
+            }
+        }
+
+        [Test]
         public void SpawnRequestBuildSystem_LowMediumHighBudgets_CreateExpectedRoleCounts()
         {
             var low = BuildRequestsForBudget(31f, DirectorPhase.BuildUp);
@@ -340,7 +417,7 @@ namespace StaticMlp.Tests.CombatDirector
         public void EnemySpawnApplySystem_ValidRequest_CreatesEnemiesConsumesBudgetAndEmitsEvent()
         {
             using var scope = new CombatDirectorTestServerWorldScope();
-            scope.CreatePlayer(new NetworkPeerId(37), Vector3.zero);
+            var player = scope.CreatePlayer(new NetworkPeerId(37), Vector3.zero);
             var cellTrackingSystem = new CombatCellTrackingSystem();
             var validationSystem = new SpawnRequestValidationSystem();
             var applySystem = new EnemySpawnApplySystem();
@@ -349,7 +426,7 @@ namespace StaticMlp.Tests.CombatDirector
             var directorEntity = scope.GetDirectorEntity();
             directorEntity.Mut<DirectorState>().Phase = DirectorPhase.BuildUp;
             directorEntity.Mut<ThreatBudget>().Current = 20f;
-            var source = scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
+            var source = scope.CreateSpawnSource(new Vector3(60f, 0f, 0f), isActive: true);
             scope.CreateSpawnRequest(source, EnemyRole.Swarmer, count: 2);
 
             var receiver = SW.RegisterEventReceiver<EnemySpawnedEvent>();
@@ -369,6 +446,7 @@ namespace StaticMlp.Tests.CombatDirector
 
                 Assert.That(spawnedEvents, Is.EqualTo(2));
                 Assert.That(scope.CountEnemies(EnemyRole.Swarmer), Is.EqualTo(2));
+                Assert.That(scope.CountEnemiesTargeting(player.GID), Is.EqualTo(2));
                 Assert.That(scope.ReadThreatBudget().Current, Is.EqualTo(18f).Within(0.001f));
             }
             finally
@@ -431,11 +509,13 @@ namespace StaticMlp.Tests.CombatDirector
                 SW.Create(WorldConfig.Default());
                 SW.Types().RegisterAll(
                     typeof(CombatCell).Assembly,
+                    typeof(Health).Assembly,
                     typeof(ReplicatedComponentRegistration).Assembly,
                     typeof(ServerWT).Assembly,
                     typeof(PlayerTag).Assembly,
                     typeof(ServerCombatAttackState).Assembly,
                     typeof(AiBotsGameplayFeature).Assembly,
+                    typeof(OpenWorldChunkGenerationCompleted).Assembly,
                     typeof(OpenWorldResourcesGameplayFeature).Assembly,
                     typeof(ResourcesInventory).Assembly,
                     typeof(CombatDirectorGameplayFeature).Assembly);
@@ -529,6 +609,33 @@ namespace StaticMlp.Tests.CombatDirector
                 foreach (var enemy in SW.Query<All<EnemyTag, EnemyArchetype>>().Entities())
                 {
                     if (enemy.Read<EnemyArchetype>().Role == role)
+                        count++;
+                }
+
+                return count;
+            }
+
+            public int CountEnemiesTargeting(EntityGID target)
+            {
+                var count = 0;
+                foreach (var enemy in SW.Query<All<EnemyTag, SW.Multi<AiBlackboardEntry>>>().Entities())
+                {
+                    if (AiBlackboardAccess.TryGetEntity(enemy, AiCoreVariableIds.Enemy, out var enemyTarget)
+                        && enemyTarget == target)
+                    {
+                        count++;
+                    }
+                }
+
+                return count;
+            }
+
+            public int CountSpawnSources(WorldChunkId chunkId)
+            {
+                var count = 0;
+                foreach (var source in SW.Query<All<SpawnSourcePlacementRef>>().Entities())
+                {
+                    if (source.Read<SpawnSourcePlacementRef>().ChunkId == chunkId)
                         count++;
                 }
 
@@ -652,6 +759,19 @@ namespace StaticMlp.Tests.CombatDirector
             }
 
             return counts;
+        }
+
+        private static void SendChunkCompleted(WorldChunkId chunkId, SpawnPlacement[] spawnPlacements)
+        {
+            SW.SendEvent(new OpenWorldChunkGenerationCompleted(
+                chunkId,
+                lod: 0,
+                outputs: GenerationOutputMask.Placements,
+                terrainMesh: null,
+                physicsMesh: null,
+                navMeshSourceMesh: null,
+                resourcePlacements: Array.Empty<ResourcePlacement>(),
+                spawnPlacements: spawnPlacements));
         }
 
         private struct SpawnRequestRoleCounts

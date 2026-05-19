@@ -9,9 +9,11 @@
         "Ecs.Networking",
         "StaticMlp.Features.AiBots",
         "StaticMlp.Features.Combat.Logic",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
         "StaticMlp.Features.OpenWorldResources",
         "StaticMlp.Features.ResourcesInventoryMinimal",
-        "StaticMlp.Generated"
+        "StaticMlp.Generated",
+        "StaticMlp.Features.Shared.Logic"
     ],
     "includePlatforms": [
         "Editor"

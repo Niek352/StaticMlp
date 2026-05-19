@@ -9,6 +9,7 @@
         "StaticMlp.Features.CombatDirector.Contracts",
         "StaticMlp.Features.AiBots",
         "StaticMlp.Features.Combat.Logic",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
         "StaticMlp.Features.OpenWorldResources",
         "StaticMlp.Features.ResourcesInventoryMinimal"
     ],

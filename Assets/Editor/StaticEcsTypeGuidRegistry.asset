@@ -414,6 +414,15 @@ MonoBehaviour:
       - className: EnemyArchetype
         namespaceName: StaticMlp.Features.CombatDirector
         assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 33487314-85fa-4e81-85ac-35fe029e1a78
+      current:
+        className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -1040,6 +1049,15 @@ MonoBehaviour:
         assembly: StaticMlp.Features.CombatDirector.Contracts
       history:
       - className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 33487314-85fa-4e81-85ac-35fe029e1a78
+      current:
+        className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemySpawnSource
         namespaceName: StaticMlp.Features.CombatDirector
         assembly: StaticMlp.Features.CombatDirector.Contracts
     tags: []

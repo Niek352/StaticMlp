@@ -30,6 +30,7 @@ Short operational rules for `StaticMlp.Features.AiBots`. Keep this file small; p
 
 - `AiBrain` stores long-lived behavior selection state such as `BehaviorId`, current task, and decision cooldown.
 - `Multi<AiBlackboardEntry>` plus `AiBlackboardAccess` stores sensed or derived context that may be rewritten every frame.
+- `AiBotSpawnSpec.InitialEnemy` is an explicit spawn-time target. `ServerAiPerceptionSystem` must continue tracking an assigned enemy even outside the normal acquisition radius, unless the target is no longer available.
 - `AiTaskState` stores execution progress for the current task, but the execution logic itself lives in `StaticMlp.Features.AiTaskExecution`.
 - `AiNetState` is a replicated presentation summary for clients. Do not drive server AI decisions from it.
 

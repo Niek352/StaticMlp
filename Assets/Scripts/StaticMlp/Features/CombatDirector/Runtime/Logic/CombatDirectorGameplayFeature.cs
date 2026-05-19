@@ -22,6 +22,7 @@ namespace StaticMlp.Features.CombatDirector
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
+            systems.Add(new SpawnSourcePlacementSeedSystem(), GameplaySystemOrder.Gameplay - 100);
             systems.Add(new CombatCellTrackingSystem(), GameplaySystemOrder.Gameplay - 99);
             systems.Add(new PlayerThreatInputSystem(), GameplaySystemOrder.Gameplay - 20);
             systems.Add(new ThreatBudgetAccumulationSystem(), GameplaySystemOrder.Gameplay - 19);

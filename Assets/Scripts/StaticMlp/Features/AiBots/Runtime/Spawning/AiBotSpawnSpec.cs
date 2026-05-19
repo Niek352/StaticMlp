@@ -14,6 +14,7 @@ namespace StaticMlp.Features.AiBots
         public readonly float Hunger;
         public readonly float Fear;
         public readonly EntityGID Leader;
+        public readonly EntityGID InitialEnemy;
 
         public AiBotSpawnSpec(
             ushort networkArchetypeId,
@@ -24,7 +25,8 @@ namespace StaticMlp.Features.AiBots
             float health01,
             float hunger,
             float fear,
-            EntityGID leader)
+            EntityGID leader,
+            EntityGID initialEnemy = default)
         {
             NetworkArchetypeId = networkArchetypeId;
             Position = position;
@@ -35,6 +37,7 @@ namespace StaticMlp.Features.AiBots
             Hunger = hunger;
             Fear = fear;
             Leader = leader;
+            InitialEnemy = initialEnemy;
         }
     }
 }
