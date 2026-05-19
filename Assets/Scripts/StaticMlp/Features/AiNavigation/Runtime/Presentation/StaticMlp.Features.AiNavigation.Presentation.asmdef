@@ -8,7 +8,9 @@
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.AiNavigation.Contracts",
         "StaticMlp.Features.AiBots",
-        "StaticMlp.Features.Frontier.Contracts"
+        "StaticMlp.Features.CombatDirector.Contracts",
+        "StaticMlp.Features.Frontier.Contracts",
+        "StaticMlp.Features.AiNavigation.Logic"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

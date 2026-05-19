@@ -1,14 +1,12 @@
 {
-    "name": "StaticMlp.Features.AiNavigation.Logic",
-    "rootNamespace": "StaticMlp.Features.AiNavigation",
+    "name": "StaticMlp.Features.CombatDirector.Logic",
+    "rootNamespace": "StaticMlp.Features.CombatDirector",
     "references": [
         "FFS.StaticEcs",
+        "Ecs.Networking",
         "Game.Core",
-        "StaticMlp.Features.AiNavigation.Contracts",
-        "StaticMlp.Features.CombatDirector.Contracts",
-        "StaticMlp.Features.Frontier.Contracts",
-        "StaticMlp.Features.Combat.Logic",
-        "Ecs.Networking"
+        "Unity.Mathematics",
+        "StaticMlp.Features.CombatDirector.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,5 +1,5 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Frontier;
+using StaticMlp.Features.CombatDirector;
 using StaticMlp.Networking;
 using Unity.Mathematics;
 

@@ -1,11 +1,11 @@
 {
-    "name": "StaticMlp.Features.AiNavigation.Contracts",
-    "rootNamespace": "StaticMlp.Features.AiNavigation",
+    "name": "StaticMlp.Features.CombatDirector.Contracts",
+    "rootNamespace": "StaticMlp.Features.CombatDirector",
     "references": [
         "FFS.StaticEcs",
-        "Game.Core",
-        "StaticMlp.Features.CombatDirector.Contracts",
-        "StaticMlp.Features.Frontier.Contracts"
+        "FFS.StaticPack",
+        "Ecs.Networking",
+        "Unity.Mathematics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

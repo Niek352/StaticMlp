@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.CombatDirector;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
@@ -114,10 +115,10 @@ namespace StaticMlp.Features.AiNavigation
             if (!snapshot.BestReachableSource.TryUnpack<ServerWT>(out var sourceEntity))
                 return;
 
-            if (!sourceEntity.Has<StaticMlp.Features.Frontier.SpawnSource>())
+            if (!sourceEntity.Has<SpawnSource>())
                 return;
 
-            var sourcePosition = ToVector3(sourceEntity.Read<StaticMlp.Features.Frontier.SpawnSource>().Position);
+            var sourcePosition = ToVector3(sourceEntity.Read<SpawnSource>().Position);
             Gizmos.color = _bestSourceColor;
             Gizmos.DrawWireSphere(sourcePosition, _bestSourceRadius);
         }

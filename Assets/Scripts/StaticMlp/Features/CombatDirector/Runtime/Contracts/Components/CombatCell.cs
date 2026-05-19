@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using Unity.Mathematics;
 
-namespace StaticMlp.Features.Frontier
+namespace StaticMlp.Features.CombatDirector
 {
     public struct CombatCell : IComponent
     {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Frontier;
+using StaticMlp.Features.CombatDirector;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.AiNavigation

@@ -1,5 +1,5 @@
 using System;
-using StaticMlp.Features.Frontier;
+using StaticMlp.Features.CombatDirector;
 using Unity.Mathematics;
 
 namespace StaticMlp.Features.AiNavigation

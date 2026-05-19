@@ -1,0 +1,22 @@
+{
+    "name": "StaticMlp.Tests.CombatDirector",
+    "rootNamespace": "StaticMlp.Tests.CombatDirector",
+    "references": [
+        "StaticMlp.Features.CombatDirector.Contracts",
+        "StaticMlp.Features.CombatDirector.Logic"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
