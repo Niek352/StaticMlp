@@ -9,5 +9,6 @@ namespace StaticMlp.Features.AiNavigation
         public int MaxPathRequestsPerTick;
         public int MaxReachabilityChecksPerTick;
         public int MaxAiDecisionsPerTick;
+        public int MaxNavRebuildStartsPerTick;
     }
 }

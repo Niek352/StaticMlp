@@ -19,7 +19,22 @@ namespace StaticMlp.Features.AiNavigation
 
             for (var i = 0; i < _staleNavAreas.Count; i++)
             {
-                if (_staleNavAreas[i].TryUnpack<ServerWT>(out var entity) && entity.Has<CombatCellNavArea>())
+                if (!_staleNavAreas[i].TryUnpack<ServerWT>(out var entity))
+                    continue;
+
+                if (entity.Has<NavRebuildRequest>())
+                    entity.Delete<NavRebuildRequest>();
+
+                if (entity.Has<RuntimeNavMeshZoneState>())
+                    entity.Delete<RuntimeNavMeshZoneState>();
+
+                if (entity.Has<NavWorkBudgetCounter>())
+                    entity.Delete<NavWorkBudgetCounter>();
+
+                if (entity.Has<CombatCellPerformanceBudget>())
+                    entity.Delete<CombatCellPerformanceBudget>();
+
+                if (entity.Has<CombatCellNavArea>())
                     entity.Delete<CombatCellNavArea>();
             }
 
@@ -35,10 +50,20 @@ namespace StaticMlp.Features.AiNavigation
             {
                 ref var currentNavArea = ref entity.Mut<CombatCellNavArea>();
                 currentNavArea = navArea;
-                return;
+            }
+            else
+            {
+                entity.Set(navArea);
             }
 
-            entity.Set(navArea);
+            if (!entity.Has<RuntimeNavMeshZoneState>())
+                entity.Set(default(RuntimeNavMeshZoneState));
+
+            if (!entity.Has<NavWorkBudgetCounter>())
+                entity.Set(default(NavWorkBudgetCounter));
+
+            if (!entity.Has<CombatCellPerformanceBudget>())
+                entity.Set(CombatCellPerformanceBudgetDefaults.Create());
         }
     }
 }

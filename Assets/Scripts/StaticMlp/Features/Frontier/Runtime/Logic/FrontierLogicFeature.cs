@@ -27,6 +27,7 @@ namespace StaticMlp.Features.Frontier
             systems.Add(new ServerFrontierBossAvailabilitySystem(), GameplaySystemOrder.Gameplay - 88);
             systems.Add(new ServerFrontierStartBossEncounterSystem(), GameplaySystemOrder.Gameplay - 87);
             systems.Add(new ServerFrontierBossResolutionSystem(), GameplaySystemOrder.Gameplay - 86);
+            systems.Add(new ServerFrontierNavWorkPhaseSyncSystem(), GameplaySystemOrder.Gameplay - 85);
         }
     }
 }
