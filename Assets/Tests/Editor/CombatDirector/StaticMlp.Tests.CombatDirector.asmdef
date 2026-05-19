@@ -9,7 +9,8 @@
         "Ecs.Networking",
         "StaticMlp.Features.Combat.Logic",
         "StaticMlp.Features.OpenWorldResources",
-        "StaticMlp.Features.ResourcesInventoryMinimal"
+        "StaticMlp.Features.ResourcesInventoryMinimal",
+        "StaticMlp.Generated"
     ],
     "includePlatforms": [
         "Editor"

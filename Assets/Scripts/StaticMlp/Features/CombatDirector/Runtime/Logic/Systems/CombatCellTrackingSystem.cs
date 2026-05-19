@@ -46,6 +46,12 @@ namespace StaticMlp.Features.CombatDirector
 
             if (found)
             {
+                if (!cellEntity.Has<ThreatBudget>())
+                    throw new InvalidOperationException("Combat cell entity must own ThreatBudget.");
+
+                if (!cellEntity.Has<DirectorState>())
+                    throw new InvalidOperationException("Combat cell entity must own DirectorState.");
+
                 _cellInitialized = true;
                 return cellEntity;
             }
@@ -59,6 +65,20 @@ namespace StaticMlp.Features.CombatDirector
                 CellId = 0,
                 Center = float3.zero,
                 Radius = cellRadius
+            });
+            cellEntity.Set(new ThreatBudget
+            {
+                Current = 0f,
+                Max = math.max(
+                    SW.GetResource<EncounterDirectorConfig>().BuildUpThreshold,
+                    SW.GetResource<EncounterDirectorConfig>().PeakThreshold),
+                AccumulationPerSecond = 0f
+            });
+            cellEntity.Set(new DirectorState
+            {
+                Phase = DirectorPhase.Calm,
+                PhaseTimer = 0f,
+                TimeSinceLastPeak = 0f
             });
             _cellInitialized = true;
             return cellEntity;

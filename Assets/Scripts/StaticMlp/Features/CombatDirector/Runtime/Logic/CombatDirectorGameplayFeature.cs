@@ -23,6 +23,8 @@ namespace StaticMlp.Features.CombatDirector
         {
             systems.Add(new CombatCellTrackingSystem(), GameplaySystemOrder.Gameplay - 99);
             systems.Add(new PlayerThreatInputSystem(), GameplaySystemOrder.Gameplay - 20);
+            systems.Add(new ThreatBudgetAccumulationSystem(), GameplaySystemOrder.Gameplay - 19);
+            systems.Add(new DirectorPhaseSystem(), GameplaySystemOrder.Gameplay - 18);
         }
     }
 }

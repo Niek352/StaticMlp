@@ -82,6 +82,46 @@ Reason:
 - Run Unity compile checks.
 - Run the Combat Director editor tests in Unity.
 
+# Task 4 Summary - Threat Budget Accumulation And Phase Machine
+
+## Completed
+
+- Added `ThreatBudgetAccumulationSystem` to sum in-cell `PlayerNoise` and `CarriedLootValue`, convert them through `EncounterDirectorConfig`, and accumulate clamped threat budget on the authoritative Combat Director cell entity.
+- Added `DirectorPhaseSystem` to drive deterministic `Calm -> BuildUp -> Peak -> Relief -> Cooldown` transitions from budget, timers, active spawn-source availability, and alive-enemy counts.
+- Extended `CombatCellTrackingSystem` so the single authoritative combat-cell entity also owns initialized `ThreatBudget` and `DirectorState`.
+- Registered the new systems in `CombatDirectorGameplayFeature`.
+- Added editor runtime-system tests for:
+  - budget accumulation from noise and loot
+  - budget clamping
+  - threshold-based phase transitions
+  - relief/cooldown timing enforcement
+  - deterministic identical-input results
+
+## Architecture Deviation
+
+- `Peak -> Relief` currently uses the alive-enemy condition only; task 4 does not yet introduce a separate "wave spawned" signal.
+- `BuildUp -> Peak` currently requires at least one active `SpawnSource`, not task-5 distance/directional scoring.
+
+Reason:
+
+- Adding a speculative pre-task-5 spawn marker or source-selection contract here would create unstable cross-task state ownership.
+- The current implementation stays within the existing Combat Director contracts and leaves concrete spawn-source validation/build decisions to task 5.
+
+## Intentional Scope Limit
+
+- Threat budget max initializes from the configured phase thresholds because task 2 does not yet expose a separate budget-cap field.
+- Relief currently preserves budget; it does not add design-specific decay until that behavior is explicitly defined.
+
+## Verification
+
+- Added focused editor runtime-system tests in `Assets/Tests/Editor/CombatDirector`.
+- Kept verification to repository-safe static checks; Unity compile and test execution still require manual validation in-editor.
+
+## Manual Follow-Up Required
+
+- Run Unity compile checks.
+- Run the Combat Director editor tests in Unity.
+
 # Task 3 Summary - Combat Cell Tracking And Threat Input Systems
 
 ## Completed

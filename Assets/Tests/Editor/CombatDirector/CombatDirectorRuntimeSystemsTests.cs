@@ -105,6 +105,187 @@ namespace StaticMlp.Tests.CombatDirector
             }
         }
 
+        [Test]
+        public void ThreatBudgetAccumulationSystem_PlayerNoiseAndLoot_AccumulatesBudget()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            var player = scope.CreatePlayer(new NetworkPeerId(15), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var threatInputSystem = new PlayerThreatInputSystem();
+            var budgetSystem = new ThreatBudgetAccumulationSystem();
+
+            threatInputSystem.Init();
+            try
+            {
+                cellTrackingSystem.Update();
+                threatInputSystem.Update();
+
+                player.Mut<PlayerNoise>().Value = 4f;
+                player.Mut<CarriedLootValue>().Value = 3f;
+
+                budgetSystem.Update();
+
+                var budget = scope.ReadThreatBudget();
+                Assert.That(budget.AccumulationPerSecond, Is.EqualTo(12f).Within(0.001f));
+                Assert.That(budget.Current, Is.EqualTo(6f).Within(0.001f));
+            }
+            finally
+            {
+                threatInputSystem.Destroy();
+            }
+        }
+
+        [Test]
+        public void ThreatBudgetAccumulationSystem_ClampPreventsOverflow()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            var player = scope.CreatePlayer(new NetworkPeerId(17), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var threatInputSystem = new PlayerThreatInputSystem();
+            var budgetSystem = new ThreatBudgetAccumulationSystem();
+
+            threatInputSystem.Init();
+            try
+            {
+                cellTrackingSystem.Update();
+                threatInputSystem.Update();
+                player.Mut<PlayerNoise>().Value = 100f;
+                player.Mut<CarriedLootValue>().Value = 100f;
+
+                var directorEntity = scope.GetDirectorEntity();
+                ref var budget = ref directorEntity.Mut<ThreatBudget>();
+                budget.Current = budget.Max - 0.25f;
+
+                budgetSystem.Update();
+
+                Assert.That(scope.ReadThreatBudget().Current, Is.EqualTo(budget.Max).Within(0.001f));
+            }
+            finally
+            {
+                threatInputSystem.Destroy();
+            }
+        }
+
+        [Test]
+        public void DirectorPhaseSystem_ThresholdsAndSpawnSource_TransitionDeterministically()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(21), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var phaseSystem = new DirectorPhaseSystem();
+
+            cellTrackingSystem.Update();
+
+            var directorEntity = scope.GetDirectorEntity();
+            directorEntity.Mut<ThreatBudget>().Current = 31f;
+
+            phaseSystem.Update();
+
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.BuildUp));
+
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
+            directorEntity.Mut<ThreatBudget>().Current = 76f;
+
+            phaseSystem.Update();
+
+            var peakState = scope.ReadDirectorState();
+            Assert.That(peakState.Phase, Is.EqualTo(DirectorPhase.Peak));
+            Assert.That(peakState.PhaseTimer, Is.EqualTo(0f).Within(0.001f));
+            Assert.That(peakState.TimeSinceLastPeak, Is.EqualTo(0f).Within(0.001f));
+        }
+
+        [Test]
+        public void DirectorPhaseSystem_ReliefAndCooldown_PreventImmediateSecondPeak()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(23), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var phaseSystem = new DirectorPhaseSystem();
+
+            cellTrackingSystem.Update();
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
+
+            var directorEntity = scope.GetDirectorEntity();
+            ref var state = ref directorEntity.Mut<DirectorState>();
+            ref var budget = ref directorEntity.Mut<ThreatBudget>();
+            state.Phase = DirectorPhase.Peak;
+            state.PhaseTimer = 0f;
+            state.TimeSinceLastPeak = 0f;
+            budget.Current = 76f;
+
+            phaseSystem.Update();
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Relief));
+
+            state = directorEntity.Mut<DirectorState>();
+            state.PhaseTimer = 19f;
+            phaseSystem.Update();
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Relief));
+
+            phaseSystem.Update();
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Cooldown));
+
+            state = directorEntity.Mut<DirectorState>();
+            state.PhaseTimer = 14f;
+            phaseSystem.Update();
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Cooldown));
+
+            phaseSystem.Update();
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Calm));
+        }
+
+        [Test]
+        public void DirectorSystems_IdenticalInputState_ProducesDeterministicResults()
+        {
+            var first = RunDeterministicDirectorSequence();
+            var second = RunDeterministicDirectorSequence();
+
+            Assert.That(second.Phase, Is.EqualTo(first.Phase));
+            Assert.That(second.PhaseTimer, Is.EqualTo(first.PhaseTimer).Within(0.001f));
+            Assert.That(second.TimeSinceLastPeak, Is.EqualTo(first.TimeSinceLastPeak).Within(0.001f));
+            Assert.That(second.BudgetCurrent, Is.EqualTo(first.BudgetCurrent).Within(0.001f));
+            Assert.That(second.BudgetAccumulationPerSecond, Is.EqualTo(first.BudgetAccumulationPerSecond).Within(0.001f));
+        }
+
+        private static DeterministicDirectorResult RunDeterministicDirectorSequence()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            var player = scope.CreatePlayer(new NetworkPeerId(29), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var threatInputSystem = new PlayerThreatInputSystem();
+            var budgetSystem = new ThreatBudgetAccumulationSystem();
+            var phaseSystem = new DirectorPhaseSystem();
+
+            threatInputSystem.Init();
+            try
+            {
+                cellTrackingSystem.Update();
+                threatInputSystem.Update();
+                scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
+
+                player.Mut<PlayerNoise>().Value = 8f;
+                player.Mut<CarriedLootValue>().Value = 10f;
+
+                for (var i = 0; i < 15; i++)
+                {
+                    budgetSystem.Update();
+                    phaseSystem.Update();
+                }
+
+                var state = scope.ReadDirectorState();
+                var budget = scope.ReadThreatBudget();
+                return new DeterministicDirectorResult(
+                    state.Phase,
+                    state.PhaseTimer,
+                    state.TimeSinceLastPeak,
+                    budget.Current,
+                    budget.AccumulationPerSecond);
+            }
+            finally
+            {
+                threatInputSystem.Destroy();
+            }
+        }
+
         private sealed class CombatDirectorTestServerWorldScope : IDisposable
         {
             public CombatDirectorTestServerWorldScope()
@@ -118,6 +299,8 @@ namespace StaticMlp.Tests.CombatDirector
                 new OpenWorldResourcesGameplayFeature().RegisterNetworkEvents();
                 SW.Create(WorldConfig.Default());
                 SW.Types().RegisterAll(
+                    typeof(CombatCell).Assembly,
+                    typeof(ReplicatedComponentRegistration).Assembly,
                     typeof(ServerWT).Assembly,
                     typeof(PlayerTag).Assembly,
                     typeof(ServerCombatAttackState).Assembly,
@@ -153,6 +336,38 @@ namespace StaticMlp.Tests.CombatDirector
                 return player;
             }
 
+            public SW.Entity CreateSpawnSource(Vector3 position, bool isActive)
+            {
+                var source = SW.NewEntity<Default>();
+                source.Set(new SpawnSource
+                {
+                    Type = SpawnSourceType.Burrow,
+                    Position = new Unity.Mathematics.float3(position.x, position.y, position.z),
+                    Radius = 5f,
+                    IsActive = isActive
+                });
+                return source;
+            }
+
+            public SW.Entity GetDirectorEntity()
+            {
+                var found = false;
+                SW.Entity directorEntity = default;
+                foreach (var entity in SW.Query<All<CombatCell, ThreatBudget, DirectorState>>().Entities())
+                {
+                    if (found)
+                        throw new InvalidOperationException("Expected exactly one director entity in test scope.");
+
+                    directorEntity = entity;
+                    found = true;
+                }
+
+                if (!found)
+                    throw new InvalidOperationException("Director entity was not created by the tracking system.");
+
+                return directorEntity;
+            }
+
             public CombatCell ReadSingleCombatCell()
             {
                 var found = false;
@@ -172,11 +387,44 @@ namespace StaticMlp.Tests.CombatDirector
                 return cell;
             }
 
+            public ThreatBudget ReadThreatBudget()
+            {
+                return GetDirectorEntity().Read<ThreatBudget>();
+            }
+
+            public DirectorState ReadDirectorState()
+            {
+                return GetDirectorEntity().Read<DirectorState>();
+            }
+
             public void Dispose()
             {
                 NetworkEventRegistry.Clear();
                 if (SW.Status != WorldStatus.NotCreated)
                     SW.Destroy();
+            }
+        }
+
+        private readonly struct DeterministicDirectorResult
+        {
+            public readonly DirectorPhase Phase;
+            public readonly float PhaseTimer;
+            public readonly float TimeSinceLastPeak;
+            public readonly float BudgetCurrent;
+            public readonly float BudgetAccumulationPerSecond;
+
+            public DeterministicDirectorResult(
+                DirectorPhase phase,
+                float phaseTimer,
+                float timeSinceLastPeak,
+                float budgetCurrent,
+                float budgetAccumulationPerSecond)
+            {
+                Phase = phase;
+                PhaseTimer = phaseTimer;
+                TimeSinceLastPeak = timeSinceLastPeak;
+                BudgetCurrent = budgetCurrent;
+                BudgetAccumulationPerSecond = budgetAccumulationPerSecond;
             }
         }
     }
