@@ -3,7 +3,8 @@
     "rootNamespace": "StaticMlp.Tests.CombatDirector",
     "references": [
         "StaticMlp.Features.CombatDirector.Contracts",
-        "StaticMlp.Features.CombatDirector.Logic"
+        "StaticMlp.Features.CombatDirector.Logic",
+        "FFS.StaticEcs"
     ],
     "includePlatforms": [
         "Editor"

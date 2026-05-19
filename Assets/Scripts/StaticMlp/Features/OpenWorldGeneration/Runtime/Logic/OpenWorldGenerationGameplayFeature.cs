@@ -13,7 +13,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
             SW.SetResource(new OpenWorldChunkStreamingState());
             SW.SetResource(new OpenWorldServerChunkGeometryRuntime());
             SW.SetResource(new OpenWorldNavMeshSurfaceRuntime());
-            SW.SetResource<IHeightSampler>(new OpenWorldHeightSampler(generationRuntime.Seed));
+            SW.SetResource<IHeightSampler>(CreateHeightSampler(generationRuntime));
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
@@ -30,7 +30,9 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
-            CW.SetResource(CreateClientGenerationRuntime());
+            var generationRuntime = CreateClientGenerationRuntime();
+            CW.SetResource(generationRuntime);
+            CW.SetResource<IHeightSampler>(CreateHeightSampler(generationRuntime));
             
             systems.Add(new ClientOpenWorldChunkGenerationSystem(), GameplaySystemOrder.ClientPresentation - 40);
         }
@@ -41,6 +43,11 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 return SW.GetResource<OpenWorldChunkGenerationRuntime>();
 
             return OpenWorldChunkGenerationRuntime.CreateDefault();
+        }
+
+        private static IHeightSampler CreateHeightSampler(OpenWorldChunkGenerationRuntime generationRuntime)
+        {
+            return new OpenWorldHeightSampler(generationRuntime.Seed);
         }
     }
 }

@@ -1,5 +1,6 @@
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking.Replication;
+using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.CombatDirector
 {

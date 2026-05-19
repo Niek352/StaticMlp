@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Input;
 using StaticMlp.Networking;
@@ -21,6 +22,7 @@ namespace StaticMlp.Features.Player
         {
             var inputState = CW.GetResource<ClientInputState>();
             var cameraState = CW.GetResource<ClientCameraState>();
+            var heightSampler = CW.GetResource<IHeightSampler>();
 
             foreach (var e in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities())
             {
@@ -35,6 +37,7 @@ namespace StaticMlp.Features.Player
 
                 state.Velocity = move * _speed;
                 state.Position += state.Velocity * Time.deltaTime;
+                state.Position.y = heightSampler.SampleHeight(state.Position.x, state.Position.z);
 
                 if (state.Velocity.sqrMagnitude > 0.0001f)
                     state.Rotation = Quaternion.LookRotation(state.Velocity);

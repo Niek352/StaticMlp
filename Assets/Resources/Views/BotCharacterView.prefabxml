@@ -10,6 +10,7 @@
             _headLocalPosition="0, 0.75, .3"
             _headScale="0.45, 0.45, 0.45" />
         <BotNavigationGizmoPart />
+        <AiNavigationDebugGizmoPart />
         <CombatHealthViewPart />
         <PassiveAutoAttackViewPart />
         <StatusAuraViewPart />

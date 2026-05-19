@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -15,6 +16,8 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
         public void BuildAndAdd(WorldChunkId chunkId, TerrainMeshData meshData, float chunkWorldSize)
         {
+            CompleteTrackedNavMeshJobs();
+
             if (_surfaces.ContainsKey(chunkId))
                 Remove(chunkId);
 
@@ -27,6 +30,8 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
         public void Remove(WorldChunkId chunkId)
         {
+            CompleteTrackedNavMeshJobs();
+
             if (!_surfaces.TryGetValue(chunkId, out var state))
                 return;
 
@@ -40,6 +45,8 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
         public void Dispose()
         {
+            CompleteTrackedNavMeshJobs();
+
             foreach (var pair in _surfaces)
             {
                 pair.Value.Instance.Remove();
@@ -87,6 +94,15 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 throw new InvalidOperationException($"Failed to build NavMeshData for chunk {chunkId}.");
 
             return navMeshData;
+        }
+
+        private static void CompleteTrackedNavMeshJobs()
+        {
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null)
+                throw new InvalidOperationException("Default Unity.Entities world is required before mutating runtime NavMesh surfaces.");
+
+            world.EntityManager.CompleteAllTrackedJobs();
         }
 
         private readonly struct SurfaceState

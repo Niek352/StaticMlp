@@ -10,6 +10,7 @@
         "StaticMlp.LayerProcLite",
         "Unity.Burst",
         "Unity.Collections",
+        "Unity.Entities",
         "Unity.Jobs",
         "Unity.Mathematics"
     ],

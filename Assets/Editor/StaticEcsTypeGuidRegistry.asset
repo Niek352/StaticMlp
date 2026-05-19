@@ -396,6 +396,24 @@ MonoBehaviour:
       - className: NpcRosterRecord
         namespaceName: StaticMlp.Features.Npc
         assembly: StaticMlp.Features.Npc.Logic
+    - guid: 3ee4b71a-e2d1-4446-9301-a36017ab984b
+      current:
+        className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 2fd68c53-cf5c-4d13-94cc-1ad5420a82d7
+      current:
+        className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -1006,6 +1024,24 @@ MonoBehaviour:
       - className: NpcRosterRecord
         namespaceName: StaticMlp.Features.Npc
         assembly: StaticMlp.Features.Npc.Logic
+    - guid: 3ee4b71a-e2d1-4446-9301-a36017ab984b
+      current:
+        className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 2fd68c53-cf5c-4d13-94cc-1ad5420a82d7
+      current:
+        className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
