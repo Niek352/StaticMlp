@@ -2,8 +2,12 @@
     "name": "StaticMlp.Features.Npc.Logic",
     "rootNamespace": "StaticMlp.Features.Npc",
     "references": [
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking",
         "Game.Core",
         "StaticMlp.Features.Npc.Contracts",
+        "StaticMlp.Features.Shared.Logic",
         "StaticMlp.Features.Settlement.Contracts"
     ],
     "includePlatforms": [],

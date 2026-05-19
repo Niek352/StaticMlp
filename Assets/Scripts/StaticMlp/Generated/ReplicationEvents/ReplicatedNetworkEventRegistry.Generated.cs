@@ -9,6 +9,7 @@ using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.Npc;
 using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
@@ -104,6 +105,30 @@ namespace StaticMlp.Networking.Replication.Generated {
                 16,
                 WriteStartExpeditionRequestEvent,
                 ReadStartExpeditionRequestEvent);
+            NetworkEventRegistry.Register<ExtractNpcRequestEvent>(
+                ReplicatedNetworkEventIds.ExtractNpcRequestEvent,
+                NetDelivery.ReliableSequenced,
+                16,
+                WriteExtractNpcRequestEvent,
+                ReadExtractNpcRequestEvent);
+            NetworkEventRegistry.Register<ExtractNpcResultEvent>(
+                ReplicatedNetworkEventIds.ExtractNpcResultEvent,
+                NetDelivery.ReliableSequenced,
+                22,
+                WriteExtractNpcResultEvent,
+                ReadExtractNpcResultEvent);
+            NetworkEventRegistry.Register<RescueNpcRequestEvent>(
+                ReplicatedNetworkEventIds.RescueNpcRequestEvent,
+                NetDelivery.ReliableSequenced,
+                16,
+                WriteRescueNpcRequestEvent,
+                ReadRescueNpcRequestEvent);
+            NetworkEventRegistry.Register<RescueNpcResultEvent>(
+                ReplicatedNetworkEventIds.RescueNpcResultEvent,
+                NetDelivery.ReliableSequenced,
+                22,
+                WriteRescueNpcResultEvent,
+                ReadRescueNpcResultEvent);
             NetworkEventRegistry.Register<OpenWorldChunkUnloadEvent>(
                 ReplicatedNetworkEventIds.OpenWorldChunkUnloadEvent,
                 NetDelivery.ReliableSequenced,
@@ -325,6 +350,66 @@ namespace StaticMlp.Networking.Replication.Generated {
             return new StartExpeditionRequestEvent {
                 AnchorId = reader.ReadUshort(),
                 ExpeditionId = reader.ReadUshort(),
+            };
+        }
+
+        private static void WriteExtractNpcRequestEvent(ref NetworkWriter writer, in ExtractNpcRequestEvent evt) {
+            writer.WriteRequestId(evt.RequestId);
+            writer.WriteEntityGid(evt.Target);
+        }
+
+        private static ExtractNpcRequestEvent ReadExtractNpcRequestEvent(ref NetworkReader reader) {
+            return new ExtractNpcRequestEvent {
+                RequestId = reader.ReadRequestId(),
+                Target = reader.ReadEntityGid(),
+            };
+        }
+
+        private static void WriteExtractNpcResultEvent(ref NetworkWriter writer, in ExtractNpcResultEvent evt) {
+            writer.WriteRequestId(evt.RequestId);
+            writer.WriteByte((byte)evt.Status);
+            writer.WriteEntityGid(evt.Target);
+            writer.WriteEntityGid(evt.RosterRecord);
+            writer.WriteByte((byte)evt.AcquisitionResult);
+        }
+
+        private static ExtractNpcResultEvent ReadExtractNpcResultEvent(ref NetworkReader reader) {
+            return new ExtractNpcResultEvent {
+                RequestId = reader.ReadRequestId(),
+                Status = (RequestStatus)reader.ReadByte(),
+                Target = reader.ReadEntityGid(),
+                RosterRecord = reader.ReadEntityGid(),
+                AcquisitionResult = (NpcAcquisitionResult)reader.ReadByte(),
+            };
+        }
+
+        private static void WriteRescueNpcRequestEvent(ref NetworkWriter writer, in RescueNpcRequestEvent evt) {
+            writer.WriteRequestId(evt.RequestId);
+            writer.WriteEntityGid(evt.RescueSite);
+        }
+
+        private static RescueNpcRequestEvent ReadRescueNpcRequestEvent(ref NetworkReader reader) {
+            return new RescueNpcRequestEvent {
+                RequestId = reader.ReadRequestId(),
+                RescueSite = reader.ReadEntityGid(),
+            };
+        }
+
+        private static void WriteRescueNpcResultEvent(ref NetworkWriter writer, in RescueNpcResultEvent evt) {
+            writer.WriteRequestId(evt.RequestId);
+            writer.WriteByte((byte)evt.Status);
+            writer.WriteEntityGid(evt.RescueSite);
+            writer.WriteEntityGid(evt.RosterRecord);
+            writer.WriteByte((byte)evt.AcquisitionResult);
+        }
+
+        private static RescueNpcResultEvent ReadRescueNpcResultEvent(ref NetworkReader reader) {
+            return new RescueNpcResultEvent {
+                RequestId = reader.ReadRequestId(),
+                Status = (RequestStatus)reader.ReadByte(),
+                RescueSite = reader.ReadEntityGid(),
+                RosterRecord = reader.ReadEntityGid(),
+                AcquisitionResult = (NpcAcquisitionResult)reader.ReadByte(),
             };
         }
 

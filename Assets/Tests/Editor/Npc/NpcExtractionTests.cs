@@ -7,6 +7,9 @@ using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
+using StaticMlp.Networking.Replication;
+using StaticMlp.Networking.Replication.Generated;
+using StaticMlp.Networking.Requests;
 using UnityEngine;
 
 namespace StaticMlp.Tests.Npc
@@ -94,6 +97,57 @@ namespace StaticMlp.Tests.Npc
             Assert.That(result.AcquisitionResult, Is.EqualTo(NpcAcquisitionResult.Accepted));
             Assert.That(result.RosterRecord, Is.Not.EqualTo(default(EntityGID)));
             Assert.That(result.Status, Is.EqualTo(Networking.Requests.RequestStatus.Accepted));
+            Assert.That(result.RosterRecord.TryUnpack<ServerWT>(out var rosterRecord), Is.True);
+
+            ref readonly var record = ref rosterRecord.Read<NpcRosterRecord>();
+            Assert.That(record.Definition, Is.EqualTo(NpcDefinitionCatalog.ExtractedCompanionId));
+            Assert.That(record.Class, Is.EqualTo(NpcClass.Companion));
+            Assert.That(record.AcquisitionPath, Is.EqualTo(NpcAcquisitionPath.Extraction));
+            Assert.That(record.State, Is.EqualTo(NpcRosterState.Captured));
+            Assert.That(record.CreatedServerTick, Is.EqualTo(_scope.SimulationTime.ServerTick));
+        }
+
+        [Test]
+        public void Extract_ValidTarget_ConsumesExtractionState()
+        {
+            var target = CreateTarget(extractable: true);
+
+            var handler = new ExtractNpcHandler();
+            var request = new ExtractNpcRequestEvent(target.GID);
+
+            handler.Handle(new NetworkPeerId(1), request);
+
+            Assert.That(target.Has<ExtractableState>(), Is.False);
+            Assert.That(target.Has<ExtractionTargetTag>(), Is.False);
+        }
+
+        [Test]
+        public void Extract_RepeatedValidRequest_IsRejectedAfterStateIsConsumed()
+        {
+            var target = CreateTarget(extractable: true);
+
+            var handler = new ExtractNpcHandler();
+            var request = new ExtractNpcRequestEvent(target.GID);
+
+            var first = handler.Handle(new NetworkPeerId(1), request);
+            var second = handler.Handle(new NetworkPeerId(1), request);
+
+            Assert.That(first.AcquisitionResult, Is.EqualTo(NpcAcquisitionResult.Accepted));
+            Assert.That(second.AcquisitionResult, Is.EqualTo(NpcAcquisitionResult.Rejected));
+            Assert.That(second.RosterRecord, Is.EqualTo(default(EntityGID)));
+        }
+
+        [Test]
+        public void Extract_TargetOutsideInteractionRange_IsRejected()
+        {
+            var target = CreateTarget(extractable: true, position: new Vector3(10f, 0f, 0f));
+
+            var handler = new ExtractNpcHandler();
+            var request = new ExtractNpcRequestEvent(target.GID);
+
+            var result = handler.Handle(new NetworkPeerId(1), request);
+
+            Assert.That(result.AcquisitionResult, Is.EqualTo(NpcAcquisitionResult.Rejected));
         }
 
         [Test]
@@ -110,7 +164,8 @@ namespace StaticMlp.Tests.Npc
             bool extractable,
             ushort definitionId = 0,
             uint expiresAtTick = 1000,
-            bool dead = false)
+            bool dead = false,
+            Vector3 position = default)
         {
             if (definitionId == 0)
                 definitionId = NpcDefinitionCatalog.ExtractedCompanionId.Value;
@@ -119,7 +174,7 @@ namespace StaticMlp.Tests.Npc
             entity.Set<ServerOwned>();
             entity.Set(new CharacterNetState
             {
-                Position = Vector3.zero,
+                Position = position,
                 Velocity = Vector3.zero,
                 Rotation = Quaternion.identity
             });
@@ -158,12 +213,14 @@ namespace StaticMlp.Tests.Npc
             SW.Create(WorldConfig.Default());
             SW.Types().RegisterAll(
                 typeof(ServerWT).Assembly,
+                typeof(NpcTag).Assembly,
                 typeof(NpcGameplayFeature).Assembly,
                 typeof(Health).Assembly,
                 typeof(PlayerTag).Assembly,
                 typeof(CharacterNetState).Assembly);
             SW.Initialize();
             NetworkEventRegistry.RegisterServerWorldTypes();
+            ReplicatedComponentRegistration.RegisterReplicationComponents();
             ProjectionRegistry.Register<NpcRosterRecord>();
 
             SW.SetResource(new SimulationTime

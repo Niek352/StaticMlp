@@ -24,6 +24,8 @@
         "StaticMlp.Features.Statuses.Logic",
         "StaticMlp.Features.Settlement.Workers.Contracts",
         "StaticMlp.Features.Settlement.Workers.Logic",
+        "StaticMlp.Features.Npc.Contracts",
+        "StaticMlp.Features.Npc.Logic",
         "StaticMlp.Features.Progression.Logic",
         "StaticMlp.Features.OpenWorldResources",
         "StaticMlp.Features.Combat.Contracts",

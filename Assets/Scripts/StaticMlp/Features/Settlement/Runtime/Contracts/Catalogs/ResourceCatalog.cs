@@ -7,6 +7,10 @@ namespace StaticMlp.Features.Settlement
     {
         public static readonly ResourceId WoodId = new(1);
         public static readonly ResourceId StoneId = new(2);
+        public static readonly ResourceId FlowCatalystId = new(3);
+        public static readonly ResourceId RefinedPlankId = new(4);
+        public static readonly ResourceId ResearchDataId = new(5);
+        public static readonly ResourceId StabilityCoreId = new(6);
 
         private static readonly ResourceDefinition[] Definitions =
         {
@@ -21,7 +25,31 @@ namespace StaticMlp.Features.Settlement
                 ResourceFamily.Raw,
                 ResourceUsageFlags.Construction | ResourceUsageFlags.ExpeditionReward,
                 isSettlementStored: true,
-                startingSettlementAmount: 25)
+                startingSettlementAmount: 25),
+            new(
+                FlowCatalystId,
+                ResourceFamily.Flow,
+                ResourceUsageFlags.None,
+                isSettlementStored: false,
+                startingSettlementAmount: 0),
+            new(
+                RefinedPlankId,
+                ResourceFamily.Refined,
+                ResourceUsageFlags.None,
+                isSettlementStored: false,
+                startingSettlementAmount: 0),
+            new(
+                ResearchDataId,
+                ResourceFamily.Progression,
+                ResourceUsageFlags.None,
+                isSettlementStored: false,
+                startingSettlementAmount: 0),
+            new(
+                StabilityCoreId,
+                ResourceFamily.Stability,
+                ResourceUsageFlags.None,
+                isSettlementStored: false,
+                startingSettlementAmount: 0)
         };
 
         static ResourceCatalog()

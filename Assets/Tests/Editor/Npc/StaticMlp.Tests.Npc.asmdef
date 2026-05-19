@@ -2,8 +2,14 @@
     "name": "StaticMlp.Tests.Npc",
     "rootNamespace": "StaticMlp.Tests.Npc",
     "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
         "StaticMlp.Features.Npc.Contracts",
-        "StaticMlp.Features.Npc.Logic"
+        "StaticMlp.Features.Npc.Logic",
+        "StaticMlp.Features.Shared.Logic",
+        "StaticMlp.Features.Settlement.Contracts",
+        "StaticMlp.Generated"
     ],
     "includePlatforms": [
         "Editor"

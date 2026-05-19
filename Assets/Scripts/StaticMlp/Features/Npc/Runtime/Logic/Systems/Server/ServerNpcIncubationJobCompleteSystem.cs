@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Game;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Npc
 {

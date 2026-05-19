@@ -9,6 +9,8 @@ namespace StaticMlp.Features.Npc
     public sealed class RescueNpcHandler
         : IRequestHandler<RescueNpcRequestEvent, RescueNpcResultEvent>
     {
+        private const float INTERACTION_RANGE = 4f;
+
         public RescueNpcResultEvent Handle(NetworkPeerId sourcePeer, in RescueNpcRequestEvent request)
         {
             var rejected = new RescueNpcResultEvent
@@ -26,7 +28,7 @@ namespace StaticMlp.Features.Npc
             if (!site.Has<NpcRescueSite>())
                 return rejected;
 
-            ref var rescueSite = ref site.Read<NpcRescueSite>();
+            ref var rescueSite = ref site.Mut<NpcRescueSite>();
             if (rescueSite.State != NpcRescueSiteState.Rescuable)
                 return rejected;
 
@@ -36,11 +38,10 @@ namespace StaticMlp.Features.Npc
             if ((definition.AllowedAcquisitionPaths & NpcAcquisitionPathFlags.Rescue) == 0)
                 return rejected;
 
-            if (!ServerPeerPlayers.HasPlayer(sourcePeer))
+            if (!ServerPeerPlayers.IsPlayerNear(sourcePeer, rescueSite.Position, INTERACTION_RANGE))
                 return rejected;
 
             rescueSite.State = NpcRescueSiteState.Resolved;
-            site.Set(rescueSite);
 
             var simulationTime = SW.GetResource<SimulationTime>();
             var factory = SW.GetResource<NpcRosterRecordFactory>();

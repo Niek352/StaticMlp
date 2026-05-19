@@ -1,4 +1,5 @@
 using StaticMlp.Game.Bootstrap;
+using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Requests;
 using FFS.Libraries.StaticEcs;
@@ -29,18 +30,20 @@ namespace StaticMlp.Features.Npc
             NetArchetypeRegistry.RegisterClient(NPC_ROSTER_RECORD, e =>
             {
                 e.Set<NpcRosterRecordTag>();
-                e.Set<NpcRosterRecord>();
+                e.Set(new NpcRosterRecord());
             });
 
             NetArchetypeRegistry.RegisterServer(NPC_ROSTER_RECORD, e =>
             {
                 e.Set<NpcRosterRecordTag>();
-                e.Set<NpcRosterRecord>();
+                e.Set(new NpcRosterRecord());
             });
         }
 
         public override void RegisterServerResources()
         {
+            NpcDefinitionCatalogValidator.Validate(NpcDefinitionCatalog.All);
+            NpcIncubationRecipeCatalogValidator.Validate(NpcIncubationRecipeCatalog.All);
             SW.SetResource(new NpcRosterRecordFactory());
         }
 

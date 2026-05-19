@@ -15,6 +15,10 @@ namespace StaticMlp.Networking.Replication.Generated {
         public const ushort UseAbilityCommand = 57022;
         public const ushort StartBossEncounterRequestEvent = 40182;
         public const ushort StartExpeditionRequestEvent = 40181;
+        public const ushort ExtractNpcRequestEvent = 28748;
+        public const ushort ExtractNpcResultEvent = 33151;
+        public const ushort RescueNpcRequestEvent = 47012;
+        public const ushort RescueNpcResultEvent = 59127;
         public const ushort OpenWorldChunkUnloadEvent = 59031;
         public const ushort SetSettlementWorkerAssignmentRequestEvent = 40171;
         public const ushort SetSettlementWorkerAssignmentResultEvent = 40172;

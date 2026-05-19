@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using StaticMlp.Features.Build;
 
@@ -48,6 +49,46 @@ namespace StaticMlp.Tests.Build
                 Assert.That(module.SlotKind, Is.EqualTo(EquipmentSlotKind.Combat));
                 Assert.That(module.SlotType, Is.EqualTo(BuildModuleSlotType.PrimaryAbility));
             }
+        }
+
+        [Test]
+        public void ActiveLoadout_ActivateWrongSlotKind_Throws()
+        {
+            var loadout = new ActiveBuildModuleLoadout();
+            var module = BuildModuleCatalog.Get(BuildModuleCatalog.PoisonArrowModuleId);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                ActiveBuildModuleLoadoutRules.Activate(ref loadout, module, EquipmentSlotKind.Utility, 0));
+        }
+
+        [Test]
+        public void ActiveLoadout_ActivateOverSlotLimit_Throws()
+        {
+            var loadout = new ActiveBuildModuleLoadout();
+            var module = BuildModuleCatalog.Get(BuildModuleCatalog.PoisonArrowModuleId);
+
+            Assert.Throws<InvalidOperationException>(() =>
+                ActiveBuildModuleLoadoutRules.Activate(ref loadout, module, EquipmentSlotKind.Combat, SlotRuleCatalog.COMBAT_LIMIT));
+        }
+
+        [Test]
+        public void ActiveLoadout_ActiveModules_AreQueryable()
+        {
+            var loadout = new ActiveBuildModuleLoadout();
+            var poisonArrow = BuildModuleCatalog.Get(BuildModuleCatalog.PoisonArrowModuleId);
+            var fireFlask = BuildModuleCatalog.Get(BuildModuleCatalog.FireFlaskModuleId);
+
+            ActiveBuildModuleLoadoutRules.Activate(ref loadout, poisonArrow, EquipmentSlotKind.Combat, 0);
+            ActiveBuildModuleLoadoutRules.Activate(ref loadout, fireFlask, EquipmentSlotKind.Combat, 1);
+
+            var activeModules = new List<BuildModuleId>();
+            ActiveBuildModuleLoadoutQuery.CopyActiveModules(loadout, activeModules);
+
+            Assert.That(activeModules, Is.EqualTo(new[]
+            {
+                BuildModuleCatalog.PoisonArrowModuleId,
+                BuildModuleCatalog.FireFlaskModuleId
+            }));
         }
     }
 }

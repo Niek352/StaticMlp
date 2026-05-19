@@ -7,6 +7,7 @@ using UnityEngine;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Build;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.Npc;
 using StaticMlp.Features.OpenWorldResources;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.ResourcesInventoryMinimal;
@@ -76,6 +77,20 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ReplicationAudience.All,
                 NetDelivery.ReliableSequenced,
                 sendRate: ThreatStateReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<NpcIdentity>(
+                ReplicatedComponentIds.NpcIdentity,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: NpcIdentityReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<NpcRosterRecord>(
+                ReplicatedComponentIds.NpcRosterRecord,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: NpcRosterRecordReplication.SendRate);
 
             ReplicationRegistry.RegisterComponent<OpenWorldResourceNodeState>(
                 ReplicatedComponentIds.OpenWorldResourceNodeState,
@@ -240,6 +255,7 @@ namespace StaticMlp.Networking.Replication.Generated {
             ReplicationRegistry.RegisterNetworkEntity(5, 1, 200);
             ReplicationRegistry.RegisterNetworkEntity(3, 1, 100);
             ReplicationRegistry.RegisterNetworkEntity(4, 1, 101);
+            ReplicationRegistry.RegisterNetworkEntity(10, 1, 500);
             ReplicationRegistry.RegisterNetworkEntity(9, 1, 400);
             ReplicationRegistry.RegisterNetworkEntity(1, 1, 1);
             ReplicationRegistry.RegisterNetworkEntity(7, 1, 300);

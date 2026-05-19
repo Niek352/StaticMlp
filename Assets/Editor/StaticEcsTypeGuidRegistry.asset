@@ -381,6 +381,15 @@ MonoBehaviour:
       - className: NpcIdentity
         namespaceName: StaticMlp.Features.Npc
         assembly: StaticMlp.Features.Npc.Contracts
+    - guid: b7e9c3a1-5d2f-4e8b-9c1d-3a8f5e2b7c4d
+      current:
+        className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -521,6 +530,90 @@ MonoBehaviour:
       - className: OpenWorldChunkUnloadEvent
         namespaceName: StaticMlp.Features.OpenWorldGeneration
         assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+    - guid: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+      current:
+        className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      - className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
+      current:
+        className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      - className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b
+      current:
+        className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      - className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c
+      current:
+        className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      - className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+      current:
+        className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e
+      current:
+        className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: d6e7f8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0a
+      current:
+        className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f
+      current:
+        className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
     links: []
     linksList: []
     multi: []
@@ -892,6 +985,15 @@ MonoBehaviour:
       - className: NpcIdentity
         namespaceName: StaticMlp.Features.Npc
         assembly: StaticMlp.Features.Npc.Contracts
+    - guid: b7e9c3a1-5d2f-4e8b-9c1d-3a8f5e2b7c4d
+      current:
+        className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -1032,6 +1134,90 @@ MonoBehaviour:
       - className: OpenWorldChunkUnloadEvent
         namespaceName: StaticMlp.Features.OpenWorldGeneration
         assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+    - guid: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+      current:
+        className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      - className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
+      current:
+        className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      - className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b
+      current:
+        className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      - className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c
+      current:
+        className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      - className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+      current:
+        className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e
+      current:
+        className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: d6e7f8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0a
+      current:
+        className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f
+      current:
+        className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
     links: []
     linksList: []
     multi: []

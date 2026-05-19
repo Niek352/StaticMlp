@@ -39,6 +39,7 @@ namespace StaticMlp.Tests.Ai
                 typeof(SettlementWorkersGameplayFeature).Assembly,
                 typeof(Health).Assembly,
                 typeof(CharacterNetState).Assembly,
+                typeof(NpcTag).Assembly,
                 typeof(NpcGameplayFeature).Assembly);
             SW.Initialize();
 

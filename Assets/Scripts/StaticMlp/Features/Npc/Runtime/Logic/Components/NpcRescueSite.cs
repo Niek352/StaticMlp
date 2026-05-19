@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using UnityEngine;
 
 namespace StaticMlp.Features.Npc
 {
@@ -6,6 +7,7 @@ namespace StaticMlp.Features.Npc
     {
         public ushort NpcDefinitionId;
         public NpcRescueSiteState State;
+        public Vector3 Position;
 
         public NpcDefinitionId Definition => new(NpcDefinitionId);
     }

@@ -4,6 +4,7 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Npc;
 using StaticMlp.Game;
 using StaticMlp.Networking;
+using UnityEngine;
 
 namespace StaticMlp.Tests.Npc
 {
@@ -86,6 +87,14 @@ namespace StaticMlp.Tests.Npc
 
             Assert.That(result.AcquisitionResult, Is.EqualTo(NpcAcquisitionResult.Accepted));
             Assert.That(result.RosterRecord, Is.Not.EqualTo(default(EntityGID)));
+            Assert.That(result.RosterRecord.TryUnpack<ServerWT>(out var rosterRecord), Is.True);
+
+            ref readonly var record = ref rosterRecord.Read<NpcRosterRecord>();
+            Assert.That(record.Definition, Is.EqualTo(NpcDefinitionCatalog.RescuedSpecialistId));
+            Assert.That(record.Class, Is.EqualTo(NpcClass.Specialist));
+            Assert.That(record.AcquisitionPath, Is.EqualTo(NpcAcquisitionPath.Rescue));
+            Assert.That(record.State, Is.EqualTo(NpcRosterState.Recruited));
+            Assert.That(record.CreatedServerTick, Is.EqualTo(_scope.SimulationTime.ServerTick));
         }
 
         [Test]
@@ -102,7 +111,26 @@ namespace StaticMlp.Tests.Npc
             Assert.That(site.Read<NpcRescueSite>().State, Is.EqualTo(NpcRescueSiteState.Resolved));
         }
 
-        private SW.Entity CreateRescueSite(NpcRescueSiteState state, ushort definitionId = 0)
+        [Test]
+        public void Rescue_SiteOutsideInteractionRange_IsRejected()
+        {
+            var site = CreateRescueSite(
+                NpcRescueSiteState.Rescuable,
+                NpcDefinitionCatalog.RescuedSpecialistId.Value,
+                new Vector3(10f, 0f, 0f));
+            var handler = new RescueNpcHandler();
+            var request = new RescueNpcRequestEvent(site.GID);
+
+            var result = handler.Handle(new NetworkPeerId(1), request);
+
+            Assert.That(result.AcquisitionResult, Is.EqualTo(NpcAcquisitionResult.Rejected));
+            Assert.That(site.Read<NpcRescueSite>().State, Is.EqualTo(NpcRescueSiteState.Rescuable));
+        }
+
+        private SW.Entity CreateRescueSite(
+            NpcRescueSiteState state,
+            ushort definitionId = 0,
+            Vector3 position = default)
         {
             if (definitionId == 0)
                 definitionId = NpcDefinitionCatalog.RescuedSpecialistId.Value;
@@ -111,7 +139,8 @@ namespace StaticMlp.Tests.Npc
             entity.Set(new NpcRescueSite
             {
                 NpcDefinitionId = definitionId,
-                State = state
+                State = state,
+                Position = position
             });
             return entity;
         }

@@ -29,6 +29,7 @@ namespace StaticMlp.Features.Settlement
 
         public override void RegisterServerResources()
         {
+            ResourceCatalogValidator.Validate(ResourceCatalog.All);
             SW.SetResource(new SettlementSharedResourcesFactory());
         }
 

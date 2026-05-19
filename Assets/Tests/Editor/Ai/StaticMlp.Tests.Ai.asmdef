@@ -19,7 +19,8 @@
         "StaticMlp.Features.Settlement.Workers.Contracts",
         "StaticMlp.Features.Settlement.Workers.Logic",
         "StaticMlp.Features.Stage1.Contracts",
-        "StaticMlp.Features.Npc.Contracts"
+        "StaticMlp.Features.Npc.Contracts",
+        "StaticMlp.Features.Npc.Logic"
     ],
     "includePlatforms": [
         "Editor"

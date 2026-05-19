@@ -46,11 +46,15 @@ namespace StaticMlp.Tests.Settlement
         }
 
         [Test]
-        public void Validate_CurrentCatalog_DoesNotThrowAndUsesRawFamily()
+        public void Validate_CurrentCatalog_DoesNotThrowAndCoversDesignLockFamilies()
         {
             Assert.DoesNotThrow(() => ResourceCatalogValidator.Validate(ResourceCatalog.All));
             Assert.That(ResourceCatalog.Get(ResourceCatalog.WoodId).Family, Is.EqualTo(ResourceFamily.Raw));
             Assert.That(ResourceCatalog.Get(ResourceCatalog.StoneId).Family, Is.EqualTo(ResourceFamily.Raw));
+            Assert.That(ResourceCatalog.Get(ResourceCatalog.FlowCatalystId).Family, Is.EqualTo(ResourceFamily.Flow));
+            Assert.That(ResourceCatalog.Get(ResourceCatalog.RefinedPlankId).Family, Is.EqualTo(ResourceFamily.Refined));
+            Assert.That(ResourceCatalog.Get(ResourceCatalog.ResearchDataId).Family, Is.EqualTo(ResourceFamily.Progression));
+            Assert.That(ResourceCatalog.Get(ResourceCatalog.StabilityCoreId).Family, Is.EqualTo(ResourceFamily.Stability));
         }
 
         private static ResourceDefinition CreateDefinition(ResourceId id, ResourceFamily family)

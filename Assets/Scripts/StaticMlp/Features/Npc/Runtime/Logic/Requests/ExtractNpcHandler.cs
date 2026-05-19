@@ -1,5 +1,6 @@
 using StaticMlp.Features.Shared;
 using StaticMlp.Game;
+using StaticMlp.Game.Components;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
@@ -10,6 +11,8 @@ namespace StaticMlp.Features.Npc
     public sealed class ExtractNpcHandler
         : IRequestHandler<ExtractNpcRequestEvent, ExtractNpcResultEvent>
     {
+        private const float INTERACTION_RANGE = 4f;
+
         public ExtractNpcResultEvent Handle(NetworkPeerId sourcePeer, in ExtractNpcRequestEvent request)
         {
             var rejected = new ExtractNpcResultEvent
@@ -41,7 +44,11 @@ namespace StaticMlp.Features.Npc
             if (target.Has<Health>() && target.Read<Health>().Current <= 0f)
                 return rejected;
 
-            if (!ServerPeerPlayers.HasPlayer(sourcePeer))
+            if (!target.Has<CharacterNetState>())
+                return rejected;
+
+            var targetPosition = target.Read<CharacterNetState>().Position;
+            if (!ServerPeerPlayers.IsPlayerNear(sourcePeer, targetPosition, INTERACTION_RANGE))
                 return rejected;
 
             var factory = SW.GetResource<NpcRosterRecordFactory>();
@@ -53,6 +60,8 @@ namespace StaticMlp.Features.Npc
                 simulationTime.ServerTick));
 
             SW.SendEvent(new NpcAcquisitionAcceptedEvent(rosterRecord, NpcAcquisitionPath.Extraction));
+            target.Delete<ExtractableState>();
+            target.Delete<ExtractionTargetTag>();
 
             return new ExtractNpcResultEvent
             {
