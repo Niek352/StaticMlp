@@ -46,3 +46,38 @@ Reason:
 - Run Unity compile checks.
 - Run `StaticMlp/Replication/Generate` so the new replicated components get generated registration/serializer output.
 - Run the editor test suite after Unity recompiles.
+
+# Task 2 Summary - Encounter Director Config And Enemy Spawn Catalog
+
+## Completed
+
+- Added `EncounterDirectorConfig` as a Combat Director world resource with authoritative encounter tuning values for cell size, threat rates, phase timings, and spawn caps.
+- Added `EnemySpawnDefinition`, `EnemySpawnCatalog`, and `EnemySpawnCatalogValidator` under `CombatDirector.Runtime.Logic`.
+- Registered default Combat Director config and spawn catalog in `CombatDirectorGameplayFeature.RegisterServerResources()`.
+- Added editor tests covering the default catalog plus duplicate-role, zero-cost, and inverted min/max validation failures.
+
+## Architecture Deviation
+
+- Placed `EncounterDirectorConfig` in `Runtime/Logic/WorldResources` instead of the task's suggested `Runtime/Logic/Configs`.
+
+Reason:
+
+- Project feature layout requires `IResource` scripts to live in `WorldResources`.
+- Introducing a new top-level `Configs` bucket for a single ECS resource would conflict with the repository's enforced layout rules.
+
+## Intentional Scope Limit
+
+- The config and catalog are server resources only in this task.
+- They were not mirrored into client-core state because the task calls for authoritative runtime definitions, not client-side prediction or presentation access.
+- Runtime spawn logic, prefab/view mapping, and AI behavior binding remain out of scope.
+
+## Verification
+
+- Added focused editor tests in `Assets/Tests/Editor/CombatDirector`.
+- Verified the gameplay feature now seeds the Combat Director config and spawn catalog during server resource registration.
+- Manual Unity compile and editor test execution are still required because repository rules prohibit local `dotnet build` verification here.
+
+## Manual Follow-Up Required
+
+- Run Unity compile checks.
+- Run the Combat Director editor tests in Unity.
