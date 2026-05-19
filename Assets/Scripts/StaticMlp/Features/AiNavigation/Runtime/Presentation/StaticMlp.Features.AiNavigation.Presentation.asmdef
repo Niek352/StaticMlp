@@ -1,13 +1,14 @@
 {
-    "name": "StaticMlp.Features.AiNavigation.Logic",
+    "name": "StaticMlp.Features.AiNavigation.Presentation",
     "rootNamespace": "StaticMlp.Features.AiNavigation",
     "references": [
         "FFS.StaticEcs",
+        "Ecs.Networking",
         "Game.Core",
+        "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.AiNavigation.Contracts",
-        "StaticMlp.Features.Frontier.Contracts",
-        "StaticMlp.Features.Combat.Logic",
-        "Ecs.Networking"
+        "StaticMlp.Features.AiBots",
+        "StaticMlp.Features.Frontier.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

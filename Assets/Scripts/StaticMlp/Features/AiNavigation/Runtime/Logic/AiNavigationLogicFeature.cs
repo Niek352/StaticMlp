@@ -15,6 +15,7 @@ namespace StaticMlp.Features.AiNavigation
             systems.Add(new FarAiApproximateMoveSystem(), GameplaySystemOrder.Gameplay - 38);
             systems.Add(new LocalNavAttachStateSystem(), GameplaySystemOrder.Gameplay - 37);
             systems.Add(new FarToLocalAiNavigationHandoffSystem(), GameplaySystemOrder.Gameplay - 36);
+            systems.Add(new AiNavigationDebugSnapshotSystem(), GameplaySystemOrder.Gameplay - 34);
         }
     }
 }

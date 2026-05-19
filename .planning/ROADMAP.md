@@ -64,7 +64,7 @@ Outcome:
 
 ## Phase 05: Debug And Verification
 
-Status: planned
+Status: Complete (1/1 plans complete, 2026-05-19)
 
 Plans:
 
@@ -72,4 +72,4 @@ Plans:
 
 Outcome:
 
-- Debug tooling can inspect nav areas, nav versions, reachability, selected sources, and per-tick budget counters without mutating gameplay state.
+- Debug tooling can inspect nav areas, nav versions, reachability, best reachable/resolved source facts, and per-tick budget counters without mutating gameplay state.
