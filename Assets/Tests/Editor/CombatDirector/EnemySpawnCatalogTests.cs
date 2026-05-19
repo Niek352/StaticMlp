@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using StaticMlp.Features.CombatDirector;
 
 namespace StaticMlp.Tests.CombatDirector
 {
