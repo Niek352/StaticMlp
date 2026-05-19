@@ -12,7 +12,8 @@
         "StaticMlp.Features.Combat.Logic",
         "StaticMlp.Features.Combat.Presentation",
         "StaticMlp.Features.Shared.Logic",
-        "StaticMlp.Features.Frontier.Logic"
+        "StaticMlp.Features.Frontier.Logic",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

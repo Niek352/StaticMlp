@@ -13,6 +13,7 @@ Short operational rules for `StaticMlp.Features.AiBots`. Keep this file small; p
 - `Runtime/AiBotsGameplayFeature.cs`
 - `Runtime/Systems/Server/*` except task execution
 - `Runtime/Navigation/AiNavigationRuntime.cs`
+- `Runtime/Navigation/AiNavigation.md`
 - `Runtime/Actions/AiActionCatalog.cs`
 - `../AiTaskExecution/AGENTS.md`
 - `../AiActions/Runtime/Actions/*`

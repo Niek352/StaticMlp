@@ -44,7 +44,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 WorldChunkBounds.Default,
                 128f,
                 -7f,
-                64,
+                12,
                 true,
                 6f);
         }

@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Combat;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.Shared;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
@@ -31,7 +32,7 @@ namespace StaticMlp.Features.AiBots
             entity.Set<AiAgentTag>();
             entity.Set(new ServerCombatAttackState());
             ApplyServerAiAgentState(entity, new AiAgentSpawnStateSpec(
-                _spec.Position,
+                ResolveTerrainPosition(_spec.Position),
                 _spec.Rotation,
                 _spec.BehaviorId,
                 _spec.MaxHealth,
@@ -39,6 +40,16 @@ namespace StaticMlp.Features.AiBots
                 _spec.Hunger,
                 _spec.Fear,
                 _spec.Leader));
+        }
+
+        private static Vector3 ResolveTerrainPosition(Vector3 position)
+        {
+            if (!SW.HasResource<IHeightSampler>())
+                return position;
+
+            var sampler = SW.GetResource<IHeightSampler>();
+            var height = sampler.SampleHeight(position.x, position.z);
+            return new Vector3(position.x, height, position.z);
         }
 
         public void ApplyServerAiAgentState(SW.Entity entity, in AiAgentSpawnStateSpec spec)

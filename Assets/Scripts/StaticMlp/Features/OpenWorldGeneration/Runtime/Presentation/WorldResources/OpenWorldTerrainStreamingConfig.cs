@@ -8,7 +8,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
         public WorldGenerationSeed Seed = new(12345);
         public WorldChunkBounds Bounds = WorldChunkBounds.Default;
         public float ChunkWorldSize = 128f;
-        public int BaseQuadCount = 64;
+        public int BaseQuadCount = 12;
         public int ViewRadiusInChunks = 4;
         public int ColliderRadiusInChunks = 1;
         public int MaxChunkLoadsPerFrame = 4;

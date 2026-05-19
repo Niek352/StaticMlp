@@ -28,7 +28,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 SW.SendEvent(new OpenWorldChunkGenerationRequested(
                     request.Value.ChunkId,
                     runtime.CreateServerGeometryRequest(),
-                    GenerationOutputMask.Placements | GenerationOutputMask.PhysicsMesh));
+                    GenerationOutputMask.Placements | GenerationOutputMask.ServerGeometry));
             }
         }
     }
