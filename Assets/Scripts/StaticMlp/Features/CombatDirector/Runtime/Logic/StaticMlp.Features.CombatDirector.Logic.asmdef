@@ -6,7 +6,10 @@
         "Ecs.Networking",
         "Game.Core",
         "Unity.Mathematics",
-        "StaticMlp.Features.CombatDirector.Contracts"
+        "StaticMlp.Features.CombatDirector.Contracts",
+        "StaticMlp.Features.Combat.Logic",
+        "StaticMlp.Features.OpenWorldResources",
+        "StaticMlp.Features.ResourcesInventoryMinimal"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -18,5 +18,11 @@ namespace StaticMlp.Features.CombatDirector
             SW.SetResource(EncounterDirectorConfig.CreateDefault());
             SW.SetResource(EnemySpawnCatalog.CreateDefault());
         }
+
+        public override void RegisterServerSystems(ServerSystemsBuilder systems)
+        {
+            systems.Add(new CombatCellTrackingSystem(), GameplaySystemOrder.Gameplay - 99);
+            systems.Add(new PlayerThreatInputSystem(), GameplaySystemOrder.Gameplay - 20);
+        }
     }
 }

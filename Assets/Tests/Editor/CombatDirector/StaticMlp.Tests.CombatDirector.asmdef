@@ -4,7 +4,12 @@
     "references": [
         "StaticMlp.Features.CombatDirector.Contracts",
         "StaticMlp.Features.CombatDirector.Logic",
-        "FFS.StaticEcs"
+        "FFS.StaticEcs",
+        "Game.Core",
+        "Ecs.Networking",
+        "StaticMlp.Features.Combat.Logic",
+        "StaticMlp.Features.OpenWorldResources",
+        "StaticMlp.Features.ResourcesInventoryMinimal"
     ],
     "includePlatforms": [
         "Editor"

@@ -81,3 +81,43 @@ Reason:
 
 - Run Unity compile checks.
 - Run the Combat Director editor tests in Unity.
+
+# Task 3 Summary - Combat Cell Tracking And Threat Input Systems
+
+## Completed
+
+- Added `CombatCellTrackingSystem` to own the vertical-slice single combat cell and keep its center/radius updated from current server player positions.
+- Added `PlayerThreatInputSystem` to seed Combat Director player state, derive per-frame attack/harvest noise, map carried loot from `ResourcesInventory`, and add spawn-source proximity plus time-in-cell pressure.
+- Registered both systems from `CombatDirectorGameplayFeature`.
+- Added editor tests covering:
+  - single-player cell center
+  - multi-player averaged cell center
+  - attack plus harvest noise accumulation
+  - carried loot projection from inventory
+
+## Architecture Deviation
+
+- The single-cell active group selects the largest connected player cluster using `2 * CellRadius` adjacency before averaging positions.
+- Proximity threat currently reads active `SpawnSource` entities only.
+
+Reason:
+
+- The task explicitly constrains the vertical slice to one combat cell, but a naive average of all players would produce unstable centers when groups split.
+- The current feature boundary exposes spawn sources, while "enemy placements" do not yet exist as a stable public contract owned by Combat Director or another feature.
+
+## Intentional Scope Limit
+
+- Attack noise is derived from authoritative `ServerCombatAttackState.LastAcceptedShotSequence` rather than transient combat request entities.
+- Harvest noise is derived from the typed `TryHarvestOpenWorldResourceCommand` event stream.
+- `CarriedLootValue` currently maps raw `ResourcesInventory` totals because the project does not yet expose a richer loot valuation catalog.
+
+## Verification
+
+- Added focused editor runtime-system tests in `Assets/Tests/Editor/CombatDirector`.
+- Verified the Combat Director gameplay feature now registers server systems for cell tracking and threat input accumulation.
+- Manual Unity compile and editor test execution are still required because repository rules prohibit local build verification here.
+
+## Manual Follow-Up Required
+
+- Run Unity compile checks.
+- Run the Combat Director editor tests in Unity.
