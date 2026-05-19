@@ -3,13 +3,11 @@ using Unity.Mathematics;
 
 namespace StaticMlp.Features.CombatDirector
 {
-    public struct SpawnRequest : IComponent
+    public struct SelectedSpawnSource : IComponent
     {
-        public EntityGID SourceEntity;
-        public float3 SpawnPosition;
         public int CellId;
-        public int Count;
+        public EntityGID SourceEntity;
         public SpawnSourceType SourceType;
-        public EnemyRole Role;
+        public float3 Position;
     }
 }

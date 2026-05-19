@@ -33,6 +33,21 @@ namespace StaticMlp.Features.CombatDirector
                 $"Missing {nameof(EnemySpawnDefinition)} for enemy role {(byte)role} in {nameof(EnemySpawnCatalog)}.");
         }
 
+        public bool TryGet(EnemyRole role, out EnemySpawnDefinition definition)
+        {
+            for (var i = 0; i < _definitions.Length; i++)
+            {
+                if (_definitions[i].Role != role)
+                    continue;
+
+                definition = _definitions[i];
+                return true;
+            }
+
+            definition = default;
+            return false;
+        }
+
         public static EnemySpawnCatalog CreateDefault()
         {
             return new EnemySpawnCatalog(new[]

@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.CombatDirector;
 using StaticMlp.Features.OpenWorldResources;
@@ -246,6 +247,136 @@ namespace StaticMlp.Tests.CombatDirector
             Assert.That(second.BudgetAccumulationPerSecond, Is.EqualTo(first.BudgetAccumulationPerSecond).Within(0.001f));
         }
 
+        [Test]
+        public void SpawnSourceSelectionSystem_InactiveOrInvalidDistanceSources_AreRejected()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(31), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var selectionSystem = new SpawnSourceSelectionSystem();
+
+            cellTrackingSystem.Update();
+            var directorEntity = scope.GetDirectorEntity();
+            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.BuildUp;
+
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: false);
+            selectionSystem.Update();
+            Assert.That(directorEntity.Has<SelectedSpawnSource>(), Is.False);
+
+            scope.CreateSpawnSource(new Vector3(2f, 0f, 0f), isActive: true);
+            selectionSystem.Update();
+            Assert.That(directorEntity.Has<SelectedSpawnSource>(), Is.False);
+
+            scope.CreateSpawnSource(new Vector3(120f, 0f, 0f), isActive: true);
+            selectionSystem.Update();
+            Assert.That(directorEntity.Has<SelectedSpawnSource>(), Is.False);
+        }
+
+        [Test]
+        public void SpawnRequestBuildSystem_LowMediumHighBudgets_CreateExpectedRoleCounts()
+        {
+            var low = BuildRequestsForBudget(31f, DirectorPhase.BuildUp);
+            Assert.That(low.Swarmers, Is.EqualTo(10));
+            Assert.That(low.Markers, Is.EqualTo(0));
+            Assert.That(low.Anchors, Is.EqualTo(0));
+
+            var medium = BuildRequestsForBudget(60f, DirectorPhase.BuildUp);
+            Assert.That(medium.Swarmers, Is.EqualTo(14));
+            Assert.That(medium.Markers, Is.EqualTo(1));
+            Assert.That(medium.Anchors, Is.EqualTo(0));
+
+            var high = BuildRequestsForBudget(80f, DirectorPhase.Peak);
+            Assert.That(high.Swarmers, Is.EqualTo(18));
+            Assert.That(high.Markers, Is.EqualTo(1));
+            Assert.That(high.Anchors, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void SpawnRequestBuildSystem_SpawnCap_PreventsOverSpawnRequests()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(33), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var selectionSystem = new SpawnSourceSelectionSystem();
+            var buildSystem = new SpawnRequestBuildSystem();
+
+            cellTrackingSystem.Update();
+            for (var i = 0; i < 22; i++)
+                scope.CreateEnemy(new Vector3(i * 0.1f, 0f, 0f), EnemyRole.Swarmer);
+
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
+            var directorEntity = scope.GetDirectorEntity();
+            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.Peak;
+            directorEntity.Mut<ThreatBudget>().Current = 80f;
+
+            selectionSystem.Update();
+            buildSystem.Update();
+
+            Assert.That(scope.CountSpawnRequestEnemies(), Is.LessThanOrEqualTo(2));
+        }
+
+        [Test]
+        public void SpawnRequestValidationSystem_InvalidCatalogRole_RejectsRequest()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(35), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var validationSystem = new SpawnRequestValidationSystem();
+
+            cellTrackingSystem.Update();
+            var directorEntity = scope.GetDirectorEntity();
+            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.BuildUp;
+            directorEntity.Mut<ThreatBudget>().Current = 20f;
+            var source = scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
+            var request = scope.CreateSpawnRequest(source, (EnemyRole)250, count: 1);
+            var requestGid = request.GID;
+
+            validationSystem.Update();
+
+            Assert.That(requestGid.TryUnpack<ServerWT>(out _), Is.False);
+        }
+
+        [Test]
+        public void EnemySpawnApplySystem_ValidRequest_CreatesEnemiesConsumesBudgetAndEmitsEvent()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(37), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var validationSystem = new SpawnRequestValidationSystem();
+            var applySystem = new EnemySpawnApplySystem();
+
+            cellTrackingSystem.Update();
+            var directorEntity = scope.GetDirectorEntity();
+            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.BuildUp;
+            directorEntity.Mut<ThreatBudget>().Current = 20f;
+            var source = scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
+            scope.CreateSpawnRequest(source, EnemyRole.Swarmer, count: 2);
+
+            var receiver = SW.RegisterEventReceiver<EnemySpawnedEvent>();
+            try
+            {
+                validationSystem.Update();
+                applySystem.Update();
+
+                var spawnedEvents = 0;
+                foreach (var evt in receiver)
+                {
+                    Assert.That(evt.Value.SpawnedEntity.TryUnpack<ServerWT>(out _), Is.True);
+                    Assert.That(evt.Value.Role, Is.EqualTo(EnemyRole.Swarmer));
+                    Assert.That(evt.Value.SourceType, Is.EqualTo(SpawnSourceType.Burrow));
+                    spawnedEvents++;
+                }
+
+                Assert.That(spawnedEvents, Is.EqualTo(2));
+                Assert.That(scope.CountEnemies(EnemyRole.Swarmer), Is.EqualTo(2));
+                Assert.That(scope.ReadThreatBudget().Current, Is.EqualTo(18f).Within(0.001f));
+            }
+            finally
+            {
+                SW.DeleteEventReceiver(ref receiver);
+            }
+        }
+
         private static DeterministicDirectorResult RunDeterministicDirectorSequence()
         {
             using var scope = new CombatDirectorTestServerWorldScope();
@@ -304,6 +435,7 @@ namespace StaticMlp.Tests.CombatDirector
                     typeof(ServerWT).Assembly,
                     typeof(PlayerTag).Assembly,
                     typeof(ServerCombatAttackState).Assembly,
+                    typeof(AiBotsGameplayFeature).Assembly,
                     typeof(OpenWorldResourcesGameplayFeature).Assembly,
                     typeof(ResourcesInventory).Assembly,
                     typeof(CombatDirectorGameplayFeature).Assembly);
@@ -315,6 +447,7 @@ namespace StaticMlp.Tests.CombatDirector
                 });
                 SW.SetResource(EncounterDirectorConfig.CreateDefault());
                 SW.SetResource(EnemySpawnCatalog.CreateDefault());
+                SW.SetResource(new AiBotFactory());
             }
 
             public SW.Entity CreatePlayer(NetworkPeerId owner, Vector3 position)
@@ -347,6 +480,59 @@ namespace StaticMlp.Tests.CombatDirector
                     IsActive = isActive
                 });
                 return source;
+            }
+
+            public SW.Entity CreateEnemy(Vector3 position, EnemyRole role)
+            {
+                var enemy = SW.NewEntity<Default>();
+                enemy.Set<EnemyTag>();
+                enemy.Set(new EnemyArchetype
+                {
+                    Role = role
+                });
+                enemy.Set(new CharacterNetState
+                {
+                    Position = position,
+                    Rotation = Quaternion.identity
+                });
+                return enemy;
+            }
+
+            public SW.Entity CreateSpawnRequest(SW.Entity source, EnemyRole role, int count)
+            {
+                ref readonly var spawnSource = ref source.Read<SpawnSource>();
+                var request = SW.NewEntity<Default>();
+                request.Set(new SpawnRequest
+                {
+                    CellId = ReadSingleCombatCell().CellId,
+                    SourceEntity = source.GID,
+                    SourceType = spawnSource.Type,
+                    Role = role,
+                    Count = count,
+                    SpawnPosition = spawnSource.Position
+                });
+                return request;
+            }
+
+            public int CountSpawnRequestEnemies()
+            {
+                var count = 0;
+                foreach (var request in SW.Query<All<SpawnRequest>>().Entities())
+                    count += request.Read<SpawnRequest>().Count;
+
+                return count;
+            }
+
+            public int CountEnemies(EnemyRole role)
+            {
+                var count = 0;
+                foreach (var enemy in SW.Query<All<EnemyTag, EnemyArchetype>>().Entities())
+                {
+                    if (enemy.Read<EnemyArchetype>().Role == role)
+                        count++;
+                }
+
+                return count;
             }
 
             public SW.Entity GetDirectorEntity()
@@ -426,6 +612,53 @@ namespace StaticMlp.Tests.CombatDirector
                 BudgetCurrent = budgetCurrent;
                 BudgetAccumulationPerSecond = budgetAccumulationPerSecond;
             }
+        }
+
+        private static SpawnRequestRoleCounts BuildRequestsForBudget(float budgetCurrent, DirectorPhase phase)
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(41), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var selectionSystem = new SpawnSourceSelectionSystem();
+            var buildSystem = new SpawnRequestBuildSystem();
+
+            cellTrackingSystem.Update();
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
+            var directorEntity = scope.GetDirectorEntity();
+            directorEntity.Mut<DirectorState>().Phase = phase;
+            directorEntity.Mut<ThreatBudget>().Current = budgetCurrent;
+
+            selectionSystem.Update();
+            buildSystem.Update();
+
+            var counts = new SpawnRequestRoleCounts();
+            foreach (var request in SW.Query<All<SpawnRequest>>().Entities())
+            {
+                ref readonly var spawnRequest = ref request.Read<SpawnRequest>();
+                switch (spawnRequest.Role)
+                {
+                    case EnemyRole.Swarmer:
+                        counts.Swarmers += spawnRequest.Count;
+                        break;
+                    case EnemyRole.Marker:
+                        counts.Markers += spawnRequest.Count;
+                        break;
+                    case EnemyRole.AnchorElite:
+                        counts.Anchors += spawnRequest.Count;
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unexpected enemy role in spawn request: {spawnRequest.Role}.");
+                }
+            }
+
+            return counts;
+        }
+
+        private struct SpawnRequestRoleCounts
+        {
+            public int Swarmers;
+            public int Markers;
+            public int Anchors;
         }
     }
 }

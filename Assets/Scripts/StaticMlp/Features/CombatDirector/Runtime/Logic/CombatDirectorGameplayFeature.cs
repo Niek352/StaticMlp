@@ -25,6 +25,10 @@ namespace StaticMlp.Features.CombatDirector
             systems.Add(new PlayerThreatInputSystem(), GameplaySystemOrder.Gameplay - 20);
             systems.Add(new ThreatBudgetAccumulationSystem(), GameplaySystemOrder.Gameplay - 19);
             systems.Add(new DirectorPhaseSystem(), GameplaySystemOrder.Gameplay - 18);
+            systems.Add(new SpawnSourceSelectionSystem(), GameplaySystemOrder.Gameplay - 17);
+            systems.Add(new SpawnRequestBuildSystem(), GameplaySystemOrder.Gameplay - 16);
+            systems.Add(new SpawnRequestValidationSystem(), GameplaySystemOrder.Gameplay - 15);
+            systems.Add(new EnemySpawnApplySystem(), GameplaySystemOrder.Gameplay - 14);
         }
     }
 }

@@ -82,6 +82,82 @@ Reason:
 - Run Unity compile checks.
 - Run the Combat Director editor tests in Unity.
 
+# Task 5 Summary - Spawn Source Selection And Spawn Request Build
+
+## Completed
+
+- Added server-side spawn-source selection using active-state, configured min/max distance, and a behind/side directional heuristic from current player forward vectors.
+- Added selected-source ECS state so request building can consume the exact source identity through `EntityGID`.
+- Extended `SpawnRequest` with source identity and type for later validation.
+- Added spawn request composition for low, medium, and high budgets using `EnemySpawnCatalog` costs and `EncounterDirectorConfig.MaxAliveEnemiesPerCell`.
+- Registered the new selection/build systems in `CombatDirectorGameplayFeature`.
+- Added editor tests for inactive/distance rejection, budget-level composition, and cap-limited request generation.
+
+## Architecture Deviation
+
+- Added `MinSpawnSourceDistance` and `MaxSpawnSourceDistance` to `EncounterDirectorConfig`.
+
+Reason:
+
+- The task requires min/max source-distance validation, but the previous config did not expose those values.
+- Keeping them in the existing authoritative director config avoids hardcoded system-local tuning.
+
+## Intentional Scope Limit
+
+- Safe-zone rejection is not implemented because no stable safe-zone contract is available to Combat Director yet.
+- Visibility/occlusion remains out of scope as requested.
+
+## Verification
+
+- Ran `git diff --check` on the touched Combat Director runtime and test paths.
+- Added focused editor coverage in `Assets/Tests/Editor/CombatDirector`.
+- Unity compile and editor test execution still require manual validation in-editor.
+
+## Manual Follow-Up Required
+
+- Run Unity compile checks.
+- Run the Combat Director editor tests in Unity.
+
+# Task 6 Summary - Enemy Spawn Apply And Authoritative Entity Creation
+
+## Completed
+
+- Added spawn-request validation for active target phase, source liveness, source distance, catalog role existence, alive cap, and available threat budget.
+- Added valid-request tagging so the apply system only consumes explicitly validated requests.
+- Added enemy spawn application through the existing `AiBotFactory` networked entity factory instead of hand-writing `NetworkIdentity`.
+- Added Combat Director-owned spawned enemy metadata:
+  - `EnemyTag`
+  - `EnemyArchetype`
+  - `EnemySpawnSource`
+- Added internal `EnemySpawnedEvent` with `EntityGID`, `EnemyRole`, and `SpawnSourceType`.
+- Registered validation/apply systems in the server pipeline.
+- Added editor tests for invalid-role rejection and valid spawn application with budget consumption and event emission.
+
+## Architecture Deviation
+
+- Used `AiBotFactory` as the authoritative networked entity creation boundary rather than introducing a second Combat Director `NetEntityFactory`.
+
+Reason:
+
+- The project already owns AI bot network entity creation and combat/AI initialization through `AiBots`.
+- Combat Director should choose encounter composition, not duplicate AI behavior or combat component setup.
+
+## Intentional Scope Limit
+
+- Role-specific AI behavior, health scaling, and presentation/view binding remain out of scope.
+- The spawned-event is an internal ECS event only; no raw transport packets or replicated events were added.
+
+## Verification
+
+- Ran `git diff --check` on the touched Combat Director runtime and test paths.
+- Added focused editor coverage in `Assets/Tests/Editor/CombatDirector`.
+- Unity compile and editor test execution still require manual validation in-editor.
+
+## Manual Follow-Up Required
+
+- Run Unity compile checks.
+- Run the Combat Director editor tests in Unity.
+
 # Task 4 Summary - Threat Budget Accumulation And Phase Machine
 
 ## Completed

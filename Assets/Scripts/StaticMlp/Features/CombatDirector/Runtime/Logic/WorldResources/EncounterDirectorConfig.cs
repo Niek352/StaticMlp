@@ -11,6 +11,8 @@ namespace StaticMlp.Features.CombatDirector
         public readonly float MinReliefSeconds;
         public readonly float MinCooldownSeconds;
         public readonly int MaxAliveEnemiesPerCell;
+        public readonly float MinSpawnSourceDistance;
+        public readonly float MaxSpawnSourceDistance;
         public readonly float BuildUpThreshold;
         public readonly float PeakThreshold;
 
@@ -22,6 +24,8 @@ namespace StaticMlp.Features.CombatDirector
             float minReliefSeconds,
             float minCooldownSeconds,
             int maxAliveEnemiesPerCell,
+            float minSpawnSourceDistance,
+            float maxSpawnSourceDistance,
             float buildUpThreshold,
             float peakThreshold)
         {
@@ -32,6 +36,8 @@ namespace StaticMlp.Features.CombatDirector
             MinReliefSeconds = minReliefSeconds;
             MinCooldownSeconds = minCooldownSeconds;
             MaxAliveEnemiesPerCell = maxAliveEnemiesPerCell;
+            MinSpawnSourceDistance = minSpawnSourceDistance;
+            MaxSpawnSourceDistance = maxSpawnSourceDistance;
             BuildUpThreshold = buildUpThreshold;
             PeakThreshold = peakThreshold;
         }
@@ -46,6 +52,8 @@ namespace StaticMlp.Features.CombatDirector
                 minReliefSeconds: 20f,
                 minCooldownSeconds: 15f,
                 maxAliveEnemiesPerCell: 24,
+                minSpawnSourceDistance: 10f,
+                maxSpawnSourceDistance: 90f,
                 buildUpThreshold: 30f,
                 peakThreshold: 75f);
         }

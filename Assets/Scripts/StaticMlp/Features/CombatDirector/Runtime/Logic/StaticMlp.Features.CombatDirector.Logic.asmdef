@@ -7,6 +7,7 @@
         "Game.Core",
         "Unity.Mathematics",
         "StaticMlp.Features.CombatDirector.Contracts",
+        "StaticMlp.Features.AiBots",
         "StaticMlp.Features.Combat.Logic",
         "StaticMlp.Features.OpenWorldResources",
         "StaticMlp.Features.ResourcesInventoryMinimal"
