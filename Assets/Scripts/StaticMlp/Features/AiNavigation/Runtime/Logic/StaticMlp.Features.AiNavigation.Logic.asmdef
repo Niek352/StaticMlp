@@ -1,0 +1,18 @@
+{
+    "name": "StaticMlp.Features.AiNavigation.Logic",
+    "rootNamespace": "StaticMlp.Features.AiNavigation",
+    "references": [
+        "FFS.StaticEcs",
+        "Game.Core",
+        "StaticMlp.Features.AiNavigation.Contracts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

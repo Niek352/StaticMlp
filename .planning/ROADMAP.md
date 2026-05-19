@@ -6,7 +6,7 @@ Goal: implement a clean, cache-driven contract between `CombatDirector`, shared 
 
 ## Phase 01: Architecture And Contracts
 
-Status: In progress (1/2 plans complete)
+Status: Complete (2/2 plans complete, 2026-05-19)
 
 Plans:
 
