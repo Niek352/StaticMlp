@@ -9,6 +9,7 @@ namespace StaticMlp.Features.AiNavigation
             systems.Add(new CombatCellNavAreaSyncSystem(), GameplaySystemOrder.Gameplay - 97);
             systems.Add(new RuntimeNavMeshRebuildQueueSystem(), GameplaySystemOrder.Gameplay - 96);
             systems.Add(new RuntimeNavMeshBuildSystem(), GameplaySystemOrder.Gameplay - 84);
+            systems.Add(new SpawnSourceReachabilitySystem(), GameplaySystemOrder.Gameplay - 83);
         }
     }
 }
