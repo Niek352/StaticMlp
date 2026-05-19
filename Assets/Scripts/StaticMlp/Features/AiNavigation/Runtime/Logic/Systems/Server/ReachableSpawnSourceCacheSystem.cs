@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Networking;
 using Unity.Mathematics;
 
 namespace StaticMlp.Features.AiNavigation

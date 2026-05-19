@@ -3,7 +3,8 @@
     "rootNamespace": "StaticMlp.Features.AiNavigation",
     "references": [
         "FFS.StaticEcs",
-        "Game.Core"
+        "Game.Core",
+        "StaticMlp.Features.Frontier.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -5,7 +5,8 @@
         "FFS.StaticEcs",
         "Game.Core",
         "StaticMlp.Features.AiNavigation.Contracts",
-        "StaticMlp.Features.Frontier.Contracts"
+        "StaticMlp.Features.Frontier.Contracts",
+        "Ecs.Networking"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

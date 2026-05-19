@@ -2,6 +2,7 @@ using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Game;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.AiNavigation
 {

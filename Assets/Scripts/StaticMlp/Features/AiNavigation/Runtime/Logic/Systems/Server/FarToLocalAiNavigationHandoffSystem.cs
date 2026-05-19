@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.AiNavigation
 {
