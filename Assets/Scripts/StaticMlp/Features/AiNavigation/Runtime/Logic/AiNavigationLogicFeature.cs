@@ -10,6 +10,8 @@ namespace StaticMlp.Features.AiNavigation
             systems.Add(new RuntimeNavMeshRebuildQueueSystem(), GameplaySystemOrder.Gameplay - 96);
             systems.Add(new RuntimeNavMeshBuildSystem(), GameplaySystemOrder.Gameplay - 84);
             systems.Add(new SpawnSourceReachabilitySystem(), GameplaySystemOrder.Gameplay - 83);
+            systems.Add(new ReachableSpawnSourceCacheSystem(), GameplaySystemOrder.Gameplay - 82);
+            systems.Add(new ResolvedSpawnPointSystem(), GameplaySystemOrder.Gameplay - 81);
         }
     }
 }

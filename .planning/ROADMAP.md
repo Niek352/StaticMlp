@@ -35,7 +35,7 @@ Outcome:
 
 ## Phase 03: Spawn Source Reachability
 
-Status: In progress (1/2 plans complete, 2026-05-19)
+Status: Complete (2/2 plans complete, 2026-05-19)
 
 Plans:
 
@@ -46,6 +46,7 @@ Outcome:
 
 - `SpawnSourceSelection` uses cached reachable state only.
 - `SpawnRequestBuildSystem` does not search NavMesh directly.
+- Reachable candidates and resolved spawn points are explicit navigation-owned cached outputs.
 
 ## Phase 04: AI Navigation Modes
 
