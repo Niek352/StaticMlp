@@ -12,6 +12,9 @@ namespace StaticMlp.Features.AiNavigation
             systems.Add(new SpawnSourceReachabilitySystem(), GameplaySystemOrder.Gameplay - 83);
             systems.Add(new ReachableSpawnSourceCacheSystem(), GameplaySystemOrder.Gameplay - 82);
             systems.Add(new ResolvedSpawnPointSystem(), GameplaySystemOrder.Gameplay - 81);
+            systems.Add(new FarAiApproximateMoveSystem(), GameplaySystemOrder.Gameplay - 38);
+            systems.Add(new LocalNavAttachStateSystem(), GameplaySystemOrder.Gameplay - 37);
+            systems.Add(new FarToLocalAiNavigationHandoffSystem(), GameplaySystemOrder.Gameplay - 36);
         }
     }
 }

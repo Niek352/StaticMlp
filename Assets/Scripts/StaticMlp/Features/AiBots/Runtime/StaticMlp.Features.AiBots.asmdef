@@ -13,6 +13,7 @@
         "StaticMlp.Features.Combat.Presentation",
         "StaticMlp.Features.Shared.Logic",
         "StaticMlp.Features.Frontier.Logic",
+        "StaticMlp.Features.AiNavigation.Contracts",
         "StaticMlp.Features.OpenWorldGeneration.Contracts"
     ],
     "includePlatforms": [],

@@ -50,7 +50,7 @@ Outcome:
 
 ## Phase 04: AI Navigation Modes
 
-Status: planned
+Status: Complete (2/2 plans complete, 2026-05-19)
 
 Plans:
 
@@ -60,7 +60,7 @@ Plans:
 Outcome:
 
 - Far AI can move logically without a loaded chunk.
-- When local nav is available, AI resumes local movement through the existing bot navigation path.
+- When local nav is available, AI resumes local movement through an explicit handoff into the existing bot navigation path.
 
 ## Phase 05: Debug And Verification
 

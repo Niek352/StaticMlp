@@ -52,6 +52,7 @@ namespace StaticMlp.Features.AiBots
             systems.Add(new ServerAiActionVariablesCollectSystem(), GameplaySystemOrder.Gameplay - 60);
             systems.Add(new ServerAiUtilityDecisionSystem(), GameplaySystemOrder.Gameplay - 50);
             systems.Add(new ServerAiAttackRequestSystem(), GameplaySystemOrder.Gameplay - 39);
+            systems.Add(new ServerAiLocalNavigationHandoffApplySystem(), GameplaySystemOrder.Gameplay - 35);
             systems.Add(new ServerAiNavigationSystem(), GameplaySystemOrder.Gameplay - 30);
             systems.Add(new ServerAiNetStateSystem(), GameplaySystemOrder.CollectReplication - 10);
         }
