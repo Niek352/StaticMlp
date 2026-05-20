@@ -6,20 +6,41 @@ namespace StaticMlp.Features.BuildingCatalog
     public readonly struct BuildingDefinition
     {
         public readonly BuildingId Id;
+        public readonly string Code;
+        public readonly string DisplayName;
+        public readonly BuildingCategory Category;
+        public readonly BuildingCapabilityFlags Capabilities;
         public readonly ResourceAmount[] ConstructionCost;
         public readonly int2 Footprint;
         public readonly float BuildWorkRequired;
+        public readonly BuildingInteractionDefinition[] Interactions;
+        public readonly BuildingNpcProfileDefinition NpcProfile;
+        public readonly BuildingOperationDefinition Operation;
 
         public BuildingDefinition(
             BuildingId id,
+            string code,
+            string displayName,
+            BuildingCategory category,
+            BuildingCapabilityFlags capabilities,
             ResourceAmount[] constructionCost,
             int2 footprint,
-            float buildWorkRequired)
+            float buildWorkRequired,
+            BuildingInteractionDefinition[] interactions,
+            BuildingNpcProfileDefinition npcProfile,
+            BuildingOperationDefinition operation)
         {
             Id = id;
+            Code = code;
+            DisplayName = displayName;
+            Category = category;
+            Capabilities = capabilities;
             ConstructionCost = constructionCost;
             Footprint = footprint;
             BuildWorkRequired = buildWorkRequired;
+            Interactions = interactions;
+            NpcProfile = npcProfile;
+            Operation = operation;
         }
 
         public int FootprintWidth => Footprint.x;

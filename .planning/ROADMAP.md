@@ -24,7 +24,7 @@ This roadmap upgrades the current camp repair prototype into a Stage1 settlement
 Plans:
 
 - [x] 01-01: Extend resource catalog and settlement shared storage beyond wood/stone.
-- [ ] 01-02: Add building metadata for categories, capabilities, interactions, NPC profile, and operation profile.
+- [x] 01-02: Add building metadata for categories, capabilities, interactions, NPC profile, and operation profile.
 - [ ] 01-03: Generalize construction resource ledgers and deposit rules over the Stage1 resource contract.
 
 ### Phase 2: Building Catalog And Construction
@@ -91,7 +91,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Settlement Foundation | 1/3 | In progress | - |
+| 1. Settlement Foundation | 2/3 | In progress | - |
 | 2. Building Catalog And Construction | 0/3 | Not started | - |
 | 3. Storage And Operations | 0/3 | Not started | - |
 | 4. NPC Worker Economy | 0/3 | Not started | - |

@@ -2,8 +2,10 @@
     "name": "StaticMlp.Tests.Settlement",
     "rootNamespace": "StaticMlp.Tests.Settlement",
     "references": [
+        "StaticMlp.Features.BuildingCatalog",
         "StaticMlp.Features.Settlement.Contracts",
-        "StaticMlp.Features.Settlement.Logic"
+        "StaticMlp.Features.Settlement.Logic",
+        "Unity.Mathematics"
     ],
     "includePlatforms": [
         "Editor"

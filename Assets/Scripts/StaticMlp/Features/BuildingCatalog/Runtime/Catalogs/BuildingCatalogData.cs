@@ -13,14 +13,33 @@ namespace StaticMlp.Features.BuildingCatalog
         {
             new(
                 WoodenHutId,
+                code: "wooden_hut",
+                displayName: "Wooden Hut",
+                BuildingCategory.Housing,
+                BuildingCapabilityFlags.ProvidesHousing
+                    | BuildingCapabilityFlags.SupportsPlayerInteraction
+                    | BuildingCapabilityFlags.BlocksPathing,
                 new[]
                 {
                     new ResourceAmount(ResourceCatalog.WoodId, 10),
                     new ResourceAmount(ResourceCatalog.StoneId, 4)
                 },
                 new int2(4, 5),
-                buildWorkRequired: 100f)
+                buildWorkRequired: 100f,
+                new[]
+                {
+                    new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, requiresCompletedBuilding: false),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, requiresCompletedBuilding: false),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, requiresCompletedBuilding: false)
+                },
+                BuildingNpcProfileDefinition.None,
+                BuildingOperationDefinition.None)
         };
+
+        static BuildingCatalogData()
+        {
+            BuildingCatalogValidator.Validate(Definitions);
+        }
 
         public static IReadOnlyList<BuildingDefinition> All => Definitions;
 
