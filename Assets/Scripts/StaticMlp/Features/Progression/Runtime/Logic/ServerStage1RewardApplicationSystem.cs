@@ -57,20 +57,7 @@ namespace StaticMlp.Features.Progression
 
         private static void Grant(ref SettlementSharedResources storage, ResourceAmount grant)
         {
-            if (grant.Id == ResourceCatalog.WoodId)
-            {
-                storage.Wood += grant.Amount;
-                return;
-            }
-
-            if (grant.Id == ResourceCatalog.StoneId)
-            {
-                storage.Stone += grant.Amount;
-                return;
-            }
-
-            throw new System.InvalidOperationException(
-                $"Unsupported progression reward resource id {grant.Id.Value}.");
+            storage.Add(grant.Id, grant.Amount);
         }
     }
 }

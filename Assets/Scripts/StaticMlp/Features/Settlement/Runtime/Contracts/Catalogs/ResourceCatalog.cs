@@ -7,48 +7,69 @@ namespace StaticMlp.Features.Settlement
     {
         public static readonly ResourceId WoodId = new(1);
         public static readonly ResourceId StoneId = new(2);
-        public static readonly ResourceId FlowCatalystId = new(3);
-        public static readonly ResourceId RefinedPlankId = new(4);
-        public static readonly ResourceId ResearchDataId = new(5);
-        public static readonly ResourceId StabilityCoreId = new(6);
+        public static readonly ResourceId PlanksId = new(3);
+        public static readonly ResourceId SimplePartsId = new(4);
+        public static readonly ResourceId RepairKitsId = new(5);
+        public static readonly ResourceId FoodId = new(6);
+        public static readonly ResourceId FuelId = new(7);
+        public static readonly ResourceId ResearchDataId = new(8);
+        public static readonly ResourceId MedicineId = new(9);
 
         private static readonly ResourceDefinition[] Definitions =
         {
             new(
                 WoodId,
                 ResourceFamily.Raw,
-                ResourceUsageFlags.Construction | ResourceUsageFlags.ExpeditionReward,
+                ResourceUsageFlags.Construction | ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.ProductionInput,
                 isSettlementStored: true,
                 startingSettlementAmount: 50),
             new(
                 StoneId,
                 ResourceFamily.Raw,
-                ResourceUsageFlags.Construction | ResourceUsageFlags.ExpeditionReward,
+                ResourceUsageFlags.Construction | ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.Repair | ResourceUsageFlags.ProductionInput,
                 isSettlementStored: true,
                 startingSettlementAmount: 25),
             new(
-                FlowCatalystId,
-                ResourceFamily.Flow,
-                ResourceUsageFlags.None,
-                isSettlementStored: false,
+                PlanksId,
+                ResourceFamily.Refined,
+                ResourceUsageFlags.Construction | ResourceUsageFlags.ProductionOutput | ResourceUsageFlags.ProductionInput,
+                isSettlementStored: true,
                 startingSettlementAmount: 0),
             new(
-                RefinedPlankId,
+                SimplePartsId,
                 ResourceFamily.Refined,
-                ResourceUsageFlags.None,
-                isSettlementStored: false,
+                ResourceUsageFlags.Construction | ResourceUsageFlags.Repair | ResourceUsageFlags.ProductionOutput | ResourceUsageFlags.ProductionInput,
+                isSettlementStored: true,
+                startingSettlementAmount: 0),
+            new(
+                RepairKitsId,
+                ResourceFamily.Stability,
+                ResourceUsageFlags.Repair | ResourceUsageFlags.ProductionOutput,
+                isSettlementStored: true,
+                startingSettlementAmount: 0),
+            new(
+                FoodId,
+                ResourceFamily.Flow,
+                ResourceUsageFlags.Upkeep | ResourceUsageFlags.ExpeditionReward,
+                isSettlementStored: true,
+                startingSettlementAmount: 0),
+            new(
+                FuelId,
+                ResourceFamily.Flow,
+                ResourceUsageFlags.Fuel | ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.ProductionInput,
+                isSettlementStored: true,
                 startingSettlementAmount: 0),
             new(
                 ResearchDataId,
                 ResourceFamily.Progression,
-                ResourceUsageFlags.None,
-                isSettlementStored: false,
+                ResourceUsageFlags.Progression | ResourceUsageFlags.ExpeditionReward,
+                isSettlementStored: true,
                 startingSettlementAmount: 0),
             new(
-                StabilityCoreId,
+                MedicineId,
                 ResourceFamily.Stability,
-                ResourceUsageFlags.None,
-                isSettlementStored: false,
+                ResourceUsageFlags.Upkeep | ResourceUsageFlags.ProductionOutput,
+                isSettlementStored: true,
                 startingSettlementAmount: 0)
         };
 

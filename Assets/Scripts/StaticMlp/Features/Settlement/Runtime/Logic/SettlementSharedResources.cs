@@ -21,6 +21,27 @@ namespace StaticMlp.Features.Settlement
         [ReplicatedField]
         public int Stone;
 
+        [ReplicatedField]
+        public int Planks;
+
+        [ReplicatedField]
+        public int SimpleParts;
+
+        [ReplicatedField]
+        public int RepairKits;
+
+        [ReplicatedField]
+        public int Food;
+
+        [ReplicatedField]
+        public int Fuel;
+
+        [ReplicatedField]
+        public int ResearchData;
+
+        [ReplicatedField]
+        public int Medicine;
+
         public readonly int GetAmount(ResourceId resourceId)
         {
             if (resourceId == ResourceCatalog.WoodId)
@@ -28,6 +49,89 @@ namespace StaticMlp.Features.Settlement
 
             if (resourceId == ResourceCatalog.StoneId)
                 return Stone;
+
+            if (resourceId == ResourceCatalog.PlanksId)
+                return Planks;
+
+            if (resourceId == ResourceCatalog.SimplePartsId)
+                return SimpleParts;
+
+            if (resourceId == ResourceCatalog.RepairKitsId)
+                return RepairKits;
+
+            if (resourceId == ResourceCatalog.FoodId)
+                return Food;
+
+            if (resourceId == ResourceCatalog.FuelId)
+                return Fuel;
+
+            if (resourceId == ResourceCatalog.ResearchDataId)
+                return ResearchData;
+
+            if (resourceId == ResourceCatalog.MedicineId)
+                return Medicine;
+
+            throw new InvalidOperationException($"Unsupported settlement resource id {resourceId.Value}.");
+        }
+
+        public void Add(ResourceId resourceId, int amount)
+        {
+            if (amount < 0)
+                throw new InvalidOperationException($"Cannot add negative settlement resource amount {amount} for resource id {resourceId.Value}.");
+
+            if (resourceId == ResourceCatalog.WoodId)
+            {
+                Wood += amount;
+                return;
+            }
+
+            if (resourceId == ResourceCatalog.StoneId)
+            {
+                Stone += amount;
+                return;
+            }
+
+            if (resourceId == ResourceCatalog.PlanksId)
+            {
+                Planks += amount;
+                return;
+            }
+
+            if (resourceId == ResourceCatalog.SimplePartsId)
+            {
+                SimpleParts += amount;
+                return;
+            }
+
+            if (resourceId == ResourceCatalog.RepairKitsId)
+            {
+                RepairKits += amount;
+                return;
+            }
+
+            if (resourceId == ResourceCatalog.FoodId)
+            {
+                Food += amount;
+                return;
+            }
+
+            if (resourceId == ResourceCatalog.FuelId)
+            {
+                Fuel += amount;
+                return;
+            }
+
+            if (resourceId == ResourceCatalog.ResearchDataId)
+            {
+                ResearchData += amount;
+                return;
+            }
+
+            if (resourceId == ResourceCatalog.MedicineId)
+            {
+                Medicine += amount;
+                return;
+            }
 
             throw new InvalidOperationException($"Unsupported settlement resource id {resourceId.Value}.");
         }
@@ -49,6 +153,55 @@ namespace StaticMlp.Features.Settlement
                 return spent;
             }
 
+            if (resourceId == ResourceCatalog.PlanksId)
+            {
+                var spent = Math.Min(amount, Planks);
+                Planks -= spent;
+                return spent;
+            }
+
+            if (resourceId == ResourceCatalog.SimplePartsId)
+            {
+                var spent = Math.Min(amount, SimpleParts);
+                SimpleParts -= spent;
+                return spent;
+            }
+
+            if (resourceId == ResourceCatalog.RepairKitsId)
+            {
+                var spent = Math.Min(amount, RepairKits);
+                RepairKits -= spent;
+                return spent;
+            }
+
+            if (resourceId == ResourceCatalog.FoodId)
+            {
+                var spent = Math.Min(amount, Food);
+                Food -= spent;
+                return spent;
+            }
+
+            if (resourceId == ResourceCatalog.FuelId)
+            {
+                var spent = Math.Min(amount, Fuel);
+                Fuel -= spent;
+                return spent;
+            }
+
+            if (resourceId == ResourceCatalog.ResearchDataId)
+            {
+                var spent = Math.Min(amount, ResearchData);
+                ResearchData -= spent;
+                return spent;
+            }
+
+            if (resourceId == ResourceCatalog.MedicineId)
+            {
+                var spent = Math.Min(amount, Medicine);
+                Medicine -= spent;
+                return spent;
+            }
+
             throw new InvalidOperationException($"Unsupported settlement resource id {resourceId.Value}.");
         }
 
@@ -60,6 +213,13 @@ namespace StaticMlp.Features.Settlement
         {
             writer.WriteInt(Wood);
             writer.WriteInt(Stone);
+            writer.WriteInt(Planks);
+            writer.WriteInt(SimpleParts);
+            writer.WriteInt(RepairKits);
+            writer.WriteInt(Food);
+            writer.WriteInt(Fuel);
+            writer.WriteInt(ResearchData);
+            writer.WriteInt(Medicine);
         }
 
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
@@ -67,6 +227,13 @@ namespace StaticMlp.Features.Settlement
         {
             Wood = reader.ReadInt();
             Stone = reader.ReadInt();
+            Planks = reader.ReadInt();
+            SimpleParts = reader.ReadInt();
+            RepairKits = reader.ReadInt();
+            Food = reader.ReadInt();
+            Fuel = reader.ReadInt();
+            ResearchData = reader.ReadInt();
+            Medicine = reader.ReadInt();
         }
     }
 }

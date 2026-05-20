@@ -24,7 +24,14 @@ namespace StaticMlp.Features.Settlement
             entity.Set(new SettlementSharedResources
             {
                 Wood = seed.GetStartingResourceAmount(ResourceCatalog.WoodId),
-                Stone = seed.GetStartingResourceAmount(ResourceCatalog.StoneId)
+                Stone = seed.GetStartingResourceAmount(ResourceCatalog.StoneId),
+                Planks = seed.GetStartingResourceAmount(ResourceCatalog.PlanksId),
+                SimpleParts = seed.GetStartingResourceAmount(ResourceCatalog.SimplePartsId),
+                RepairKits = seed.GetStartingResourceAmount(ResourceCatalog.RepairKitsId),
+                Food = seed.GetStartingResourceAmount(ResourceCatalog.FoodId),
+                Fuel = seed.GetStartingResourceAmount(ResourceCatalog.FuelId),
+                ResearchData = seed.GetStartingResourceAmount(ResourceCatalog.ResearchDataId),
+                Medicine = seed.GetStartingResourceAmount(ResourceCatalog.MedicineId)
             });
         }
     }

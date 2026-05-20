@@ -33,14 +33,19 @@ namespace StaticMlp.Features.Settlement
 
         private static ResourceAmount[] CreateStartingResources()
         {
-            var woodDefinition = ResourceCatalog.Get(ResourceCatalog.WoodId);
-            var stoneDefinition = ResourceCatalog.Get(ResourceCatalog.StoneId);
+            var resources = ResourceCatalog.All;
+            var startingResources = new ResourceAmount[resources.Count];
 
-            return new[]
+            for (var i = 0; i < resources.Count; i++)
             {
-                new ResourceAmount(ResourceCatalog.WoodId, woodDefinition.StartingSettlementAmount),
-                new ResourceAmount(ResourceCatalog.StoneId, stoneDefinition.StartingSettlementAmount)
-            };
+                var definition = resources[i];
+                if (!definition.IsSettlementStored)
+                    throw new InvalidOperationException($"Stage1 seed cannot initialize non-stored settlement resource id {definition.Id.Value}.");
+
+                startingResources[i] = new ResourceAmount(definition.Id, definition.StartingSettlementAmount);
+            }
+
+            return startingResources;
         }
 
         private static Stage1SettlementWorkerSeed[] CreateInitialWorkers()
