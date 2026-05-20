@@ -8,6 +8,7 @@ namespace StaticMlp.Features.CombatDirector
         public int CellId;
         public EntityGID SourceEntity;
         public SpawnSourceType SourceType;
+        public SpawnSourceKind SourceKind;
         public float3 Position;
     }
 }

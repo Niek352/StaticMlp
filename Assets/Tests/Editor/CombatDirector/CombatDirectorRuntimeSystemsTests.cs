@@ -377,6 +377,50 @@ namespace StaticMlp.Tests.CombatDirector
         }
 
         [Test]
+        public void SpawnSourceSelectionSystem_PressureSelection_RejectsAmbientOnlySources()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(32), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var selectionSystem = new SpawnSourceSelectionSystem();
+
+            cellTrackingSystem.Update();
+            var directorEntity = scope.GetDirectorEntity();
+            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.PressureEvent;
+
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.AmbientPoint, allowsAmbient: true);
+            selectionSystem.Update();
+            Assert.That(directorEntity.Has<SelectedSpawnSource>(), Is.False);
+
+            scope.CreateSpawnSource(new Vector3(25f, 0f, 0f), isActive: true, kind: SpawnSourceKind.Rift, allowsPressureEvent: true);
+            selectionSystem.Update();
+
+            Assert.That(directorEntity.Has<SelectedSpawnSource>(), Is.True);
+            Assert.That(directorEntity.Read<SelectedSpawnSource>().SourceKind, Is.EqualTo(SpawnSourceKind.Rift));
+        }
+
+        [Test]
+        public void SpawnRequestValidationSystem_AmbientOnlySource_CannotValidatePressureRequest()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(34), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var validationSystem = new SpawnRequestValidationSystem();
+
+            cellTrackingSystem.Update();
+            var directorEntity = scope.GetDirectorEntity();
+            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.PressureEvent;
+            directorEntity.Mut<ThreatBudget>().Current = 20f;
+            var source = scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.AmbientPoint, allowsAmbient: true);
+            var request = scope.CreateSpawnRequest(source, EnemyRole.Swarmer, count: 1);
+            var requestGid = request.GID;
+
+            validationSystem.Update();
+
+            Assert.That(requestGid.TryUnpack<ServerWT>(out _), Is.False);
+        }
+
+        [Test]
         public void SpawnSourcePlacementSeedSystem_OpenWorldSpawnPlacements_CreateActiveSources()
         {
             using var scope = new CombatDirectorTestServerWorldScope();
@@ -394,7 +438,7 @@ namespace StaticMlp.Tests.CombatDirector
 
                 system.Update();
 
-                var burrows = 0;
+                var ambientSources = 0;
                 var rifts = 0;
                 foreach (var source in SW.Query<All<SpawnSource, SpawnSourcePlacementRef>>().Entities())
                 {
@@ -405,14 +449,49 @@ namespace StaticMlp.Tests.CombatDirector
                     Assert.That(spawnSource.IsActive, Is.True);
                     Assert.That(spawnSource.Radius, Is.GreaterThan(0f));
 
-                    if (spawnSource.Type == SpawnSourceType.Burrow)
-                        burrows++;
-                    else if (spawnSource.Type == SpawnSourceType.Rift)
+                    if (spawnSource.Kind == SpawnSourceKind.AmbientPoint)
+                    {
+                        Assert.That(spawnSource.Type, Is.EqualTo(SpawnSourceType.Burrow));
+                        Assert.That(spawnSource.AllowsAmbient, Is.True);
+                        Assert.That(spawnSource.AllowsEscalation, Is.False);
+                        Assert.That(spawnSource.AllowsPressureEvent, Is.False);
+                        ambientSources++;
+                    }
+                    else if (spawnSource.Kind == SpawnSourceKind.Rift)
+                    {
+                        Assert.That(spawnSource.Type, Is.EqualTo(SpawnSourceType.Rift));
+                        Assert.That(spawnSource.AllowsAmbient, Is.False);
+                        Assert.That(spawnSource.AllowsEscalation, Is.True);
+                        Assert.That(spawnSource.AllowsPressureEvent, Is.True);
                         rifts++;
+                    }
                 }
 
-                Assert.That(burrows, Is.EqualTo(1));
+                Assert.That(ambientSources, Is.EqualTo(1));
                 Assert.That(rifts, Is.EqualTo(1));
+            }
+            finally
+            {
+                system.Destroy();
+            }
+        }
+
+        [Test]
+        public void SpawnSourcePlacementSeedSystem_UnknownPlacementKind_FailsFast()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            var system = new SpawnSourcePlacementSeedSystem();
+            var chunkId = new WorldChunkId(2, 0);
+
+            system.Init();
+            try
+            {
+                SendChunkCompleted(chunkId, new[]
+                {
+                    new SpawnPlacement(new SpawnPlacementKindId(250), chunkId, new Vector3(20f, 0f, 0f), 0f, 1f)
+                });
+
+                Assert.Throws<InvalidOperationException>(() => system.Update());
             }
             finally
             {
@@ -552,7 +631,7 @@ namespace StaticMlp.Tests.CombatDirector
                 {
                     Assert.That(evt.Value.SpawnedEntity.TryUnpack<ServerWT>(out _), Is.True);
                     Assert.That(evt.Value.Role, Is.EqualTo(EnemyRole.Swarmer));
-                    Assert.That(evt.Value.SourceType, Is.EqualTo(SpawnSourceType.Burrow));
+                    Assert.That(evt.Value.SourceType, Is.EqualTo(SpawnSourceType.Rift));
                     spawnedEvents++;
                 }
 
@@ -665,15 +744,25 @@ namespace StaticMlp.Tests.CombatDirector
                 return player;
             }
 
-            public SW.Entity CreateSpawnSource(Vector3 position, bool isActive)
+            public SW.Entity CreateSpawnSource(
+                Vector3 position,
+                bool isActive,
+                SpawnSourceKind kind = SpawnSourceKind.Rift,
+                bool allowsAmbient = false,
+                bool allowsEscalation = true,
+                bool allowsPressureEvent = true)
             {
                 var source = SW.NewEntity<Default>();
                 source.Set(new SpawnSource
                 {
-                    Type = SpawnSourceType.Burrow,
+                    Type = kind == SpawnSourceKind.Rift ? SpawnSourceType.Rift : SpawnSourceType.Burrow,
+                    Kind = kind,
                     Position = new Unity.Mathematics.float3(position.x, position.y, position.z),
                     Radius = 5f,
-                    IsActive = isActive
+                    IsActive = isActive,
+                    AllowsAmbient = allowsAmbient,
+                    AllowsEscalation = allowsEscalation,
+                    AllowsPressureEvent = allowsPressureEvent
                 });
                 return source;
             }
@@ -703,6 +792,7 @@ namespace StaticMlp.Tests.CombatDirector
                     CellId = ReadSingleCombatCell().CellId,
                     SourceEntity = source.GID,
                     SourceType = spawnSource.Type,
+                    SourceKind = spawnSource.Kind,
                     Role = role,
                     Count = count,
                     SpawnPosition = spawnSource.Position

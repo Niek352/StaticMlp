@@ -131,8 +131,13 @@ namespace StaticMlp.Features.CombatDirector
                 return false;
 
             ref readonly var source = ref sourceEntity.Read<SpawnSource>();
-            if (!source.IsActive || source.Type != request.SourceType)
+            if (!source.IsActive
+                || !source.AllowsPressureEvent
+                || source.Type != request.SourceType
+                || source.Kind != request.SourceKind)
+            {
                 return false;
+            }
 
             if (math.distancesq(source.Position, request.SpawnPosition) > 0.0001f)
                 return false;

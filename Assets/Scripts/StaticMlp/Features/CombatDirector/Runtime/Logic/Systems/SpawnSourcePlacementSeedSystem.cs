@@ -58,13 +58,7 @@ namespace StaticMlp.Features.CombatDirector
                 throw new InvalidOperationException("Open-world spawn placement position must be finite.");
 
             var source = SW.NewEntity<Default>();
-            source.Set(new SpawnSource
-            {
-                Type = SpawnSourcePlacementRules.ResolveSourceType(placement.KindId),
-                Position = position,
-                Radius = SpawnSourcePlacementRules.ResolveSourceRadius(placement.Scale),
-                IsActive = true
-            });
+            source.Set(SpawnSourcePlacementRules.CreateSource(placement.KindId, position, placement.Scale));
             source.Set(new SpawnSourcePlacementRef
             {
                 ChunkId = chunkId,

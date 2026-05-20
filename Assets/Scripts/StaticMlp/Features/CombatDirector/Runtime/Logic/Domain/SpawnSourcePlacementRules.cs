@@ -1,5 +1,6 @@
 using System;
 using StaticMlp.Features.OpenWorldGeneration;
+using Unity.Mathematics;
 
 namespace StaticMlp.Features.CombatDirector
 {
@@ -9,13 +10,39 @@ namespace StaticMlp.Features.CombatDirector
         private static readonly SpawnPlacementKindId HIGHLAND_SPAWN = new(2);
         private const float BASE_SOURCE_RADIUS = 5f;
 
-        public static SpawnSourceType ResolveSourceType(SpawnPlacementKindId kindId)
+        public static SpawnSource CreateSource(SpawnPlacementKindId kindId, float3 position, float placementScale)
         {
+            var radius = ResolveSourceRadius(placementScale);
+
             if (kindId == WILDLIFE_SPAWN)
-                return SpawnSourceType.Burrow;
+            {
+                return new SpawnSource
+                {
+                    Type = SpawnSourceType.Burrow,
+                    Kind = SpawnSourceKind.AmbientPoint,
+                    Position = position,
+                    Radius = radius,
+                    IsActive = true,
+                    AllowsAmbient = true,
+                    AllowsEscalation = false,
+                    AllowsPressureEvent = false
+                };
+            }
 
             if (kindId == HIGHLAND_SPAWN)
-                return SpawnSourceType.Rift;
+            {
+                return new SpawnSource
+                {
+                    Type = SpawnSourceType.Rift,
+                    Kind = SpawnSourceKind.Rift,
+                    Position = position,
+                    Radius = radius,
+                    IsActive = true,
+                    AllowsAmbient = false,
+                    AllowsEscalation = true,
+                    AllowsPressureEvent = true
+                };
+            }
 
             throw new InvalidOperationException($"Unknown open-world spawn placement kind: {kindId.Value}.");
         }

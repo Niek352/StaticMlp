@@ -10,6 +10,7 @@ namespace StaticMlp.Features.CombatDirector
         public int CellId;
         public int Count;
         public SpawnSourceType SourceType;
+        public SpawnSourceKind SourceKind;
         public EnemyRole Role;
     }
 }

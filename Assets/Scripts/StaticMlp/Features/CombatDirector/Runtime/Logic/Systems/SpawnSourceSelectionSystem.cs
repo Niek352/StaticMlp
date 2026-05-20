@@ -78,6 +78,9 @@ namespace StaticMlp.Features.CombatDirector
                 if (!source.IsActive)
                     continue;
 
+                if (!source.AllowsPressureEvent)
+                    continue;
+
                 if (!math.all(math.isfinite(source.Position)))
                     throw new InvalidOperationException("Spawn source position must be finite.");
 
@@ -99,6 +102,7 @@ namespace StaticMlp.Features.CombatDirector
                     CellId = cell.CellId,
                     SourceEntity = entity.GID,
                     SourceType = source.Type,
+                    SourceKind = source.Kind,
                     Position = source.Position
                 };
                 bestDirectionalScore = directionalScore;

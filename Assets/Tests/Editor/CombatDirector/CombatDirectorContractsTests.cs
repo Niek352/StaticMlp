@@ -58,6 +58,31 @@ namespace StaticMlp.Tests.CombatDirector
         }
 
         [Test]
+        public void SpawnSourceKind_UsesOpenWorldDesignLockOrdering()
+        {
+            Assert.That((byte)SpawnSourceKind.AmbientPoint, Is.EqualTo(1));
+            Assert.That((byte)SpawnSourceKind.PatrolRoute, Is.EqualTo(2));
+            Assert.That((byte)SpawnSourceKind.CampGate, Is.EqualTo(3));
+            Assert.That((byte)SpawnSourceKind.LairEntrance, Is.EqualTo(4));
+            Assert.That((byte)SpawnSourceKind.Rift, Is.EqualTo(5));
+            Assert.That((byte)SpawnSourceKind.RoadAmbush, Is.EqualTo(6));
+            Assert.That((byte)SpawnSourceKind.BaseRaidEntry, Is.EqualTo(7));
+        }
+
+        [Test]
+        public void SpawnSource_DefaultInitialization_DoesNotAllowAnyDirectorUsage()
+        {
+            var source = new SpawnSource();
+
+            Assert.That(source.Kind, Is.EqualTo((SpawnSourceKind)0));
+            Assert.That(source.FactionId, Is.EqualTo(0));
+            Assert.That(source.BiomeId, Is.EqualTo(0));
+            Assert.That(source.AllowsAmbient, Is.False);
+            Assert.That(source.AllowsEscalation, Is.False);
+            Assert.That(source.AllowsPressureEvent, Is.False);
+        }
+
+        [Test]
         public void ReplicatedContracts_UseStableGuids()
         {
             Assert.That(new DirectorState().Config().Guid, Is.EqualTo(new Guid("3ee4b71a-e2d1-4446-9301-a36017ab984b")));
@@ -72,7 +97,7 @@ namespace StaticMlp.Tests.CombatDirector
             Assert.That(Marshal.SizeOf<ThreatBudget>(), Is.LessThanOrEqualTo(16));
             Assert.That(Marshal.SizeOf<DirectorState>(), Is.LessThanOrEqualTo(16));
             Assert.That(Marshal.SizeOf<EncounterState>(), Is.LessThanOrEqualTo(24));
-            Assert.That(Marshal.SizeOf<SpawnSource>(), Is.LessThanOrEqualTo(24));
+            Assert.That(Marshal.SizeOf<SpawnSource>(), Is.LessThanOrEqualTo(40));
             Assert.That(Marshal.SizeOf<EnemyArchetype>(), Is.LessThanOrEqualTo(8));
             Assert.That(Marshal.SizeOf<SpawnRequest>(), Is.LessThanOrEqualTo(32));
         }

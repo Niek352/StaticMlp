@@ -85,6 +85,7 @@ namespace StaticMlp.Features.CombatDirector
                 CellId = selectedSource.CellId,
                 SourceEntity = selectedSource.SourceEntity,
                 SourceType = selectedSource.SourceType,
+                SourceKind = selectedSource.SourceKind,
                 Role = definition.Role,
                 Count = count,
                 SpawnPosition = selectedSource.Position
