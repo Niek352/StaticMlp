@@ -4,12 +4,10 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.OpenWorldResources;
 using StaticMlp.Features.ResourcesInventoryMinimal;
-using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
-using Unity.Mathematics;
 
 namespace StaticMlp.Features.CombatDirector
 {
@@ -17,10 +15,9 @@ namespace StaticMlp.Features.CombatDirector
     {
         private const float ATTACK_NOISE_PER_SHOT = 1f;
         private const float HARVEST_NOISE_PER_ACTION = 1f;
-        private const float TIME_IN_CELL_NOISE_PER_SECOND = 0.5f;
-        private const float MAX_SPAWN_SOURCE_PROXIMITY_NOISE = 1f;
 
         private readonly Dictionary<EntityGID, float> _frameNoiseByPlayer = new();
+        private readonly Dictionary<EntityGID, float> _frameCombatByPlayer = new();
         private EventReceiver<ServerWT, NetworkEventFromClient<TryHarvestOpenWorldResourceCommand>> _harvestRequests;
 
         public void Init()
@@ -35,14 +32,13 @@ namespace StaticMlp.Features.CombatDirector
 
         public void Update()
         {
-            EnsurePlayerThreatState();
+            PreparePlayerThreatState();
 
             _frameNoiseByPlayer.Clear();
+            _frameCombatByPlayer.Clear();
             AccumulateHarvestNoise();
 
-            var cell = ReadSingleCell();
-            var deltaTime = SW.GetResource<SimulationTime>().FixedStepSeconds;
-            foreach (var player in SW.Query<All<PlayerTag, CharacterNetState, ServerCombatAttackState, PlayerThreatInputState, PlayerNoise, CarriedLootValue>>().Entities())
+            foreach (var player in SW.Query<All<PlayerTag, CharacterNetState, ServerCombatAttackState, PlayerThreatInputState, PlayerNoise, PlayerCombatAttention, CarriedLootValue>>().Entities())
             {
                 ref var threatState = ref player.Mut<PlayerThreatInputState>();
                 ref readonly var attackState = ref player.Read<ServerCombatAttackState>();
@@ -54,28 +50,30 @@ namespace StaticMlp.Features.CombatDirector
 
                 var attackCountDelta = attackState.LastAcceptedShotSequence - threatState.LastAcceptedShotSequence;
                 if (attackCountDelta > 0)
-                    AddNoise(player.GID, attackCountDelta * ATTACK_NOISE_PER_SHOT);
+                    AddCombat(player.GID, attackCountDelta * ATTACK_NOISE_PER_SHOT);
 
                 threatState.LastAcceptedShotSequence = attackState.LastAcceptedShotSequence;
 
                 ref var carriedLootValue = ref player.Mut<CarriedLootValue>();
                 carriedLootValue.Value = ComputeCarriedLootValue(player);
 
-                var position = ToFloat3(player.Read<CharacterNetState>().Position);
                 var noise = GetActionNoise(player.GID);
-                noise += ComputeSpawnSourceProximityNoise(position, in cell);
-                if (IsInsideCell(position, in cell))
-                    noise += deltaTime * TIME_IN_CELL_NOISE_PER_SECOND;
-
                 if (noise < 0f)
                     throw new InvalidOperationException("Player noise must be non-negative.");
 
                 ref var playerNoise = ref player.Mut<PlayerNoise>();
                 playerNoise.Value = noise;
+
+                var combat = GetActionCombat(player.GID);
+                if (combat < 0f)
+                    throw new InvalidOperationException("Player combat attention must be non-negative.");
+
+                ref var playerCombat = ref player.Mut<PlayerCombatAttention>();
+                playerCombat.Value = combat;
             }
         }
 
-        private void EnsurePlayerThreatState()
+        private void PreparePlayerThreatState()
         {
             foreach (var player in SW.Query<All<PlayerTag, CharacterNetState, ServerCombatAttackState>>().Entities())
             {
@@ -89,6 +87,9 @@ namespace StaticMlp.Features.CombatDirector
 
                 if (!player.Has<PlayerNoise>())
                     player.Set(default(PlayerNoise));
+
+                if (!player.Has<PlayerCombatAttention>())
+                    player.Set(default(PlayerCombatAttention));
 
                 if (!player.Has<CarriedLootValue>())
                     player.Set(default(CarriedLootValue));
@@ -106,26 +107,6 @@ namespace StaticMlp.Features.CombatDirector
             }
         }
 
-        private static CombatCell ReadSingleCell()
-        {
-            var found = false;
-            CombatCell cell = default;
-
-            foreach (var entity in SW.Query<All<CombatCell>>().Entities())
-            {
-                if (found)
-                    throw new InvalidOperationException("Combat Director currently supports only a single combat cell.");
-
-                cell = entity.Read<CombatCell>();
-                found = true;
-            }
-
-            if (!found)
-                throw new InvalidOperationException("Combat cell entity must exist before threat input updates.");
-
-            return cell;
-        }
-
         private static float ComputeCarriedLootValue(SW.Entity player)
         {
             if (!player.Has<ResourcesInventory>())
@@ -133,30 +114,6 @@ namespace StaticMlp.Features.CombatDirector
 
             ref readonly var inventory = ref player.Read<ResourcesInventory>();
             return inventory.Wood + inventory.Stone;
-        }
-
-        private static float ComputeSpawnSourceProximityNoise(float3 playerPosition, in CombatCell cell)
-        {
-            var bestContribution = 0f;
-            foreach (var sourceEntity in SW.Query<All<SpawnSource>>().Entities())
-            {
-                ref readonly var source = ref sourceEntity.Read<SpawnSource>();
-                if (!source.IsActive)
-                    continue;
-
-                var influenceRadius = math.max(source.Radius, cell.Radius);
-                var distance = math.distance(playerPosition, source.Position);
-                var contribution = MAX_SPAWN_SOURCE_PROXIMITY_NOISE * math.saturate(1f - distance / influenceRadius);
-                if (contribution > bestContribution)
-                    bestContribution = contribution;
-            }
-
-            return bestContribution;
-        }
-
-        private static bool IsInsideCell(float3 position, in CombatCell cell)
-        {
-            return math.distancesq(position, cell.Center) <= cell.Radius * cell.Radius;
         }
 
         private float GetActionNoise(EntityGID playerGid)
@@ -177,9 +134,22 @@ namespace StaticMlp.Features.CombatDirector
             _frameNoiseByPlayer.Add(playerGid, noise);
         }
 
-        private static float3 ToFloat3(UnityEngine.Vector3 value)
+        private float GetActionCombat(EntityGID playerGid)
         {
-            return new float3(value.x, value.y, value.z);
+            return _frameCombatByPlayer.TryGetValue(playerGid, out var combat)
+                ? combat
+                : 0f;
+        }
+
+        private void AddCombat(EntityGID playerGid, float combat)
+        {
+            if (_frameCombatByPlayer.TryGetValue(playerGid, out var current))
+            {
+                _frameCombatByPlayer[playerGid] = current + combat;
+                return;
+            }
+
+            _frameCombatByPlayer.Add(playerGid, combat);
         }
     }
 }

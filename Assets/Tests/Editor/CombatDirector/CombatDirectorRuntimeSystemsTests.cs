@@ -51,7 +51,7 @@ namespace StaticMlp.Tests.CombatDirector
         }
 
         [Test]
-        public void PlayerThreatInputSystem_AttackAndHarvestInputs_AccumulateIntoPlayerNoise()
+        public void PlayerThreatInputSystem_AttackAndHarvestInputs_MapIntoExplicitPlayerCauses()
         {
             using var scope = new CombatDirectorTestServerWorldScope();
             var peer = new NetworkPeerId(9);
@@ -72,7 +72,8 @@ namespace StaticMlp.Tests.CombatDirector
 
                 threatInputSystem.Update();
 
-                Assert.That(player.Read<PlayerNoise>().Value, Is.GreaterThan(baselineNoise + 2.5f));
+                Assert.That(player.Read<PlayerNoise>().Value, Is.EqualTo(baselineNoise + 1f).Within(0.001f));
+                Assert.That(player.Read<PlayerCombatAttention>().Value, Is.EqualTo(2f).Within(0.001f));
             }
             finally
             {
@@ -109,28 +110,23 @@ namespace StaticMlp.Tests.CombatDirector
         }
 
         [Test]
-        public void ThreatBudgetAccumulationSystem_PlayerNoiseAndLoot_AccumulatesBudget()
+        public void CellAttentionInputSystem_PassivePlayerPresence_StaysCalm()
         {
             using var scope = new CombatDirectorTestServerWorldScope();
-            var player = scope.CreatePlayer(new NetworkPeerId(15), Vector3.zero);
+            scope.CreatePlayer(new NetworkPeerId(13), Vector3.zero);
             var cellTrackingSystem = new CombatCellTrackingSystem();
             var threatInputSystem = new PlayerThreatInputSystem();
-            var budgetSystem = new ThreatBudgetAccumulationSystem();
+            var attentionInputSystem = new CellAttentionInputSystem();
 
             threatInputSystem.Init();
             try
             {
                 cellTrackingSystem.Update();
                 threatInputSystem.Update();
+                attentionInputSystem.Update();
 
-                player.Mut<PlayerNoise>().Value = 4f;
-                player.Mut<CarriedLootValue>().Value = 3f;
-
-                budgetSystem.Update();
-
-                var budget = scope.ReadThreatBudget();
-                Assert.That(budget.AccumulationPerSecond, Is.EqualTo(12f).Within(0.001f));
-                Assert.That(budget.Current, Is.EqualTo(6f).Within(0.001f));
+                Assert.That(scope.ReadCellAttention().Current, Is.EqualTo(0f).Within(0.001f));
+                Assert.That(scope.ReadThreatBudget().Current, Is.EqualTo(0f).Within(0.001f));
             }
             finally
             {
@@ -139,13 +135,48 @@ namespace StaticMlp.Tests.CombatDirector
         }
 
         [Test]
-        public void ThreatBudgetAccumulationSystem_ClampPreventsOverflow()
+        public void CellAttentionInputSystem_PlayerNoiseCombatAndLoot_AccumulateNamedAttention()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            var player = scope.CreatePlayer(new NetworkPeerId(15), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var threatInputSystem = new PlayerThreatInputSystem();
+            var attentionInputSystem = new CellAttentionInputSystem();
+
+            threatInputSystem.Init();
+            try
+            {
+                cellTrackingSystem.Update();
+                threatInputSystem.Update();
+                player.Mut<PlayerNoise>().Value = 4f;
+                player.Mut<PlayerCombatAttention>().Value = 2f;
+                player.Mut<CarriedLootValue>().Value = 3f;
+
+                attentionInputSystem.Update();
+
+                var attention = scope.ReadCellAttention();
+                Assert.That(attention.Noise, Is.EqualTo(5f).Within(0.001f));
+                Assert.That(attention.Combat, Is.EqualTo(6f).Within(0.001f));
+                Assert.That(attention.Loot, Is.EqualTo(2.25f).Within(0.001f));
+                Assert.That(attention.Current, Is.EqualTo(13.25f).Within(0.001f));
+                var budget = scope.ReadThreatBudget();
+                Assert.That(budget.AccumulationPerSecond, Is.EqualTo(26.5f).Within(0.001f));
+                Assert.That(budget.Current, Is.EqualTo(attention.Current).Within(0.001f));
+            }
+            finally
+            {
+                threatInputSystem.Destroy();
+            }
+        }
+
+        [Test]
+        public void CellAttentionInputSystem_ClampPreventsOverflow()
         {
             using var scope = new CombatDirectorTestServerWorldScope();
             var player = scope.CreatePlayer(new NetworkPeerId(17), Vector3.zero);
             var cellTrackingSystem = new CombatCellTrackingSystem();
             var threatInputSystem = new PlayerThreatInputSystem();
-            var budgetSystem = new ThreatBudgetAccumulationSystem();
+            var attentionInputSystem = new CellAttentionInputSystem();
 
             threatInputSystem.Init();
             try
@@ -156,17 +187,43 @@ namespace StaticMlp.Tests.CombatDirector
                 player.Mut<CarriedLootValue>().Value = 100f;
 
                 var directorEntity = scope.GetDirectorEntity();
-                ref var budget = ref directorEntity.Mut<ThreatBudget>();
-                budget.Current = budget.Max - 0.25f;
+                ref var attention = ref directorEntity.Mut<CellAttention>();
+                attention.Noise = attention.Max - 0.25f;
 
-                budgetSystem.Update();
+                attentionInputSystem.Update();
 
-                Assert.That(scope.ReadThreatBudget().Current, Is.EqualTo(budget.Max).Within(0.001f));
+                Assert.That(scope.ReadCellAttention().Current, Is.EqualTo(attention.Max).Within(0.001f));
+                Assert.That(scope.ReadThreatBudget().Current, Is.EqualTo(attention.Max).Within(0.001f));
             }
             finally
             {
                 threatInputSystem.Destroy();
             }
+        }
+
+        [Test]
+        public void CellAttentionDecaySystem_DecaysAttentionBackTowardCalm()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(19), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var decaySystem = new CellAttentionDecaySystem();
+
+            cellTrackingSystem.Update();
+            var directorEntity = scope.GetDirectorEntity();
+            ref var attention = ref directorEntity.Mut<CellAttention>();
+            attention.Noise = 5f;
+            attention.Combat = 4f;
+            attention.Loot = 3f;
+            attention.Current = 12f;
+
+            decaySystem.Update();
+
+            var decayedAttention = scope.ReadCellAttention();
+            Assert.That(decayedAttention.Noise, Is.EqualTo(4.791666f).Within(0.001f));
+            Assert.That(decayedAttention.Combat, Is.EqualTo(3.833333f).Within(0.001f));
+            Assert.That(decayedAttention.Loot, Is.EqualTo(2.875f).Within(0.001f));
+            Assert.That(decayedAttention.Current, Is.EqualTo(11.5f).Within(0.001f));
         }
 
         [Test]
@@ -245,6 +302,7 @@ namespace StaticMlp.Tests.CombatDirector
             Assert.That(second.Phase, Is.EqualTo(first.Phase));
             Assert.That(second.PhaseTimer, Is.EqualTo(first.PhaseTimer).Within(0.001f));
             Assert.That(second.TimeSinceLastPeak, Is.EqualTo(first.TimeSinceLastPeak).Within(0.001f));
+            Assert.That(second.AttentionCurrent, Is.EqualTo(first.AttentionCurrent).Within(0.001f));
             Assert.That(second.BudgetCurrent, Is.EqualTo(first.BudgetCurrent).Within(0.001f));
             Assert.That(second.BudgetAccumulationPerSecond, Is.EqualTo(first.BudgetAccumulationPerSecond).Within(0.001f));
         }
@@ -461,7 +519,8 @@ namespace StaticMlp.Tests.CombatDirector
             var player = scope.CreatePlayer(new NetworkPeerId(29), Vector3.zero);
             var cellTrackingSystem = new CombatCellTrackingSystem();
             var threatInputSystem = new PlayerThreatInputSystem();
-            var budgetSystem = new ThreatBudgetAccumulationSystem();
+            var attentionInputSystem = new CellAttentionInputSystem();
+            var decaySystem = new CellAttentionDecaySystem();
             var phaseSystem = new DirectorPhaseSystem();
 
             threatInputSystem.Init();
@@ -476,16 +535,19 @@ namespace StaticMlp.Tests.CombatDirector
 
                 for (var i = 0; i < 15; i++)
                 {
-                    budgetSystem.Update();
+                    attentionInputSystem.Update();
+                    decaySystem.Update();
                     phaseSystem.Update();
                 }
 
                 var state = scope.ReadDirectorState();
+                var attention = scope.ReadCellAttention();
                 var budget = scope.ReadThreatBudget();
                 return new DeterministicDirectorResult(
                     state.Phase,
                     state.PhaseTimer,
                     state.TimeSinceLastPeak,
+                    attention.Current,
                     budget.Current,
                     budget.AccumulationPerSecond);
             }
@@ -646,7 +708,7 @@ namespace StaticMlp.Tests.CombatDirector
             {
                 var found = false;
                 SW.Entity directorEntity = default;
-                foreach (var entity in SW.Query<All<CombatCell, ThreatBudget, DirectorState>>().Entities())
+                foreach (var entity in SW.Query<All<CombatCell, CellAttention, ThreatBudget, DirectorState>>().Entities())
                 {
                     if (found)
                         throw new InvalidOperationException("Expected exactly one director entity in test scope.");
@@ -685,6 +747,11 @@ namespace StaticMlp.Tests.CombatDirector
                 return GetDirectorEntity().Read<ThreatBudget>();
             }
 
+            public CellAttention ReadCellAttention()
+            {
+                return GetDirectorEntity().Read<CellAttention>();
+            }
+
             public DirectorState ReadDirectorState()
             {
                 return GetDirectorEntity().Read<DirectorState>();
@@ -703,6 +770,7 @@ namespace StaticMlp.Tests.CombatDirector
             public readonly DirectorPhase Phase;
             public readonly float PhaseTimer;
             public readonly float TimeSinceLastPeak;
+            public readonly float AttentionCurrent;
             public readonly float BudgetCurrent;
             public readonly float BudgetAccumulationPerSecond;
 
@@ -710,12 +778,14 @@ namespace StaticMlp.Tests.CombatDirector
                 DirectorPhase phase,
                 float phaseTimer,
                 float timeSinceLastPeak,
+                float attentionCurrent,
                 float budgetCurrent,
                 float budgetAccumulationPerSecond)
             {
                 Phase = phase;
                 PhaseTimer = phaseTimer;
                 TimeSinceLastPeak = timeSinceLastPeak;
+                AttentionCurrent = attentionCurrent;
                 BudgetCurrent = budgetCurrent;
                 BudgetAccumulationPerSecond = budgetAccumulationPerSecond;
             }

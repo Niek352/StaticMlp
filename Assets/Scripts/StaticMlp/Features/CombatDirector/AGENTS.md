@@ -34,7 +34,8 @@ Preserve this ordering unless the phase architecture changes explicitly:
 SpawnSourcePlacementSeedSystem
 CombatCellTrackingSystem
 PlayerThreatInputSystem
-ThreatBudgetAccumulationSystem
+CellAttentionInputSystem
+CellAttentionDecaySystem
 DirectorPhaseSystem
 SpawnSourceSelectionSystem
 SpawnRequestBuildSystem
@@ -46,7 +47,7 @@ Key dependencies:
 
 - `SpawnSourcePlacementSeedSystem` must run before source selection so generated open-world spawn placements are available as active `SpawnSource` entities.
 - `CombatCellTrackingSystem` must run before budget, phase, and spawn systems because it owns the director cell entity.
-- `ThreatBudgetAccumulationSystem` must run before phase selection.
+- `CellAttentionInputSystem` and `CellAttentionDecaySystem` must run before phase selection. `ThreatBudget` is temporary compatibility state until phase/spawn logic migrates fully to `CellAttention`.
 - `SpawnSourceSelectionSystem` must run before request building.
 - `SpawnRequestValidationSystem` must run before apply.
 - `EnemySpawnApplySystem` is the only system in this feature that creates enemy entities.
@@ -101,8 +102,8 @@ When enemies do not spawn, check in this order:
 1. Did the server receive `OpenWorldChunkGenerationCompleted` with non-empty `SpawnPlacements`?
 2. Does `SpawnSourcePlacementSeedSystem` create active `SpawnSource` entities?
 3. Does the server have a player with `PlayerTag` and `CharacterNetState`?
-4. Does `CombatCellTrackingSystem` create exactly one entity with `CombatCell`, `ThreatBudget`, and `DirectorState`?
-5. Does `ThreatBudget.Current` pass `BuildUpThreshold`?
+4. Does `CombatCellTrackingSystem` create exactly one entity with `CombatCell`, `CellAttention`, temporary `ThreatBudget`, and `DirectorState`?
+5. Does `CellAttention.Current` explain the temporary `ThreatBudget.Current` value?
 6. Is there an active `SpawnSource` at a valid distance from the cell center?
 7. Does the director entity get `SelectedSpawnSource`?
 8. Does `SpawnRequestBuildSystem` create `SpawnRequest`?

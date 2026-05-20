@@ -43,6 +43,7 @@ namespace StaticMlp.Tests.CombatDirector
         public void Contracts_RemainCompactEnoughForNetworkAndRuntimeUse()
         {
             Assert.That(Marshal.SizeOf<CombatCell>(), Is.LessThanOrEqualTo(24));
+            Assert.That(Marshal.SizeOf<CellAttention>(), Is.LessThanOrEqualTo(32));
             Assert.That(Marshal.SizeOf<ThreatBudget>(), Is.LessThanOrEqualTo(16));
             Assert.That(Marshal.SizeOf<DirectorState>(), Is.LessThanOrEqualTo(16));
             Assert.That(Marshal.SizeOf<SpawnSource>(), Is.LessThanOrEqualTo(24));

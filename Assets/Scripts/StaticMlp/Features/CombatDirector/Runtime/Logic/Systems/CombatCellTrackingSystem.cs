@@ -46,6 +46,9 @@ namespace StaticMlp.Features.CombatDirector
 
             if (found)
             {
+                if (!cellEntity.Has<CellAttention>())
+                    throw new InvalidOperationException("Combat cell entity must own CellAttention.");
+
                 if (!cellEntity.Has<ThreatBudget>())
                     throw new InvalidOperationException("Combat cell entity must own ThreatBudget.");
 
@@ -65,6 +68,19 @@ namespace StaticMlp.Features.CombatDirector
                 CellId = 0,
                 Center = float3.zero,
                 Radius = cellRadius
+            });
+            cellEntity.Set(new CellAttention
+            {
+                Current = 0f,
+                Max = math.max(
+                    SW.GetResource<EncounterDirectorConfig>().BuildUpThreshold,
+                    SW.GetResource<EncounterDirectorConfig>().PeakThreshold),
+                DecayPerSecond = SW.GetResource<EncounterDirectorConfig>().AttentionDecayPerSecond,
+                Noise = 0f,
+                Trespass = 0f,
+                Combat = 0f,
+                Loot = 0f,
+                FactionAlarm = 0f
             });
             cellEntity.Set(new ThreatBudget
             {

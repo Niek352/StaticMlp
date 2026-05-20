@@ -5,9 +5,12 @@ namespace StaticMlp.Features.CombatDirector
     public sealed class EncounterDirectorConfig : IResource
     {
         public readonly float CellRadius;
-        public readonly float BaseThreatPerSecond;
-        public readonly float NoiseThreatMultiplier;
-        public readonly float LootThreatMultiplier;
+        public readonly float NoiseAttentionMultiplier;
+        public readonly float CombatAttentionMultiplier;
+        public readonly float LootAttentionMultiplier;
+        public readonly float TrespassAttentionMultiplier;
+        public readonly float FactionAlarmAttentionMultiplier;
+        public readonly float AttentionDecayPerSecond;
         public readonly float MinReliefSeconds;
         public readonly float MinCooldownSeconds;
         public readonly int MaxAliveEnemiesPerCell;
@@ -18,9 +21,12 @@ namespace StaticMlp.Features.CombatDirector
 
         public EncounterDirectorConfig(
             float cellRadius,
-            float baseThreatPerSecond,
-            float noiseThreatMultiplier,
-            float lootThreatMultiplier,
+            float noiseAttentionMultiplier,
+            float combatAttentionMultiplier,
+            float lootAttentionMultiplier,
+            float trespassAttentionMultiplier,
+            float factionAlarmAttentionMultiplier,
+            float attentionDecayPerSecond,
             float minReliefSeconds,
             float minCooldownSeconds,
             int maxAliveEnemiesPerCell,
@@ -30,9 +36,12 @@ namespace StaticMlp.Features.CombatDirector
             float peakThreshold)
         {
             CellRadius = cellRadius;
-            BaseThreatPerSecond = baseThreatPerSecond;
-            NoiseThreatMultiplier = noiseThreatMultiplier;
-            LootThreatMultiplier = lootThreatMultiplier;
+            NoiseAttentionMultiplier = noiseAttentionMultiplier;
+            CombatAttentionMultiplier = combatAttentionMultiplier;
+            LootAttentionMultiplier = lootAttentionMultiplier;
+            TrespassAttentionMultiplier = trespassAttentionMultiplier;
+            FactionAlarmAttentionMultiplier = factionAlarmAttentionMultiplier;
+            AttentionDecayPerSecond = attentionDecayPerSecond;
             MinReliefSeconds = minReliefSeconds;
             MinCooldownSeconds = minCooldownSeconds;
             MaxAliveEnemiesPerCell = maxAliveEnemiesPerCell;
@@ -46,9 +55,12 @@ namespace StaticMlp.Features.CombatDirector
         {
             return new EncounterDirectorConfig(
                 cellRadius: 35f,
-                baseThreatPerSecond: 2.5f,
-                noiseThreatMultiplier: 1.25f,
-                lootThreatMultiplier: 1.5f,
+                noiseAttentionMultiplier: 1.25f,
+                combatAttentionMultiplier: 3f,
+                lootAttentionMultiplier: 1.5f,
+                trespassAttentionMultiplier: 2f,
+                factionAlarmAttentionMultiplier: 5f,
+                attentionDecayPerSecond: 1f,
                 minReliefSeconds: 20f,
                 minCooldownSeconds: 15f,
                 maxAliveEnemiesPerCell: 24,
