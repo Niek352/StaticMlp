@@ -35,7 +35,7 @@ Plans:
 
 Plans:
 
-- [ ] 02-01: Add Camp Core, Stockpile, Bedroll Shelter, Lumber Camp, Stone Mine, and Workbench catalog definitions.
+- [x] 02-01: Add Camp Core, Stockpile, Bedroll Shelter, Lumber Camp, Stone Mine, and Workbench catalog definitions.
 - [ ] 02-02: Register network and presentation catalog entries for the new buildings without prefab asset generation.
 - [ ] 02-03: Emit construction completion facts that operation owners can consume.
 
@@ -92,7 +92,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Settlement Foundation | 3/3 | Complete | 2026-05-20 |
-| 2. Building Catalog And Construction | 0/3 | Not started | - |
+| 2. Building Catalog And Construction | 1/3 | In progress | - |
 | 3. Storage And Operations | 0/3 | Not started | - |
 | 4. NPC Worker Economy | 0/3 | Not started | - |
 | 5. Stage1 Progression And Loadout | 0/3 | Not started | - |

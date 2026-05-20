@@ -13,12 +13,25 @@ namespace StaticMlp.Tests.Settlement
         {
             Assert.DoesNotThrow(() => BuildingCatalogValidator.Validate(BuildingCatalogData.All));
 
-            var definition = BuildingCatalogData.Get(BuildingCatalogData.WoodenHutId);
-            Assert.That(definition.Code, Is.EqualTo("wooden_hut"));
-            Assert.That(definition.DisplayName, Is.EqualTo("Wooden Hut"));
-            Assert.That(definition.Category, Is.EqualTo(BuildingCategory.Housing));
+            var definition = BuildingCatalogData.Get(BuildingCatalogData.CampCoreId);
+            Assert.That(definition.Code, Is.EqualTo("camp_core"));
+            Assert.That(definition.DisplayName, Is.EqualTo("Camp Core"));
+            Assert.That(definition.Category, Is.EqualTo(BuildingCategory.Service));
             Assert.That(definition.Capabilities.HasFlag(BuildingCapabilityFlags.SupportsPlayerInteraction), Is.True);
             Assert.That(definition.Interactions.Length, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void Validate_CurrentCatalog_HasStage1BuildingSetExactlyOnce()
+        {
+            Assert.That(BuildingCatalogData.All.Count, Is.EqualTo(6));
+
+            AssertCatalogContainsOnce(BuildingCatalogData.CampCoreId, "camp_core");
+            AssertCatalogContainsOnce(BuildingCatalogData.StockpileId, "stockpile");
+            AssertCatalogContainsOnce(BuildingCatalogData.BedrollShelterId, "bedroll_shelter");
+            AssertCatalogContainsOnce(BuildingCatalogData.LumberCampId, "lumber_camp");
+            AssertCatalogContainsOnce(BuildingCatalogData.StoneMineId, "stone_mine");
+            AssertCatalogContainsOnce(BuildingCatalogData.WorkbenchId, "workbench");
         }
 
         [Test]
@@ -26,8 +39,8 @@ namespace StaticMlp.Tests.Settlement
         {
             var definitions = new[]
             {
-                CreateDefinition(BuildingCatalogData.WoodenHutId),
-                CreateDefinition(BuildingCatalogData.WoodenHutId)
+                CreateDefinition(BuildingCatalogData.CampCoreId),
+                CreateDefinition(BuildingCatalogData.CampCoreId)
             };
 
             Assert.Throws<InvalidOperationException>(() => BuildingCatalogValidator.Validate(definitions));
@@ -106,6 +119,21 @@ namespace StaticMlp.Tests.Settlement
                 },
                 BuildingNpcProfileDefinition.None,
                 BuildingOperationDefinition.None);
+        }
+
+        private static void AssertCatalogContainsOnce(BuildingId id, string code)
+        {
+            var count = 0;
+            for (var i = 0; i < BuildingCatalogData.All.Count; i++)
+            {
+                if (BuildingCatalogData.All[i].Id != id)
+                    continue;
+
+                count++;
+                Assert.That(BuildingCatalogData.All[i].Code, Is.EqualTo(code));
+            }
+
+            Assert.That(count, Is.EqualTo(1));
         }
     }
 }

@@ -8,7 +8,8 @@
         "FFS.StaticPack",
         "Game.Core",
         "StaticMlp.Features.Settlement.Contracts",
-        "StaticMlp.Features.Stage1.Contracts"
+        "StaticMlp.Features.Stage1.Contracts",
+        "StaticMlp.Features.BuildingCatalog"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

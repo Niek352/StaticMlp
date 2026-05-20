@@ -4,7 +4,6 @@
     "references": [
         "Game.Core",
         "StaticMlp.Features.Settlement.Contracts",
-        "StaticMlp.Features.Settlement.Logic",
         "Unity.Mathematics"
     ],
     "includePlatforms": [],

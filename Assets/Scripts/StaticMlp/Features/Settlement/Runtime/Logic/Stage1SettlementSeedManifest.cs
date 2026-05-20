@@ -1,18 +1,17 @@
 using System;
+using StaticMlp.Features.BuildingCatalog;
 using UnityEngine;
 
 namespace StaticMlp.Features.Settlement
 {
     public static class Stage1SettlementSeedManifest
     {
-        private const ushort CAMP_CORE_BUILDING_ID = 1;
-
         private static readonly Stage1ConstructionSiteSeed[] INITIAL_CONSTRUCTION_SITES =
         {
             new()
             {
                 AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
-                BuildingId = CAMP_CORE_BUILDING_ID,
+                BuildingId = BuildingCatalogData.CampCoreId.Value,
                 Position = new Vector3(0f, 0f, 16f),
                 Rotation = Quaternion.identity,
                 StartReadyToBuild = true,

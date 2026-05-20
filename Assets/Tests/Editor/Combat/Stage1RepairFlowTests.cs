@@ -1,6 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.Loadout;
+using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Progression;
@@ -78,6 +79,7 @@ namespace StaticMlp.Tests.Combat
             SW.SetResource(Stage1SettlementSeedManifest.CreateResource());
 
             new ServerStage1CampAnchorSpawnSystem().Update();
+            new ServerInitialConstructionSiteSpawnSystem().Update();
 
             Assert.That(Stage1SettlementProgressionQuery.TryGetServerAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor), Is.True);
             Assert.That(anchor.Has<Stage1SettlementProgression>(), Is.True);
@@ -93,6 +95,16 @@ namespace StaticMlp.Tests.Combat
             Assert.That(anchor.Has<BossLoadoutPreparationState>(), Is.True);
             Assert.That(anchor.Has<BossPreparedLoadoutSnapshot>(), Is.True);
             Assert.That(anchor.Has<SettlementAnchorLocation>(), Is.True);
+
+            var siteCount = 0;
+            foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState, SettlementAnchorRef>>().Entities())
+            {
+                siteCount++;
+                Assert.That(site.Read<SettlementAnchorRef>().AnchorId, Is.EqualTo(SettlementAnchorCatalog.HomeCampId.Value));
+                Assert.That(site.Read<ConstructionSiteState>().BuildingId, Is.EqualTo(BuildingCatalogData.CampCoreId.Value));
+            }
+
+            Assert.That(siteCount, Is.EqualTo(1));
         }
 
         [Test]
