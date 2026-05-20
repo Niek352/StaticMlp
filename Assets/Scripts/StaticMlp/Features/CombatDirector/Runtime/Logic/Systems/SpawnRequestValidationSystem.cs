@@ -28,6 +28,7 @@ namespace StaticMlp.Features.CombatDirector
             ref readonly var state = ref directorEntity.Read<DirectorState>();
             ref readonly var budget = ref directorEntity.Read<ThreatBudget>();
             var acceptedCount = 0;
+            var acceptedAmbientCount = 0;
             var acceptedBudgetCost = 0f;
             var aliveCount = CountAliveEnemies(in cell);
 
@@ -45,6 +46,7 @@ namespace StaticMlp.Features.CombatDirector
                     catalog,
                     aliveCount,
                     ref acceptedCount,
+                    ref acceptedAmbientCount,
                     ref acceptedBudgetCost);
             }
         }
@@ -58,11 +60,13 @@ namespace StaticMlp.Features.CombatDirector
             EnemySpawnCatalog catalog,
             int aliveCount,
             ref int acceptedCount,
+            ref int acceptedAmbientCount,
             ref float acceptedBudgetCost)
         {
             ref readonly var spawnRequest = ref request.Read<SpawnRequest>();
+            var isAmbientRequest = spawnRequest.AmbientKind != AmbientSpawnKind.None;
 
-            if (!IsSpawnPhase(state.Phase)
+            if (!IsSpawnPhase(state.Phase, isAmbientRequest)
                 || spawnRequest.CellId != cell.CellId
                 || spawnRequest.Count <= 0
                 || !math.all(math.isfinite(spawnRequest.SpawnPosition)))
@@ -77,28 +81,44 @@ namespace StaticMlp.Features.CombatDirector
                 return;
             }
 
-            if (!IsSourceStillValid(in spawnRequest, in cell, config))
+            if (isAmbientRequest && spawnRequest.Count > config.AmbientMaxEnemiesPerRequest)
             {
                 request.Destroy();
                 return;
             }
 
-            var totalAfterSpawn = aliveCount + acceptedCount + spawnRequest.Count;
-            if (totalAfterSpawn > config.MaxAliveEnemiesPerCell)
+            if (!IsSourceStillValid(in spawnRequest, in cell, config, isAmbientRequest))
+            {
+                request.Destroy();
+                return;
+            }
+
+            var maxAlive = isAmbientRequest
+                ? config.AmbientMaxAliveEnemiesPerCell
+                : config.MaxAliveEnemiesPerCell;
+            var acceptedForMode = isAmbientRequest ? acceptedAmbientCount : acceptedCount;
+            var totalAfterSpawn = aliveCount + acceptedForMode + spawnRequest.Count;
+            if (totalAfterSpawn > maxAlive)
             {
                 request.Destroy();
                 return;
             }
 
             var requestCost = spawnRequest.Count * definition.BudgetCost;
-            if (acceptedBudgetCost + requestCost > currentBudget)
+            if (!isAmbientRequest && acceptedBudgetCost + requestCost > currentBudget)
             {
                 request.Destroy();
                 return;
             }
 
-            acceptedCount += spawnRequest.Count;
-            acceptedBudgetCost += requestCost;
+            if (isAmbientRequest)
+                acceptedAmbientCount += spawnRequest.Count;
+            else
+            {
+                acceptedCount += spawnRequest.Count;
+                acceptedBudgetCost += requestCost;
+            }
+
             request.Set<ValidSpawnRequestTag>();
         }
 
@@ -125,19 +145,27 @@ namespace StaticMlp.Features.CombatDirector
         private static bool IsSourceStillValid(
             in SpawnRequest request,
             in CombatCell cell,
-            EncounterDirectorConfig config)
+            EncounterDirectorConfig config,
+            bool isAmbientRequest)
         {
             if (!request.SourceEntity.TryUnpack<ServerWT>(out var sourceEntity) || !sourceEntity.Has<SpawnSource>())
                 return false;
 
             ref readonly var source = ref sourceEntity.Read<SpawnSource>();
             if (!source.IsActive
-                || !source.AllowsPressureEvent
                 || source.Type != request.SourceType
                 || source.Kind != request.SourceKind)
             {
                 return false;
             }
+
+            if (isAmbientRequest)
+            {
+                if (!source.AllowsAmbient)
+                    return false;
+            }
+            else if (!source.AllowsPressureEvent)
+                return false;
 
             if (math.distancesq(source.Position, request.SpawnPosition) > 0.0001f)
                 return false;
@@ -146,8 +174,11 @@ namespace StaticMlp.Features.CombatDirector
             return distance >= config.MinSpawnSourceDistance && distance <= config.MaxSpawnSourceDistance;
         }
 
-        private static bool IsSpawnPhase(DirectorPhase phase)
+        private static bool IsSpawnPhase(DirectorPhase phase, bool isAmbientRequest)
         {
+            if (isAmbientRequest)
+                return phase == DirectorPhase.Ambient || phase == DirectorPhase.Contact;
+
             return phase == DirectorPhase.PressureEvent;
         }
 

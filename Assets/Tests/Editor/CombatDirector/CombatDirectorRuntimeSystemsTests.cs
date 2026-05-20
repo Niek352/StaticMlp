@@ -560,6 +560,146 @@ namespace StaticMlp.Tests.CombatDirector
         }
 
         [Test]
+        public void AmbientSystems_AmbientEnabledSource_CreatesSoloRequest()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(43), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var scanSystem = new AmbientWorldInterestScanSystem();
+            var requestSystem = new AmbientEncounterSpawnRequestSystem();
+
+            cellTrackingSystem.Update();
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.AmbientPoint, allowsAmbient: true, allowsEscalation: false, allowsPressureEvent: false);
+
+            scanSystem.Update();
+            requestSystem.Update();
+
+            var request = scope.ReadSingleSpawnRequest();
+            Assert.That(request.AmbientKind, Is.EqualTo(AmbientSpawnKind.SoloAnimal));
+            Assert.That(request.SourceKind, Is.EqualTo(SpawnSourceKind.AmbientPoint));
+            Assert.That(request.Role, Is.EqualTo(EnemyRole.Swarmer));
+            Assert.That(request.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void AmbientSystems_PressureOnlySource_DoesNotCreateAmbientRequest()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(44), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var scanSystem = new AmbientWorldInterestScanSystem();
+            var requestSystem = new AmbientEncounterSpawnRequestSystem();
+
+            cellTrackingSystem.Update();
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.Rift, allowsAmbient: false, allowsEscalation: true, allowsPressureEvent: true);
+
+            scanSystem.Update();
+            requestSystem.Update();
+
+            Assert.That(scope.CountSpawnRequestEnemies(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void AmbientSystems_CooldownPreventsImmediateRepeatedRespawn()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(45), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var scanSystem = new AmbientWorldInterestScanSystem();
+            var requestSystem = new AmbientEncounterSpawnRequestSystem();
+
+            cellTrackingSystem.Update();
+            var source = scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.AmbientPoint, allowsAmbient: true, allowsEscalation: false, allowsPressureEvent: false);
+            source.Set(new AmbientSpawnMarker
+            {
+                Kind = AmbientSpawnKind.SmallPack,
+                MinCount = 2,
+                MaxCount = 4,
+                CooldownSeconds = 10f,
+                CooldownRemaining = 0f
+            });
+
+            scanSystem.Update();
+            requestSystem.Update();
+            Assert.That(scope.CountSpawnRequestEnemies(), Is.EqualTo(4));
+            Assert.That(source.Read<AmbientSpawnMarker>().CooldownRemaining, Is.GreaterThan(0f));
+
+            scope.DestroySpawnRequests();
+            scanSystem.Update();
+            requestSystem.Update();
+
+            Assert.That(scope.CountSpawnRequestEnemies(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void AmbientSystems_AmbientCapPreventsOverSpawnRequests()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(46), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var scanSystem = new AmbientWorldInterestScanSystem();
+            var requestSystem = new AmbientEncounterSpawnRequestSystem();
+
+            cellTrackingSystem.Update();
+            for (var i = 0; i < 4; i++)
+                scope.CreateEnemy(new Vector3(i, 0f, 0f), EnemyRole.Swarmer);
+
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.AmbientPoint, allowsAmbient: true, allowsEscalation: false, allowsPressureEvent: false);
+
+            scanSystem.Update();
+            requestSystem.Update();
+
+            Assert.That(scope.CountSpawnRequestEnemies(), Is.EqualTo(0));
+            Assert.That(scope.ReadCellAliveEnemyCaps().AmbientAliveEnemies, Is.EqualTo(4));
+            Assert.That(scope.ReadCellAliveEnemyCaps().AmbientMaxAliveEnemies, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void AmbientSystems_SoloAmbientKill_RecoversWithoutWave()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(47), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var scanSystem = new AmbientWorldInterestScanSystem();
+            var requestSystem = new AmbientEncounterSpawnRequestSystem();
+            var sourceSelectionSystem = new SpawnSourceSelectionSystem();
+            var validationSystem = new SpawnRequestValidationSystem();
+            var applySystem = new EnemySpawnApplySystem();
+            var lifetimeSystem = new EncounterLifetimeSystem();
+            var recoverySystem = new EncounterRecoverySystem();
+            var phaseSystem = new DirectorPhaseSystem();
+            var pressureBuildSystem = new SpawnRequestBuildSystem();
+
+            cellTrackingSystem.Update();
+            var directorEntity = scope.GetDirectorEntity();
+            var startingBudget = scope.ReadThreatBudget().Current;
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.AmbientPoint, allowsAmbient: true, allowsEscalation: false, allowsPressureEvent: false);
+
+            scanSystem.Update();
+            requestSystem.Update();
+            sourceSelectionSystem.Update();
+            validationSystem.Update();
+            applySystem.Update();
+            phaseSystem.Update();
+
+            var encounter = scope.ReadEncounterState();
+            Assert.That(encounter.Kind, Is.EqualTo(EncounterKind.AmbientSolo));
+            Assert.That(encounter.EscalationAllowed, Is.False);
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Contact));
+            Assert.That(scope.ReadThreatBudget().Current, Is.EqualTo(startingBudget).Within(0.001f));
+
+            scope.MarkAllEnemiesDied();
+            lifetimeSystem.Update();
+            recoverySystem.Update();
+            pressureBuildSystem.Update();
+
+            Assert.That(scope.HasEncounterState(), Is.False);
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Recovery));
+            Assert.That(scope.CountSpawnRequestEnemies(), Is.EqualTo(0));
+            Assert.That(directorEntity.Has<SelectedSpawnSource>(), Is.False);
+        }
+
+        [Test]
         public void SpawnRequestBuildSystem_SpawnCap_PreventsOverSpawnRequests()
         {
             using var scope = new CombatDirectorTestServerWorldScope();
@@ -800,6 +940,25 @@ namespace StaticMlp.Tests.CombatDirector
                 return request;
             }
 
+            public SpawnRequest ReadSingleSpawnRequest()
+            {
+                var found = false;
+                SpawnRequest spawnRequest = default;
+                foreach (var request in SW.Query<All<SpawnRequest>>().Entities())
+                {
+                    if (found)
+                        throw new InvalidOperationException("Expected exactly one spawn request in test scope.");
+
+                    spawnRequest = request.Read<SpawnRequest>();
+                    found = true;
+                }
+
+                if (!found)
+                    throw new InvalidOperationException("Spawn request was not created.");
+
+                return spawnRequest;
+            }
+
             public int CountSpawnRequestEnemies()
             {
                 var count = 0;
@@ -807,6 +966,25 @@ namespace StaticMlp.Tests.CombatDirector
                     count += request.Read<SpawnRequest>().Count;
 
                 return count;
+            }
+
+            public void DestroySpawnRequests()
+            {
+                var requests = new System.Collections.Generic.List<EntityGID>();
+                foreach (var request in SW.Query<All<SpawnRequest>>().Entities())
+                    requests.Add(request.GID);
+
+                for (var i = 0; i < requests.Count; i++)
+                {
+                    if (requests[i].TryUnpack<ServerWT>(out var request))
+                        request.Destroy();
+                }
+            }
+
+            public void MarkAllEnemiesDied()
+            {
+                foreach (var enemy in SW.Query<All<EnemyTag>>().Entities())
+                    enemy.Set<IsDiedTag>();
             }
 
             public int CountEnemies(EnemyRole role)
@@ -894,6 +1072,11 @@ namespace StaticMlp.Tests.CombatDirector
             public CellAttention ReadCellAttention()
             {
                 return GetDirectorEntity().Read<CellAttention>();
+            }
+
+            public CellAliveEnemyCaps ReadCellAliveEnemyCaps()
+            {
+                return GetDirectorEntity().Read<CellAliveEnemyCaps>();
             }
 
             public DirectorState ReadDirectorState()

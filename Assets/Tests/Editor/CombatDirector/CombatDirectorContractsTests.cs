@@ -70,6 +70,17 @@ namespace StaticMlp.Tests.CombatDirector
         }
 
         [Test]
+        public void AmbientSpawnKind_UsesOpenWorldDesignLockOrdering()
+        {
+            Assert.That((byte)AmbientSpawnKind.None, Is.EqualTo(0));
+            Assert.That((byte)AmbientSpawnKind.SoloAnimal, Is.EqualTo(1));
+            Assert.That((byte)AmbientSpawnKind.SoloBandit, Is.EqualTo(2));
+            Assert.That((byte)AmbientSpawnKind.SmallPack, Is.EqualTo(3));
+            Assert.That((byte)AmbientSpawnKind.Patrol, Is.EqualTo(4));
+            Assert.That((byte)AmbientSpawnKind.ResourceGuardian, Is.EqualTo(5));
+        }
+
+        [Test]
         public void SpawnSource_DefaultInitialization_DoesNotAllowAnyDirectorUsage()
         {
             var source = new SpawnSource();
@@ -80,6 +91,25 @@ namespace StaticMlp.Tests.CombatDirector
             Assert.That(source.AllowsAmbient, Is.False);
             Assert.That(source.AllowsEscalation, Is.False);
             Assert.That(source.AllowsPressureEvent, Is.False);
+        }
+
+        [Test]
+        public void AmbientContracts_DefaultsExposeCooldownAndConservativeCaps()
+        {
+            var marker = new AmbientSpawnMarker();
+            Assert.That(marker.Kind, Is.EqualTo(AmbientSpawnKind.None));
+            Assert.That(marker.CooldownSeconds, Is.EqualTo(0f));
+            Assert.That(marker.CooldownRemaining, Is.EqualTo(0f));
+
+            var config = EncounterDirectorConfig.CreateDefault();
+            Assert.That(config.AmbientMinAliveEnemiesPerCell, Is.EqualTo(1));
+            Assert.That(config.AmbientMaxAliveEnemiesPerCell, Is.EqualTo(4));
+            Assert.That(config.EncounterMinAliveEnemiesPerCell, Is.EqualTo(1));
+            Assert.That(config.EncounterMaxAliveEnemiesPerCell, Is.EqualTo(6));
+            Assert.That(config.EscalationMinAliveEnemiesPerCell, Is.EqualTo(2));
+            Assert.That(config.EscalationMaxAliveEnemiesPerCell, Is.EqualTo(8));
+            Assert.That(config.AmbientMaxEnemiesPerRequest, Is.EqualTo(4));
+            Assert.That(config.AmbientSpawnCooldownSeconds, Is.GreaterThan(0f));
         }
 
         [Test]
@@ -98,8 +128,10 @@ namespace StaticMlp.Tests.CombatDirector
             Assert.That(Marshal.SizeOf<DirectorState>(), Is.LessThanOrEqualTo(16));
             Assert.That(Marshal.SizeOf<EncounterState>(), Is.LessThanOrEqualTo(24));
             Assert.That(Marshal.SizeOf<SpawnSource>(), Is.LessThanOrEqualTo(40));
+            Assert.That(Marshal.SizeOf<AmbientSpawnMarker>(), Is.LessThanOrEqualTo(20));
+            Assert.That(Marshal.SizeOf<CellAliveEnemyCaps>(), Is.LessThanOrEqualTo(32));
             Assert.That(Marshal.SizeOf<EnemyArchetype>(), Is.LessThanOrEqualTo(8));
-            Assert.That(Marshal.SizeOf<SpawnRequest>(), Is.LessThanOrEqualTo(32));
+            Assert.That(Marshal.SizeOf<SpawnRequest>(), Is.LessThanOrEqualTo(40));
         }
     }
 }

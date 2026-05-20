@@ -31,10 +31,11 @@ namespace StaticMlp.Features.CombatDirector
             if (completed.SpawnPlacements == null)
                 throw new InvalidOperationException("Open-world chunk generation completed without spawn placements array.");
 
+            var config = SW.GetResource<EncounterDirectorConfig>();
             ClearChunkSpawnSources(completed.ChunkId);
 
             for (var i = 0; i < completed.SpawnPlacements.Length; i++)
-                CreateSource(completed.ChunkId, i, completed.SpawnPlacements[i]);
+                CreateSource(completed.ChunkId, i, completed.SpawnPlacements[i], config);
         }
 
         private static void ClearChunkSpawnSources(WorldChunkId chunkId)
@@ -48,7 +49,11 @@ namespace StaticMlp.Features.CombatDirector
             }
         }
 
-        private static void CreateSource(WorldChunkId chunkId, int placementIndex, in SpawnPlacement placement)
+        private static void CreateSource(
+            WorldChunkId chunkId,
+            int placementIndex,
+            in SpawnPlacement placement,
+            EncounterDirectorConfig config)
         {
             if (placement.ChunkId != chunkId)
                 throw new InvalidOperationException("Open-world spawn placement chunk id must match completed chunk id.");
@@ -58,7 +63,11 @@ namespace StaticMlp.Features.CombatDirector
                 throw new InvalidOperationException("Open-world spawn placement position must be finite.");
 
             var source = SW.NewEntity<Default>();
-            source.Set(SpawnSourcePlacementRules.CreateSource(placement.KindId, position, placement.Scale));
+            var spawnSource = SpawnSourcePlacementRules.CreateSource(placement.KindId, position, placement.Scale);
+            source.Set(spawnSource);
+            if (spawnSource.AllowsAmbient)
+                source.Set(SpawnSourcePlacementRules.CreateAmbientMarker(placement.KindId, config.AmbientSpawnCooldownSeconds));
+
             source.Set(new SpawnSourcePlacementRef
             {
                 ChunkId = chunkId,

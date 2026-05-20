@@ -9,6 +9,9 @@ namespace StaticMlp.Features.CombatDirector
         public EntityGID SourceEntity;
         public SpawnSourceType SourceType;
         public SpawnSourceKind SourceKind;
+        public AmbientSpawnKind AmbientKind;
+        public int AmbientMinCount;
+        public int AmbientMaxCount;
         public float3 Position;
     }
 }

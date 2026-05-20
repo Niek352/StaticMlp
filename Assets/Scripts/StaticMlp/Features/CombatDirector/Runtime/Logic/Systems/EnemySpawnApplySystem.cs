@@ -42,10 +42,14 @@ namespace StaticMlp.Features.CombatDirector
             var directorEntity = ReadDirectorEntity(spawnRequest.CellId);
             ref readonly var cell = ref directorEntity.Read<CombatCell>();
             var initialTarget = SelectInitialTarget(in cell, spawnRequest.SpawnPosition);
-            ref var budget = ref directorEntity.Mut<ThreatBudget>();
             var totalCost = definition.BudgetCost * spawnRequest.Count;
-            if (budget.Current < totalCost)
-                throw new InvalidOperationException("Threat budget became insufficient after spawn request validation.");
+            var isAmbientRequest = spawnRequest.AmbientKind != AmbientSpawnKind.None;
+            if (!isAmbientRequest)
+            {
+                ref readonly var budget = ref directorEntity.Read<ThreatBudget>();
+                if (budget.Current < totalCost)
+                    throw new InvalidOperationException("Threat budget became insufficient after spawn request validation.");
+            }
 
             for (var i = 0; i < spawnRequest.Count; i++)
             {
@@ -78,8 +82,49 @@ namespace StaticMlp.Features.CombatDirector
                 SW.SendEvent(new EnemySpawnedEvent(spawnedGid, spawnRequest.Role, spawnRequest.SourceType));
             }
 
-            budget.Current -= totalCost;
+            if (isAmbientRequest)
+                SetAmbientEncounter(directorEntity, in cell, spawnRequest.AmbientKind, spawnRequest.Count);
+            else
+                directorEntity.Mut<ThreatBudget>().Current -= totalCost;
+
             request.Destroy();
+        }
+
+        private static void SetAmbientEncounter(
+            SW.Entity directorEntity,
+            in CombatCell cell,
+            AmbientSpawnKind ambientKind,
+            int spawnedCount)
+        {
+            if (directorEntity.Has<EncounterState>())
+                return;
+
+            var aliveEnemyCount = CountAliveEnemies(in cell);
+            directorEntity.Set(new EncounterState
+            {
+                CellId = cell.CellId,
+                EncounterId = cell.CellId + 1,
+                Kind = ResolveEncounterKind(ambientKind),
+                Intensity = aliveEnemyCount <= 2
+                    ? EncounterIntensity.Minor
+                    : EncounterIntensity.Moderate,
+                TimeAlive = 0f,
+                AliveEnemyCount = aliveEnemyCount > spawnedCount ? aliveEnemyCount : spawnedCount,
+                EscalationAllowed = false
+            });
+        }
+
+        private static EncounterKind ResolveEncounterKind(AmbientSpawnKind ambientKind)
+        {
+            return ambientKind switch
+            {
+                AmbientSpawnKind.SoloAnimal => EncounterKind.AmbientSolo,
+                AmbientSpawnKind.SoloBandit => EncounterKind.AmbientSolo,
+                AmbientSpawnKind.SmallPack => EncounterKind.AmbientSmallPack,
+                AmbientSpawnKind.Patrol => EncounterKind.PatrolContact,
+                AmbientSpawnKind.ResourceGuardian => EncounterKind.ResourceGuard,
+                _ => throw new InvalidOperationException($"Unknown ambient spawn kind: {ambientKind}.")
+            };
         }
 
         private static EntityGID SelectInitialTarget(in CombatCell cell, float3 spawnPosition)

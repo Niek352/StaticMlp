@@ -18,6 +18,14 @@ namespace StaticMlp.Features.CombatDirector
         public readonly float MaxSpawnSourceDistance;
         public readonly float BuildUpThreshold;
         public readonly float PeakThreshold;
+        public readonly int AmbientMinAliveEnemiesPerCell;
+        public readonly int AmbientMaxAliveEnemiesPerCell;
+        public readonly int EncounterMinAliveEnemiesPerCell;
+        public readonly int EncounterMaxAliveEnemiesPerCell;
+        public readonly int EscalationMinAliveEnemiesPerCell;
+        public readonly int EscalationMaxAliveEnemiesPerCell;
+        public readonly int AmbientMaxEnemiesPerRequest;
+        public readonly float AmbientSpawnCooldownSeconds;
 
         public EncounterDirectorConfig(
             float cellRadius,
@@ -33,7 +41,15 @@ namespace StaticMlp.Features.CombatDirector
             float minSpawnSourceDistance,
             float maxSpawnSourceDistance,
             float buildUpThreshold,
-            float peakThreshold)
+            float peakThreshold,
+            int ambientMinAliveEnemiesPerCell,
+            int ambientMaxAliveEnemiesPerCell,
+            int encounterMinAliveEnemiesPerCell,
+            int encounterMaxAliveEnemiesPerCell,
+            int escalationMinAliveEnemiesPerCell,
+            int escalationMaxAliveEnemiesPerCell,
+            int ambientMaxEnemiesPerRequest,
+            float ambientSpawnCooldownSeconds)
         {
             CellRadius = cellRadius;
             NoiseAttentionMultiplier = noiseAttentionMultiplier;
@@ -49,6 +65,14 @@ namespace StaticMlp.Features.CombatDirector
             MaxSpawnSourceDistance = maxSpawnSourceDistance;
             BuildUpThreshold = buildUpThreshold;
             PeakThreshold = peakThreshold;
+            AmbientMinAliveEnemiesPerCell = ambientMinAliveEnemiesPerCell;
+            AmbientMaxAliveEnemiesPerCell = ambientMaxAliveEnemiesPerCell;
+            EncounterMinAliveEnemiesPerCell = encounterMinAliveEnemiesPerCell;
+            EncounterMaxAliveEnemiesPerCell = encounterMaxAliveEnemiesPerCell;
+            EscalationMinAliveEnemiesPerCell = escalationMinAliveEnemiesPerCell;
+            EscalationMaxAliveEnemiesPerCell = escalationMaxAliveEnemiesPerCell;
+            AmbientMaxEnemiesPerRequest = ambientMaxEnemiesPerRequest;
+            AmbientSpawnCooldownSeconds = ambientSpawnCooldownSeconds;
         }
 
         public static EncounterDirectorConfig CreateDefault()
@@ -67,7 +91,15 @@ namespace StaticMlp.Features.CombatDirector
                 minSpawnSourceDistance: 10f,
                 maxSpawnSourceDistance: 90f,
                 buildUpThreshold: 30f,
-                peakThreshold: 75f);
+                peakThreshold: 75f,
+                ambientMinAliveEnemiesPerCell: 1,
+                ambientMaxAliveEnemiesPerCell: 4,
+                encounterMinAliveEnemiesPerCell: 1,
+                encounterMaxAliveEnemiesPerCell: 6,
+                escalationMinAliveEnemiesPerCell: 2,
+                escalationMaxAliveEnemiesPerCell: 8,
+                ambientMaxEnemiesPerRequest: 4,
+                ambientSpawnCooldownSeconds: 30f);
         }
     }
 }

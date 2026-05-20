@@ -47,6 +47,26 @@ namespace StaticMlp.Features.CombatDirector
             throw new InvalidOperationException($"Unknown open-world spawn placement kind: {kindId.Value}.");
         }
 
+        public static AmbientSpawnMarker CreateAmbientMarker(SpawnPlacementKindId kindId, float cooldownSeconds)
+        {
+            if (cooldownSeconds <= 0f)
+                throw new InvalidOperationException("Ambient spawn marker cooldown must be positive.");
+
+            if (kindId == WILDLIFE_SPAWN)
+            {
+                return new AmbientSpawnMarker
+                {
+                    Kind = AmbientSpawnKind.SoloAnimal,
+                    MinCount = 1,
+                    MaxCount = 1,
+                    CooldownSeconds = cooldownSeconds,
+                    CooldownRemaining = 0f
+                };
+            }
+
+            throw new InvalidOperationException($"Open-world spawn placement kind does not support ambient markers: {kindId.Value}.");
+        }
+
         public static float ResolveSourceRadius(float placementScale)
         {
             if (placementScale <= 0f)

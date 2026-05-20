@@ -55,6 +55,9 @@ namespace StaticMlp.Features.CombatDirector
                 if (!cellEntity.Has<DirectorState>())
                     throw new InvalidOperationException("Combat cell entity must own DirectorState.");
 
+                if (!cellEntity.Has<CellAliveEnemyCaps>())
+                    throw new InvalidOperationException("Combat cell entity must own CellAliveEnemyCaps.");
+
                 _cellInitialized = true;
                 return cellEntity;
             }
@@ -96,8 +99,24 @@ namespace StaticMlp.Features.CombatDirector
                 PhaseTimer = 0f,
                 TimeSinceLastPressureEvent = 0f
             });
+            cellEntity.Set(CreateCaps(SW.GetResource<EncounterDirectorConfig>()));
             _cellInitialized = true;
             return cellEntity;
+        }
+
+        private static CellAliveEnemyCaps CreateCaps(EncounterDirectorConfig config)
+        {
+            return new CellAliveEnemyCaps
+            {
+                AmbientMinAliveEnemies = config.AmbientMinAliveEnemiesPerCell,
+                AmbientMaxAliveEnemies = config.AmbientMaxAliveEnemiesPerCell,
+                EncounterMinAliveEnemies = config.EncounterMinAliveEnemiesPerCell,
+                EncounterMaxAliveEnemies = config.EncounterMaxAliveEnemiesPerCell,
+                EscalationMinAliveEnemies = config.EscalationMinAliveEnemiesPerCell,
+                EscalationMaxAliveEnemies = config.EscalationMaxAliveEnemiesPerCell,
+                AmbientAliveEnemies = 0,
+                EncounterAliveEnemies = 0
+            };
         }
 
         private float3 ComputeCenter(float cellRadius)

@@ -11,6 +11,7 @@ namespace StaticMlp.Features.CombatDirector
         public int Count;
         public SpawnSourceType SourceType;
         public SpawnSourceKind SourceKind;
+        public AmbientSpawnKind AmbientKind;
         public EnemyRole Role;
     }
 }
