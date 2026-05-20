@@ -40,15 +40,22 @@ namespace StaticMlp.Features.Buildings
             var definition = BuildingCatalogData.Get(new BuildingId(state.BuildingId));
             var anchorRef = site.Read<SettlementAnchorRef>();
 
-            SW.SendEvent(new Stage1RepairCompletedEvent(anchorRef.Anchor));
-
             var finishedGid = SW.GetResource<BuildingEntityFactory>().SpawnFinishedBuilding(new FinishedBuildingSpawnSpec(
                 owner,
                 definition,
                 anchorRef.Anchor,
                 transform));
-            if (!finishedGid.TryUnpack<ServerWT>(out var finishedBuilding))
+            if (!finishedGid.TryUnpack<ServerWT>(out _))
                 throw new System.InvalidOperationException("Spawned finished building could not be unpacked in server world.");
+
+            SW.SendEvent(new BuildingConstructionCompletedEvent(
+                finishedGid,
+                definition.Id,
+                anchorRef.Anchor,
+                transform));
+
+            if (definition.Id == BuildingCatalogData.CampCoreId)
+                SW.SendEvent(new Stage1RepairCompletedEvent(anchorRef.Anchor));
 
             NetworkEntityDespawner.DespawnAndDestroy(site);
         }

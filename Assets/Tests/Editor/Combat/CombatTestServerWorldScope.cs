@@ -47,6 +47,7 @@ namespace StaticMlp.Tests.Combat
                 typeof(NpcTag).Assembly,
                 typeof(ServerWT).Assembly,
                 typeof(LoadoutLogicFeature).Assembly,
+                typeof(BuildingConstructionCompletedEvent).Assembly,
                 typeof(BuildingsGameplayFeature).Assembly,
                 typeof(CombatLogicFeature).Assembly,
                 typeof(EffectProcessedTag).Assembly,
@@ -271,6 +272,7 @@ namespace StaticMlp.Tests.Combat
         }
 
         public SW.Entity CreateNetworkedConstructionSite(
+            BuildingId? buildingId = null,
             ConstructionPhase phase = ConstructionPhase.ReadyToBuild,
             float buildWorkRequired = 100f,
             float buildWorkDone = 0f,
@@ -279,9 +281,7 @@ namespace StaticMlp.Tests.Combat
             Vector3? position = null,
             NetworkPeerId? owner = null)
         {
-            const ushort woodenHutBuildingId = 1;
-
-            var definition = BuildingCatalogData.Get(new BuildingId(woodenHutBuildingId));
+            var definition = BuildingCatalogData.Get(buildingId ?? BuildingCatalogData.CampCoreId);
             var gid = SW.GetResource<BuildingEntityFactory>().SpawnConstructionSite(new ConstructionSiteSpawnSpec(
                 owner ?? new NetworkPeerId(1),
                 definition,

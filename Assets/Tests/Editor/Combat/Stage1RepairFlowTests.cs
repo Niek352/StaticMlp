@@ -28,6 +28,7 @@ namespace StaticMlp.Tests.Combat
             var siteGid = site.GID;
             var flowSystem = new ServerStage1FlowSystem();
             flowSystem.Init();
+            var completedReceiver = SW.RegisterEventReceiver<BuildingConstructionCompletedEvent>();
 
             ref var siteState = ref site.Mut<ConstructionSiteState>();
             ref readonly var siteResources = ref site.Read<ConstructionResources>();
@@ -44,15 +45,66 @@ namespace StaticMlp.Tests.Combat
             Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.CampRepaired));
 
             var finishedCount = 0;
+            EntityGID finishedGid = default;
             foreach (var finished in SW.Query<All<FinishedBuildingTag, SettlementAnchorRef, ConstructionSiteState, ConstructionProgress>>().Entities())
             {
                 finishedCount++;
+                finishedGid = finished.GID;
                 Assert.That(finished.Read<SettlementAnchorRef>().AnchorId, Is.EqualTo(SettlementAnchorCatalog.HomeCampId.Value));
                 Assert.That(finished.Read<ConstructionSiteState>().Phase, Is.EqualTo(ConstructionPhase.Completed));
                 Assert.That(finished.Read<ConstructionProgress>().IsComplete, Is.True);
             }
 
             Assert.That(finishedCount, Is.EqualTo(1));
+
+            var completedCount = 0;
+            foreach (var evt in completedReceiver)
+            {
+                completedCount++;
+                Assert.That(evt.Value.FinishedBuilding, Is.EqualTo(finishedGid));
+                Assert.That(evt.Value.BuildingId, Is.EqualTo(BuildingCatalogData.CampCoreId));
+                Assert.That(evt.Value.AnchorId, Is.EqualTo(SettlementAnchorCatalog.HomeCampId));
+                Assert.That(evt.Value.Transform.Position, Is.EqualTo(Vector3.zero));
+            }
+
+            SW.DeleteEventReceiver(ref completedReceiver);
+            Assert.That(completedCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ServerCompleteConstructionSystem_WhenNonCampCoreFinishes_EmitsGenericFactWithoutRepairFact()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var anchor = scope.CreateSettlementAnchor(
+                SettlementAnchorCatalog.HomeCampId,
+                Vector3.zero,
+                Stage1SettlementProgressStage.RepairResourcesReady);
+            var site = scope.CreateNetworkedConstructionSite(BuildingCatalogData.StockpileId, buildWorkDone: 100f);
+            ref var siteState = ref site.Mut<ConstructionSiteState>();
+            siteState.Phase = ConstructionPhase.Completed;
+
+            var flowSystem = new ServerStage1FlowSystem();
+            flowSystem.Init();
+            var completedReceiver = SW.RegisterEventReceiver<BuildingConstructionCompletedEvent>();
+
+            new ServerCompleteConstructionSystem().Update();
+            flowSystem.Update();
+            flowSystem.Destroy();
+
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.RepairResourcesReady));
+
+            var completedCount = 0;
+            foreach (var evt in completedReceiver)
+            {
+                completedCount++;
+                Assert.That(evt.Value.BuildingId, Is.EqualTo(BuildingCatalogData.StockpileId));
+                Assert.That(evt.Value.AnchorId, Is.EqualTo(SettlementAnchorCatalog.HomeCampId));
+                Assert.That(evt.Value.FinishedBuilding.TryUnpack<ServerWT>(out var finished), Is.True);
+                Assert.That(finished.Read<ConstructionSiteState>().BuildingId, Is.EqualTo(BuildingCatalogData.StockpileId.Value));
+            }
+
+            SW.DeleteEventReceiver(ref completedReceiver);
+            Assert.That(completedCount, Is.EqualTo(1));
         }
 
         [Test]
