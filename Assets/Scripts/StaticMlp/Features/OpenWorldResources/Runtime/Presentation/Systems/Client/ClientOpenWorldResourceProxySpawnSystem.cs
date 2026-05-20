@@ -1,5 +1,4 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.EcsViews;
 using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Networking;
@@ -10,8 +9,6 @@ namespace StaticMlp.Features.OpenWorldResources
 {
     public sealed class ClientOpenWorldResourceProxySpawnSystem : ISystem
     {
-        private const string RESOURCE_NODE_VIEW_PATH = "Views/OpenWorldResources/OpenWorldResourceNodeView";
-
         private EventReceiver<ClientCoreWT, OpenWorldChunkGenerationCompleted> _completed;
 
         public void Init()
@@ -78,7 +75,6 @@ namespace StaticMlp.Features.OpenWorldResources
                 RemainingAmount = state.RemainingAmount,
                 Flags = state.Flags
             });
-            entity.Set(new ViewPath(RESOURCE_NODE_VIEW_PATH));
             entity.Set(new ViewTransform
             {
                 RenderPosition = placement.Position,
@@ -88,6 +84,8 @@ namespace StaticMlp.Features.OpenWorldResources
             {
                 KindIdValue = state.KindIdValue,
                 RemainingAmount = state.RemainingAmount,
+                MaxAmount = OpenWorldResourceNodeRules.StartingAmount(placement.KindId),
+                Flags = state.Flags,
                 Scale = placement.Scale
             });
             proxyIndex.Register(placement.PlacementId, entity.GID);

@@ -6,6 +6,8 @@ namespace StaticMlp.Features.OpenWorldResources
     {
         public ushort KindIdValue;
         public int RemainingAmount;
+        public int MaxAmount;
+        public OpenWorldResourceOverlayFlags Flags;
         public float Scale;
     }
 }

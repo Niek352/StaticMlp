@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 
@@ -96,6 +97,8 @@ namespace StaticMlp.Features.OpenWorldResources
             ref var viewState = ref entity.Mut<OpenWorldResourceNodeViewState>();
             viewState.KindIdValue = state.KindIdValue;
             viewState.RemainingAmount = state.RemainingAmount;
+            viewState.MaxAmount = OpenWorldResourceNodeRules.StartingAmount(new ResourcePlacementKindId(state.KindIdValue));
+            viewState.Flags = state.Flags;
         }
 
         private static void ApplyResourceDeltaToProxy(
@@ -116,6 +119,8 @@ namespace StaticMlp.Features.OpenWorldResources
 
             ref var viewState = ref entity.Mut<OpenWorldResourceNodeViewState>();
             viewState.RemainingAmount = delta.RemainingAmount;
+            viewState.MaxAmount = OpenWorldResourceNodeRules.StartingAmount(new ResourcePlacementKindId(proxyState.KindIdValue));
+            viewState.Flags = delta.Flags;
         }
     }
 }

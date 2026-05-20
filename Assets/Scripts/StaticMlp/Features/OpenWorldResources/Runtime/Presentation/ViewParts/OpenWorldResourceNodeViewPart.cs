@@ -9,15 +9,20 @@ namespace StaticMlp.Features.OpenWorldResources
     {
         private const ushort WOOD_KIND = 1;
         private const ushort STONE_KIND = 2;
+        private const int AMOUNT_PIP_COUNT = 5;
 
         [SerializeField] private Color _woodTrunkColor = new(0.45f, 0.26f, 0.12f, 1f);
         [SerializeField] private Color _woodCanopyColor = new(0.2f, 0.62f, 0.24f, 1f);
         [SerializeField] private Color _stoneColor = new(0.48f, 0.52f, 0.55f, 1f);
+        [SerializeField] private Color _amountPipColor = new(0.95f, 0.78f, 0.28f, 1f);
 
         private GameObject _visualRoot;
+        private GameObject _amountIndicatorRoot;
+        private GameObject[] _amountPips;
         private Material _trunkMaterial;
         private Material _canopyMaterial;
         private Material _stoneMaterial;
+        private Material _amountPipMaterial;
         private ushort _activeKindId;
         private bool _hasActiveKind;
 
@@ -39,16 +44,21 @@ namespace StaticMlp.Features.OpenWorldResources
         {
             if (component.Scale <= 0f)
                 throw new InvalidOperationException($"{nameof(OpenWorldResourceNodeViewState)} scale must be positive.");
+            if (component.MaxAmount <= 0)
+                throw new InvalidOperationException($"{nameof(OpenWorldResourceNodeViewState)} max amount must be positive.");
 
             BuildVisual(component.KindIdValue);
             _visualRoot.transform.localScale = Vector3.one * component.Scale;
-            SetVisualActive(component.RemainingAmount > 0);
+            ApplyAmountIndicator(component.RemainingAmount, component.MaxAmount);
+            SetVisualActive(!IsInactive(component.Flags) && component.RemainingAmount > 0);
         }
 
         private void BuildVisual(ushort kindId)
         {
             if (_visualRoot != null && _hasActiveKind && _activeKindId == kindId)
                 return;
+            if (kindId != WOOD_KIND && kindId != STONE_KIND)
+                throw new InvalidOperationException($"Unknown open world resource node kind: {kindId}.");
 
             DestroyVisual();
             _activeKindId = kindId;
@@ -69,6 +79,8 @@ namespace StaticMlp.Features.OpenWorldResources
                 default:
                     throw new InvalidOperationException($"Unknown open world resource node kind: {kindId}.");
             }
+
+            BuildAmountIndicator(_visualRoot.transform);
         }
 
         private void BuildWoodVisual(Transform root)
@@ -105,6 +117,40 @@ namespace StaticMlp.Features.OpenWorldResources
             stone.GetComponent<Renderer>().sharedMaterial = _stoneMaterial;
         }
 
+        private void BuildAmountIndicator(Transform root)
+        {
+            _amountIndicatorRoot = new GameObject("Resource Amount Indicator");
+            _amountIndicatorRoot.transform.SetParent(root, worldPositionStays: false);
+            _amountIndicatorRoot.transform.localPosition = new Vector3(0f, 1.95f, 0f);
+            _amountIndicatorRoot.transform.localRotation = Quaternion.identity;
+
+            _amountPipMaterial = RuntimeVisualMaterial.Create(_amountPipColor);
+            _amountPips = new GameObject[AMOUNT_PIP_COUNT];
+            var firstPipX = (AMOUNT_PIP_COUNT - 1) * -0.13f;
+            for (var i = 0; i < AMOUNT_PIP_COUNT; i++)
+            {
+                var pip = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                pip.name = $"Resource Amount Pip {i + 1}";
+                pip.transform.SetParent(_amountIndicatorRoot.transform, worldPositionStays: false);
+                pip.transform.localPosition = new Vector3(firstPipX + i * 0.26f, 0f, 0f);
+                pip.transform.localScale = new Vector3(0.18f, 0.18f, 0.08f);
+                RemoveCollider(pip);
+                pip.GetComponent<Renderer>().sharedMaterial = _amountPipMaterial;
+                _amountPips[i] = pip;
+            }
+        }
+
+        private void ApplyAmountIndicator(int remainingAmount, int maxAmount)
+        {
+            if (_amountPips == null)
+                throw new InvalidOperationException($"{nameof(OpenWorldResourceNodeViewPart)} amount indicator is not built.");
+
+            var normalized = Mathf.Clamp01((float)remainingAmount / maxAmount);
+            var activePips = remainingAmount <= 0 ? 0 : Mathf.Max(1, Mathf.CeilToInt(normalized * AMOUNT_PIP_COUNT));
+            for (var i = 0; i < _amountPips.Length; i++)
+                _amountPips[i].SetActive(i < activePips);
+        }
+
         private void SetVisualActive(bool active)
         {
             if (_visualRoot != null)
@@ -115,13 +161,16 @@ namespace StaticMlp.Features.OpenWorldResources
         {
             if (_visualRoot != null)
             {
-                Destroy(_visualRoot);
+                DestroyRuntimeObject(_visualRoot);
                 _visualRoot = null;
             }
 
+            _amountIndicatorRoot = null;
+            _amountPips = null;
             DestroyMaterial(ref _trunkMaterial);
             DestroyMaterial(ref _canopyMaterial);
             DestroyMaterial(ref _stoneMaterial);
+            DestroyMaterial(ref _amountPipMaterial);
             _hasActiveKind = false;
         }
 
@@ -129,7 +178,7 @@ namespace StaticMlp.Features.OpenWorldResources
         {
             var collider = target.GetComponent<Collider>();
             if (collider != null)
-                Destroy(collider);
+                DestroyRuntimeObject(collider);
         }
 
         private static void DestroyMaterial(ref Material material)
@@ -137,8 +186,28 @@ namespace StaticMlp.Features.OpenWorldResources
             if (material == null)
                 return;
 
-            Destroy(material);
+            DestroyRuntimeObject(material);
             material = null;
+        }
+
+        private static bool IsInactive(OpenWorldResourceOverlayFlags flags)
+        {
+            const OpenWorldResourceOverlayFlags inactive =
+                OpenWorldResourceOverlayFlags.Depleted
+                | OpenWorldResourceOverlayFlags.Hidden
+                | OpenWorldResourceOverlayFlags.Replaced;
+            return (flags & inactive) != 0;
+        }
+
+        private static void DestroyRuntimeObject(UnityEngine.Object target)
+        {
+            if (target == null)
+                return;
+
+            if (Application.isPlaying)
+                Destroy(target);
+            else
+                DestroyImmediate(target);
         }
 
         private void OnDestroy()

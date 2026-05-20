@@ -12,7 +12,7 @@ namespace StaticMlp.Features.CombatDirector
 {
     public sealed class EnemySpawnApplySystem : ISystem
     {
-        private const float DEFAULT_ENEMY_MAX_HEALTH = 100f;
+        private const float DEFAULT_ENEMY_MAX_HEALTH = 10f;
         private readonly List<EntityGID> _requests = new();
 
         public void Update()

@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
@@ -21,6 +22,8 @@ namespace StaticMlp.Features.OpenWorldResources
                 ref var viewState = ref entity.Mut<OpenWorldResourceNodeViewState>();
                 viewState.KindIdValue = nodeState.KindIdValue;
                 viewState.RemainingAmount = nodeState.RemainingAmount;
+                viewState.MaxAmount = OpenWorldResourceNodeRules.StartingAmount(new ResourcePlacementKindId(nodeState.KindIdValue));
+                viewState.Flags = OpenWorldResourceOverlayFlags.None;
                 viewState.Scale = nodeTransform.Scale;
             }
         }

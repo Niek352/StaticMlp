@@ -166,7 +166,10 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 return;
 
             var request = _config.CreateGenerationRequest(lod);
-            CW.SendEvent(new OpenWorldChunkGenerationRequested(chunkId, request, GenerationOutputMask.VisualMesh));
+            CW.SendEvent(new OpenWorldChunkGenerationRequested(
+                chunkId,
+                request,
+                GenerationOutputMask.VisualMesh | GenerationOutputMask.Placements));
             _loadRequestsThisFrame++;
 
             if (!_loadedChunks.TryGetValue(chunkId, out loaded))
