@@ -151,6 +151,22 @@ namespace StaticMlp.Features.CombatDirector
             return target;
         }
 
+        private static int CountAliveEnemies(in CombatCell cell)
+        {
+            var aliveEnemyCount = 0;
+
+            foreach (var entity in SW.Query<All<EnemyTag, CharacterNetState>, None<IsDiedTag>>().Entities())
+            {
+                var position = entity.Read<CharacterNetState>().Position;
+                if (math.distancesq(position, cell.Center) > cell.Radius * cell.Radius)
+                    continue;
+
+                aliveEnemyCount++;
+            }
+
+            return aliveEnemyCount;
+        }
+
         private static SW.Entity ReadDirectorEntity(int cellId)
         {
             var found = false;

@@ -1,5 +1,6 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.CombatDirector
 {
