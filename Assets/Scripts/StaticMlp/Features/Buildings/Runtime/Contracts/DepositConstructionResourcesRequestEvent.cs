@@ -13,13 +13,22 @@ namespace StaticMlp.Features.Buildings
         public EntityGID Site { get; set; }
         public int Wood { get; set; }
         public int Stone { get; set; }
+        public int Planks { get; set; }
+        public int SimpleParts { get; set; }
 
-        public DepositConstructionResourcesRequestEvent(EntityGID site, int wood, int stone)
+        public DepositConstructionResourcesRequestEvent(
+            EntityGID site,
+            int wood,
+            int stone,
+            int planks = 0,
+            int simpleParts = 0)
         {
             RequestId = default;
             Site = site;
             Wood = wood;
             Stone = stone;
+            Planks = planks;
+            SimpleParts = simpleParts;
         }
 
         public EventTypeConfig<DepositConstructionResourcesRequestEvent> Config() =>

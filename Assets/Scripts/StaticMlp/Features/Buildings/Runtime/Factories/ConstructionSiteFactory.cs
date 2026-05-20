@@ -24,11 +24,10 @@ namespace StaticMlp.Features.Buildings
         {
             InitializeConstructionSite(entity, in spec);
         }
-        
+
         private static void InitializeConstructionSite(SW.Entity entity, in ConstructionSiteSpawnSpec spec)
         {
-            var woodCost = spec.Definition.GetConstructionCost(ResourceCatalog.WoodId);
-            var stoneCost = spec.Definition.GetConstructionCost(ResourceCatalog.StoneId);
+            var constructionResources = SettlementConstructionRules.CreateResources(spec.Definition.ConstructionCost);
 
             entity.Set(new SettlementAnchorRef(spec.AnchorId));
             entity.Set<ConstructionSiteTag>();
@@ -42,11 +41,7 @@ namespace StaticMlp.Features.Buildings
                 Position = spec.Position,
                 Rotation = spec.Rotation
             });
-            entity.Set(new ConstructionResources
-            {
-                WoodRequired = woodCost,
-                StoneRequired = stoneCost
-            });
+            entity.Set(constructionResources);
             entity.Set(new ConstructionProgress
             {
                 BuildWorkRequired = spec.Definition.BuildWorkRequired
@@ -57,8 +52,7 @@ namespace StaticMlp.Features.Buildings
             {
                 ref var siteState = ref ReplicationMut.Mut<ConstructionSiteState>(entity);
                 ref var siteResources = ref ReplicationMut.Mut<ConstructionResources>(entity);
-                siteResources.WoodDelivered = siteResources.WoodRequired;
-                siteResources.StoneDelivered = siteResources.StoneRequired;
+                SettlementConstructionRules.MarkAllResourcesDelivered(ref siteResources);
                 siteState.Phase = ConstructionPhase.ReadyToBuild;
             }
 

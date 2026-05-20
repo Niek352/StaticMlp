@@ -278,6 +278,80 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
+        public void SettlementConstructionRules_WhenPlanksAreRequired_DepositsNonWoodStoneResource()
+        {
+            var state = new ConstructionSiteState
+            {
+                Phase = ConstructionPhase.WaitingForResources
+            };
+            var resources = SettlementConstructionRules.CreateResources(new[]
+            {
+                new ResourceAmount(ResourceCatalog.PlanksId, 3)
+            });
+
+            var planned = SettlementConstructionRules.TryPlanResourceDeposit(
+                in state,
+                in resources,
+                availableWood: 0,
+                availableStone: 0,
+                availablePlanks: 5,
+                availableSimpleParts: 0,
+                requestedWood: 0,
+                requestedStone: 0,
+                requestedPlanks: 5,
+                requestedSimpleParts: 0,
+                out var wood,
+                out var stone,
+                out var planks,
+                out var simpleParts);
+
+            Assert.That(planned, Is.True);
+            Assert.That(wood, Is.EqualTo(0));
+            Assert.That(stone, Is.EqualTo(0));
+            Assert.That(planks, Is.EqualTo(3));
+            Assert.That(simpleParts, Is.EqualTo(0));
+
+            var applied = SettlementConstructionRules.ApplyResourceDeposit(
+                ref state,
+                ref resources,
+                wood,
+                stone,
+                planks,
+                simpleParts);
+
+            Assert.That(applied, Is.True);
+            Assert.That(resources.PlanksDelivered, Is.EqualTo(3));
+            Assert.That(resources.IsComplete, Is.True);
+            Assert.That(state.Phase, Is.EqualTo(ConstructionPhase.ReadyToBuild));
+        }
+
+        [Test]
+        public void DepositConstructionResourcesHandler_WhenRequestHasNegativeAmount_Rejects()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var peer = new NetworkPeerId(1);
+            scope.CreatePlayer(peer, Vector3.zero);
+            var storage = scope.CreateSettlementSharedResources(wood: 50, stone: 25);
+            var site = scope.CreateNetworkedConstructionSite(
+                phase: ConstructionPhase.WaitingForResources,
+                woodRequired: 10,
+                stoneRequired: 4);
+
+            ref var resources = ref site.Mut<ConstructionResources>();
+            resources.WoodDelivered = 0;
+            resources.StoneDelivered = 0;
+
+            var result = new DepositConstructionResourcesHandler().Handle(
+                peer,
+                new DepositConstructionResourcesRequestEvent(site.GID, wood: -1, stone: 0));
+
+            Assert.That(result.Status, Is.EqualTo(RequestStatus.Rejected));
+            Assert.That(storage.Read<SettlementSharedResources>().Wood, Is.EqualTo(50));
+            Assert.That(resources.WoodDelivered, Is.EqualTo(0));
+            Assert.That(site.Read<ConstructionSiteState>().Phase, Is.EqualTo(ConstructionPhase.WaitingForResources));
+        }
+
+        [Test]
         public void ClientStage1HudStateSystem_WhenRepairResourcesAreReady_ShowsContinueBuildingHint()
         {
             using var scope = new Stage1PresentationClientWorldScope();

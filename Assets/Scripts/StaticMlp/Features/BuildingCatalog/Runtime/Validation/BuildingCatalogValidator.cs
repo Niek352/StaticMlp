@@ -63,7 +63,9 @@ namespace StaticMlp.Features.BuildingCatalog
                 if (cost.Amount <= 0)
                     throw new InvalidOperationException($"Building id {definition.Id.Value} has non-positive construction cost for resource {cost.Id.Value}.");
 
-                _ = ResourceCatalog.Get(cost.Id);
+                ref readonly var resource = ref ResourceCatalog.Get(cost.Id);
+                if (!resource.Usage.HasFlag(ResourceUsageFlags.Construction))
+                    throw new InvalidOperationException($"Building id {definition.Id.Value} uses non-construction resource {cost.Id.Value} in construction cost.");
             }
         }
 

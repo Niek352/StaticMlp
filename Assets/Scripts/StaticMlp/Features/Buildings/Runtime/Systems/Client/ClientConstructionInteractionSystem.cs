@@ -48,7 +48,9 @@ namespace StaticMlp.Features.Buildings
             var request = new DepositConstructionResourcesRequestEvent(
                 site.GID,
                 resources.RemainingWood,
-                resources.RemainingStone);
+                resources.RemainingStone,
+                resources.RemainingPlanks,
+                resources.RemainingSimpleParts);
 
             RequestApi.Send<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(request);
         }

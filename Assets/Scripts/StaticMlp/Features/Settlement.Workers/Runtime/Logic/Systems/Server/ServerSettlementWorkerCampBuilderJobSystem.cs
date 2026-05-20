@@ -146,13 +146,19 @@ namespace StaticMlp.Features.Settlement.Workers
             {
                 ref readonly var siteState = ref site.Read<ConstructionSiteState>();
                 ref readonly var resources = ref site.Read<ConstructionResources>();
-                if (!ConstructionRules.TryPlanResourceDeposit(
+                if (!SettlementConstructionRules.TryPlanResourceDeposit(
                         in siteState,
                         in resources,
                         sharedResources.GetAmount(ResourceCatalog.WoodId),
                         sharedResources.GetAmount(ResourceCatalog.StoneId),
+                        sharedResources.GetAmount(ResourceCatalog.PlanksId),
+                        sharedResources.GetAmount(ResourceCatalog.SimplePartsId),
                         resources.RemainingWood,
                         resources.RemainingStone,
+                        resources.RemainingPlanks,
+                        resources.RemainingSimpleParts,
+                        out _,
+                        out _,
                         out _,
                         out _))
                 {
@@ -201,7 +207,7 @@ namespace StaticMlp.Features.Settlement.Workers
             foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState>>().Entities())
             {
                 ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-                if (ConstructionRules.CanDepositResources(in siteState))
+                if (SettlementConstructionRules.CanDepositResources(in siteState))
                     return true;
             }
 

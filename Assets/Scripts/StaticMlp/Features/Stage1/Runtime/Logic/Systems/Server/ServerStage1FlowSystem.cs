@@ -87,7 +87,9 @@ namespace StaticMlp.Features.Stage1
             var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
             ref readonly var storage = ref storageEntity.Read<SettlementSharedResources>();
             return storage.GetAmount(ResourceCatalog.WoodId) >= resources.RemainingWood
-                   && storage.GetAmount(ResourceCatalog.StoneId) >= resources.RemainingStone;
+                   && storage.GetAmount(ResourceCatalog.StoneId) >= resources.RemainingStone
+                   && storage.GetAmount(ResourceCatalog.PlanksId) >= resources.RemainingPlanks
+                   && storage.GetAmount(ResourceCatalog.SimplePartsId) >= resources.RemainingSimpleParts;
         }
 
         private static SW.Entity GetRepairSite(SettlementAnchorId anchorId)

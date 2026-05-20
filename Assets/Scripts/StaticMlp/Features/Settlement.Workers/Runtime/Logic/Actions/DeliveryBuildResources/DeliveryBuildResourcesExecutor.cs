@@ -31,7 +31,7 @@ namespace StaticMlp.Features.Settlement.Workers
 
             ref readonly var siteState = ref site.Read<ConstructionSiteState>();
             ref readonly var siteResources = ref site.Read<ConstructionResources>();
-            if (!ConstructionRules.CanDepositResources(in siteState))
+            if (!SettlementConstructionRules.CanDepositResources(in siteState))
             {
                 _transitions.SwitchToIdle(entity, ref task);
                 return;
@@ -53,21 +53,32 @@ namespace StaticMlp.Features.Settlement.Workers
 
             var sharedStorageEntity = SettlementSharedResourcesQuery.GetServerEntity();
             var sharedStorage = sharedStorageEntity.Read<SettlementSharedResources>();
-            if (!ConstructionRules.TryPlanResourceDeposit(
+            if (!SettlementConstructionRules.TryPlanResourceDeposit(
                     in siteState,
                     in siteResources,
                     sharedStorage.GetAmount(ResourceCatalog.WoodId),
                     sharedStorage.GetAmount(ResourceCatalog.StoneId),
+                    sharedStorage.GetAmount(ResourceCatalog.PlanksId),
+                    sharedStorage.GetAmount(ResourceCatalog.SimplePartsId),
                     siteResources.RemainingWood,
                     siteResources.RemainingStone,
+                    siteResources.RemainingPlanks,
+                    siteResources.RemainingSimpleParts,
                     out var acceptedWood,
-                    out var acceptedStone))
+                    out var acceptedStone,
+                    out var acceptedPlanks,
+                    out var acceptedSimpleParts))
             {
                 _transitions.SwitchToIdle(entity, ref task);
                 return;
             }
 
-            SW.SendEvent(new DepositConstructionResourcesEvent(site.GID, acceptedWood, acceptedStone));
+            SW.SendEvent(new DepositConstructionResourcesEvent(
+                site.GID,
+                acceptedWood,
+                acceptedStone,
+                acceptedPlanks,
+                acceptedSimpleParts));
             task.ElapsedTicks++;
         }
     }

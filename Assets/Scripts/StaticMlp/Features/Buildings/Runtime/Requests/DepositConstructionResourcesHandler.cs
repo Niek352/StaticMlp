@@ -34,32 +34,45 @@ namespace StaticMlp.Features.Buildings
             if (!ServerPeerPlayers.IsPlayerNear(sourcePeer, transform.Position, _interactionRange))
                 return rejected;
 
+            if (!HasValidAmounts(in request))
+                return rejected;
+
             var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
             var storage = storageEntity.Read<SettlementSharedResources>();
             var currentState = site.Read<ConstructionSiteState>();
             var currentResources = site.Read<ConstructionResources>();
-            if (!ConstructionRules.TryPlanResourceDeposit(
+            if (!SettlementConstructionRules.TryPlanResourceDeposit(
                     in currentState,
                     in currentResources,
                     storage.GetAmount(ResourceCatalog.WoodId),
                     storage.GetAmount(ResourceCatalog.StoneId),
+                    storage.GetAmount(ResourceCatalog.PlanksId),
+                    storage.GetAmount(ResourceCatalog.SimplePartsId),
                     request.Wood,
                     request.Stone,
+                    request.Planks,
+                    request.SimpleParts,
                     out var wood,
-                    out var stone))
+                    out var stone,
+                    out var planks,
+                    out var simpleParts))
                 return rejected;
 
             ref var mutableStorage = ref ReplicationMut.Mut<SettlementSharedResources>(storageEntity);
             var spentWood = mutableStorage.Spend(ResourceCatalog.WoodId, wood);
             var spentStone = mutableStorage.Spend(ResourceCatalog.StoneId, stone);
+            var spentPlanks = mutableStorage.Spend(ResourceCatalog.PlanksId, planks);
+            var spentSimpleParts = mutableStorage.Spend(ResourceCatalog.SimplePartsId, simpleParts);
 
             ref var state = ref ReplicationMut.Mut<ConstructionSiteState>(site);
             ref var resources = ref ReplicationMut.Mut<ConstructionResources>(site);
-            ConstructionRules.ApplyResourceDeposit(
+            SettlementConstructionRules.ApplyResourceDeposit(
                 ref state,
                 ref resources,
                 spentWood,
-                spentStone);
+                spentStone,
+                spentPlanks,
+                spentSimpleParts);
 
             return new DepositConstructionResourcesResultEvent
             {
@@ -67,8 +80,18 @@ namespace StaticMlp.Features.Buildings
                 Status = RequestStatus.Accepted,
                 Site = request.Site,
                 AcceptedWood = spentWood,
-                AcceptedStone = spentStone
+                AcceptedStone = spentStone,
+                AcceptedPlanks = spentPlanks,
+                AcceptedSimpleParts = spentSimpleParts
             };
+        }
+
+        private static bool HasValidAmounts(in DepositConstructionResourcesRequestEvent request)
+        {
+            return request.Wood >= 0
+                   && request.Stone >= 0
+                   && request.Planks >= 0
+                   && request.SimpleParts >= 0;
         }
     }
 }

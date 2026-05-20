@@ -23,11 +23,11 @@ namespace StaticMlp.Features.Buildings
         {
             InitializeFinishedBuilding(entity, in spec);
         }
-        
+
         private static void InitializeFinishedBuilding(SW.Entity entity, in FinishedBuildingSpawnSpec spec)
         {
-            var woodCost = spec.Definition.GetConstructionCost(ResourceCatalog.WoodId);
-            var stoneCost = spec.Definition.GetConstructionCost(ResourceCatalog.StoneId);
+            var constructionResources = SettlementConstructionRules.CreateResources(spec.Definition.ConstructionCost);
+            SettlementConstructionRules.MarkAllResourcesDelivered(ref constructionResources);
 
             entity.Set(new SettlementAnchorRef(spec.AnchorId));
             entity.Set<FinishedBuildingTag>();
@@ -37,13 +37,7 @@ namespace StaticMlp.Features.Buildings
                 Phase = ConstructionPhase.Completed
             });
             entity.Set(spec.Transform);
-            entity.Set(new ConstructionResources
-            {
-                WoodRequired = woodCost,
-                StoneRequired = stoneCost,
-                WoodDelivered = woodCost,
-                StoneDelivered = stoneCost
-            });
+            entity.Set(constructionResources);
             entity.Set(new ConstructionProgress
             {
                 BuildWorkRequired = spec.Definition.BuildWorkRequired,

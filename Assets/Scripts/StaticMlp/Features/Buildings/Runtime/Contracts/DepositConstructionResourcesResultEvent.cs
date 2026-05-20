@@ -14,6 +14,8 @@ namespace StaticMlp.Features.Buildings {
         public EntityGID Site;
         public int AcceptedWood;
         public int AcceptedStone;
+        public int AcceptedPlanks;
+        public int AcceptedSimpleParts;
 
         public EventTypeConfig<DepositConstructionResourcesResultEvent> Config() =>
             new(guid: new Guid("f5910f59-cf18-4370-bfad-7251af0cb3d4"));

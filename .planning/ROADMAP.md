@@ -6,7 +6,7 @@ This roadmap upgrades the current camp repair prototype into a Stage1 settlement
 
 ## Phases
 
-- [ ] **Phase 1: Settlement Foundation** - Expand resource/storage and building metadata contracts without changing gameplay flow yet. *(In progress)*
+- [x] **Phase 1: Settlement Foundation** - Expand resource/storage and building metadata contracts without changing gameplay flow yet.
 - [ ] **Phase 2: Building Catalog And Construction** - Add Stage1 buildings and connect them to construction/network/presentation catalogs.
 - [ ] **Phase 3: Storage And Operations** - Add stockpile, shelter, and workbench operation contracts that buildings can own after construction.
 - [ ] **Phase 4: NPC Worker Economy** - Expand worker roles and make NPC workers discover gather, haul, and process demands.
@@ -25,7 +25,7 @@ Plans:
 
 - [x] 01-01: Extend resource catalog and settlement shared storage beyond wood/stone.
 - [x] 01-02: Add building metadata for categories, capabilities, interactions, NPC profile, and operation profile.
-- [ ] 01-03: Generalize construction resource ledgers and deposit rules over the Stage1 resource contract.
+- [x] 01-03: Generalize construction resource ledgers and deposit rules over the Stage1 resource contract.
 
 ### Phase 2: Building Catalog And Construction
 
@@ -91,7 +91,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Settlement Foundation | 2/3 | In progress | - |
+| 1. Settlement Foundation | 3/3 | Complete | 2026-05-20 |
 | 2. Building Catalog And Construction | 0/3 | Not started | - |
 | 3. Storage And Operations | 0/3 | Not started | - |
 | 4. NPC Worker Economy | 0/3 | Not started | - |

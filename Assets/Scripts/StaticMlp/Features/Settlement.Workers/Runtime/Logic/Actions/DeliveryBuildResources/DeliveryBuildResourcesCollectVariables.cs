@@ -32,13 +32,19 @@ namespace StaticMlp.Features.Settlement.Workers
             {
                 ref readonly var siteState = ref site.Read<ConstructionSiteState>();
                 ref readonly var siteResources = ref site.Read<ConstructionResources>();
-                if (!ConstructionRules.TryPlanResourceDeposit(
+                if (!SettlementConstructionRules.TryPlanResourceDeposit(
                         in siteState,
                         in siteResources,
                         sharedResources.GetAmount(ResourceCatalog.WoodId),
                         sharedResources.GetAmount(ResourceCatalog.StoneId),
+                        sharedResources.GetAmount(ResourceCatalog.PlanksId),
+                        sharedResources.GetAmount(ResourceCatalog.SimplePartsId),
                         siteResources.RemainingWood,
                         siteResources.RemainingStone,
+                        siteResources.RemainingPlanks,
+                        siteResources.RemainingSimpleParts,
+                        out _,
+                        out _,
                         out _,
                         out _))
                     continue;

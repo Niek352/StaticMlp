@@ -40,15 +40,23 @@ namespace StaticMlp.Features.Settlement
                     in currentResources,
                     currentStorage.GetAmount(ResourceCatalog.WoodId),
                     currentStorage.GetAmount(ResourceCatalog.StoneId),
+                    currentStorage.GetAmount(ResourceCatalog.PlanksId),
+                    currentStorage.GetAmount(ResourceCatalog.SimplePartsId),
                     request.Wood,
                     request.Stone,
+                    request.Planks,
+                    request.SimpleParts,
                     out var acceptedWood,
-                    out var acceptedStone))
+                    out var acceptedStone,
+                    out var acceptedPlanks,
+                    out var acceptedSimpleParts))
                 return;
 
             ref var storage = ref ReplicationMut.Mut<SettlementSharedResources>(storageEntity);
             var spentWood = storage.Spend(ResourceCatalog.WoodId, acceptedWood);
             var spentStone = storage.Spend(ResourceCatalog.StoneId, acceptedStone);
+            var spentPlanks = storage.Spend(ResourceCatalog.PlanksId, acceptedPlanks);
+            var spentSimpleParts = storage.Spend(ResourceCatalog.SimplePartsId, acceptedSimpleParts);
 
             ref var state = ref ReplicationMut.Mut<ConstructionSiteState>(site);
             ref var resources = ref ReplicationMut.Mut<ConstructionResources>(site);
@@ -56,7 +64,9 @@ namespace StaticMlp.Features.Settlement
                 ref state,
                 ref resources,
                 spentWood,
-                spentStone);
+                spentStone,
+                spentPlanks,
+                spentSimpleParts);
         }
     }
 }
