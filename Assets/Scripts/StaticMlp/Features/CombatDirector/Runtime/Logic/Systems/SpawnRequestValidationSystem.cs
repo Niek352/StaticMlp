@@ -143,7 +143,7 @@ namespace StaticMlp.Features.CombatDirector
 
         private static bool IsSpawnPhase(DirectorPhase phase)
         {
-            return phase == DirectorPhase.BuildUp || phase == DirectorPhase.Peak;
+            return phase == DirectorPhase.PressureEvent;
         }
 
         private static int CountAliveEnemies(in CombatCell cell)

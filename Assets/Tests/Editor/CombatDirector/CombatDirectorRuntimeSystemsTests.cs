@@ -227,7 +227,7 @@ namespace StaticMlp.Tests.CombatDirector
         }
 
         [Test]
-        public void DirectorPhaseSystem_ThresholdsAndSpawnSource_TransitionDeterministically()
+        public void DirectorPhaseSystem_PassiveExploration_RemainsAmbient()
         {
             using var scope = new CombatDirectorTestServerWorldScope();
             scope.CreatePlayer(new NetworkPeerId(21), Vector3.zero);
@@ -235,27 +235,15 @@ namespace StaticMlp.Tests.CombatDirector
             var phaseSystem = new DirectorPhaseSystem();
 
             cellTrackingSystem.Update();
-
-            var directorEntity = scope.GetDirectorEntity();
-            directorEntity.Mut<ThreatBudget>().Current = 31f;
-
             phaseSystem.Update();
 
-            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.BuildUp));
-
-            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
-            directorEntity.Mut<ThreatBudget>().Current = 76f;
-
-            phaseSystem.Update();
-
-            var peakState = scope.ReadDirectorState();
-            Assert.That(peakState.Phase, Is.EqualTo(DirectorPhase.Peak));
-            Assert.That(peakState.PhaseTimer, Is.EqualTo(0f).Within(0.001f));
-            Assert.That(peakState.TimeSinceLastPeak, Is.EqualTo(0f).Within(0.001f));
+            var state = scope.ReadDirectorState();
+            Assert.That(state.Phase, Is.EqualTo(DirectorPhase.Ambient));
+            Assert.That(state.PhaseTimer, Is.EqualTo(0.5f).Within(0.001f));
         }
 
         [Test]
-        public void DirectorPhaseSystem_ReliefAndCooldown_PreventImmediateSecondPeak()
+        public void DirectorPhaseSystem_HighAttentionAlone_CannotCreatePressureEvent()
         {
             using var scope = new CombatDirectorTestServerWorldScope();
             scope.CreatePlayer(new NetworkPeerId(23), Vector3.zero);
@@ -263,23 +251,40 @@ namespace StaticMlp.Tests.CombatDirector
             var phaseSystem = new DirectorPhaseSystem();
 
             cellTrackingSystem.Update();
-            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
-
             var directorEntity = scope.GetDirectorEntity();
-            ref var state = ref directorEntity.Mut<DirectorState>();
-            ref var budget = ref directorEntity.Mut<ThreatBudget>();
-            state.Phase = DirectorPhase.Peak;
-            state.PhaseTimer = 0f;
-            state.TimeSinceLastPeak = 0f;
-            budget.Current = 76f;
+            ref var attention = ref directorEntity.Mut<CellAttention>();
+            attention.Noise = 80f;
+            attention.Current = 80f;
 
             phaseSystem.Update();
-            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Relief));
+
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Suspicion));
+            Assert.That(scope.CountSpawnRequestEnemies(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void DirectorPhaseSystem_SuspicionCanDecayToRecoveryAndCooldown()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(24), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var phaseSystem = new DirectorPhaseSystem();
+
+            cellTrackingSystem.Update();
+            var directorEntity = scope.GetDirectorEntity();
+            ref var state = ref directorEntity.Mut<DirectorState>();
+            ref var attention = ref directorEntity.Mut<CellAttention>();
+            state.Phase = DirectorPhase.Suspicion;
+            attention.Noise = 0f;
+            attention.Current = 0f;
+
+            phaseSystem.Update();
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Recovery));
 
             state = directorEntity.Mut<DirectorState>();
             state.PhaseTimer = 19f;
             phaseSystem.Update();
-            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Relief));
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Recovery));
 
             phaseSystem.Update();
             Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Cooldown));
@@ -290,7 +295,46 @@ namespace StaticMlp.Tests.CombatDirector
             Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Cooldown));
 
             phaseSystem.Update();
-            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Calm));
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Ambient));
+        }
+
+        [Test]
+        public void EncounterSystems_SoloContactAdvancesAndResolvesWithoutSpawnRequest()
+        {
+            using var scope = new CombatDirectorTestServerWorldScope();
+            scope.CreatePlayer(new NetworkPeerId(25), Vector3.zero);
+            var cellTrackingSystem = new CombatCellTrackingSystem();
+            var contactSystem = new EncounterContactDetectionSystem();
+            var lifetimeSystem = new EncounterLifetimeSystem();
+            var recoverySystem = new EncounterRecoverySystem();
+            var phaseSystem = new DirectorPhaseSystem();
+            var buildSystem = new SpawnRequestBuildSystem();
+
+            cellTrackingSystem.Update();
+            var enemy = scope.CreateEnemy(new Vector3(3f, 0f, 0f), EnemyRole.Swarmer);
+
+            contactSystem.Update();
+            lifetimeSystem.Update();
+            phaseSystem.Update();
+            buildSystem.Update();
+
+            var encounter = scope.ReadEncounterState();
+            Assert.That(encounter.Kind, Is.EqualTo(EncounterKind.AmbientSolo));
+            Assert.That(encounter.Intensity, Is.EqualTo(EncounterIntensity.Minor));
+            Assert.That(encounter.TimeAlive, Is.EqualTo(0.5f).Within(0.001f));
+            Assert.That(encounter.AliveEnemyCount, Is.EqualTo(1));
+            Assert.That(encounter.EscalationAllowed, Is.False);
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Contact));
+            Assert.That(scope.CountSpawnRequestEnemies(), Is.EqualTo(0));
+
+            enemy.Set<IsDiedTag>();
+            lifetimeSystem.Update();
+            recoverySystem.Update();
+            buildSystem.Update();
+
+            Assert.That(scope.HasEncounterState(), Is.False);
+            Assert.That(scope.ReadDirectorState().Phase, Is.EqualTo(DirectorPhase.Recovery));
+            Assert.That(scope.CountSpawnRequestEnemies(), Is.EqualTo(0));
         }
 
         [Test]
@@ -301,7 +345,7 @@ namespace StaticMlp.Tests.CombatDirector
 
             Assert.That(second.Phase, Is.EqualTo(first.Phase));
             Assert.That(second.PhaseTimer, Is.EqualTo(first.PhaseTimer).Within(0.001f));
-            Assert.That(second.TimeSinceLastPeak, Is.EqualTo(first.TimeSinceLastPeak).Within(0.001f));
+            Assert.That(second.TimeSinceLastPressureEvent, Is.EqualTo(first.TimeSinceLastPressureEvent).Within(0.001f));
             Assert.That(second.AttentionCurrent, Is.EqualTo(first.AttentionCurrent).Within(0.001f));
             Assert.That(second.BudgetCurrent, Is.EqualTo(first.BudgetCurrent).Within(0.001f));
             Assert.That(second.BudgetAccumulationPerSecond, Is.EqualTo(first.BudgetAccumulationPerSecond).Within(0.001f));
@@ -317,7 +361,7 @@ namespace StaticMlp.Tests.CombatDirector
 
             cellTrackingSystem.Update();
             var directorEntity = scope.GetDirectorEntity();
-            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.BuildUp;
+            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.PressureEvent;
 
             scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: false);
             selectionSystem.Update();
@@ -408,22 +452,32 @@ namespace StaticMlp.Tests.CombatDirector
         }
 
         [Test]
-        public void SpawnRequestBuildSystem_LowMediumHighBudgets_CreateExpectedRoleCounts()
+        public void SpawnRequestBuildSystem_PressureEventBudgets_CreateExpectedRoleCounts()
         {
-            var low = BuildRequestsForBudget(31f, DirectorPhase.BuildUp);
+            var low = BuildRequestsForBudget(31f, DirectorPhase.PressureEvent);
             Assert.That(low.Swarmers, Is.EqualTo(10));
             Assert.That(low.Markers, Is.EqualTo(0));
             Assert.That(low.Anchors, Is.EqualTo(0));
 
-            var medium = BuildRequestsForBudget(60f, DirectorPhase.BuildUp);
+            var medium = BuildRequestsForBudget(60f, DirectorPhase.PressureEvent);
             Assert.That(medium.Swarmers, Is.EqualTo(14));
             Assert.That(medium.Markers, Is.EqualTo(1));
             Assert.That(medium.Anchors, Is.EqualTo(0));
 
-            var high = BuildRequestsForBudget(80f, DirectorPhase.Peak);
+            var high = BuildRequestsForBudget(80f, DirectorPhase.PressureEvent);
             Assert.That(high.Swarmers, Is.EqualTo(18));
             Assert.That(high.Markers, Is.EqualTo(1));
             Assert.That(high.Anchors, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void SpawnRequestBuildSystem_AmbientContactAndRecovery_DoNotCreateWaveRequests()
+        {
+            Assert.That(BuildRequestsForBudget(80f, DirectorPhase.Ambient).Total, Is.EqualTo(0));
+            Assert.That(BuildRequestsForBudget(31f, DirectorPhase.Contact).Total, Is.EqualTo(0));
+            Assert.That(BuildRequestsForBudget(60f, DirectorPhase.Contact).Total, Is.EqualTo(0));
+            Assert.That(BuildRequestsForBudget(80f, DirectorPhase.Contact).Total, Is.EqualTo(0));
+            Assert.That(BuildRequestsForBudget(80f, DirectorPhase.Recovery).Total, Is.EqualTo(0));
         }
 
         [Test]
@@ -441,7 +495,7 @@ namespace StaticMlp.Tests.CombatDirector
 
             scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
             var directorEntity = scope.GetDirectorEntity();
-            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.Peak;
+            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.PressureEvent;
             directorEntity.Mut<ThreatBudget>().Current = 80f;
 
             selectionSystem.Update();
@@ -460,7 +514,7 @@ namespace StaticMlp.Tests.CombatDirector
 
             cellTrackingSystem.Update();
             var directorEntity = scope.GetDirectorEntity();
-            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.BuildUp;
+            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.PressureEvent;
             directorEntity.Mut<ThreatBudget>().Current = 20f;
             var source = scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true);
             var request = scope.CreateSpawnRequest(source, (EnemyRole)250, count: 1);
@@ -482,7 +536,7 @@ namespace StaticMlp.Tests.CombatDirector
 
             cellTrackingSystem.Update();
             var directorEntity = scope.GetDirectorEntity();
-            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.BuildUp;
+            directorEntity.Mut<DirectorState>().Phase = DirectorPhase.PressureEvent;
             directorEntity.Mut<ThreatBudget>().Current = 20f;
             var source = scope.CreateSpawnSource(new Vector3(60f, 0f, 0f), isActive: true);
             scope.CreateSpawnRequest(source, EnemyRole.Swarmer, count: 2);
@@ -546,7 +600,7 @@ namespace StaticMlp.Tests.CombatDirector
                 return new DeterministicDirectorResult(
                     state.Phase,
                     state.PhaseTimer,
-                    state.TimeSinceLastPeak,
+                    state.TimeSinceLastPressureEvent,
                     attention.Current,
                     budget.Current,
                     budget.AccumulationPerSecond);
@@ -757,6 +811,16 @@ namespace StaticMlp.Tests.CombatDirector
                 return GetDirectorEntity().Read<DirectorState>();
             }
 
+            public bool HasEncounterState()
+            {
+                return GetDirectorEntity().Has<EncounterState>();
+            }
+
+            public EncounterState ReadEncounterState()
+            {
+                return GetDirectorEntity().Read<EncounterState>();
+            }
+
             public void Dispose()
             {
                 NetworkEventRegistry.Clear();
@@ -769,7 +833,7 @@ namespace StaticMlp.Tests.CombatDirector
         {
             public readonly DirectorPhase Phase;
             public readonly float PhaseTimer;
-            public readonly float TimeSinceLastPeak;
+            public readonly float TimeSinceLastPressureEvent;
             public readonly float AttentionCurrent;
             public readonly float BudgetCurrent;
             public readonly float BudgetAccumulationPerSecond;
@@ -777,14 +841,14 @@ namespace StaticMlp.Tests.CombatDirector
             public DeterministicDirectorResult(
                 DirectorPhase phase,
                 float phaseTimer,
-                float timeSinceLastPeak,
+                float timeSinceLastPressureEvent,
                 float attentionCurrent,
                 float budgetCurrent,
                 float budgetAccumulationPerSecond)
             {
                 Phase = phase;
                 PhaseTimer = phaseTimer;
-                TimeSinceLastPeak = timeSinceLastPeak;
+                TimeSinceLastPressureEvent = timeSinceLastPressureEvent;
                 AttentionCurrent = attentionCurrent;
                 BudgetCurrent = budgetCurrent;
                 BudgetAccumulationPerSecond = budgetAccumulationPerSecond;
@@ -849,6 +913,8 @@ namespace StaticMlp.Tests.CombatDirector
             public int Swarmers;
             public int Markers;
             public int Anchors;
+
+            public int Total => Swarmers + Markers + Anchors;
         }
     }
 }

@@ -9,13 +9,13 @@ namespace StaticMlp.Features.CombatDirector
         private const int SAMPLE_RATE = 22050;
         private AudioClip _sourceActivationClip;
         private AudioClip _enemyAppearanceClip;
-        private AudioClip _peakEntryClip;
+        private AudioClip _pressureEventEntryClip;
 
         public void Init()
         {
             _sourceActivationClip = CreateToneClip("CombatDirectorSourceActivation", 164f, 0.16f, 0.28f);
             _enemyAppearanceClip = CreateToneClip("CombatDirectorEnemyAppearance", 247f, 0.12f, 0.22f);
-            _peakEntryClip = CreateToneClip("CombatDirectorPeakEntry", 110f, 0.35f, 0.32f);
+            _pressureEventEntryClip = CreateToneClip("CombatDirectorPressureEventEntry", 110f, 0.35f, 0.32f);
         }
 
         public void Update()
@@ -35,7 +35,7 @@ namespace StaticMlp.Features.CombatDirector
         {
             Object.Destroy(_sourceActivationClip);
             Object.Destroy(_enemyAppearanceClip);
-            Object.Destroy(_peakEntryClip);
+            Object.Destroy(_pressureEventEntryClip);
         }
 
         private void PlayPhaseTransitionAudio(CW.Entity director)
@@ -57,8 +57,8 @@ namespace StaticMlp.Features.CombatDirector
 
             audio.LastPhase = state.Phase;
             audio.IsInitialized = true;
-            if (state.Phase == DirectorPhase.Peak)
-                AudioSource.PlayClipAtPoint(_peakEntryClip, Vector3.zero);
+            if (state.Phase == DirectorPhase.PressureEvent)
+                AudioSource.PlayClipAtPoint(_pressureEventEntryClip, Vector3.zero);
         }
 
         private static AudioClip CreateToneClip(string name, float frequency, float durationSeconds, float gain)

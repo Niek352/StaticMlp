@@ -27,11 +27,14 @@ namespace StaticMlp.Features.CombatDirector
             systems.Add(new PlayerThreatInputSystem(), GameplaySystemOrder.Gameplay - 20);
             systems.Add(new CellAttentionInputSystem(), GameplaySystemOrder.Gameplay - 19);
             systems.Add(new CellAttentionDecaySystem(), GameplaySystemOrder.Gameplay - 18);
-            systems.Add(new DirectorPhaseSystem(), GameplaySystemOrder.Gameplay - 17);
-            systems.Add(new SpawnSourceSelectionSystem(), GameplaySystemOrder.Gameplay - 16);
-            systems.Add(new SpawnRequestBuildSystem(), GameplaySystemOrder.Gameplay - 15);
-            systems.Add(new SpawnRequestValidationSystem(), GameplaySystemOrder.Gameplay - 14);
-            systems.Add(new EnemySpawnApplySystem(), GameplaySystemOrder.Gameplay - 13);
+            systems.Add(new EncounterContactDetectionSystem(), GameplaySystemOrder.Gameplay - 17);
+            systems.Add(new EncounterLifetimeSystem(), GameplaySystemOrder.Gameplay - 16);
+            systems.Add(new EncounterRecoverySystem(), GameplaySystemOrder.Gameplay - 15);
+            systems.Add(new DirectorPhaseSystem(), GameplaySystemOrder.Gameplay - 14);
+            systems.Add(new SpawnSourceSelectionSystem(), GameplaySystemOrder.Gameplay - 13);
+            systems.Add(new SpawnRequestBuildSystem(), GameplaySystemOrder.Gameplay - 12);
+            systems.Add(new SpawnRequestValidationSystem(), GameplaySystemOrder.Gameplay - 11);
+            systems.Add(new EnemySpawnApplySystem(), GameplaySystemOrder.Gameplay - 10);
         }
     }
 }

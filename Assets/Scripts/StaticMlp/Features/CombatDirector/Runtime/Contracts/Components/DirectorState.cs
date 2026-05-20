@@ -22,7 +22,7 @@ namespace StaticMlp.Features.CombatDirector
         public float PhaseTimer;
 
         [ReplicatedField(Quantize = 0.01f)]
-        public float TimeSinceLastPeak;
+        public float TimeSinceLastPressureEvent;
 
         public ComponentTypeConfig<DirectorState> Config() =>
             new(guid: new Guid("3ee4b71a-e2d1-4446-9301-a36017ab984b"));
@@ -32,7 +32,7 @@ namespace StaticMlp.Features.CombatDirector
         {
             writer.WriteByte((byte)Phase);
             writer.WriteFloat(PhaseTimer);
-            writer.WriteFloat(TimeSinceLastPeak);
+            writer.WriteFloat(TimeSinceLastPressureEvent);
         }
 
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
@@ -40,7 +40,7 @@ namespace StaticMlp.Features.CombatDirector
         {
             Phase = (DirectorPhase)reader.ReadByte();
             PhaseTimer = reader.ReadFloat();
-            TimeSinceLastPeak = reader.ReadFloat();
+            TimeSinceLastPressureEvent = reader.ReadFloat();
         }
     }
 }

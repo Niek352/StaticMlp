@@ -10,11 +10,36 @@ namespace StaticMlp.Tests.CombatDirector
         [Test]
         public void DirectorPhase_UsesDesignLockOrdering()
         {
-            Assert.That((byte)DirectorPhase.Calm, Is.EqualTo(0));
-            Assert.That((byte)DirectorPhase.BuildUp, Is.EqualTo(1));
-            Assert.That((byte)DirectorPhase.Peak, Is.EqualTo(2));
-            Assert.That((byte)DirectorPhase.Relief, Is.EqualTo(3));
-            Assert.That((byte)DirectorPhase.Cooldown, Is.EqualTo(4));
+            Assert.That((byte)DirectorPhase.Dormant, Is.EqualTo(0));
+            Assert.That((byte)DirectorPhase.Ambient, Is.EqualTo(1));
+            Assert.That((byte)DirectorPhase.Contact, Is.EqualTo(2));
+            Assert.That((byte)DirectorPhase.Suspicion, Is.EqualTo(3));
+            Assert.That((byte)DirectorPhase.Escalation, Is.EqualTo(4));
+            Assert.That((byte)DirectorPhase.PressureEvent, Is.EqualTo(5));
+            Assert.That((byte)DirectorPhase.Recovery, Is.EqualTo(6));
+            Assert.That((byte)DirectorPhase.Cooldown, Is.EqualTo(7));
+        }
+
+        [Test]
+        public void EncounterContracts_UseDesignLockOrdering()
+        {
+            Assert.That((byte)EncounterKind.None, Is.EqualTo(0));
+            Assert.That((byte)EncounterKind.AmbientSolo, Is.EqualTo(1));
+            Assert.That((byte)EncounterKind.AmbientSmallPack, Is.EqualTo(2));
+            Assert.That((byte)EncounterKind.CampContact, Is.EqualTo(3));
+            Assert.That((byte)EncounterKind.LairContact, Is.EqualTo(4));
+            Assert.That((byte)EncounterKind.PatrolContact, Is.EqualTo(5));
+            Assert.That((byte)EncounterKind.ResourceGuard, Is.EqualTo(6));
+            Assert.That((byte)EncounterKind.CaravanAmbush, Is.EqualTo(7));
+            Assert.That((byte)EncounterKind.BaseRaid, Is.EqualTo(8));
+            Assert.That((byte)EncounterKind.BossEvent, Is.EqualTo(9));
+
+            Assert.That((byte)EncounterIntensity.Passive, Is.EqualTo(0));
+            Assert.That((byte)EncounterIntensity.Minor, Is.EqualTo(1));
+            Assert.That((byte)EncounterIntensity.Moderate, Is.EqualTo(2));
+            Assert.That((byte)EncounterIntensity.Dangerous, Is.EqualTo(3));
+            Assert.That((byte)EncounterIntensity.Raid, Is.EqualTo(4));
+            Assert.That((byte)EncounterIntensity.Boss, Is.EqualTo(5));
         }
 
         [Test]
@@ -46,6 +71,7 @@ namespace StaticMlp.Tests.CombatDirector
             Assert.That(Marshal.SizeOf<CellAttention>(), Is.LessThanOrEqualTo(32));
             Assert.That(Marshal.SizeOf<ThreatBudget>(), Is.LessThanOrEqualTo(16));
             Assert.That(Marshal.SizeOf<DirectorState>(), Is.LessThanOrEqualTo(16));
+            Assert.That(Marshal.SizeOf<EncounterState>(), Is.LessThanOrEqualTo(24));
             Assert.That(Marshal.SizeOf<SpawnSource>(), Is.LessThanOrEqualTo(24));
             Assert.That(Marshal.SizeOf<EnemyArchetype>(), Is.LessThanOrEqualTo(8));
             Assert.That(Marshal.SizeOf<SpawnRequest>(), Is.LessThanOrEqualTo(32));

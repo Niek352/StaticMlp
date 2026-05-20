@@ -11,8 +11,6 @@ namespace StaticMlp.Features.CombatDirector
 {
     public sealed class DirectorPhaseSystem : ISystem
     {
-        private const int MIN_ALIVE_ENEMIES_TO_SUSTAIN_PEAK = 1;
-
         public void Update()
         {
             var config = SW.GetResource<EncounterDirectorConfig>();
@@ -24,35 +22,53 @@ namespace StaticMlp.Features.CombatDirector
 
             var directorEntity = ReadDirectorEntity();
             ref readonly var cell = ref directorEntity.Read<CombatCell>();
-            ref readonly var budget = ref directorEntity.Read<ThreatBudget>();
+            ref readonly var attention = ref directorEntity.Read<CellAttention>();
             ref var state = ref directorEntity.Mut<DirectorState>();
 
             var deltaTime = SW.GetResource<SimulationTime>().FixedStepSeconds;
             var nextPhaseTimer = state.PhaseTimer + deltaTime;
-            var nextTimeSinceLastPeak = state.TimeSinceLastPeak + deltaTime;
+            var nextTimeSinceLastPressureEvent = state.TimeSinceLastPressureEvent + deltaTime;
             var nextPhase = state.Phase;
+            var hasEncounter = directorEntity.Has<EncounterState>();
+            var hasSuspicion = HasSuspicionAttention(in attention);
 
             switch (state.Phase)
             {
-                case DirectorPhase.Calm:
-                    if (budget.Current > config.BuildUpThreshold)
-                        nextPhase = DirectorPhase.BuildUp;
+                case DirectorPhase.Dormant:
+                    if (HasActivePlayer())
+                        nextPhase = DirectorPhase.Ambient;
                     break;
-                case DirectorPhase.BuildUp:
-                    if (budget.Current > config.PeakThreshold && HasActiveSpawnSource())
-                        nextPhase = DirectorPhase.Peak;
+                case DirectorPhase.Ambient:
+                    if (hasEncounter)
+                        nextPhase = DirectorPhase.Contact;
+                    else if (hasSuspicion)
+                        nextPhase = DirectorPhase.Suspicion;
                     break;
-                case DirectorPhase.Peak:
-                    if (CountAliveEnemies(in cell) < MIN_ALIVE_ENEMIES_TO_SUSTAIN_PEAK)
-                        nextPhase = DirectorPhase.Relief;
+                case DirectorPhase.Contact:
+                    if (!hasEncounter)
+                        nextPhase = DirectorPhase.Recovery;
+                    else if (hasSuspicion)
+                        nextPhase = DirectorPhase.Suspicion;
                     break;
-                case DirectorPhase.Relief:
+                case DirectorPhase.Suspicion:
+                    if (hasEncounter)
+                        nextPhase = DirectorPhase.Contact;
+                    else if (!hasSuspicion)
+                        nextPhase = DirectorPhase.Recovery;
+                    break;
+                case DirectorPhase.Escalation:
+                    break;
+                case DirectorPhase.PressureEvent:
+                    if (CountAliveEnemies(in cell) == 0)
+                        nextPhase = DirectorPhase.Recovery;
+                    break;
+                case DirectorPhase.Recovery:
                     if (nextPhaseTimer >= config.MinReliefSeconds)
                         nextPhase = DirectorPhase.Cooldown;
                     break;
                 case DirectorPhase.Cooldown:
-                    if (nextPhaseTimer >= config.MinCooldownSeconds)
-                        nextPhase = DirectorPhase.Calm;
+                    if (nextPhaseTimer >= config.MinCooldownSeconds && !hasEncounter && !hasSuspicion)
+                        nextPhase = DirectorPhase.Ambient;
                     break;
                 default:
                     throw new InvalidOperationException($"Unknown director phase: {state.Phase}.");
@@ -62,14 +78,14 @@ namespace StaticMlp.Features.CombatDirector
             {
                 state.Phase = nextPhase;
                 state.PhaseTimer = 0f;
-                state.TimeSinceLastPeak = nextPhase == DirectorPhase.Peak
+                state.TimeSinceLastPressureEvent = nextPhase == DirectorPhase.PressureEvent
                     ? 0f
-                    : nextTimeSinceLastPeak;
+                    : nextTimeSinceLastPressureEvent;
                 return;
             }
 
             state.PhaseTimer = nextPhaseTimer;
-            state.TimeSinceLastPeak = nextTimeSinceLastPeak;
+            state.TimeSinceLastPressureEvent = nextTimeSinceLastPressureEvent;
         }
 
         private static SW.Entity ReadDirectorEntity()
@@ -77,7 +93,7 @@ namespace StaticMlp.Features.CombatDirector
             var found = false;
             SW.Entity directorEntity = default;
 
-            foreach (var entity in SW.Query<All<CombatCell, ThreatBudget, DirectorState>>().Entities())
+            foreach (var entity in SW.Query<All<CombatCell, CellAttention, DirectorState>>().Entities())
             {
                 if (found)
                     throw new InvalidOperationException("Combat Director currently supports only a single director cell.");
@@ -92,15 +108,21 @@ namespace StaticMlp.Features.CombatDirector
             return directorEntity;
         }
 
-        private static bool HasActiveSpawnSource()
+        private static bool HasActivePlayer()
         {
-            foreach (var entity in SW.Query<All<SpawnSource>>().Entities())
-            {
-                if (entity.Read<SpawnSource>().IsActive)
-                    return true;
-            }
+            foreach (var _ in SW.Query<All<PlayerTag, CharacterNetState>>().Entities())
+                return true;
 
             return false;
+        }
+
+        private static bool HasSuspicionAttention(in CellAttention attention)
+        {
+            return attention.Noise > 0f
+                   || attention.Trespass > 0f
+                   || attention.Combat > 0f
+                   || attention.Loot > 0f
+                   || attention.FactionAlarm > 0f;
         }
 
         private static int CountAliveEnemies(in CombatCell cell)

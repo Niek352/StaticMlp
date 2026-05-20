@@ -92,9 +92,9 @@ namespace StaticMlp.Features.CombatDirector
             });
             cellEntity.Set(new DirectorState
             {
-                Phase = DirectorPhase.Calm,
+                Phase = DirectorPhase.Ambient,
                 PhaseTimer = 0f,
-                TimeSinceLastPeak = 0f
+                TimeSinceLastPressureEvent = 0f
             });
             _cellInitialized = true;
             return cellEntity;
