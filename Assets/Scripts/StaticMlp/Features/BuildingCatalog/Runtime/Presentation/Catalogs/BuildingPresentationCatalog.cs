@@ -7,8 +7,38 @@ namespace StaticMlp.Features.BuildingCatalog
         private static readonly BuildingPresentationDefinition[] Definitions =
         {
             new(
-                BuildingCatalogData.WoodenHutId,
-                displayName: "Wooden Hut",
+                BuildingCatalogData.CampCoreId,
+                displayName: "Camp Core",
+                ghostPreviewViewPath: "Views/Buildings/WoodenHutGhostPreview",
+                blueprintViewPath: "Views/Buildings/WoodenHutBlueprint",
+                finishedViewPath: "Views/Buildings/WoodenHut"),
+            new(
+                BuildingCatalogData.StockpileId,
+                displayName: "Stockpile",
+                ghostPreviewViewPath: "Views/Buildings/WoodenHutGhostPreview",
+                blueprintViewPath: "Views/Buildings/WoodenHutBlueprint",
+                finishedViewPath: "Views/Buildings/WoodenHut"),
+            new(
+                BuildingCatalogData.BedrollShelterId,
+                displayName: "Bedroll Shelter",
+                ghostPreviewViewPath: "Views/Buildings/WoodenHutGhostPreview",
+                blueprintViewPath: "Views/Buildings/WoodenHutBlueprint",
+                finishedViewPath: "Views/Buildings/WoodenHut"),
+            new(
+                BuildingCatalogData.LumberCampId,
+                displayName: "Lumber Camp",
+                ghostPreviewViewPath: "Views/Buildings/WoodenHutGhostPreview",
+                blueprintViewPath: "Views/Buildings/WoodenHutBlueprint",
+                finishedViewPath: "Views/Buildings/WoodenHut"),
+            new(
+                BuildingCatalogData.StoneMineId,
+                displayName: "Stone Mine",
+                ghostPreviewViewPath: "Views/Buildings/WoodenHutGhostPreview",
+                blueprintViewPath: "Views/Buildings/WoodenHutBlueprint",
+                finishedViewPath: "Views/Buildings/WoodenHut"),
+            new(
+                BuildingCatalogData.WorkbenchId,
+                displayName: "Workbench",
                 ghostPreviewViewPath: "Views/Buildings/WoodenHutGhostPreview",
                 blueprintViewPath: "Views/Buildings/WoodenHutBlueprint",
                 finishedViewPath: "Views/Buildings/WoodenHut")

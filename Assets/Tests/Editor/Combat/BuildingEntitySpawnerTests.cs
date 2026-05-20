@@ -17,7 +17,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             var owner = new NetworkPeerId(7);
-            var definition = BuildingCatalogData.Get(BuildingCatalogData.WoodenHutId);
+            var definition = BuildingCatalogData.Get(BuildingCatalogData.CampCoreId);
             var gid = SW.GetResource<BuildingEntityFactory>().SpawnConstructionSite(new ConstructionSiteSpawnSpec(
                 owner,
                 definition,
@@ -46,7 +46,7 @@ namespace StaticMlp.Tests.Combat
             var system = new ServerPlaceBuildingRequestSystem();
             system.Init();
             var request = new PlaceBuildingRequestEvent(
-                BuildingCatalogData.WoodenHutId.Value,
+                BuildingCatalogData.CampCoreId.Value,
                 new Vector3(20f, 0f, 20f),
                 Quaternion.identity);
             SW.SendEvent(new NetworkEventFromClient<PlaceBuildingRequestEvent>(owner, in request));

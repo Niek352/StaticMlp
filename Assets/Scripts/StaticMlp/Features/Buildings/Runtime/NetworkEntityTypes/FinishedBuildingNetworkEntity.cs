@@ -13,6 +13,6 @@ namespace StaticMlp.Features.Buildings {
     public struct FinishedBuildingNetworkEntity : INetworkEntityType {
         public byte Id() => 4;
         public ushort NetworkSchemaVersion() => 1;
-        public ushort DefaultNetworkArchetypeId() => BuildingNetworkArchetypeIds.WoodenHutFinished;
+        public ushort DefaultNetworkArchetypeId() => BuildingNetworkArchetypeIds.CampCoreFinished;
     }
 }

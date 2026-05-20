@@ -50,7 +50,7 @@ namespace StaticMlp.Features.Buildings
         {
             var definition = state.HasSelection
                 ? BuildingCatalogData.Get(state.SelectedBuildingId)
-                : BuildingCatalogData.Get(BuildingCatalogData.WoodenHutId);
+                : BuildingCatalogData.Get(BuildingCatalogData.CampCoreId);
             var presentation = BuildingPresentationCatalog.Get(definition.Id);
 
             return new BuildingMenuPresentation(
@@ -70,7 +70,7 @@ namespace StaticMlp.Features.Buildings
         private static void SelectWoodenHut()
         {
             ref var state = ref CW.GetResource<BuildingMenuState>();
-            state.Select(BuildingCatalogData.WoodenHutId, Time.frameCount);
+            state.Select(BuildingCatalogData.CampCoreId, Time.frameCount);
         }
     }
 }

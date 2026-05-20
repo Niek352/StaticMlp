@@ -13,6 +13,6 @@ namespace StaticMlp.Features.Buildings {
     public struct ConstructionSiteNetworkEntity : INetworkEntityType {
         public byte Id() => 3;
         public ushort NetworkSchemaVersion() => 1;
-        public ushort DefaultNetworkArchetypeId() => BuildingNetworkArchetypeIds.WoodenHutBlueprint;
+        public ushort DefaultNetworkArchetypeId() => BuildingNetworkArchetypeIds.CampCoreBlueprint;
     }
 }

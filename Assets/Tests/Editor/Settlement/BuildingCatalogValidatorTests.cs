@@ -35,6 +35,39 @@ namespace StaticMlp.Tests.Settlement
         }
 
         [Test]
+        public void NetworkCatalog_HasEntriesForEveryStage1Building()
+        {
+            Assert.That(BuildingNetworkCatalog.All.Count, Is.EqualTo(BuildingCatalogData.All.Count));
+
+            for (var i = 0; i < BuildingCatalogData.All.Count; i++)
+            {
+                var building = BuildingCatalogData.All[i];
+                var network = BuildingNetworkCatalog.Get(building.Id);
+
+                Assert.That(network.BlueprintArchetypeId, Is.Not.EqualTo(0));
+                Assert.That(network.FinishedArchetypeId, Is.Not.EqualTo(0));
+                Assert.That(network.FinishedArchetypeId, Is.Not.EqualTo(network.BlueprintArchetypeId));
+            }
+        }
+
+        [Test]
+        public void PresentationCatalog_HasEntriesForEveryStage1Building()
+        {
+            Assert.That(BuildingPresentationCatalog.All.Count, Is.EqualTo(BuildingCatalogData.All.Count));
+
+            for (var i = 0; i < BuildingCatalogData.All.Count; i++)
+            {
+                var building = BuildingCatalogData.All[i];
+                var presentation = BuildingPresentationCatalog.Get(building.Id);
+
+                Assert.That(presentation.DisplayName, Is.EqualTo(building.DisplayName));
+                Assert.That(presentation.GhostPreviewViewPath, Is.Not.Empty);
+                Assert.That(presentation.BlueprintViewPath, Is.Not.Empty);
+                Assert.That(presentation.FinishedViewPath, Is.Not.Empty);
+            }
+        }
+
+        [Test]
         public void Validate_DuplicateBuildingIds_Throws()
         {
             var definitions = new[]

@@ -7,9 +7,29 @@ namespace StaticMlp.Features.BuildingCatalog
         private static readonly BuildingNetworkDefinition[] Definitions =
         {
             new(
-                BuildingCatalogData.WoodenHutId,
-                BuildingNetworkArchetypeIds.WoodenHutBlueprint,
-                BuildingNetworkArchetypeIds.WoodenHutFinished)
+                BuildingCatalogData.CampCoreId,
+                BuildingNetworkArchetypeIds.CampCoreBlueprint,
+                BuildingNetworkArchetypeIds.CampCoreFinished),
+            new(
+                BuildingCatalogData.StockpileId,
+                BuildingNetworkArchetypeIds.StockpileBlueprint,
+                BuildingNetworkArchetypeIds.StockpileFinished),
+            new(
+                BuildingCatalogData.BedrollShelterId,
+                BuildingNetworkArchetypeIds.BedrollShelterBlueprint,
+                BuildingNetworkArchetypeIds.BedrollShelterFinished),
+            new(
+                BuildingCatalogData.LumberCampId,
+                BuildingNetworkArchetypeIds.LumberCampBlueprint,
+                BuildingNetworkArchetypeIds.LumberCampFinished),
+            new(
+                BuildingCatalogData.StoneMineId,
+                BuildingNetworkArchetypeIds.StoneMineBlueprint,
+                BuildingNetworkArchetypeIds.StoneMineFinished),
+            new(
+                BuildingCatalogData.WorkbenchId,
+                BuildingNetworkArchetypeIds.WorkbenchBlueprint,
+                BuildingNetworkArchetypeIds.WorkbenchFinished)
         };
 
         public static IReadOnlyList<BuildingNetworkDefinition> All => Definitions;
