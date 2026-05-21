@@ -9,5 +9,6 @@ namespace StaticMlp.Features.Settlement
     public struct StockpileOperationState : IComponent
     {
         public ushort ContributedCapacity;
+        public bool Enabled;
     }
 }

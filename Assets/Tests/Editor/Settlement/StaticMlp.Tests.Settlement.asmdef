@@ -5,6 +5,10 @@
         "StaticMlp.Features.BuildingCatalog",
         "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Settlement.Logic",
+        "StaticMlp.Features.Buildings.Contracts",
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
         "Unity.Mathematics"
     ],
     "includePlatforms": [

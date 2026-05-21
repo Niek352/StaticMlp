@@ -9,7 +9,8 @@
         "Game.Core",
         "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Stage1.Contracts",
-        "StaticMlp.Features.BuildingCatalog"
+        "StaticMlp.Features.BuildingCatalog",
+        "StaticMlp.Features.Buildings.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
