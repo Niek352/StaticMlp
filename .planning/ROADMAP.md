@@ -60,7 +60,7 @@ Plans:
 Plans:
 
 - [x] 04-01: Add worker roles and NPC/runtime mappings for Builder, Gatherer, Hauler, Processor, and Guard.
-- [ ] 04-02: Add typed demand discovery for gather, haul, and process tasks.
+- [x] 04-02: Add typed demand discovery for gather, haul, and process tasks.
 - [ ] 04-03: Connect Lumber Camp and Stone Mine extraction buffers to Stockpile through worker tasks.
 
 ### Phase 5: Stage1 Progression And Loadout
@@ -94,6 +94,6 @@ Plans:
 | 1. Settlement Foundation | 3/3 | Complete | 2026-05-20 |
 | 2. Building Catalog And Construction | 3/3 | Complete | 2026-05-20 |
 | 3. Storage And Operations | 3/3 | Complete | 2026-05-21 |
-| 4. NPC Worker Economy | 1/3 | In progress | - |
+| 4. NPC Worker Economy | 2/3 | In progress | - |
 | 5. Stage1 Progression And Loadout | 0/3 | Not started | - |
 | 6. UX And Presentation | 0/3 | Not started | - |

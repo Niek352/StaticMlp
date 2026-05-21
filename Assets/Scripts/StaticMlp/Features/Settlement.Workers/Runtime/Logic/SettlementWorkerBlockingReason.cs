@@ -7,5 +7,9 @@ namespace StaticMlp.Features.Settlement.Workers
         AwaitingCampRepair = 2,
         NoConstructionDemand = 3,
         MissingResources = 4,
+        NoGatherDemand = 5,
+        NoHaulDemand = 6,
+        NoProcessDemand = 7,
+        NoEligibleDemand = 8
     }
 }

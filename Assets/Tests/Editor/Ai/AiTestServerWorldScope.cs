@@ -139,10 +139,15 @@ namespace StaticMlp.Tests.Ai
         public SW.Entity CreateWorker(
             SettlementAnchorId anchorId,
             Vector3 position,
-            SettlementWorkerAssignmentStatus status = SettlementWorkerAssignmentStatus.Unassigned)
+            SettlementWorkerAssignmentStatus status = SettlementWorkerAssignmentStatus.Unassigned,
+            WorkerRoleId roleId = default)
         {
-            var entity = CreateBot(position, SettlementWorkerBehaviorIds.PEACEFUL_BUILDER);
-            var npcDefinitionId = SettlementWorkerNpcProfileCatalog.Get(WorkerRoleCatalog.CampBuilderId);
+            if (roleId.Value == 0)
+                roleId = WorkerRoleCatalog.CampBuilderId;
+
+            var profile = SettlementWorkerRuntimeProfileCatalog.Get(roleId);
+            var entity = CreateBot(position, profile.BehaviorId);
+            var npcDefinitionId = SettlementWorkerNpcProfileCatalog.Get(roleId);
             var npcDefinition = NpcDefinitionCatalog.Get(npcDefinitionId);
 
             entity.Set<SettlementWorkerTag>();
@@ -157,7 +162,7 @@ namespace StaticMlp.Tests.Ai
             entity.Set(new SettlementWorkerIdentity
             {
                 HomeAnchorId = anchorId.Value,
-                RoleId = WorkerRoleCatalog.CampBuilderId.Value
+                RoleId = roleId.Value
             });
             entity.Set(new SettlementWorkerAssignment
             {

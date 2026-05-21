@@ -1,6 +1,5 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
-using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -14,10 +13,9 @@ namespace StaticMlp.Features.Settlement.Workers
             foreach (var anchor in SW.Query<All<Stage1SettlementProgression>>().Entities())
             {
                 ref readonly var progression = ref anchor.Read<Stage1SettlementProgression>();
-                var assignedWorker = FindAssignedCampBuilder(progression.Anchor);
 
-                var jobState = CreateJobState(progression.Anchor, assignedWorker, in progression);
-                var summary = CreateSummary(progression.Anchor, jobState, assignedWorker);
+                var jobState = CreateJobState(progression.Anchor, in progression);
+                var summary = CreateSummary(progression.Anchor, jobState);
 
                 ref var mutableJobState = ref ReplicationMut.Mut<SettlementCampBuilderJobState>(anchor);
                 mutableJobState = jobState;
@@ -29,58 +27,68 @@ namespace StaticMlp.Features.Settlement.Workers
 
         private static SettlementCampBuilderJobState CreateJobState(
             SettlementAnchorId anchorId,
-            EntityGID assignedWorker,
             in Stage1SettlementProgression progression)
         {
             var state = new SettlementCampBuilderJobState
             {
                 AnchorId = anchorId.Value,
-                AssignedWorker = assignedWorker,
+                AssignedWorker = default,
                 TargetSite = default,
                 CurrentTask = AiTaskType.Idle,
                 BlockingReason = SettlementWorkerBlockingReason.None
             };
 
-            if (!assignedWorker.TryUnpack<ServerWT>(out var worker))
+            if ((byte)progression.Stage < (byte)Stage1SettlementProgressStage.CampRepaired)
+            {
+                state.AssignedWorker = FindFirstAssignedWorker(anchorId, out _);
+                state.BlockingReason = SettlementWorkerBlockingReason.AwaitingCampRepair;
+                return state;
+            }
+
+            var firstAssignedWorker = default(EntityGID);
+            var firstAllowedJobs = WorkerJobFlags.None;
+
+            foreach (var worker in SW.Query<All<SettlementWorkerTag, SettlementWorkerIdentity, SettlementWorkerAssignment>>().Entities())
+            {
+                ref readonly var identity = ref worker.Read<SettlementWorkerIdentity>();
+                if (identity.HomeAnchorId != anchorId.Value)
+                    continue;
+
+                ref readonly var assignment = ref worker.Read<SettlementWorkerAssignment>();
+                if (!assignment.IsAssigned || assignment.AnchorId != anchorId.Value)
+                    continue;
+
+                var role = WorkerRoleCatalog.Get(identity.Role);
+                if (!firstAssignedWorker.TryUnpack<ServerWT>(out _))
+                {
+                    firstAssignedWorker = worker.GID;
+                    firstAllowedJobs = role.AllowedJobs;
+                }
+
+                if (!SettlementWorkerDemandQuery.TryFindBestDemand(worker, role.AllowedJobs, out var demand))
+                    continue;
+
+                state.AssignedWorker = worker.GID;
+                state.TargetSite = demand.Target;
+                state.CurrentTask = demand.Task;
+                state.BlockingReason = SettlementWorkerBlockingReason.None;
+                return state;
+            }
+
+            if (!firstAssignedWorker.TryUnpack<ServerWT>(out _))
             {
                 state.BlockingReason = SettlementWorkerBlockingReason.NoAssignment;
                 return state;
             }
 
-            var role = WorkerRoleCatalog.Get(worker.Read<SettlementWorkerIdentity>().Role);
-
-            if ((byte)progression.Stage < (byte)Stage1SettlementProgressStage.CampRepaired)
-            {
-                state.BlockingReason = SettlementWorkerBlockingReason.AwaitingCampRepair;
-                return state;
-            }
-
-            if ((role.AllowedJobs & WorkerJobFlags.DeliverConstructionResources) != 0
-                && TryFindDeliverySite(worker, out var deliverySite))
-            {
-                state.TargetSite = deliverySite;
-                state.CurrentTask = AiTaskType.DeliveryResourceToBuilding;
-                return state;
-            }
-
-            if ((role.AllowedJobs & WorkerJobFlags.BuildConstruction) != 0
-                && TryFindBuildSite(worker, out var buildSite))
-            {
-                state.TargetSite = buildSite;
-                state.CurrentTask = AiTaskType.BuildConstruction;
-                return state;
-            }
-
-            state.BlockingReason = HasAnyResourceWaitingSite()
-                ? SettlementWorkerBlockingReason.MissingResources
-                : SettlementWorkerBlockingReason.NoConstructionDemand;
+            state.AssignedWorker = firstAssignedWorker;
+            state.BlockingReason = SettlementWorkerDemandQuery.GetNoDemandReason(firstAllowedJobs);
             return state;
         }
 
         private static SettlementWorkerSummary CreateSummary(
             SettlementAnchorId anchorId,
-            SettlementCampBuilderJobState jobState,
-            EntityGID assignedWorker)
+            SettlementCampBuilderJobState jobState)
         {
             var summary = new SettlementWorkerSummary
             {
@@ -110,96 +118,30 @@ namespace StaticMlp.Features.Settlement.Workers
                     summary.CampBuilderAssignedWorkers++;
             }
 
-            if (!assignedWorker.TryUnpack<ServerWT>(out _))
+            if (!jobState.AssignedWorker.TryUnpack<ServerWT>(out _))
                 summary.BlockingReason = SettlementWorkerBlockingReason.NoAssignment;
 
             return summary;
         }
 
-        private static EntityGID FindAssignedCampBuilder(SettlementAnchorId anchorId)
+        private static EntityGID FindFirstAssignedWorker(SettlementAnchorId anchorId, out WorkerJobFlags allowedJobs)
         {
             foreach (var worker in SW.Query<All<SettlementWorkerTag, SettlementWorkerIdentity, SettlementWorkerAssignment>>().Entities())
             {
                 ref readonly var identity = ref worker.Read<SettlementWorkerIdentity>();
-                if (identity.HomeAnchorId != anchorId.Value || identity.Role != WorkerRoleCatalog.CampBuilderId)
+                if (identity.HomeAnchorId != anchorId.Value)
                     continue;
 
                 ref readonly var assignment = ref worker.Read<SettlementWorkerAssignment>();
                 if (!assignment.IsAssigned || assignment.AnchorId != anchorId.Value)
                     continue;
 
+                allowedJobs = WorkerRoleCatalog.Get(identity.Role).AllowedJobs;
                 return worker.GID;
             }
 
+            allowedJobs = WorkerJobFlags.None;
             return default;
-        }
-
-        private static bool TryFindDeliverySite(SW.Entity worker, out EntityGID siteGid)
-        {
-            ref readonly var workerState = ref worker.Read<StaticMlp.Game.Components.CharacterNetState>();
-            var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
-            var bestDistanceSq = float.MaxValue;
-            siteGid = default;
-
-            foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState, ConstructionResources, ConstructionTransform>>().Entities())
-            {
-                ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-                if (!SettlementConstructionRules.TryPlanResourceDeposit(
-                        in siteState,
-                        site,
-                        storageEntity,
-                        ConstructionResourcesAccess.GetRemainingResources(site),
-                        out _))
-                {
-                    continue;
-                }
-
-                ref readonly var transform = ref site.Read<ConstructionTransform>();
-                var distanceSq = (transform.Position - workerState.Position).sqrMagnitude;
-                if (distanceSq >= bestDistanceSq)
-                    continue;
-
-                bestDistanceSq = distanceSq;
-                siteGid = site.GID;
-            }
-
-            return siteGid.TryUnpack<ServerWT>(out _);
-        }
-
-        private static bool TryFindBuildSite(SW.Entity worker, out EntityGID siteGid)
-        {
-            ref readonly var workerState = ref worker.Read<StaticMlp.Game.Components.CharacterNetState>();
-            var bestDistanceSq = float.MaxValue;
-            siteGid = default;
-
-            foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState, ConstructionResources, ConstructionTransform, ConstructionProgress>>().Entities())
-            {
-                ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-                if (!ConstructionRules.CanBuild(site, in siteState))
-                    continue;
-
-                ref readonly var transform = ref site.Read<ConstructionTransform>();
-                var distanceSq = (transform.Position - workerState.Position).sqrMagnitude;
-                if (distanceSq >= bestDistanceSq)
-                    continue;
-
-                bestDistanceSq = distanceSq;
-                siteGid = site.GID;
-            }
-
-            return siteGid.TryUnpack<ServerWT>(out _);
-        }
-
-        private static bool HasAnyResourceWaitingSite()
-        {
-            foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState>>().Entities())
-            {
-                ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-                if (SettlementConstructionRules.CanDepositResources(in siteState))
-                    return true;
-            }
-
-            return false;
         }
     }
 }

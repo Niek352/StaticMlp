@@ -1,0 +1,308 @@
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Buildings;
+using StaticMlp.Features.Settlement;
+using StaticMlp.Game.Components;
+using StaticMlp.Networking;
+
+namespace StaticMlp.Features.Settlement.Workers
+{
+    public static class SettlementWorkerDemandQuery
+    {
+        public static bool TryFindBestDemand(
+            SW.Entity worker,
+            WorkerJobFlags allowedJobs,
+            out SettlementWorkerDemand demand)
+        {
+            if ((allowedJobs & WorkerJobFlags.DeliverConstructionResources) != 0
+                && TryFindConstructionDeliveryDemand(worker, out demand))
+            {
+                return true;
+            }
+
+            if ((allowedJobs & WorkerJobFlags.BuildConstruction) != 0
+                && TryFindConstructionBuildDemand(worker, out demand))
+            {
+                return true;
+            }
+
+            if ((allowedJobs & WorkerJobFlags.HaulResources) != 0
+                && TryFindHaulDemand(out demand))
+            {
+                return true;
+            }
+
+            if ((allowedJobs & WorkerJobFlags.GatherResources) != 0
+                && TryFindGatherDemand(out demand))
+            {
+                return true;
+            }
+
+            if ((allowedJobs & WorkerJobFlags.ProcessRecipe) != 0
+                && TryFindProcessDemand(out demand))
+            {
+                return true;
+            }
+
+            demand = default;
+            return false;
+        }
+
+        public static SettlementWorkerBlockingReason GetNoDemandReason(WorkerJobFlags allowedJobs)
+        {
+            if ((allowedJobs & (WorkerJobFlags.DeliverConstructionResources | WorkerJobFlags.BuildConstruction)) != 0)
+            {
+                return HasAnyResourceWaitingSite()
+                    ? SettlementWorkerBlockingReason.MissingResources
+                    : SettlementWorkerBlockingReason.NoConstructionDemand;
+            }
+
+            if ((allowedJobs & WorkerJobFlags.HaulResources) != 0)
+                return SettlementWorkerBlockingReason.NoHaulDemand;
+
+            if ((allowedJobs & WorkerJobFlags.GatherResources) != 0)
+                return SettlementWorkerBlockingReason.NoGatherDemand;
+
+            if ((allowedJobs & WorkerJobFlags.ProcessRecipe) != 0)
+                return SettlementWorkerBlockingReason.NoProcessDemand;
+
+            return SettlementWorkerBlockingReason.NoEligibleDemand;
+        }
+
+        public static bool TryFindConstructionDeliveryDemand(SW.Entity worker, out SettlementWorkerDemand demand)
+        {
+            ref readonly var workerState = ref worker.Read<CharacterNetState>();
+            var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
+            var bestDistanceSq = float.MaxValue;
+            demand = default;
+
+            foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState, ConstructionResources, ConstructionTransform>>().Entities())
+            {
+                ref readonly var siteState = ref site.Read<ConstructionSiteState>();
+                if (!SettlementConstructionRules.TryPlanResourceDeposit(
+                        in siteState,
+                        site,
+                        storageEntity,
+                        ConstructionResourcesAccess.GetRemainingResources(site),
+                        out var acceptedResources)
+                    || acceptedResources.Length == 0)
+                {
+                    continue;
+                }
+
+                ref readonly var transform = ref site.Read<ConstructionTransform>();
+                var distanceSq = (transform.Position - workerState.Position).sqrMagnitude;
+                if (distanceSq >= bestDistanceSq)
+                    continue;
+
+                bestDistanceSq = distanceSq;
+                demand = new SettlementWorkerDemand(
+                    SettlementWorkerDemand.DemandKind.ConstructionDelivery,
+                    AiTaskType.DeliveryResourceToBuilding,
+                    site.GID,
+                    acceptedResources[0].Id,
+                    acceptedResources[0].Amount);
+            }
+
+            return demand.Target.TryUnpack<ServerWT>(out _);
+        }
+
+        public static bool TryFindConstructionBuildDemand(SW.Entity worker, out SettlementWorkerDemand demand)
+        {
+            ref readonly var workerState = ref worker.Read<CharacterNetState>();
+            var bestDistanceSq = float.MaxValue;
+            demand = default;
+
+            foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState, ConstructionResources, ConstructionTransform, ConstructionProgress>>().Entities())
+            {
+                ref readonly var siteState = ref site.Read<ConstructionSiteState>();
+                if (!ConstructionRules.CanBuild(site, in siteState))
+                    continue;
+
+                ref readonly var transform = ref site.Read<ConstructionTransform>();
+                var distanceSq = (transform.Position - workerState.Position).sqrMagnitude;
+                if (distanceSq >= bestDistanceSq)
+                    continue;
+
+                bestDistanceSq = distanceSq;
+                demand = new SettlementWorkerDemand(
+                    SettlementWorkerDemand.DemandKind.ConstructionBuild,
+                    AiTaskType.BuildConstruction,
+                    site.GID,
+                    default,
+                    0);
+            }
+
+            return demand.Target.TryUnpack<ServerWT>(out _);
+        }
+
+        public static bool TryFindGatherDemand(out SettlementWorkerDemand demand)
+        {
+            foreach (var workbench in SW.Query<All<WorkbenchOperationState>>().Entities())
+            {
+                ref readonly var state = ref workbench.Read<WorkbenchOperationState>();
+                if (!state.Enabled)
+                    continue;
+
+                var recipe = WorkbenchRecipeCatalog.Get(state.ActiveRecipe);
+                for (var i = 0; i < recipe.Inputs.Length; i++)
+                {
+                    var input = recipe.Inputs[i];
+                    ref readonly var resource = ref ResourceCatalog.Get(input.Id);
+                    if (resource.Family != ResourceFamily.Raw)
+                        continue;
+
+                    var missing = input.Amount - GetWorkbenchInputAmount(in state, input.Id);
+                    if (missing <= 0)
+                        continue;
+
+                    demand = new SettlementWorkerDemand(
+                        SettlementWorkerDemand.DemandKind.Gather,
+                        AiTaskType.GatherResources,
+                        workbench.GID,
+                        input.Id,
+                        missing);
+                    return true;
+                }
+            }
+
+            demand = default;
+            return false;
+        }
+
+        public static bool TryFindHaulDemand(out SettlementWorkerDemand demand)
+        {
+            if (!HasEnabledStockpile())
+            {
+                demand = default;
+                return false;
+            }
+
+            foreach (var workbench in SW.Query<All<WorkbenchOperationState>>().Entities())
+            {
+                ref readonly var state = ref workbench.Read<WorkbenchOperationState>();
+                if (!state.Enabled)
+                    continue;
+
+                var recipe = WorkbenchRecipeCatalog.Get(state.ActiveRecipe);
+                for (var i = 0; i < recipe.Outputs.Length; i++)
+                {
+                    var output = recipe.Outputs[i];
+                    var amount = GetWorkbenchOutputAmount(in state, output.Id);
+                    if (amount <= 0)
+                        continue;
+
+                    demand = new SettlementWorkerDemand(
+                        SettlementWorkerDemand.DemandKind.Haul,
+                        AiTaskType.HaulResources,
+                        workbench.GID,
+                        output.Id,
+                        amount);
+                    return true;
+                }
+            }
+
+            demand = default;
+            return false;
+        }
+
+        public static bool TryFindProcessDemand(out SettlementWorkerDemand demand)
+        {
+            foreach (var workbench in SW.Query<All<WorkbenchOperationState>>().Entities())
+            {
+                ref readonly var state = ref workbench.Read<WorkbenchOperationState>();
+                if (!state.Enabled || state.WorkerSlotCount == 0)
+                    continue;
+
+                var recipe = WorkbenchRecipeCatalog.Get(state.ActiveRecipe);
+                if (state.WorkDone >= recipe.WorkRequired || !HasRecipeInputs(in state, recipe))
+                    continue;
+
+                var output = recipe.Outputs[0];
+                demand = new SettlementWorkerDemand(
+                    SettlementWorkerDemand.DemandKind.Process,
+                    AiTaskType.ProcessRecipe,
+                    workbench.GID,
+                    output.Id,
+                    output.Amount);
+                return true;
+            }
+
+            demand = default;
+            return false;
+        }
+
+        private static bool HasRecipeInputs(in WorkbenchOperationState state, in WorkbenchRecipeDefinition recipe)
+        {
+            for (var i = 0; i < recipe.Inputs.Length; i++)
+            {
+                var input = recipe.Inputs[i];
+                if (GetWorkbenchInputAmount(in state, input.Id) < input.Amount)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static int GetWorkbenchInputAmount(in WorkbenchOperationState state, ResourceId resourceId)
+        {
+            if (resourceId == ResourceCatalog.WoodId)
+                return state.InputWood;
+
+            if (resourceId == ResourceCatalog.StoneId)
+                return state.InputStone;
+
+            if (resourceId == ResourceCatalog.PlanksId)
+                return state.InputPlanks;
+
+            if (resourceId == ResourceCatalog.SimplePartsId)
+                return state.InputSimpleParts;
+
+            if (resourceId == ResourceCatalog.FuelId)
+                return state.InputFuel;
+
+            return 0;
+        }
+
+        private static int GetWorkbenchOutputAmount(in WorkbenchOperationState state, ResourceId resourceId)
+        {
+            if (resourceId == ResourceCatalog.PlanksId)
+                return state.OutputPlanks;
+
+            if (resourceId == ResourceCatalog.SimplePartsId)
+                return state.OutputSimpleParts;
+
+            if (resourceId == ResourceCatalog.RepairKitsId)
+                return state.OutputRepairKits;
+
+            if (resourceId == ResourceCatalog.MedicineId)
+                return state.OutputMedicine;
+
+            return 0;
+        }
+
+        private static bool HasEnabledStockpile()
+        {
+            foreach (var stockpile in SW.Query<All<StockpileOperationState>>().Entities())
+            {
+                ref readonly var state = ref stockpile.Read<StockpileOperationState>();
+                if (state.Enabled && state.ContributedCapacity > 0)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool HasAnyResourceWaitingSite()
+        {
+            foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState>>().Entities())
+            {
+                ref readonly var siteState = ref site.Read<ConstructionSiteState>();
+                if (SettlementConstructionRules.CanDepositResources(in siteState))
+                    return true;
+            }
+
+            return false;
+        }
+    }
+}

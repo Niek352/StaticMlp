@@ -1,9 +1,11 @@
 using System;
+using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Npc;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
+using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
 using UnityEngine;
 
@@ -68,6 +70,130 @@ namespace StaticMlp.Tests.Ai
         }
 
         [Test]
+        public void DemandQuery_ReturnsTypedResourceDataForWorkbenchDemands()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var gatherWorkbench = CreateWorkbench(inputWood: 0);
+            var processWorkbench = CreateWorkbench(inputWood: 2);
+            var haulWorkbench = CreateWorkbench(outputPlanks: 3);
+            CreateStockpile();
+
+            Assert.That(SettlementWorkerDemandQuery.TryFindGatherDemand(out var gatherDemand), Is.True);
+            Assert.That(gatherDemand.Kind, Is.EqualTo(SettlementWorkerDemand.DemandKind.Gather));
+            Assert.That(gatherDemand.Task, Is.EqualTo(AiTaskType.GatherResources));
+            Assert.That(gatherDemand.Target, Is.EqualTo(gatherWorkbench.GID));
+            Assert.That(gatherDemand.Resource, Is.EqualTo(ResourceCatalog.WoodId));
+            Assert.That(gatherDemand.Amount, Is.EqualTo(2));
+
+            Assert.That(SettlementWorkerDemandQuery.TryFindProcessDemand(out var processDemand), Is.True);
+            Assert.That(processDemand.Kind, Is.EqualTo(SettlementWorkerDemand.DemandKind.Process));
+            Assert.That(processDemand.Task, Is.EqualTo(AiTaskType.ProcessRecipe));
+            Assert.That(processDemand.Target, Is.EqualTo(processWorkbench.GID));
+            Assert.That(processDemand.Resource, Is.EqualTo(ResourceCatalog.PlanksId));
+            Assert.That(processDemand.Amount, Is.EqualTo(1));
+
+            Assert.That(SettlementWorkerDemandQuery.TryFindHaulDemand(out var haulDemand), Is.True);
+            Assert.That(haulDemand.Kind, Is.EqualTo(SettlementWorkerDemand.DemandKind.Haul));
+            Assert.That(haulDemand.Task, Is.EqualTo(AiTaskType.HaulResources));
+            Assert.That(haulDemand.Target, Is.EqualTo(haulWorkbench.GID));
+            Assert.That(haulDemand.Resource, Is.EqualTo(ResourceCatalog.PlanksId));
+            Assert.That(haulDemand.Amount, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void GathererJobSystem_SelectsGatherDemand_NotConstructionDemand()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var anchorId = SettlementAnchorCatalog.HomeCampId;
+            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var worker = scope.CreateWorker(
+                anchorId,
+                Vector3.zero,
+                SettlementWorkerAssignmentStatus.Assigned,
+                WorkerRoleCatalog.GathererId);
+            var workbench = CreateWorkbench(inputWood: 0);
+            scope.CreateConstructionSite(new Vector3(1f, 0f, 0f), ConstructionPhase.WaitingForResources, resourcesComplete: false);
+
+            new ServerSettlementWorkerCampBuilderJobSystem().Update();
+
+            ref readonly var job = ref anchor.Read<SettlementCampBuilderJobState>();
+            Assert.That(job.AssignedWorker, Is.EqualTo(worker.GID));
+            Assert.That(job.TargetSite, Is.EqualTo(workbench.GID));
+            Assert.That(job.CurrentTask, Is.EqualTo(AiTaskType.GatherResources));
+            Assert.That(job.BlockingReason, Is.EqualTo(SettlementWorkerBlockingReason.None));
+        }
+
+        [Test]
+        public void HaulerJobSystem_SelectsHaulDemand_NotGatherDemand()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var anchorId = SettlementAnchorCatalog.HomeCampId;
+            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var worker = scope.CreateWorker(
+                anchorId,
+                Vector3.zero,
+                SettlementWorkerAssignmentStatus.Assigned,
+                WorkerRoleCatalog.HaulerId);
+            CreateWorkbench(inputWood: 0);
+            var outputWorkbench = CreateWorkbench(outputPlanks: 3);
+            CreateStockpile();
+
+            new ServerSettlementWorkerCampBuilderJobSystem().Update();
+
+            ref readonly var job = ref anchor.Read<SettlementCampBuilderJobState>();
+            Assert.That(job.AssignedWorker, Is.EqualTo(worker.GID));
+            Assert.That(job.TargetSite, Is.EqualTo(outputWorkbench.GID));
+            Assert.That(job.CurrentTask, Is.EqualTo(AiTaskType.HaulResources));
+            Assert.That(job.BlockingReason, Is.EqualTo(SettlementWorkerBlockingReason.None));
+        }
+
+        [Test]
+        public void ProcessorJobSystem_SelectsProcessDemand()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var anchorId = SettlementAnchorCatalog.HomeCampId;
+            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var worker = scope.CreateWorker(
+                anchorId,
+                Vector3.zero,
+                SettlementWorkerAssignmentStatus.Assigned,
+                WorkerRoleCatalog.ProcessorId);
+            var workbench = CreateWorkbench(inputWood: 2);
+
+            new ServerSettlementWorkerCampBuilderJobSystem().Update();
+
+            ref readonly var job = ref anchor.Read<SettlementCampBuilderJobState>();
+            Assert.That(job.AssignedWorker, Is.EqualTo(worker.GID));
+            Assert.That(job.TargetSite, Is.EqualTo(workbench.GID));
+            Assert.That(job.CurrentTask, Is.EqualTo(AiTaskType.ProcessRecipe));
+            Assert.That(job.BlockingReason, Is.EqualTo(SettlementWorkerBlockingReason.None));
+        }
+
+        [Test]
+        public void GuardJobSystem_IgnoresEconomyDemandWithoutAllowedJobFlags()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var anchorId = SettlementAnchorCatalog.HomeCampId;
+            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var worker = scope.CreateWorker(
+                anchorId,
+                Vector3.zero,
+                SettlementWorkerAssignmentStatus.Assigned,
+                WorkerRoleCatalog.GuardId);
+            CreateWorkbench(inputWood: 0, outputPlanks: 3);
+            CreateStockpile();
+            scope.CreateConstructionSite(new Vector3(1f, 0f, 0f), ConstructionPhase.WaitingForResources, resourcesComplete: false);
+
+            new ServerSettlementWorkerCampBuilderJobSystem().Update();
+
+            ref readonly var job = ref anchor.Read<SettlementCampBuilderJobState>();
+            Assert.That(job.AssignedWorker, Is.EqualTo(worker.GID));
+            Assert.That(job.TargetSite, Is.EqualTo(default(EntityGID)));
+            Assert.That(job.CurrentTask, Is.EqualTo(AiTaskType.Idle));
+            Assert.That(job.BlockingReason, Is.EqualTo(SettlementWorkerBlockingReason.NoEligibleDemand));
+        }
+
+        [Test]
         public void TaskSyncSystem_PushesCampOwnedTargetIntoExistingAiExecutionState()
         {
             using var scope = new AiTestServerWorldScope();
@@ -90,6 +216,35 @@ namespace StaticMlp.Tests.Ai
             Assert.That(worker.Read<AiTaskState>().Task, Is.EqualTo(AiTaskType.BuildConstruction));
             Assert.That(AiBlackboardAccess.TryGetEntity(worker, BuildConstructionCollectVariables.BuildTargetSite, out var target), Is.True);
             Assert.That(target, Is.EqualTo(site.GID));
+            Assert.That(AiBlackboardAccess.TryGetEntity(worker, DeliveryBuildResourcesCollectVariables.TargetSite, out _), Is.False);
+        }
+
+        [Test]
+        public void TaskSyncSystem_SwitchesAssignedWorkerToEconomyDemandTask()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var anchorId = SettlementAnchorCatalog.HomeCampId;
+            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.WorkerAssigned);
+            var worker = scope.CreateWorker(
+                anchorId,
+                Vector3.zero,
+                SettlementWorkerAssignmentStatus.Assigned,
+                WorkerRoleCatalog.HaulerId);
+            var workbench = CreateWorkbench(outputPlanks: 3);
+
+            anchor.Set(new SettlementCampBuilderJobState
+            {
+                AnchorId = anchorId.Value,
+                AssignedWorker = worker.GID,
+                TargetSite = workbench.GID,
+                CurrentTask = AiTaskType.HaulResources,
+                BlockingReason = SettlementWorkerBlockingReason.None
+            });
+
+            new ServerSettlementWorkerTaskSyncSystem().Update();
+
+            Assert.That(worker.Read<AiTaskState>().Task, Is.EqualTo(AiTaskType.HaulResources));
+            Assert.That(AiBlackboardAccess.TryGetEntity(worker, BuildConstructionCollectVariables.BuildTargetSite, out _), Is.False);
             Assert.That(AiBlackboardAccess.TryGetEntity(worker, DeliveryBuildResourcesCollectVariables.TargetSite, out _), Is.False);
         }
 
@@ -228,6 +383,35 @@ namespace StaticMlp.Tests.Ai
             Assert.That(mappedDefinitionId, Is.EqualTo(definitionId));
             Assert.That(definition.Roles, Is.EqualTo(roles));
             Assert.That(definition.AllowedAcquisitionPaths, Is.EqualTo(NpcAcquisitionPathFlags.Seeded));
+        }
+
+        private static SW.Entity CreateWorkbench(
+            int inputWood = 0,
+            int outputPlanks = 0,
+            bool enabled = true)
+        {
+            var entity = SW.NewEntity<Default>();
+            entity.Set(new WorkbenchOperationState
+            {
+                ActiveRecipeId = WorkbenchRecipeCatalog.PlanksId.Value,
+                Enabled = enabled,
+                WorkerSlotCount = 1,
+                WorkDone = 0f,
+                InputWood = inputWood,
+                OutputPlanks = outputPlanks
+            });
+            return entity;
+        }
+
+        private static SW.Entity CreateStockpile(bool enabled = true)
+        {
+            var entity = SW.NewEntity<Default>();
+            entity.Set(new StockpileOperationState
+            {
+                Enabled = enabled,
+                ContributedCapacity = 200
+            });
+            return entity;
         }
     }
 }

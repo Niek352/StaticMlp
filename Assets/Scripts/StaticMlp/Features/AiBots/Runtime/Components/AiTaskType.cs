@@ -9,6 +9,9 @@ namespace StaticMlp.Features.AiBots
         Flee = 4,
         FollowLeader = 5,
         BuildConstruction = 6,
-        DeliveryResourceToBuilding = 7
+        DeliveryResourceToBuilding = 7,
+        GatherResources = 8,
+        HaulResources = 9,
+        ProcessRecipe = 10
     }
 }
