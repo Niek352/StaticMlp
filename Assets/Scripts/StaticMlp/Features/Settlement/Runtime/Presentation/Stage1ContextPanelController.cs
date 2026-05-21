@@ -1,10 +1,11 @@
 using System;
 using Code.EcsUi.Mvc;
+using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
-using UnityEngine;
 
 namespace StaticMlp.Features.Settlement
 {
@@ -45,7 +46,7 @@ namespace StaticMlp.Features.Settlement
             ref readonly var state = ref CW.GetResource<Stage1ContextPanelState>();
             if (state.Mode == Stage1ContextPanelMode.Building)
             {
-                SendDepositOrBuild(state);
+                HandleBuildingAction(state.PrimaryBuildingAction);
                 return;
             }
 
@@ -54,30 +55,69 @@ namespace StaticMlp.Features.Settlement
 
         private static void HandleSecondaryAction()
         {
+            ref readonly var state = ref CW.GetResource<Stage1ContextPanelState>();
+            if (state.Mode == Stage1ContextPanelMode.Building)
+                HandleBuildingAction(state.SecondaryBuildingAction);
         }
 
-        private static void SendDepositOrBuild(in Stage1ContextPanelState state)
+        private static void HandleBuildingAction(in BuildingAvailableActionPresentation action)
         {
-            if (state.CanDepositResources)
+            if (!action.IsDefined)
+                throw new InvalidOperationException("Building context action requires a defined action.");
+
+            if (!action.Enabled)
+                throw new InvalidOperationException($"Building context action {action.Kind} is disabled: {action.DisabledReason}");
+
+            switch (action.Kind)
             {
-                var depositRequest = new DepositConstructionResourcesRequestEvent(
-                    state.FocusedSite,
-                    new[]
-                    {
-                        new ResourceAmount(ResourceCatalog.WoodId, Mathf.Max(0, state.WoodRequired - state.WoodDelivered)),
-                        new ResourceAmount(ResourceCatalog.StoneId, Mathf.Max(0, state.StoneRequired - state.StoneDelivered))
-                    });
-                RequestApi.Send<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(depositRequest);
-                return;
+                case BuildingInteractionKind.DepositConstructionResources:
+                    SendDeposit(action.Target);
+                    return;
+                case BuildingInteractionKind.ContributeBuildWork:
+                    SendBuild(action.Target);
+                    return;
+                case BuildingInteractionKind.OpenDetails:
+                case BuildingInteractionKind.AssignWorker:
+                case BuildingInteractionKind.OpenProductionQueue:
+                case BuildingInteractionKind.SetRecipe:
+                case BuildingInteractionKind.ClaimOutput:
+                case BuildingInteractionKind.AssignBed:
+                case BuildingInteractionKind.ToggleEnabled:
+                case BuildingInteractionKind.TriggerRepair:
+                case BuildingInteractionKind.Extract:
+                case BuildingInteractionKind.Rest:
+                case BuildingInteractionKind.StoreItems:
+                case BuildingInteractionKind.WithdrawItems:
+                    OpenOperationIntent(action.Target, action.Kind);
+                    return;
+                default:
+                    throw new InvalidOperationException($"Unsupported building context action {action.Kind}.");
             }
+        }
 
-            if (!state.CanBuild)
-                return;
+        private static void SendDeposit(EntityGID target)
+        {
+            if (!target.TryUnpack<ClientCoreWT>(out var site))
+                throw new InvalidOperationException($"Deposit construction target {target} is not a client entity.");
 
+            var depositRequest = new DepositConstructionResourcesRequestEvent(
+                target,
+                ConstructionResourcesAccess.GetProjectedRemainingResources(site));
+            RequestApi.Send<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(depositRequest);
+        }
+
+        private static void SendBuild(EntityGID target)
+        {
             var buildRequest = new BuildConstructionRequestEvent(
-                state.FocusedSite,
+                target,
                 ConstructionActionProfiles.PlayerBuildClickWork);
             RequestApi.Send<BuildConstructionRequestEvent, BuildConstructionResultEvent>(buildRequest);
+        }
+
+        private static void OpenOperationIntent(EntityGID target, BuildingInteractionKind kind)
+        {
+            ref var intent = ref CW.GetResource<Stage1BuildingOperationOpenIntent>();
+            intent.Set(target, kind);
         }
 
         private static void ToggleWorkerAssignment(in Stage1ContextPanelState state)

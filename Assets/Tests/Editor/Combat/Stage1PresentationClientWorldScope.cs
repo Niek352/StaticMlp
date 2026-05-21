@@ -1,6 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Frontier;
@@ -159,6 +160,7 @@ namespace StaticMlp.Tests.Combat
         public CW.Entity CreateConstructionSite(ConstructionPhase phase, int woodRequired, int woodDelivered, int stoneRequired, int stoneDelivered, float progress01)
         {
             return CreateConstructionSite(
+                BuildingCatalogData.CampCoreId,
                 phase,
                 woodRequired,
                 woodDelivered,
@@ -177,6 +179,27 @@ namespace StaticMlp.Tests.Combat
             float progress01,
             Vector3 position)
         {
+            return CreateConstructionSite(
+                BuildingCatalogData.CampCoreId,
+                phase,
+                woodRequired,
+                woodDelivered,
+                stoneRequired,
+                stoneDelivered,
+                progress01,
+                position);
+        }
+
+        public CW.Entity CreateConstructionSite(
+            BuildingId buildingId,
+            ConstructionPhase phase,
+            int woodRequired,
+            int woodDelivered,
+            int stoneRequired,
+            int stoneDelivered,
+            float progress01,
+            Vector3 position)
+        {
             var site = CW.NewEntity<Default>();
             site.Set<ConstructionSiteTag>();
             site.Set(new ConstructionTransform
@@ -186,6 +209,7 @@ namespace StaticMlp.Tests.Combat
             });
             site.Set(new ConstructionSiteState
             {
+                BuildingId = buildingId.Value,
                 Phase = phase
             });
             site.Set(new ConstructionResources());

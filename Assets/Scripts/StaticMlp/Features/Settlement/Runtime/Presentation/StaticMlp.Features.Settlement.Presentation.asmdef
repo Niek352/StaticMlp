@@ -23,7 +23,8 @@
         "StaticMlp.Features.AiBots",
         "StaticMlp.Features.Frontier.Presentation",
         "StaticMlp.Features.Loadout.Presentation",
-        "StaticMlp.Features.Settlement.Workers.Contracts"
+        "StaticMlp.Features.Settlement.Workers.Contracts",
+        "StaticMlp.Features.BuildingCatalog"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

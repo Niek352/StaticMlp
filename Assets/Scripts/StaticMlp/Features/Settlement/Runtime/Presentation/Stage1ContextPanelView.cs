@@ -66,17 +66,17 @@ namespace StaticMlp.Features.Settlement
 
             if (state.Mode == Stage1ContextPanelMode.Building)
             {
-                var primaryActionAvailable = state.CanDepositResources || state.CanBuild;
                 summaryLabel.text =
-                    $"Building focus\n" +
+                    $"{state.BuildingDisplayName}\n" +
                     $"Phase: {state.ConstructionPhase}\n" +
                     $"Wood: {state.WoodDelivered}/{state.WoodRequired}\n" +
                     $"Stone: {state.StoneDelivered}/{state.StoneRequired}\n" +
-                    $"Progress: {Mathf.RoundToInt(state.Progress01 * 100f)}%";
-                primaryButtonLabel.text = state.CanDepositResources ? "Deposit" : "Build";
-                secondaryButtonLabel.text = "Inspect";
-                primaryButton.interactable = primaryActionAvailable;
-                secondaryButton.interactable = false;
+                    $"Progress: {Mathf.RoundToInt(state.Progress01 * 100f)}%" +
+                    FormatDisabledReason(state.PrimaryBuildingAction.DisabledReason);
+                primaryButtonLabel.text = state.PrimaryBuildingAction.Label;
+                secondaryButtonLabel.text = state.SecondaryBuildingAction.Label;
+                primaryButton.interactable = state.PrimaryBuildingAction.Enabled;
+                secondaryButton.interactable = state.SecondaryBuildingAction.Enabled;
                 return;
             }
 
@@ -99,6 +99,13 @@ namespace StaticMlp.Features.Settlement
         private void HandleSecondaryClicked()
         {
             _onSecondaryClicked.Invoke();
+        }
+
+        private static string FormatDisabledReason(string disabledReason)
+        {
+            return string.IsNullOrEmpty(disabledReason)
+                ? string.Empty
+                : $"\nBlocked: {disabledReason}";
         }
     }
 }

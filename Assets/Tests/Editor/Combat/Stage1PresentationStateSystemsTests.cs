@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using System.Threading;
 using Code.EcsUi.Mvc;
@@ -5,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Frontier;
@@ -146,9 +148,106 @@ namespace StaticMlp.Tests.Combat
             ref readonly var state = ref CW.GetResource<Stage1ContextPanelState>();
             Assert.That(state.Mode, Is.EqualTo(Stage1ContextPanelMode.Building));
             Assert.That(state.HasFocusedSite, Is.True);
+            Assert.That(state.BuildingDisplayName, Is.EqualTo("Camp Core"));
+            Assert.That(state.PrimaryBuildingAction.Kind, Is.EqualTo(BuildingInteractionKind.ContributeBuildWork));
+            Assert.That(state.PrimaryBuildingAction.Label, Is.EqualTo("Build"));
+            Assert.That(state.PrimaryBuildingAction.Enabled, Is.True);
+            Assert.That(state.PrimaryBuildingAction.Target, Is.EqualTo(site.GID));
+            Assert.That(state.SecondaryBuildingAction.Kind, Is.EqualTo(BuildingInteractionKind.OpenDetails));
             Assert.That(state.CanDepositResources, Is.False);
             Assert.That(state.CanBuild, Is.True);
             Assert.That(state.Progress01, Is.EqualTo(0.4f));
+        }
+
+        [Test]
+        public void ContextPanel_WhenConstructionSiteNeedsResources_ExposesDepositAction()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
+            scope.CreateSharedResources();
+            var site = scope.CreateConstructionSite(
+                ConstructionPhase.WaitingForResources,
+                woodRequired: 10,
+                woodDelivered: 2,
+                stoneRequired: 5,
+                stoneDelivered: 5,
+                progress01: 0f);
+            scope.RefreshProjections();
+
+            new ClientStage1PresentationBootstrapSystem().Init();
+            ref var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            session.Mode = Stage1ContextPanelMode.Building;
+            session.FocusedSite = site.GID;
+            new ClientStage1ContextPanelStateSystem().Update();
+
+            ref readonly var state = ref CW.GetResource<Stage1ContextPanelState>();
+            Assert.That(state.PrimaryBuildingAction.Kind, Is.EqualTo(BuildingInteractionKind.DepositConstructionResources));
+            Assert.That(state.PrimaryBuildingAction.Label, Is.EqualTo("Deposit"));
+            Assert.That(state.PrimaryBuildingAction.Enabled, Is.True);
+            Assert.That(state.PrimaryBuildingAction.Target, Is.EqualTo(site.GID));
+            Assert.That(state.CanDepositResources, Is.True);
+            Assert.That(state.CanBuild, Is.False);
+        }
+
+        [Test]
+        public void ContextPanel_WhenConstructionSiteHasResourcesButWrongPhase_DisablesBuildActionWithReason()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
+            scope.CreateSharedResources();
+            var site = scope.CreateConstructionSite(
+                ConstructionPhase.WaitingForResources,
+                woodRequired: 10,
+                woodDelivered: 10,
+                stoneRequired: 5,
+                stoneDelivered: 5,
+                progress01: 0f);
+            scope.RefreshProjections();
+
+            new ClientStage1PresentationBootstrapSystem().Init();
+            ref var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            session.Mode = Stage1ContextPanelMode.Building;
+            session.FocusedSite = site.GID;
+            new ClientStage1ContextPanelStateSystem().Update();
+
+            ref readonly var state = ref CW.GetResource<Stage1ContextPanelState>();
+            Assert.That(state.PrimaryBuildingAction.Kind, Is.EqualTo(BuildingInteractionKind.ContributeBuildWork));
+            Assert.That(state.PrimaryBuildingAction.Enabled, Is.False);
+            Assert.That(state.PrimaryBuildingAction.DisabledReason, Is.EqualTo("Construction is not ready for build work."));
+            Assert.That(state.CanDepositResources, Is.False);
+            Assert.That(state.CanBuild, Is.False);
+        }
+
+        [Test]
+        public void ContextPanel_WhenFinishedOperationBuildingIsFocused_ExposesOperationAction()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkbenchOnline);
+            scope.CreateSharedResources();
+            var site = scope.CreateConstructionSite(
+                BuildingCatalogData.WorkbenchId,
+                ConstructionPhase.Completed,
+                woodRequired: 14,
+                woodDelivered: 14,
+                stoneRequired: 6,
+                stoneDelivered: 6,
+                progress01: 1f,
+                position: new Vector3(0f, 0f, 1f));
+            scope.RefreshProjections();
+
+            new ClientStage1PresentationBootstrapSystem().Init();
+            ref var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            session.Mode = Stage1ContextPanelMode.Building;
+            session.FocusedSite = site.GID;
+            new ClientStage1ContextPanelStateSystem().Update();
+
+            ref readonly var state = ref CW.GetResource<Stage1ContextPanelState>();
+            Assert.That(state.BuildingDisplayName, Is.EqualTo("Workbench"));
+            Assert.That(state.PrimaryBuildingAction.Kind, Is.EqualTo(BuildingInteractionKind.OpenProductionQueue));
+            Assert.That(state.PrimaryBuildingAction.Label, Is.EqualTo("Open Queue"));
+            Assert.That(state.PrimaryBuildingAction.Enabled, Is.True);
+            Assert.That(state.CanDepositResources, Is.False);
+            Assert.That(state.CanBuild, Is.False);
         }
 
         [Test]
@@ -321,6 +420,42 @@ namespace StaticMlp.Tests.Combat
             Assert.That(state.WorkerAssigned, Is.False);
             Assert.That(state.WorkerBlockingReason, Is.EqualTo(SettlementWorkerBlockingReason.NoAssignment));
             Assert.That(state.CanToggleWorkerAssignment, Is.True);
+        }
+
+        [Test]
+        public void ContextPanelController_WhenOperationPrimaryActionInvoked_RecordsOpenIntent()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkbenchOnline);
+            var site = scope.CreateConstructionSite(
+                BuildingCatalogData.WorkbenchId,
+                ConstructionPhase.Completed,
+                woodRequired: 14,
+                woodDelivered: 14,
+                stoneRequired: 6,
+                stoneDelivered: 6,
+                progress01: 1f,
+                position: new Vector3(0f, 0f, 1f));
+            scope.RefreshProjections();
+
+            new ClientStage1PresentationBootstrapSystem().Init();
+            CW.SetResource(new Stage1ContextPanelState
+            {
+                Mode = Stage1ContextPanelMode.Building,
+                PrimaryBuildingAction = new BuildingAvailableActionPresentation(
+                    BuildingInteractionKind.OpenProductionQueue,
+                    "Open Queue",
+                    enabled: true,
+                    disabledReason: string.Empty,
+                    target: site.GID)
+            });
+
+            InvokePrivateStatic(typeof(Stage1ContextPanelController), "HandlePrimaryAction");
+
+            ref readonly var intent = ref CW.GetResource<Stage1BuildingOperationOpenIntent>();
+            Assert.That(intent.HasIntent, Is.True);
+            Assert.That(intent.Target, Is.EqualTo(site.GID));
+            Assert.That(intent.Kind, Is.EqualTo(BuildingInteractionKind.OpenProductionQueue));
         }
 
         [Test]
@@ -564,6 +699,13 @@ namespace StaticMlp.Tests.Combat
             var method = target.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(method, Is.Not.Null, $"Expected private method '{methodName}' on {target.GetType().Name}.");
             method.Invoke(target, null);
+        }
+
+        private static void InvokePrivateStatic(Type type, string methodName)
+        {
+            var method = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic);
+            Assert.That(method, Is.Not.Null, $"Expected private static method '{methodName}' on {type.Name}.");
+            method.Invoke(null, null);
         }
 
         private sealed class TestThreatBannerController : IController, IResourcePresentationController<ThreatBannerState>

@@ -13,6 +13,9 @@ namespace StaticMlp.Features.Settlement
         public EntityGID FocusedSite;
         public EntityGID WorkerId;
         public bool HasFocusedSite;
+        public string BuildingDisplayName;
+        public BuildingAvailableActionPresentation PrimaryBuildingAction;
+        public BuildingAvailableActionPresentation SecondaryBuildingAction;
         public bool HasWorker;
         public ConstructionPhase ConstructionPhase;
         public int WoodRequired;
