@@ -100,6 +100,14 @@ namespace StaticMlp.Features.Settlement
                     return Stage1ObjectiveKind.RepairCamp;
                 case Stage1FlowObjective.AssignWorker:
                     return Stage1ObjectiveKind.AssignWorker;
+                case Stage1FlowObjective.PlaceStockpile:
+                    return Stage1ObjectiveKind.PlaceStockpile;
+                case Stage1FlowObjective.PlaceShelter:
+                    return Stage1ObjectiveKind.PlaceShelter;
+                case Stage1FlowObjective.BringExtractionOnline:
+                    return Stage1ObjectiveKind.BringExtractionOnline;
+                case Stage1FlowObjective.BringWorkbenchOnline:
+                    return Stage1ObjectiveKind.BringWorkbenchOnline;
                 case Stage1FlowObjective.PrepareBuild:
                     return Stage1ObjectiveKind.PrepareBuild;
                 case Stage1FlowObjective.StartExpedition:
@@ -131,6 +139,14 @@ namespace StaticMlp.Features.Settlement
                     return "Resources delivered. Keep building the camp core to finish repairs.";
                 case Stage1FlowHint.AssignWorker:
                     return "The camp is repaired. Assign the camp builder to continue the loop.";
+                case Stage1FlowHint.PlaceStockpile:
+                    return "Place a stockpile so the settlement can hold expanded resources.";
+                case Stage1FlowHint.PlaceShelter:
+                    return "Place a shelter to establish basic worker service.";
+                case Stage1FlowHint.BringExtractionOnline:
+                    return "Bring lumber or stone extraction online for steady supply.";
+                case Stage1FlowHint.BringWorkbenchOnline:
+                    return "Bring the workbench online to prepare the settlement economy.";
                 default:
                     return string.Empty;
             }

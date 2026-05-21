@@ -71,8 +71,8 @@ Plans:
 
 Plans:
 
-- [ ] 05-01: Extend Stage1 progress stages with StockpilePlaced, ShelterPlaced, ExtractionOnline, and WorkbenchOnline.
-- [ ] 05-02: Update Stage1 objectives, hints, flow view state, and tests around the new economy gates.
+- [x] 05-01: Extend Stage1 progress stages with StockpilePlaced, ShelterPlaced, ExtractionOnline, and WorkbenchOnline.
+- [x] 05-02: Update Stage1 objectives, hints, flow view state, and tests around the new economy gates.
 - [ ] 05-03: Add settlement-aware loadout module definitions for utility, build signal, and base infrastructure slots.
 
 ### Phase 6: UX And Presentation
@@ -95,5 +95,5 @@ Plans:
 | 2. Building Catalog And Construction | 3/3 | Complete | 2026-05-20 |
 | 3. Storage And Operations | 3/3 | Complete | 2026-05-21 |
 | 4. NPC Worker Economy | 3/3 | Complete | 2026-05-21 |
-| 5. Stage1 Progression And Loadout | 0/3 | Not started | - |
+| 5. Stage1 Progression And Loadout | 2/3 | In progress | - |
 | 6. UX And Presentation | 0/3 | Not started | - |

@@ -57,6 +57,45 @@ namespace StaticMlp.Tests.Combat
             Assert.That(hud.ExpeditionAvailability, Is.EqualTo(ExpeditionAvailabilityStatus.Available));
         }
 
+        [TestCase(Stage1SettlementProgressStage.WorkerAssigned, Stage1ObjectiveKind.PlaceStockpile, "Place a stockpile so the settlement can hold expanded resources.")]
+        [TestCase(Stage1SettlementProgressStage.StockpilePlaced, Stage1ObjectiveKind.PlaceShelter, "Place a shelter to establish basic worker service.")]
+        [TestCase(Stage1SettlementProgressStage.ShelterPlaced, Stage1ObjectiveKind.BringExtractionOnline, "Bring lumber or stone extraction online for steady supply.")]
+        [TestCase(Stage1SettlementProgressStage.ExtractionOnline, Stage1ObjectiveKind.BringWorkbenchOnline, "Bring the workbench online to prepare the settlement economy.")]
+        public void HudState_WhenEconomyGateIsActive_ShowsSettlementObjectiveAndKeepsLoadoutLocked(
+            Stage1SettlementProgressStage stage,
+            Stage1ObjectiveKind expectedObjective,
+            string expectedHint)
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: stage);
+            scope.CreateSharedResources();
+            scope.RefreshProjections();
+
+            new ClientStage1HudStateSystem().Update();
+
+            ref readonly var hud = ref CW.GetResource<Stage1HudState>();
+            Assert.That(hud.Objective, Is.EqualTo(expectedObjective));
+            Assert.That(hud.ObjectiveHint, Is.EqualTo(expectedHint));
+            Assert.That(hud.CanOpenLoadoutPreparation, Is.False);
+            Assert.That(hud.CanOpenExpeditionSelection, Is.False);
+        }
+
+        [Test]
+        public void HudState_WhenWorkbenchIsOnline_ShowsPrepareBuildAndUnlocksLoadoutPreparation()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkbenchOnline);
+            scope.CreateSharedResources();
+            scope.RefreshProjections();
+
+            new ClientStage1HudStateSystem().Update();
+
+            ref readonly var hud = ref CW.GetResource<Stage1HudState>();
+            Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.PrepareBuild));
+            Assert.That(hud.ObjectiveHint, Is.Empty);
+            Assert.That(hud.CanOpenLoadoutPreparation, Is.True);
+        }
+
         [Test]
         public void HudState_WhenRaidIsPending_ShowsDefendCampObjective()
         {
@@ -189,10 +228,10 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
-        public void LoadoutPreparationScreenState_UsesLocalSelectionAndBossCommitGate()
+        public void LoadoutPreparationScreenState_WhenWorkbenchIsOnline_UsesLocalSelectionAndBossCommitGate()
         {
             using var scope = new Stage1PresentationClientWorldScope();
-            scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkerAssigned);
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkbenchOnline);
             scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             var bossPreparation = CW.NewEntity<Default>();
             bossPreparation.Set(new BossLoadoutPreparationState
@@ -211,10 +250,10 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
-        public void LoadoutPreparationScreenState_WhenWorkerIsNotAssignedYet_StaysClosedFromFlowViewState()
+        public void LoadoutPreparationScreenState_WhenEconomyChainIsIncomplete_StaysClosedFromFlowViewState()
         {
             using var scope = new Stage1PresentationClientWorldScope();
-            scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.ExtractionOnline);
             scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             scope.RefreshProjections();
 
@@ -228,7 +267,7 @@ namespace StaticMlp.Tests.Combat
         public void LoadoutPreparationController_WhenConfirmInvoked_SendsPrepareLoadoutCommand()
         {
             using var scope = new Stage1PresentationClientWorldScope();
-            scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkerAssigned);
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkbenchOnline);
             scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             CW.SetResource(new NetOutbox());
             NetworkRuntime.LocalPeerId = new NetworkPeerId(1);

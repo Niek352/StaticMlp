@@ -209,16 +209,32 @@ namespace StaticMlp.Tests.Combat
                     ? Stage1FlowObjective.RepairCamp
                     : stage < Stage1SettlementProgressStage.WorkerAssigned
                         ? Stage1FlowObjective.AssignWorker
-                        : Stage1FlowObjective.PrepareBuild,
+                        : stage < Stage1SettlementProgressStage.StockpilePlaced
+                            ? Stage1FlowObjective.PlaceStockpile
+                            : stage < Stage1SettlementProgressStage.ShelterPlaced
+                                ? Stage1FlowObjective.PlaceShelter
+                                : stage < Stage1SettlementProgressStage.ExtractionOnline
+                                    ? Stage1FlowObjective.BringExtractionOnline
+                                    : stage < Stage1SettlementProgressStage.WorkbenchOnline
+                                        ? Stage1FlowObjective.BringWorkbenchOnline
+                                        : Stage1FlowObjective.PrepareBuild,
                 Hint = stage == Stage1SettlementProgressStage.RepairResourcesReady
                     ? Stage1FlowHint.ContinueRepairBuild
                     : stage < Stage1SettlementProgressStage.RepairResourcesReady
                         ? Stage1FlowHint.GatherRepairResources
                         : stage == Stage1SettlementProgressStage.CampRepaired
                             ? Stage1FlowHint.AssignWorker
-                            : Stage1FlowHint.None,
+                            : stage == Stage1SettlementProgressStage.WorkerAssigned
+                                ? Stage1FlowHint.PlaceStockpile
+                                : stage == Stage1SettlementProgressStage.StockpilePlaced
+                                    ? Stage1FlowHint.PlaceShelter
+                                    : stage == Stage1SettlementProgressStage.ShelterPlaced
+                                        ? Stage1FlowHint.BringExtractionOnline
+                                        : stage == Stage1SettlementProgressStage.ExtractionOnline
+                                            ? Stage1FlowHint.BringWorkbenchOnline
+                                            : Stage1FlowHint.None,
                 CanToggleWorkerAssignment = stage >= Stage1SettlementProgressStage.CampRepaired,
-                CanOpenLoadoutPreparation = stage >= Stage1SettlementProgressStage.WorkerAssigned
+                CanOpenLoadoutPreparation = stage >= Stage1SettlementProgressStage.WorkbenchOnline
             });
             entity.Set(new Stage1ProgressionState(anchorId, 0u));
             entity.Set(new SettlementAnchorLocation(position, Quaternion.identity));

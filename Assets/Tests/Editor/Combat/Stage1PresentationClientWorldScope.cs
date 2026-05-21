@@ -79,7 +79,7 @@ namespace StaticMlp.Tests.Combat
                 Stage = stage
             });
             anchor.Set(new Stage1ProgressionState(SettlementAnchorCatalog.HomeCampId, 0));
-            anchor.Set(CreateFlowViewState(stage, expeditionAvailability, expeditionActivity, threatPhase, bossStatus));
+            anchor.Set(CreateFlowViewState(stage, expeditionAvailability, expeditionActivity, threatPhase, raidStatus, bossStatus));
             anchor.Set(new SettlementWorkerSummary
             {
                 AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
@@ -237,6 +237,7 @@ namespace StaticMlp.Tests.Combat
             ExpeditionAvailabilityStatus expeditionAvailability,
             ExpeditionActivityStatus expeditionActivity,
             ThreatPhase threatPhase,
+            RaidScheduleStatus raidStatus,
             BossEncounterStatus bossStatus)
         {
             return new Stage1FlowViewState
@@ -246,7 +247,7 @@ namespace StaticMlp.Tests.Combat
                 Objective = ResolveObjective(stage, expeditionAvailability, expeditionActivity, threatPhase, bossStatus),
                 Hint = ResolveHint(stage),
                 CanToggleWorkerAssignment = stage >= Stage1SettlementProgressStage.CampRepaired,
-                CanOpenLoadoutPreparation = stage >= Stage1SettlementProgressStage.WorkerAssigned
+                CanOpenLoadoutPreparation = stage >= Stage1SettlementProgressStage.WorkbenchOnline
                                          && bossStatus != BossEncounterStatus.Active
                                          && bossStatus != BossEncounterStatus.Defeated,
                 CanOpenExpeditionSelection = (expeditionAvailability == ExpeditionAvailabilityStatus.Available
@@ -254,6 +255,7 @@ namespace StaticMlp.Tests.Combat
                                              && expeditionActivity == ExpeditionActivityStatus.None
                                              && threatPhase != ThreatPhase.RaidPending
                                              && threatPhase != ThreatPhase.RaidActive
+                                             && raidStatus == RaidScheduleStatus.None
             };
         }
 
@@ -285,6 +287,18 @@ namespace StaticMlp.Tests.Combat
             if (stage < Stage1SettlementProgressStage.WorkerAssigned)
                 return Stage1FlowObjective.AssignWorker;
 
+            if (stage < Stage1SettlementProgressStage.StockpilePlaced)
+                return Stage1FlowObjective.PlaceStockpile;
+
+            if (stage < Stage1SettlementProgressStage.ShelterPlaced)
+                return Stage1FlowObjective.PlaceShelter;
+
+            if (stage < Stage1SettlementProgressStage.ExtractionOnline)
+                return Stage1FlowObjective.BringExtractionOnline;
+
+            if (stage < Stage1SettlementProgressStage.WorkbenchOnline)
+                return Stage1FlowObjective.BringWorkbenchOnline;
+
             if (stage < Stage1SettlementProgressStage.LoadoutPrepared)
                 return Stage1FlowObjective.PrepareBuild;
 
@@ -304,6 +318,18 @@ namespace StaticMlp.Tests.Combat
 
             if (stage == Stage1SettlementProgressStage.CampRepaired)
                 return Stage1FlowHint.AssignWorker;
+
+            if (stage == Stage1SettlementProgressStage.WorkerAssigned)
+                return Stage1FlowHint.PlaceStockpile;
+
+            if (stage == Stage1SettlementProgressStage.StockpilePlaced)
+                return Stage1FlowHint.PlaceShelter;
+
+            if (stage == Stage1SettlementProgressStage.ShelterPlaced)
+                return Stage1FlowHint.BringExtractionOnline;
+
+            if (stage == Stage1SettlementProgressStage.ExtractionOnline)
+                return Stage1FlowHint.BringWorkbenchOnline;
 
             return Stage1FlowHint.None;
         }

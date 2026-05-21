@@ -40,7 +40,7 @@ namespace StaticMlp.Features.Stage1
                 Hint = ResolveHint(progression.Stage),
                 CanToggleWorkerAssignment = progression.Stage >= Stage1SettlementProgressStage.CampRepaired,
                 CanOpenLoadoutPreparation =
-                    progression.Stage >= Stage1SettlementProgressStage.WorkerAssigned
+                    progression.Stage >= Stage1SettlementProgressStage.WorkbenchOnline
                     && boss.Status != BossEncounterStatus.Active
                     && boss.Status != BossEncounterStatus.Defeated,
                 CanOpenExpeditionSelection =
@@ -82,6 +82,18 @@ namespace StaticMlp.Features.Stage1
             if (stage < Stage1SettlementProgressStage.WorkerAssigned)
                 return Stage1FlowObjective.AssignWorker;
 
+            if (stage < Stage1SettlementProgressStage.StockpilePlaced)
+                return Stage1FlowObjective.PlaceStockpile;
+
+            if (stage < Stage1SettlementProgressStage.ShelterPlaced)
+                return Stage1FlowObjective.PlaceShelter;
+
+            if (stage < Stage1SettlementProgressStage.ExtractionOnline)
+                return Stage1FlowObjective.BringExtractionOnline;
+
+            if (stage < Stage1SettlementProgressStage.WorkbenchOnline)
+                return Stage1FlowObjective.BringWorkbenchOnline;
+
             if (stage < Stage1SettlementProgressStage.LoadoutPrepared)
                 return Stage1FlowObjective.PrepareBuild;
 
@@ -110,6 +122,18 @@ namespace StaticMlp.Features.Stage1
 
             if (stage == Stage1SettlementProgressStage.CampRepaired)
                 return Stage1FlowHint.AssignWorker;
+
+            if (stage == Stage1SettlementProgressStage.WorkerAssigned)
+                return Stage1FlowHint.PlaceStockpile;
+
+            if (stage == Stage1SettlementProgressStage.StockpilePlaced)
+                return Stage1FlowHint.PlaceShelter;
+
+            if (stage == Stage1SettlementProgressStage.ShelterPlaced)
+                return Stage1FlowHint.BringExtractionOnline;
+
+            if (stage == Stage1SettlementProgressStage.ExtractionOnline)
+                return Stage1FlowHint.BringWorkbenchOnline;
 
             return Stage1FlowHint.None;
         }

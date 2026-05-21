@@ -31,6 +31,10 @@ namespace StaticMlp.Features.Settlement
             {
                 Stage1ObjectiveKind.RepairCamp => "Repair the camp core",
                 Stage1ObjectiveKind.AssignWorker => "Assign the camp builder",
+                Stage1ObjectiveKind.PlaceStockpile => "Place a stockpile",
+                Stage1ObjectiveKind.PlaceShelter => "Place worker shelter",
+                Stage1ObjectiveKind.BringExtractionOnline => "Bring extraction online",
+                Stage1ObjectiveKind.BringWorkbenchOnline => "Bring the workbench online",
                 Stage1ObjectiveKind.PrepareBuild => "Choose the next combat build",
                 Stage1ObjectiveKind.StartExpedition => "Start the nearby expedition",
                 Stage1ObjectiveKind.ClearExpedition => "Clear the hostile expedition",
