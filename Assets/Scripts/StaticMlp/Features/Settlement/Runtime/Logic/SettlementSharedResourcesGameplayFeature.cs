@@ -41,6 +41,7 @@ namespace StaticMlp.Features.Settlement
             systems.Add(new ServerApplyConstructionBuildWorkSystem(), GameplaySystemOrder.Gameplay - 39);
             systems.Add(new ServerStockpileOperationBootstrapSystem(), GameplaySystemOrder.Gameplay - 48);
             systems.Add(new ServerBedrollShelterBootstrapSystem(), GameplaySystemOrder.Gameplay - 48);
+            systems.Add(new ServerWorkbenchBootstrapSystem(), GameplaySystemOrder.Gameplay - 48);
         }
     }
 }
