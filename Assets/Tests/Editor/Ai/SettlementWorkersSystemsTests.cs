@@ -101,6 +101,22 @@ namespace StaticMlp.Tests.Ai
         }
 
         [Test]
+        public void DemandQuery_PrioritizesExtractionHaulDemandOverWorkbenchOutput()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var extraction = CreateExtractionBuilding(ResourceCatalog.StoneId, outputAmount: 7);
+            CreateWorkbench(outputPlanks: 3);
+            CreateStockpile();
+
+            Assert.That(SettlementWorkerDemandQuery.TryFindHaulDemand(out var demand), Is.True);
+            Assert.That(demand.Kind, Is.EqualTo(SettlementWorkerDemand.DemandKind.Haul));
+            Assert.That(demand.Task, Is.EqualTo(AiTaskType.HaulResources));
+            Assert.That(demand.Target, Is.EqualTo(extraction.GID));
+            Assert.That(demand.Resource, Is.EqualTo(ResourceCatalog.StoneId));
+            Assert.That(demand.Amount, Is.EqualTo(7));
+        }
+
+        [Test]
         public void GathererJobSystem_SelectsGatherDemand_NotConstructionDemand()
         {
             using var scope = new AiTestServerWorldScope();
@@ -244,8 +260,41 @@ namespace StaticMlp.Tests.Ai
             new ServerSettlementWorkerTaskSyncSystem().Update();
 
             Assert.That(worker.Read<AiTaskState>().Task, Is.EqualTo(AiTaskType.HaulResources));
+            Assert.That(AiBlackboardAccess.TryGetEntity(worker, HaulExtractionOutputCollectVariables.TargetExtractionBuilding, out var target), Is.True);
+            Assert.That(target, Is.EqualTo(workbench.GID));
             Assert.That(AiBlackboardAccess.TryGetEntity(worker, BuildConstructionCollectVariables.BuildTargetSite, out _), Is.False);
             Assert.That(AiBlackboardAccess.TryGetEntity(worker, DeliveryBuildResourcesCollectVariables.TargetSite, out _), Is.False);
+        }
+
+        [Test]
+        public void HaulExtractionOutputExecutor_EmitsSettlementOwnedTransferIntent()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var worker = scope.CreateWorker(
+                SettlementAnchorCatalog.HomeCampId,
+                Vector3.zero,
+                SettlementWorkerAssignmentStatus.Assigned,
+                WorkerRoleCatalog.HaulerId);
+            var extraction = CreateExtractionBuilding(ResourceCatalog.WoodId, outputAmount: 6);
+            var receiver = SW.RegisterEventReceiver<TransferExtractionOutputToStockpileEvent>();
+            AiBlackboardAccess.SetEntity(worker, HaulExtractionOutputCollectVariables.TargetExtractionBuilding, extraction.GID);
+
+            ref var task = ref worker.Mut<AiTaskState>();
+            task.Task = AiTaskType.HaulResources;
+            new HaulExtractionOutputExecutor(new AiTaskExecutionTransitions()).Execute(worker, ref task);
+
+            var received = false;
+            foreach (var e in receiver)
+            {
+                received = true;
+                Assert.That(e.Value.ExtractionBuilding, Is.EqualTo(extraction.GID));
+                Assert.That(e.Value.Resource, Is.EqualTo(ResourceCatalog.WoodId));
+                Assert.That(e.Value.RequestedAmount, Is.EqualTo(6));
+            }
+
+            SW.DeleteEventReceiver(ref receiver);
+            Assert.That(received, Is.True);
+            Assert.That(extraction.Read<ExtractionOperationState>().OutputBufferAmount, Is.EqualTo(6));
         }
 
         [Test]
@@ -255,10 +304,12 @@ namespace StaticMlp.Tests.Ai
 
             var buildExecutor = scope.Catalog.ResolveExecutor(AiTaskType.BuildConstruction);
             var deliveryExecutor = scope.Catalog.ResolveExecutor(AiTaskType.DeliveryResourceToBuilding);
+            var haulExecutor = scope.Catalog.ResolveExecutor(AiTaskType.HaulResources);
             var followLeaderExecutor = scope.Catalog.ResolveExecutor(AiTaskType.FollowLeader);
 
             Assert.That(buildExecutor.GetType().Namespace, Is.EqualTo("StaticMlp.Features.Settlement.Workers"));
             Assert.That(deliveryExecutor.GetType().Namespace, Is.EqualTo("StaticMlp.Features.Settlement.Workers"));
+            Assert.That(haulExecutor.GetType().Namespace, Is.EqualTo("StaticMlp.Features.Settlement.Workers"));
             Assert.That(followLeaderExecutor.GetType().Namespace, Is.EqualTo("StaticMlp.Features.AiActions"));
         }
 
@@ -410,6 +461,26 @@ namespace StaticMlp.Tests.Ai
             {
                 Enabled = enabled,
                 ContributedCapacity = 200
+            });
+            return entity;
+        }
+
+        private static SW.Entity CreateExtractionBuilding(ResourceId outputResource, int outputAmount, bool enabled = true)
+        {
+            var entity = SW.NewEntity<Default>();
+            entity.Set<FinishedBuildingTag>();
+            entity.Set(new ConstructionTransform
+            {
+                Position = Vector3.zero,
+                Rotation = Quaternion.identity
+            });
+            entity.Set(new ExtractionOperationState
+            {
+                OutputResourceId = outputResource.Value,
+                OutputBufferAmount = outputAmount,
+                OutputBufferCapacity = 40,
+                Enabled = enabled,
+                WorkerSlotCount = 2
             });
             return entity;
         }

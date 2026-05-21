@@ -47,10 +47,17 @@ namespace StaticMlp.Features.Settlement.Workers
                 case AiTaskType.DeliveryResourceToBuilding:
                     AiBlackboardAccess.SetEntity(worker, DeliveryBuildResourcesCollectVariables.TargetSite, jobState.TargetSite);
                     AiBlackboardAccess.Remove(worker, BuildConstructionCollectVariables.BuildTargetSite);
+                    AiBlackboardAccess.Remove(worker, HaulExtractionOutputCollectVariables.TargetExtractionBuilding);
                     break;
                 case AiTaskType.BuildConstruction:
                     AiBlackboardAccess.SetEntity(worker, BuildConstructionCollectVariables.BuildTargetSite, jobState.TargetSite);
                     AiBlackboardAccess.Remove(worker, DeliveryBuildResourcesCollectVariables.TargetSite);
+                    AiBlackboardAccess.Remove(worker, HaulExtractionOutputCollectVariables.TargetExtractionBuilding);
+                    break;
+                case AiTaskType.HaulResources:
+                    AiBlackboardAccess.SetEntity(worker, HaulExtractionOutputCollectVariables.TargetExtractionBuilding, jobState.TargetSite);
+                    AiBlackboardAccess.Remove(worker, DeliveryBuildResourcesCollectVariables.TargetSite);
+                    AiBlackboardAccess.Remove(worker, BuildConstructionCollectVariables.BuildTargetSite);
                     break;
                 default:
                     ClearTargets(worker);
@@ -62,6 +69,7 @@ namespace StaticMlp.Features.Settlement.Workers
         {
             AiBlackboardAccess.Remove(worker, DeliveryBuildResourcesCollectVariables.TargetSite);
             AiBlackboardAccess.Remove(worker, BuildConstructionCollectVariables.BuildTargetSite);
+            AiBlackboardAccess.Remove(worker, HaulExtractionOutputCollectVariables.TargetExtractionBuilding);
         }
     }
 }

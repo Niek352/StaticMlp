@@ -178,6 +178,9 @@ namespace StaticMlp.Features.Settlement.Workers
                 return false;
             }
 
+            if (TryFindExtractionHaulDemand(out demand))
+                return true;
+
             foreach (var workbench in SW.Query<All<WorkbenchOperationState>>().Entities())
             {
                 ref readonly var state = ref workbench.Read<WorkbenchOperationState>();
@@ -200,6 +203,41 @@ namespace StaticMlp.Features.Settlement.Workers
                         amount);
                     return true;
                 }
+            }
+
+            demand = default;
+            return false;
+        }
+
+        private static bool TryFindExtractionHaulDemand(out SettlementWorkerDemand demand)
+        {
+            var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
+            ref readonly var storage = ref storageEntity.Read<SettlementSharedResources>();
+            var totalUsed = SettlementSharedResourcesAccess.TotalUsed(storageEntity);
+            var remainingCapacity = storage.Capacity - totalUsed;
+            if (remainingCapacity <= 0)
+            {
+                demand = default;
+                return false;
+            }
+
+            foreach (var building in SW.Query<All<FinishedBuildingTag, ExtractionOperationState, ConstructionTransform>>().Entities())
+            {
+                ref readonly var state = ref building.Read<ExtractionOperationState>();
+                if (!ExtractionRules.HasOutput(in state))
+                    continue;
+
+                var acceptedAmount = StockpileRules.ClampToCapacity(storage.Capacity, totalUsed, state.OutputBufferAmount);
+                if (acceptedAmount <= 0)
+                    continue;
+
+                demand = new SettlementWorkerDemand(
+                    SettlementWorkerDemand.DemandKind.Haul,
+                    AiTaskType.HaulResources,
+                    building.GID,
+                    state.OutputResource,
+                    acceptedAmount);
+                return true;
             }
 
             demand = default;

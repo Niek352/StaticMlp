@@ -42,6 +42,9 @@ namespace StaticMlp.Features.Settlement
             systems.Add(new ServerStockpileOperationBootstrapSystem(), GameplaySystemOrder.Gameplay - 48);
             systems.Add(new ServerBedrollShelterBootstrapSystem(), GameplaySystemOrder.Gameplay - 48);
             systems.Add(new ServerWorkbenchBootstrapSystem(), GameplaySystemOrder.Gameplay - 48);
+            systems.Add(new ServerExtractionBootstrapSystem(), GameplaySystemOrder.Gameplay - 48);
+            systems.Add(new ServerExtractionOperationSystem(), GameplaySystemOrder.Gameplay - 47);
+            systems.Add(new ServerTransferExtractionOutputToStockpileSystem(), GameplaySystemOrder.Gameplay - 39);
         }
     }
 }
