@@ -2,6 +2,7 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Input;
 using StaticMlp.Networking;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace StaticMlp.Features.Buildings
 {
@@ -13,10 +14,13 @@ namespace StaticMlp.Features.Buildings
             if (!inputState.WasPressed(CoreInputActions.Primary))
                 return;
 
-            ref var menuState = ref CW.GetResource<BuildingMenuState>();
-            if (menuState.SelectionFrame == Time.frameCount)
+            if (EventSystem.current == null)
+                throw new MissingReferenceException($"{nameof(ClientPlacementConfirmSystem)} requires an active {nameof(EventSystem)}.");
+
+            if (EventSystem.current.IsPointerOverGameObject())
                 return;
 
+            ref var menuState = ref CW.GetResource<BuildingMenuState>();
             if (!PlacementPreviewEntityUtility.TryGet(out var previewEntity)
                 || !previewEntity.Has<PlacementPreview>())
                 return;

@@ -8,10 +8,7 @@ namespace StaticMlp.Features.Buildings
     {
         public void Init()
         {
-            CW.SetResource(new BuildingMenuState
-            {
-                SelectionFrame = -1,
-            });
+            CW.SetResource(new BuildingMenuState());
         }
 
         public void Update()

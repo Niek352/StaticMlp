@@ -18,7 +18,8 @@
         "StaticMlp.Features.Shared.Logic",
         "StaticMlp.Features.Stage1.Contracts",
         "StaticMlp.Features.Npc.Contracts",
-        "StaticMlp.Features.Npc.Logic"
+        "StaticMlp.Features.Npc.Logic",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

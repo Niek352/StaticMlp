@@ -6,6 +6,7 @@ using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Combat;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.Shared;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.Npc;
@@ -76,6 +77,7 @@ namespace StaticMlp.Tests.Combat
             SW.SetResource(new CombatDebugLogBuffer());
             SW.SetResource(new NetOutbox());
             SW.SetResource(new CombatConfig());
+            SW.SetResource<IHeightSampler>(new FlatTestHeightSampler());
             SW.SetResource(Stage1FrontierSeedManifest.CreateResource());
             SW.SetResource(Stage1ProgressionSeedManifest.CreateResource());
             SW.SetResource(new StatusesConfig());
@@ -337,6 +339,11 @@ namespace StaticMlp.Tests.Combat
             ServerPeerRegistry.Clear();
             if (SW.Status != WorldStatus.NotCreated)
                 SW.Destroy();
+        }
+
+        private sealed class FlatTestHeightSampler : IHeightSampler
+        {
+            public float SampleHeight(float worldX, float worldZ) => 0f;
         }
     }
 }

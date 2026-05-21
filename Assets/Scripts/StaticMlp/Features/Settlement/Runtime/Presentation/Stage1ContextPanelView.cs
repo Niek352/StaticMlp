@@ -72,7 +72,8 @@ namespace StaticMlp.Features.Settlement
                     $"Wood: {state.WoodDelivered}/{state.WoodRequired}\n" +
                     $"Stone: {state.StoneDelivered}/{state.StoneRequired}\n" +
                     $"Progress: {Mathf.RoundToInt(state.Progress01 * 100f)}%" +
-                    FormatDisabledReason(state.PrimaryBuildingAction.DisabledReason);
+                    FormatDisabledReason(state.PrimaryBuildingAction.DisabledReason) +
+                    FormatOpenedBuildingAction(in state);
                 primaryButtonLabel.text = state.PrimaryBuildingAction.Label;
                 secondaryButtonLabel.text = state.SecondaryBuildingAction.Label;
                 primaryButton.interactable = state.PrimaryBuildingAction.Enabled;
@@ -106,6 +107,13 @@ namespace StaticMlp.Features.Settlement
             return string.IsNullOrEmpty(disabledReason)
                 ? string.Empty
                 : $"\nBlocked: {disabledReason}";
+        }
+
+        private static string FormatOpenedBuildingAction(in Stage1ContextPanelState state)
+        {
+            return state.HasOpenedBuildingAction
+                ? $"\n\n{state.OpenedBuildingActionLabel}\n{state.OpenedBuildingActionSummary}"
+                : string.Empty;
         }
     }
 }

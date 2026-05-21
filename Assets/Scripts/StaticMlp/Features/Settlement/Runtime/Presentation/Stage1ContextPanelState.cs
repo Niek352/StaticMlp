@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
@@ -16,6 +17,10 @@ namespace StaticMlp.Features.Settlement
         public string BuildingDisplayName;
         public BuildingAvailableActionPresentation PrimaryBuildingAction;
         public BuildingAvailableActionPresentation SecondaryBuildingAction;
+        public bool HasOpenedBuildingAction;
+        public BuildingInteractionKind OpenedBuildingActionKind;
+        public string OpenedBuildingActionLabel;
+        public string OpenedBuildingActionSummary;
         public bool HasWorker;
         public ConstructionPhase ConstructionPhase;
         public int WoodRequired;

@@ -459,6 +459,39 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
+        public void ContextPanelState_WhenOperationIntentTargetsFocusedBuilding_ShowsOpenedActionSummary()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.WorkbenchOnline);
+            var site = scope.CreateConstructionSite(
+                BuildingCatalogData.WorkbenchId,
+                ConstructionPhase.Completed,
+                woodRequired: 14,
+                woodDelivered: 14,
+                stoneRequired: 6,
+                stoneDelivered: 6,
+                progress01: 1f,
+                position: new Vector3(0f, 0f, 1f));
+            scope.RefreshProjections();
+
+            new ClientStage1PresentationBootstrapSystem().Init();
+            ref var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            session.Mode = Stage1ContextPanelMode.Building;
+            session.FocusedSite = site.GID;
+            ref var intent = ref CW.GetResource<Stage1BuildingOperationOpenIntent>();
+            intent.Set(site.GID, BuildingInteractionKind.OpenProductionQueue);
+
+            new ClientStage1ContextPanelStateSystem().Update();
+
+            ref readonly var state = ref CW.GetResource<Stage1ContextPanelState>();
+            Assert.That(state.HasOpenedBuildingAction, Is.True);
+            Assert.That(state.OpenedBuildingActionKind, Is.EqualTo(BuildingInteractionKind.OpenProductionQueue));
+            Assert.That(state.OpenedBuildingActionLabel, Is.EqualTo("Open Queue"));
+            Assert.That(state.OpenedBuildingActionSummary, Does.Contain("Worker slots: 2"));
+            Assert.That(state.OpenedBuildingActionSummary, Does.Contain("planks"));
+        }
+
+        [Test]
         public void LoadoutPreparationScreenState_WhenWorkbenchIsOnline_UsesLocalSelectionAndBossCommitGate()
         {
             using var scope = new Stage1PresentationClientWorldScope();

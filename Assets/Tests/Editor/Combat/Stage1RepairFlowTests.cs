@@ -6,10 +6,12 @@ using StaticMlp.Features.Loadout;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Features.Stage1;
+using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Requests;
@@ -159,6 +161,39 @@ namespace StaticMlp.Tests.Combat
             }
 
             Assert.That(siteCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ServerStage1SeedSpawnSystems_ProjectInitialCampAndWorkerToTerrainHeight()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            SW.SetResource<IHeightSampler>(new ConstantHeightSampler(7.25f));
+            SW.SetResource(Stage1SettlementSeedManifest.CreateResource());
+
+            new ServerStage1CampAnchorSpawnSystem().Update();
+            new ServerInitialConstructionSiteSpawnSystem().Update();
+            new ServerSettlementWorkerSpawnSystem().Update();
+
+            var anchor = Stage1SettlementProgressionQuery.GetServerAnchor(SettlementAnchorCatalog.HomeCampId);
+            Assert.That(anchor.Read<SettlementAnchorLocation>().Position.y, Is.EqualTo(7.25f));
+
+            var siteCount = 0;
+            foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionTransform>>().Entities())
+            {
+                siteCount++;
+                Assert.That(site.Read<ConstructionTransform>().Position.y, Is.EqualTo(7.25f));
+            }
+
+            Assert.That(siteCount, Is.EqualTo(1));
+
+            var workerCount = 0;
+            foreach (var worker in SW.Query<All<SettlementWorkerTag, CharacterNetState>>().Entities())
+            {
+                workerCount++;
+                Assert.That(worker.Read<CharacterNetState>().Position.y, Is.EqualTo(7.25f));
+            }
+
+            Assert.That(workerCount, Is.EqualTo(1));
         }
 
         [Test]
@@ -604,6 +639,19 @@ namespace StaticMlp.Tests.Combat
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.RepairCamp));
             Assert.That(hud.ObjectiveHint, Is.EqualTo("Resources delivered. Keep building the camp core to finish repairs."));
         }
+
+        private sealed class ConstantHeightSampler : IHeightSampler
+        {
+            private readonly float _height;
+
+            public ConstantHeightSampler(float height)
+            {
+                _height = height;
+            }
+
+            public float SampleHeight(float worldX, float worldZ) => _height;
+        }
+
         [Test]
         public void ServerStage1FlowSystem_WhenStockpilePlacedEventReceived_AdvancesFromWorkerAssigned()
         {

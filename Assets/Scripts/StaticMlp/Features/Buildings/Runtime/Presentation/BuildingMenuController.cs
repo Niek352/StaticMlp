@@ -1,9 +1,7 @@
 using System;
 using Code.EcsUi.Mvc;
 using StaticMlp.Features.BuildingCatalog;
-using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
-using UnityEngine;
 
 namespace StaticMlp.Features.Buildings
 {
@@ -30,7 +28,7 @@ namespace StaticMlp.Features.Buildings
 
         protected override void OnViewInstantiated()
         {
-            View.Bind(SelectWoodenHut, CloseMenu);
+            View.Bind(SelectBuilding, CloseMenu);
         }
 
         protected override void OnBeforeViewShow()
@@ -48,16 +46,7 @@ namespace StaticMlp.Features.Buildings
 
         private static BuildingMenuPresentation BuildPresentation(in BuildingMenuState state)
         {
-            var definition = state.HasSelection
-                ? BuildingCatalogData.Get(state.SelectedBuildingId)
-                : BuildingCatalogData.Get(BuildingCatalogData.CampCoreId);
-            var presentation = BuildingPresentationCatalog.Get(definition.Id);
-
-            return new BuildingMenuPresentation(
-                state.IsOpen,
-                presentation.DisplayName,
-                definition.GetConstructionCost(ResourceCatalog.WoodId),
-                definition.GetConstructionCost(ResourceCatalog.StoneId));
+            return BuildingMenuPresentation.Create(in state);
         }
 
         private static void CloseMenu()
@@ -67,10 +56,11 @@ namespace StaticMlp.Features.Buildings
             state.ClearSelection();
         }
 
-        private static void SelectWoodenHut()
+        private static void SelectBuilding(BuildingId buildingId)
         {
             ref var state = ref CW.GetResource<BuildingMenuState>();
-            state.Select(BuildingCatalogData.CampCoreId, Time.frameCount);
+            BuildingCatalogData.Get(buildingId);
+            state.Select(buildingId);
         }
     }
 }

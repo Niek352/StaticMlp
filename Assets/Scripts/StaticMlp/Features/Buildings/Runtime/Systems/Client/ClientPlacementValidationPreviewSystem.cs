@@ -11,7 +11,7 @@ namespace StaticMlp.Features.Buildings
             foreach (var e in CW.Query<All<PlacementPreview, PlacementPreviewViewState>>().Entities())
             {
                 ref var preview = ref e.Mut<PlacementPreview>();
-                var definition = StaticMlp.Features.BuildingCatalog.BuildingCatalogData.Get(preview.BuildingId);
+                var definition = BuildingCatalogData.Get(preview.BuildingId);
                 var validation = ConstructionPlacementValidator.ValidateClient(definition, preview.Position, preview.Rotation);
 
                 preview.IsValid = validation.IsValid;

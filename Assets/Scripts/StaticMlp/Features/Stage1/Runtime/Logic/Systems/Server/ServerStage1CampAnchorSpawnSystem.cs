@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
@@ -25,6 +26,7 @@ namespace StaticMlp.Features.Stage1
 
             var settlementSeed = SW.GetResource<Stage1SettlementSeed>();
             var progressionSeed = SW.GetResource<Stage1ProgressionSeed>();
+            var heightSampler = SW.GetResource<IHeightSampler>();
             var sites = settlementSeed.InitialConstructionSites;
             var spawnedAnchorIds = new HashSet<ushort>();
             for (var i = 0; i < sites.Length; i++)
@@ -36,17 +38,23 @@ namespace StaticMlp.Features.Stage1
                     throw new InvalidOperationException(
                         $"Stage 1 seed defines duplicate camp anchor {sites[i].AnchorId}.");
 
-                SpawnAnchor(sites[i], progressionSeed);
+                SpawnAnchor(sites[i], progressionSeed, heightSampler);
             }
 
             _spawned = true;
         }
 
-        private static void SpawnAnchor(Stage1ConstructionSiteSeed siteSeed, Stage1ProgressionSeed progressionSeed)
+        private static void SpawnAnchor(
+            Stage1ConstructionSiteSeed siteSeed,
+            Stage1ProgressionSeed progressionSeed,
+            IHeightSampler heightSampler)
         {
+            var position = siteSeed.Position;
+            position.y = heightSampler.SampleHeight(position.x, position.z);
+
             SW.GetResource<Stage1CampAnchorFactory>().Spawn(new Stage1CampAnchorSpawnSpec(
                 new SettlementAnchorId(siteSeed.AnchorId),
-                siteSeed.Position,
+                position,
                 siteSeed.Rotation,
                 BuildFlagMask(progressionSeed)));
         }

@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement.Workers
@@ -16,16 +17,19 @@ namespace StaticMlp.Features.Settlement.Workers
             }
 
             var seed = SW.GetResource<Stage1SettlementSeed>();
+            var heightSampler = SW.GetResource<IHeightSampler>();
             var workers = seed.InitialWorkers;
             for (var i = 0; i < workers.Length; i++)
-                Spawn(workers[i]);
+                Spawn(workers[i], heightSampler);
 
             _spawned = true;
         }
 
-        private static void Spawn(Stage1SettlementWorkerSeed seed)
+        private static void Spawn(Stage1SettlementWorkerSeed seed, IHeightSampler heightSampler)
         {
             var profile = SettlementWorkerRuntimeProfileCatalog.Get(seed.Role);
+            var position = seed.Position;
+            position.y = heightSampler.SampleHeight(position.x, position.z);
 
             SW.GetResource<SettlementWorkerFactory>().Spawn(new SettlementWorkerSpawnSpec(
                 seed.Anchor,
@@ -33,7 +37,7 @@ namespace StaticMlp.Features.Settlement.Workers
                 profile.NetworkArchetypeId,
                 profile.BehaviorId,
                 profile.MaxHealth,
-                seed.Position,
+                position,
                 seed.Rotation));
         }
 

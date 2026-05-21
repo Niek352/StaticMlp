@@ -13,7 +13,8 @@
         "StaticMlp.Features.Settlement.Logic",
         "StaticMlp.Features.Settlement.Workers.Logic",
         "StaticMlp.Features.Progression.Contracts",
-        "StaticMlp.Features.Frontier.Contracts"
+        "StaticMlp.Features.Frontier.Contracts",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

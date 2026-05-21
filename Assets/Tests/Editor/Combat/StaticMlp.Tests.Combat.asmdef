@@ -37,6 +37,7 @@
         "StaticMlp.Features.Statuses.Contracts",
         "StaticMlp.Features.Statuses.Logic",
         "StaticMlp.Features.Statuses.Presentation",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
         "StaticMlp.Generated",
         "StaticMlp.Features.Progression.Logic",
         "StaticMlp.Features.BuildingCatalog",

@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -19,21 +20,25 @@ namespace StaticMlp.Features.Buildings
             }
 
             var resource = SW.GetResource<Stage1SettlementSeed>();
+            var heightSampler = SW.GetResource<IHeightSampler>();
             var sites = resource.InitialConstructionSites;
             for (var i = 0; i < sites.Length; i++)
-                SpawnInitialSite(sites[i]);
+                SpawnInitialSite(sites[i], heightSampler);
 
             _spawned = true;
         }
 
-        private static void SpawnInitialSite(Stage1ConstructionSiteSeed definition)
+        private static void SpawnInitialSite(Stage1ConstructionSiteSeed definition, IHeightSampler heightSampler)
         {
+            var position = definition.Position;
+            position.y = heightSampler.SampleHeight(position.x, position.z);
+
             var buildingDefinition = BuildingCatalogData.Get(new BuildingId(definition.BuildingId));
             var siteGid = SW.GetResource<BuildingEntityFactory>().SpawnConstructionSite(new ConstructionSiteSpawnSpec(
                 new NetworkPeerId(0),
                 buildingDefinition,
                 new SettlementAnchorId(definition.AnchorId),
-                definition.Position,
+                position,
                 definition.Rotation,
                 definition.StartReadyToBuild,
                 definition.InitialBuildWork));

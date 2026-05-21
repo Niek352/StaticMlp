@@ -1,3 +1,4 @@
+using System.Text;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
@@ -38,6 +39,7 @@ namespace StaticMlp.Features.Settlement
                 next.Progress01 = progress.Normalized;
                 next.PrimaryBuildingAction = CreatePrimaryBuildingAction(site, in state, in definition);
                 next.SecondaryBuildingAction = CreateSecondaryBuildingAction(site.GID);
+                PopulateOpenedBuildingAction(ref next, site.GID, in definition);
                 next.CanDepositResources = next.PrimaryBuildingAction.Kind == BuildingInteractionKind.DepositConstructionResources
                                            && next.PrimaryBuildingAction.Enabled;
                 next.CanBuild = next.PrimaryBuildingAction.Kind == BuildingInteractionKind.ContributeBuildWork
@@ -218,6 +220,154 @@ namespace StaticMlp.Features.Settlement
                 default:
                     return string.Empty;
             }
+        }
+
+        private static void PopulateOpenedBuildingAction(
+            ref Stage1ContextPanelState state,
+            EntityGID target,
+            in BuildingDefinition definition)
+        {
+            ref readonly var intent = ref CW.GetResource<Stage1BuildingOperationOpenIntent>();
+            if (!intent.HasIntent || intent.Target != target)
+                return;
+
+            state.HasOpenedBuildingAction = true;
+            state.OpenedBuildingActionKind = intent.Kind;
+            state.OpenedBuildingActionLabel = ResolveLabel(intent.Kind);
+            state.OpenedBuildingActionSummary = ResolveOpenedBuildingActionSummary(intent.Kind, in definition);
+        }
+
+        private static string ResolveOpenedBuildingActionSummary(
+            BuildingInteractionKind kind,
+            in BuildingDefinition definition)
+        {
+            switch (kind)
+            {
+                case BuildingInteractionKind.OpenDetails:
+                    return BuildDetailsSummary(in definition);
+                case BuildingInteractionKind.AssignWorker:
+                    return $"Worker slots: {definition.NpcProfile.WorkerSlots}";
+                case BuildingInteractionKind.OpenProductionQueue:
+                case BuildingInteractionKind.SetRecipe:
+                case BuildingInteractionKind.ClaimOutput:
+                    return BuildProductionSummary(in definition);
+                case BuildingInteractionKind.AssignBed:
+                case BuildingInteractionKind.Rest:
+                    return $"Bed slots: {definition.Operation.WorkerSlots}";
+                case BuildingInteractionKind.Extract:
+                    return BuildExtractionSummary(in definition);
+                case BuildingInteractionKind.StoreItems:
+                case BuildingInteractionKind.WithdrawItems:
+                    return $"Storage capacity: {definition.Operation.StorageCapacity}";
+                case BuildingInteractionKind.ToggleEnabled:
+                    return "Toggle operation enabled state.";
+                case BuildingInteractionKind.TriggerRepair:
+                    return "Repair operation available.";
+                default:
+                    return BuildDetailsSummary(in definition);
+            }
+        }
+
+        private static string BuildDetailsSummary(in BuildingDefinition definition)
+        {
+            return
+                $"Category: {ResolveCategoryLabel(definition.Category)}\n" +
+                $"Footprint: {definition.FootprintWidth}x{definition.FootprintLength}\n" +
+                $"Cost: {FormatResourceAmounts(definition.ConstructionCost)}";
+        }
+
+        private static string BuildProductionSummary(in BuildingDefinition definition)
+        {
+            var builder = new StringBuilder();
+            builder.Append("Worker slots: ");
+            builder.Append(definition.Operation.WorkerSlots);
+            builder.Append("\nRecipes: ");
+
+            for (var i = 0; i < WorkbenchRecipeCatalog.All.Count; i++)
+            {
+                if (i > 0)
+                    builder.Append(", ");
+
+                builder.Append(WorkbenchRecipeCatalog.All[i].Code);
+            }
+
+            return builder.ToString();
+        }
+
+        private static string BuildExtractionSummary(in BuildingDefinition definition)
+        {
+            if (!ExtractionRules.TryGetOutputResource(definition.Id, out var output))
+                throw new System.InvalidOperationException($"Extraction action requested for non-extraction building {definition.Id.Value}.");
+
+            return
+                $"Output: {ResolveResourceLabel(output)}\n" +
+                $"Buffer capacity: {definition.Operation.StorageCapacity}\n" +
+                $"Worker slots: {definition.Operation.WorkerSlots}";
+        }
+
+        private static string FormatResourceAmounts(ResourceAmount[] amounts)
+        {
+            var builder = new StringBuilder();
+
+            for (var i = 0; i < amounts.Length; i++)
+            {
+                if (i > 0)
+                    builder.Append(", ");
+
+                builder.Append(ResolveResourceLabel(amounts[i].Id));
+                builder.Append(' ');
+                builder.Append(amounts[i].Amount);
+            }
+
+            return builder.ToString();
+        }
+
+        private static string ResolveCategoryLabel(BuildingCategory category)
+        {
+            switch (category)
+            {
+                case BuildingCategory.Housing:
+                    return "Housing";
+                case BuildingCategory.Logistics:
+                    return "Logistics";
+                case BuildingCategory.Extraction:
+                    return "Extraction";
+                case BuildingCategory.Production:
+                    return "Production";
+                case BuildingCategory.Service:
+                    return "Service";
+                case BuildingCategory.Defense:
+                    return "Defense";
+                case BuildingCategory.Research:
+                    return "Research";
+                default:
+                    return "Uncategorized";
+            }
+        }
+
+        private static string ResolveResourceLabel(ResourceId id)
+        {
+            if (id == ResourceCatalog.WoodId)
+                return "Wood";
+            if (id == ResourceCatalog.StoneId)
+                return "Stone";
+            if (id == ResourceCatalog.PlanksId)
+                return "Planks";
+            if (id == ResourceCatalog.SimplePartsId)
+                return "Simple Parts";
+            if (id == ResourceCatalog.RepairKitsId)
+                return "Repair Kits";
+            if (id == ResourceCatalog.FoodId)
+                return "Food";
+            if (id == ResourceCatalog.FuelId)
+                return "Fuel";
+            if (id == ResourceCatalog.ResearchDataId)
+                return "Research Data";
+            if (id == ResourceCatalog.MedicineId)
+                return "Medicine";
+
+            ResourceCatalog.Get(id);
+            return $"Resource {id.Value}";
         }
 
         private static bool TryGetConstructionSite(EntityGID gid, out CW.Entity site)

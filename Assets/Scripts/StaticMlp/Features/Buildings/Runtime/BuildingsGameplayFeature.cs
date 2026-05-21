@@ -54,8 +54,13 @@ namespace StaticMlp.Features.Buildings
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
+            systems.Add(new ClientBuildingMenuSystem(), (short)(GameplaySystemOrder.ClientInput + 20));
+            systems.Add(new ClientPlacementInputSystem(), (short)(GameplaySystemOrder.Gameplay - 90));
+            systems.Add(new ClientPlacementValidationPreviewSystem(), (short)(GameplaySystemOrder.Gameplay - 85));
+            systems.Add(new ClientPlacementConfirmSystem(), (short)(GameplaySystemOrder.Gameplay - 80));
             systems.Add(new ClientConstructionInteractionSystem(), (short)(GameplaySystemOrder.Gameplay - 5));
             systems.Add(new ClientConstructionViewStateSystem(), ViewSystemOrder.BuildPresentationState);
+            systems.Add(new ClientBuildingMenuMvcSystem(), (short)(GameplaySystemOrder.ClientPresentation + 20));
         }
 
         public override void RegisterClientViewSync(ViewSyncBuilder views)
