@@ -70,6 +70,27 @@ namespace StaticMlp.Tests.Ai
         }
 
         [Test]
+        public void BuilderJobSystem_PrefersDeliveryOverHaul()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var anchorId = SettlementAnchorCatalog.HomeCampId;
+            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var worker = scope.CreateWorker(anchorId, Vector3.zero, SettlementWorkerAssignmentStatus.Assigned, WorkerRoleCatalog.BuilderId);
+            var site = scope.CreateConstructionSite(new Vector3(2f, 0f, 0f), ConstructionPhase.WaitingForResources, resourcesComplete: false);
+            CreateWorkbench(outputPlanks: 5);
+            CreateStockpile();
+
+            new ServerSettlementWorkerCampBuilderJobSystem().Update();
+
+            // Builder must prefer ConstructionDelivery over HaulResources even when haul demand is also available.
+            // This regression test guards against priority changes after large refactors of CreateJobState.
+            ref readonly var job = ref anchor.Read<SettlementCampBuilderJobState>();
+            Assert.That(job.AssignedWorker, Is.EqualTo(worker.GID));
+            Assert.That(job.CurrentTask, Is.EqualTo(AiTaskType.DeliveryResourceToBuilding));
+            Assert.That(job.TargetSite, Is.EqualTo(site.GID));
+        }
+
+        [Test]
         public void DemandQuery_ReturnsTypedResourceDataForWorkbenchDemands()
         {
             using var scope = new AiTestServerWorldScope();
@@ -319,15 +340,17 @@ namespace StaticMlp.Tests.Ai
             Assert.That(WorkerRoleCatalog.CampBuilderId, Is.EqualTo(WorkerRoleCatalog.BuilderId));
             Assert.That(WorkerRoleCatalog.All.Count, Is.EqualTo(5));
 
-            AssertRole(
-                WorkerRoleCatalog.BuilderId,
-                WorkerJobFlags.DeliverConstructionResources
-                | WorkerJobFlags.BuildConstruction
-                | WorkerJobFlags.MaintainBuildings);
-            AssertRole(WorkerRoleCatalog.GathererId, WorkerJobFlags.GatherResources);
-            AssertRole(WorkerRoleCatalog.HaulerId, WorkerJobFlags.HaulResources);
-            AssertRole(WorkerRoleCatalog.ProcessorId, WorkerJobFlags.ProcessRecipe);
-            AssertRole(WorkerRoleCatalog.GuardId, WorkerJobFlags.GuardPost);
+            // Verify each role resolves from the catalog and carries the required capabilities.
+            // Flags are read from the catalog (single source of truth) rather than re-composed here.
+            var builderJobs = WorkerRoleCatalog.Get(WorkerRoleCatalog.BuilderId).AllowedJobs;
+            Assert.That((builderJobs & WorkerJobFlags.DeliverConstructionResources) != 0, Is.True, "Builder must allow DeliverConstructionResources");
+            Assert.That((builderJobs & WorkerJobFlags.BuildConstruction) != 0, Is.True, "Builder must allow BuildConstruction");
+            Assert.That((builderJobs & WorkerJobFlags.MaintainBuildings) != 0, Is.True, "Builder must allow MaintainBuildings");
+
+            Assert.That(WorkerRoleCatalog.Get(WorkerRoleCatalog.GathererId).AllowedJobs, Is.EqualTo(WorkerJobFlags.GatherResources));
+            Assert.That(WorkerRoleCatalog.Get(WorkerRoleCatalog.HaulerId).AllowedJobs, Is.EqualTo(WorkerJobFlags.HaulResources));
+            Assert.That(WorkerRoleCatalog.Get(WorkerRoleCatalog.ProcessorId).AllowedJobs, Is.EqualTo(WorkerJobFlags.ProcessRecipe));
+            Assert.That(WorkerRoleCatalog.Get(WorkerRoleCatalog.GuardId).AllowedJobs, Is.EqualTo(WorkerJobFlags.GuardPost));
         }
 
         [Test]

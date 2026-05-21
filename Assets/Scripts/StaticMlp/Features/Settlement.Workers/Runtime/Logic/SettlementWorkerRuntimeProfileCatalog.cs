@@ -5,33 +5,40 @@ namespace StaticMlp.Features.Settlement.Workers
 {
     public static class SettlementWorkerRuntimeProfileCatalog
     {
+        // Stage1 balancing: health values reflect role fragility (guard/builder tankier; processor most fragile).
+        private const float BUILDER_MAX_HEALTH = 100f;
+        private const float GATHERER_MAX_HEALTH = 90f;
+        private const float HAULER_MAX_HEALTH = 95f;
+        private const float PROCESSOR_MAX_HEALTH = 85f;
+        private const float GUARD_MAX_HEALTH = 100f;
+
         private static readonly SettlementWorkerRuntimeProfile[] Profiles =
         {
             new(
                 WorkerRoleCatalog.BuilderId,
                 SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER,
                 SettlementWorkerBehaviorIds.PEACEFUL_BUILDER,
-                maxHealth: 100f),
+                maxHealth: BUILDER_MAX_HEALTH),
             new(
                 WorkerRoleCatalog.GathererId,
                 SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER,
                 SettlementWorkerBehaviorIds.PEACEFUL_GATHERER,
-                maxHealth: 90f),
+                maxHealth: GATHERER_MAX_HEALTH),
             new(
                 WorkerRoleCatalog.HaulerId,
                 SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER,
                 SettlementWorkerBehaviorIds.PEACEFUL_HAULER,
-                maxHealth: 95f),
+                maxHealth: HAULER_MAX_HEALTH),
             new(
                 WorkerRoleCatalog.ProcessorId,
                 SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER,
                 SettlementWorkerBehaviorIds.PEACEFUL_PROCESSOR,
-                maxHealth: 85f),
+                maxHealth: PROCESSOR_MAX_HEALTH),
             new(
                 WorkerRoleCatalog.GuardId,
                 SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER,
                 SettlementWorkerBehaviorIds.SETTLEMENT_GUARD,
-                maxHealth: 100f)
+                maxHealth: GUARD_MAX_HEALTH)
         };
 
         public static SettlementWorkerRuntimeProfile Get(WorkerRoleId roleId)

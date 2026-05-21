@@ -1,3 +1,4 @@
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;

@@ -55,6 +55,10 @@ namespace StaticMlp.Features.Settlement.Workers
                 operation.OutputResource,
                 operation.OutputBufferAmount));
             task.ElapsedTicks++;
+            // Switch to idle so the demand system re-assigns on the next frame.
+            // Without this, the executor would send one transfer event per frame for as
+            // long as the buffer stays non-empty, which is implicit and harder to reason about.
+            _transitions.SwitchToIdle(entity, ref task);
         }
     }
 }

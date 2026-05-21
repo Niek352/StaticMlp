@@ -53,8 +53,8 @@ namespace StaticMlp.Tests.Settlement
                 SettlementAnchorCatalog.HomeCampId,
                 Vector3.zero,
                 Quaternion.identity));
-            system.Update();
-            system.Destroy();
+            try { system.Update(); }
+            finally { system.Destroy(); }
 
             var state = finished.Read<ExtractionOperationState>();
             Assert.That(state.Enabled, Is.True);
@@ -105,8 +105,8 @@ namespace StaticMlp.Tests.Settlement
                 building.GID,
                 ResourceCatalog.WoodId,
                 4));
-            system.Update();
-            system.Destroy();
+            try { system.Update(); }
+            finally { system.Destroy(); }
 
             Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.WoodId), Is.EqualTo(5));
             Assert.That(building.Read<ExtractionOperationState>().OutputBufferAmount, Is.EqualTo(2));

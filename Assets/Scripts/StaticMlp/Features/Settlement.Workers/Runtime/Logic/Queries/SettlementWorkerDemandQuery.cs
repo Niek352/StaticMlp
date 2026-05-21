@@ -152,7 +152,7 @@ namespace StaticMlp.Features.Settlement.Workers
                     if (resource.Family != ResourceFamily.Raw)
                         continue;
 
-                    var missing = input.Amount - GetWorkbenchInputAmount(in state, input.Id);
+                    var missing = input.Amount - WorkbenchResourceAccess.GetInput(in state, input.Id);
                     if (missing <= 0)
                         continue;
 
@@ -191,7 +191,7 @@ namespace StaticMlp.Features.Settlement.Workers
                 for (var i = 0; i < recipe.Outputs.Length; i++)
                 {
                     var output = recipe.Outputs[i];
-                    var amount = GetWorkbenchOutputAmount(in state, output.Id);
+                    var amount = WorkbenchResourceAccess.GetOutput(in state, output.Id);
                     if (amount <= 0)
                         continue;
 
@@ -275,48 +275,11 @@ namespace StaticMlp.Features.Settlement.Workers
             for (var i = 0; i < recipe.Inputs.Length; i++)
             {
                 var input = recipe.Inputs[i];
-                if (GetWorkbenchInputAmount(in state, input.Id) < input.Amount)
+                if (WorkbenchResourceAccess.GetInput(in state, input.Id) < input.Amount)
                     return false;
             }
 
             return true;
-        }
-
-        private static int GetWorkbenchInputAmount(in WorkbenchOperationState state, ResourceId resourceId)
-        {
-            if (resourceId == ResourceCatalog.WoodId)
-                return state.InputWood;
-
-            if (resourceId == ResourceCatalog.StoneId)
-                return state.InputStone;
-
-            if (resourceId == ResourceCatalog.PlanksId)
-                return state.InputPlanks;
-
-            if (resourceId == ResourceCatalog.SimplePartsId)
-                return state.InputSimpleParts;
-
-            if (resourceId == ResourceCatalog.FuelId)
-                return state.InputFuel;
-
-            return 0;
-        }
-
-        private static int GetWorkbenchOutputAmount(in WorkbenchOperationState state, ResourceId resourceId)
-        {
-            if (resourceId == ResourceCatalog.PlanksId)
-                return state.OutputPlanks;
-
-            if (resourceId == ResourceCatalog.SimplePartsId)
-                return state.OutputSimpleParts;
-
-            if (resourceId == ResourceCatalog.RepairKitsId)
-                return state.OutputRepairKits;
-
-            if (resourceId == ResourceCatalog.MedicineId)
-                return state.OutputMedicine;
-
-            return 0;
         }
 
         private static bool HasEnabledStockpile()
