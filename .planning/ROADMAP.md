@@ -93,7 +93,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Settlement Foundation | 3/3 | Complete | 2026-05-20 |
 | 2. Building Catalog And Construction | 3/3 | Complete | 2026-05-20 |
-| 3. Storage And Operations | 1/3 | In progress | - |
+| 3. Storage And Operations | 2/3 | In progress | - |
 | 4. NPC Worker Economy | 0/3 | Not started | - |
 | 5. Stage1 Progression And Loadout | 0/3 | Not started | - |
 | 6. UX And Presentation | 0/3 | Not started | - |
