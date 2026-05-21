@@ -108,6 +108,66 @@ namespace StaticMlp.Tests.Ai
         }
 
         [Test]
+        public void WorkerRoleCatalog_DefinesStage1RoleFlags()
+        {
+            Assert.That(WorkerRoleCatalog.CampBuilderId, Is.EqualTo(WorkerRoleCatalog.BuilderId));
+            Assert.That(WorkerRoleCatalog.All.Count, Is.EqualTo(5));
+
+            AssertRole(
+                WorkerRoleCatalog.BuilderId,
+                WorkerJobFlags.DeliverConstructionResources
+                | WorkerJobFlags.BuildConstruction
+                | WorkerJobFlags.MaintainBuildings);
+            AssertRole(WorkerRoleCatalog.GathererId, WorkerJobFlags.GatherResources);
+            AssertRole(WorkerRoleCatalog.HaulerId, WorkerJobFlags.HaulResources);
+            AssertRole(WorkerRoleCatalog.ProcessorId, WorkerJobFlags.ProcessRecipe);
+            AssertRole(WorkerRoleCatalog.GuardId, WorkerJobFlags.GuardPost);
+        }
+
+        [Test]
+        public void RuntimeProfileCatalog_DefinesStage1WorkerRoles()
+        {
+            var catalog = AiActionCatalog.Discover(new AiTaskExecutionTransitions());
+
+            AssertRuntimeProfile(
+                WorkerRoleCatalog.BuilderId,
+                SettlementWorkerBehaviorIds.PEACEFUL_BUILDER,
+                maxHealth: 100f);
+            AssertRuntimeProfile(
+                WorkerRoleCatalog.GathererId,
+                SettlementWorkerBehaviorIds.PEACEFUL_GATHERER,
+                maxHealth: 90f);
+            AssertRuntimeProfile(
+                WorkerRoleCatalog.HaulerId,
+                SettlementWorkerBehaviorIds.PEACEFUL_HAULER,
+                maxHealth: 95f);
+            AssertRuntimeProfile(
+                WorkerRoleCatalog.ProcessorId,
+                SettlementWorkerBehaviorIds.PEACEFUL_PROCESSOR,
+                maxHealth: 85f);
+            AssertRuntimeProfile(
+                WorkerRoleCatalog.GuardId,
+                SettlementWorkerBehaviorIds.SETTLEMENT_GUARD,
+                maxHealth: 100f);
+
+            AssertBehavior(catalog, SettlementWorkerBehaviorIds.PEACEFUL_BUILDER);
+            AssertBehavior(catalog, SettlementWorkerBehaviorIds.PEACEFUL_GATHERER);
+            AssertBehavior(catalog, SettlementWorkerBehaviorIds.PEACEFUL_HAULER);
+            AssertBehavior(catalog, SettlementWorkerBehaviorIds.PEACEFUL_PROCESSOR);
+            AssertBehavior(catalog, SettlementWorkerBehaviorIds.SETTLEMENT_GUARD);
+        }
+
+        [Test]
+        public void WorkerNpcProfileCatalog_MapsStage1WorkerRoles()
+        {
+            AssertNpcProfile(WorkerRoleCatalog.BuilderId, NpcDefinitionCatalog.SeededBuilderId, NpcRoleFlags.Builder);
+            AssertNpcProfile(WorkerRoleCatalog.GathererId, NpcDefinitionCatalog.SeededGathererId, NpcRoleFlags.Gatherer);
+            AssertNpcProfile(WorkerRoleCatalog.HaulerId, NpcDefinitionCatalog.SeededHaulerId, NpcRoleFlags.Hauler);
+            AssertNpcProfile(WorkerRoleCatalog.ProcessorId, NpcDefinitionCatalog.SeededProcessorId, NpcRoleFlags.Processor);
+            AssertNpcProfile(WorkerRoleCatalog.GuardId, NpcDefinitionCatalog.SeededGuardId, NpcRoleFlags.Guard);
+        }
+
+        [Test]
         public void SpawnedWorker_HasNpcTag()
         {
             using var scope = new AiTestServerWorldScope();
@@ -135,6 +195,39 @@ namespace StaticMlp.Tests.Ai
         public void MissingWorkerToNpcMapping_Throws()
         {
             Assert.Throws<InvalidOperationException>(() => SettlementWorkerNpcProfileCatalog.Get(new WorkerRoleId(999)));
+        }
+
+        private static void AssertRole(WorkerRoleId roleId, WorkerJobFlags allowedJobs)
+        {
+            var definition = WorkerRoleCatalog.Get(roleId);
+
+            Assert.That(definition.Id, Is.EqualTo(roleId));
+            Assert.That(definition.AllowedJobs, Is.EqualTo(allowedJobs));
+        }
+
+        private static void AssertRuntimeProfile(WorkerRoleId roleId, ushort behaviorId, float maxHealth)
+        {
+            var profile = SettlementWorkerRuntimeProfileCatalog.Get(roleId);
+
+            Assert.That(profile.RoleId, Is.EqualTo(roleId));
+            Assert.That(profile.NetworkArchetypeId, Is.EqualTo(SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER));
+            Assert.That(profile.BehaviorId, Is.EqualTo(behaviorId));
+            Assert.That(profile.MaxHealth, Is.EqualTo(maxHealth));
+        }
+
+        private static void AssertBehavior(AiActionCatalog catalog, ushort behaviorId)
+        {
+            Assert.That(catalog.TryGetBehavior(behaviorId, out _), Is.True);
+        }
+
+        private static void AssertNpcProfile(WorkerRoleId roleId, NpcDefinitionId definitionId, NpcRoleFlags roles)
+        {
+            var mappedDefinitionId = SettlementWorkerNpcProfileCatalog.Get(roleId);
+            var definition = NpcDefinitionCatalog.Get(mappedDefinitionId);
+
+            Assert.That(mappedDefinitionId, Is.EqualTo(definitionId));
+            Assert.That(definition.Roles, Is.EqualTo(roles));
+            Assert.That(definition.AllowedAcquisitionPaths, Is.EqualTo(NpcAcquisitionPathFlags.Seeded));
         }
     }
 }

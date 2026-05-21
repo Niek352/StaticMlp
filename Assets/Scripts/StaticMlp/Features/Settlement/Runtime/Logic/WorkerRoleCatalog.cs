@@ -5,15 +5,50 @@ namespace StaticMlp.Features.Settlement
 {
     public static class WorkerRoleCatalog
     {
-        public static readonly WorkerRoleId CampBuilderId = new(1);
+        public static readonly WorkerRoleId BuilderId = new(1);
+        public static readonly WorkerRoleId CampBuilderId = BuilderId;
+        public static readonly WorkerRoleId GathererId = new(2);
+        public static readonly WorkerRoleId HaulerId = new(3);
+        public static readonly WorkerRoleId ProcessorId = new(4);
+        public static readonly WorkerRoleId GuardId = new(5);
 
         private static readonly WorkerRoleDefinition[] Definitions =
         {
             new(
-                CampBuilderId,
-                WorkerJobFlags.DeliverConstructionResources | WorkerJobFlags.BuildConstruction,
+                BuilderId,
+                WorkerJobFlags.DeliverConstructionResources
+                | WorkerJobFlags.BuildConstruction
+                | WorkerJobFlags.MaintainBuildings,
                 buildSpeedMultiplier: 1f,
                 productionSpeedMultiplier: 1f,
+                housingCost: 1,
+                raidCombatValue: 1),
+            new(
+                GathererId,
+                WorkerJobFlags.GatherResources,
+                buildSpeedMultiplier: 0.75f,
+                productionSpeedMultiplier: 1f,
+                housingCost: 1,
+                raidCombatValue: 1),
+            new(
+                HaulerId,
+                WorkerJobFlags.HaulResources,
+                buildSpeedMultiplier: 0.75f,
+                productionSpeedMultiplier: 1f,
+                housingCost: 1,
+                raidCombatValue: 1),
+            new(
+                ProcessorId,
+                WorkerJobFlags.ProcessRecipe,
+                buildSpeedMultiplier: 0.75f,
+                productionSpeedMultiplier: 1.1f,
+                housingCost: 1,
+                raidCombatValue: 1),
+            new(
+                GuardId,
+                WorkerJobFlags.GuardPost,
+                buildSpeedMultiplier: 0.5f,
+                productionSpeedMultiplier: 0.75f,
                 housingCost: 1,
                 raidCombatValue: 1)
         };

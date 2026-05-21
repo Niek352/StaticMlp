@@ -19,6 +19,22 @@ namespace StaticMlp.Features.Settlement.Workers
                 SettlementWorkerBehaviorIds.PEACEFUL_BUILDER,
                 AiTaskType.FollowLeader,
                 FollowLeaderVariableBindings.Considerations);
+            registry.Add(
+                SettlementWorkerBehaviorIds.PEACEFUL_GATHERER,
+                AiTaskType.Idle,
+                considerations: null);
+            registry.Add(
+                SettlementWorkerBehaviorIds.PEACEFUL_HAULER,
+                AiTaskType.Idle,
+                considerations: null);
+            registry.Add(
+                SettlementWorkerBehaviorIds.PEACEFUL_PROCESSOR,
+                AiTaskType.Idle,
+                considerations: null);
+            registry.Add(
+                SettlementWorkerBehaviorIds.SETTLEMENT_GUARD,
+                AiTaskType.Idle,
+                considerations: null);
         }
     }
 }

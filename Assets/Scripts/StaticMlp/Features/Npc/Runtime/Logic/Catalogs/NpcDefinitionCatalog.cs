@@ -8,7 +8,12 @@ namespace StaticMlp.Features.Npc
         public static readonly NpcDefinitionId ExtractedCompanionId = new(1);
         public static readonly NpcDefinitionId RescuedSpecialistId = new(2);
         public static readonly NpcDefinitionId IncubatedResearcherId = new(3);
-        public static readonly NpcDefinitionId SeededCampBuilderId = new(4);
+        public static readonly NpcDefinitionId SeededBuilderId = new(4);
+        public static readonly NpcDefinitionId SeededCampBuilderId = SeededBuilderId;
+        public static readonly NpcDefinitionId SeededGathererId = new(5);
+        public static readonly NpcDefinitionId SeededHaulerId = new(6);
+        public static readonly NpcDefinitionId SeededProcessorId = new(7);
+        public static readonly NpcDefinitionId SeededGuardId = new(8);
 
         private static readonly NpcDefinition[] Definitions =
         {
@@ -28,9 +33,29 @@ namespace StaticMlp.Features.Npc
                 NpcRoleFlags.Processor | NpcRoleFlags.Researcher,
                 NpcAcquisitionPathFlags.Incubation),
             new(
-                SeededCampBuilderId,
+                SeededBuilderId,
                 NpcClass.Companion,
                 NpcRoleFlags.Builder,
+                NpcAcquisitionPathFlags.Seeded),
+            new(
+                SeededGathererId,
+                NpcClass.Companion,
+                NpcRoleFlags.Gatherer,
+                NpcAcquisitionPathFlags.Seeded),
+            new(
+                SeededHaulerId,
+                NpcClass.Companion,
+                NpcRoleFlags.Hauler,
+                NpcAcquisitionPathFlags.Seeded),
+            new(
+                SeededProcessorId,
+                NpcClass.Specialist,
+                NpcRoleFlags.Processor,
+                NpcAcquisitionPathFlags.Seeded),
+            new(
+                SeededGuardId,
+                NpcClass.Companion,
+                NpcRoleFlags.Guard,
                 NpcAcquisitionPathFlags.Seeded)
         };
 

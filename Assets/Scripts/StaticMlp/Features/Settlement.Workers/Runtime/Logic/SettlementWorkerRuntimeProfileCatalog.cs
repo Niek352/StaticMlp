@@ -8,9 +8,29 @@ namespace StaticMlp.Features.Settlement.Workers
         private static readonly SettlementWorkerRuntimeProfile[] Profiles =
         {
             new(
-                WorkerRoleCatalog.CampBuilderId,
-                SettlementWorkerNetworkArchetypeIds.CAMP_BUILDER_WORKER,
+                WorkerRoleCatalog.BuilderId,
+                SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER,
                 SettlementWorkerBehaviorIds.PEACEFUL_BUILDER,
+                maxHealth: 100f),
+            new(
+                WorkerRoleCatalog.GathererId,
+                SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER,
+                SettlementWorkerBehaviorIds.PEACEFUL_GATHERER,
+                maxHealth: 90f),
+            new(
+                WorkerRoleCatalog.HaulerId,
+                SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER,
+                SettlementWorkerBehaviorIds.PEACEFUL_HAULER,
+                maxHealth: 95f),
+            new(
+                WorkerRoleCatalog.ProcessorId,
+                SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER,
+                SettlementWorkerBehaviorIds.PEACEFUL_PROCESSOR,
+                maxHealth: 85f),
+            new(
+                WorkerRoleCatalog.GuardId,
+                SettlementWorkerNetworkArchetypeIds.SETTLEMENT_WORKER,
+                SettlementWorkerBehaviorIds.SETTLEMENT_GUARD,
                 maxHealth: 100f)
         };
 

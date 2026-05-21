@@ -9,7 +9,11 @@ namespace StaticMlp.Features.Settlement.Workers
     {
         private static readonly Dictionary<WorkerRoleId, NpcDefinitionId> Mappings = new()
         {
-            { WorkerRoleCatalog.CampBuilderId, NpcDefinitionCatalog.SeededCampBuilderId }
+            { WorkerRoleCatalog.BuilderId, NpcDefinitionCatalog.SeededBuilderId },
+            { WorkerRoleCatalog.GathererId, NpcDefinitionCatalog.SeededGathererId },
+            { WorkerRoleCatalog.HaulerId, NpcDefinitionCatalog.SeededHaulerId },
+            { WorkerRoleCatalog.ProcessorId, NpcDefinitionCatalog.SeededProcessorId },
+            { WorkerRoleCatalog.GuardId, NpcDefinitionCatalog.SeededGuardId }
         };
 
         public static NpcDefinitionId Get(WorkerRoleId roleId)
