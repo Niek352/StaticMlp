@@ -271,7 +271,7 @@ namespace StaticMlp.Tests.Combat
             var anchor = scope.CreateSettlementAnchor(
                 SettlementAnchorCatalog.HomeCampId,
                 Vector3.zero,
-                Stage1SettlementProgressStage.WorkerAssigned);
+                Stage1SettlementProgressStage.WorkbenchOnline);
 
             var flowSystem = new ServerStage1FlowSystem();
             flowSystem.Init();
@@ -603,6 +603,149 @@ namespace StaticMlp.Tests.Combat
             ref readonly var hud = ref CW.GetResource<Stage1HudState>();
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.RepairCamp));
             Assert.That(hud.ObjectiveHint, Is.EqualTo("Resources delivered. Keep building the camp core to finish repairs."));
+        }
+        [Test]
+        public void ServerStage1FlowSystem_WhenStockpilePlacedEventReceived_AdvancesFromWorkerAssigned()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var anchor = scope.CreateSettlementAnchor(
+                SettlementAnchorCatalog.HomeCampId,
+                Vector3.zero,
+                Stage1SettlementProgressStage.WorkerAssigned);
+
+            var flowSystem = new ServerStage1FlowSystem();
+            flowSystem.Init();
+            SW.SendEvent(new Stage1StockpilePlacedEvent(SettlementAnchorCatalog.HomeCampId));
+            flowSystem.Update();
+            flowSystem.Destroy();
+
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.StockpilePlaced));
+        }
+
+        [Test]
+        public void ServerStage1FlowSystem_WhenShelterPlacedEventReceived_AdvancesFromStockpilePlaced()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var anchor = scope.CreateSettlementAnchor(
+                SettlementAnchorCatalog.HomeCampId,
+                Vector3.zero,
+                Stage1SettlementProgressStage.StockpilePlaced);
+
+            var flowSystem = new ServerStage1FlowSystem();
+            flowSystem.Init();
+            SW.SendEvent(new Stage1ShelterPlacedEvent(SettlementAnchorCatalog.HomeCampId));
+            flowSystem.Update();
+            flowSystem.Destroy();
+
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.ShelterPlaced));
+        }
+
+        [Test]
+        public void ServerStage1FlowSystem_WhenExtractionOnlineEventReceived_AdvancesFromShelterPlaced()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var anchor = scope.CreateSettlementAnchor(
+                SettlementAnchorCatalog.HomeCampId,
+                Vector3.zero,
+                Stage1SettlementProgressStage.ShelterPlaced);
+
+            var flowSystem = new ServerStage1FlowSystem();
+            flowSystem.Init();
+            SW.SendEvent(new Stage1ExtractionOnlineEvent(SettlementAnchorCatalog.HomeCampId));
+            flowSystem.Update();
+            flowSystem.Destroy();
+
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.ExtractionOnline));
+        }
+
+        [Test]
+        public void ServerStage1FlowSystem_WhenWorkbenchOnlineEventReceived_AdvancesFromExtractionOnline()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var anchor = scope.CreateSettlementAnchor(
+                SettlementAnchorCatalog.HomeCampId,
+                Vector3.zero,
+                Stage1SettlementProgressStage.ExtractionOnline);
+
+            var flowSystem = new ServerStage1FlowSystem();
+            flowSystem.Init();
+            SW.SendEvent(new Stage1WorkbenchOnlineEvent(SettlementAnchorCatalog.HomeCampId));
+            flowSystem.Update();
+            flowSystem.Destroy();
+
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.WorkbenchOnline));
+        }
+
+        [Test]
+        public void ServerStage1FlowSystem_WhenStockpilePlacedReceivedAtWrongStage_DoesNotAdvance()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var anchor = scope.CreateSettlementAnchor(
+                SettlementAnchorCatalog.HomeCampId,
+                Vector3.zero,
+                Stage1SettlementProgressStage.CampRepaired);
+
+            var flowSystem = new ServerStage1FlowSystem();
+            flowSystem.Init();
+            SW.SendEvent(new Stage1StockpilePlacedEvent(SettlementAnchorCatalog.HomeCampId));
+            flowSystem.Update();
+            flowSystem.Destroy();
+
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.CampRepaired));
+        }
+
+        [Test]
+        public void ServerStage1FlowSystem_WhenLoadoutPreparedReceivedAtWorkerAssigned_DoesNotAdvance()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var anchor = scope.CreateSettlementAnchor(
+                SettlementAnchorCatalog.HomeCampId,
+                Vector3.zero,
+                Stage1SettlementProgressStage.WorkerAssigned);
+
+            var flowSystem = new ServerStage1FlowSystem();
+            flowSystem.Init();
+            SW.SendEvent(new Stage1LoadoutPreparedEvent(SettlementAnchorCatalog.HomeCampId));
+            flowSystem.Update();
+            flowSystem.Destroy();
+
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.WorkerAssigned));
+        }
+
+        [Test]
+        public void ServerStage1FlowSystem_WhenExtractionOnlineReceivedAtWorkerAssigned_DoesNotAdvance()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var anchor = scope.CreateSettlementAnchor(
+                SettlementAnchorCatalog.HomeCampId,
+                Vector3.zero,
+                Stage1SettlementProgressStage.WorkerAssigned);
+
+            var flowSystem = new ServerStage1FlowSystem();
+            flowSystem.Init();
+            SW.SendEvent(new Stage1ExtractionOnlineEvent(SettlementAnchorCatalog.HomeCampId));
+            flowSystem.Update();
+            flowSystem.Destroy();
+
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.WorkerAssigned));
+        }
+
+        [Test]
+        public void ServerStage1FlowSystem_WhenWorkbenchOnlineReceivedAtStockpilePlaced_DoesNotAdvance()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var anchor = scope.CreateSettlementAnchor(
+                SettlementAnchorCatalog.HomeCampId,
+                Vector3.zero,
+                Stage1SettlementProgressStage.StockpilePlaced);
+
+            var flowSystem = new ServerStage1FlowSystem();
+            flowSystem.Init();
+            SW.SendEvent(new Stage1WorkbenchOnlineEvent(SettlementAnchorCatalog.HomeCampId));
+            flowSystem.Update();
+            flowSystem.Destroy();
+
+            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.StockpilePlaced));
         }
     }
 }

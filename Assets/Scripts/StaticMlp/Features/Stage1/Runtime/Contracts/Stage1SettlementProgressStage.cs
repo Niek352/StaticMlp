@@ -7,6 +7,10 @@ namespace StaticMlp.Features.Settlement
         RepairResourcesReady = 2,
         CampRepaired = 3,
         WorkerAssigned = 4,
-        LoadoutPrepared = 5,
+        StockpilePlaced = 5,
+        ShelterPlaced = 6,
+        ExtractionOnline = 7,
+        WorkbenchOnline = 8,
+        LoadoutPrepared = 9,
     }
 }

@@ -9,12 +9,20 @@ namespace StaticMlp.Features.Stage1
     {
         private EventReceiver<ServerWT, Stage1RepairCompletedEvent> _repairCompleted;
         private EventReceiver<ServerWT, Stage1WorkerAssignmentAcceptedEvent> _workerAssigned;
+        private EventReceiver<ServerWT, Stage1StockpilePlacedEvent> _stockpilePlaced;
+        private EventReceiver<ServerWT, Stage1ShelterPlacedEvent> _shelterPlaced;
+        private EventReceiver<ServerWT, Stage1ExtractionOnlineEvent> _extractionOnline;
+        private EventReceiver<ServerWT, Stage1WorkbenchOnlineEvent> _workbenchOnline;
         private EventReceiver<ServerWT, Stage1LoadoutPreparedEvent> _buildPrepared;
 
         public void Init()
         {
             _repairCompleted = SW.RegisterEventReceiver<Stage1RepairCompletedEvent>();
             _workerAssigned = SW.RegisterEventReceiver<Stage1WorkerAssignmentAcceptedEvent>();
+            _stockpilePlaced = SW.RegisterEventReceiver<Stage1StockpilePlacedEvent>();
+            _shelterPlaced = SW.RegisterEventReceiver<Stage1ShelterPlacedEvent>();
+            _extractionOnline = SW.RegisterEventReceiver<Stage1ExtractionOnlineEvent>();
+            _workbenchOnline = SW.RegisterEventReceiver<Stage1WorkbenchOnlineEvent>();
             _buildPrepared = SW.RegisterEventReceiver<Stage1LoadoutPreparedEvent>();
         }
 
@@ -22,6 +30,10 @@ namespace StaticMlp.Features.Stage1
         {
             SW.DeleteEventReceiver(ref _repairCompleted);
             SW.DeleteEventReceiver(ref _workerAssigned);
+            SW.DeleteEventReceiver(ref _stockpilePlaced);
+            SW.DeleteEventReceiver(ref _shelterPlaced);
+            SW.DeleteEventReceiver(ref _extractionOnline);
+            SW.DeleteEventReceiver(ref _workbenchOnline);
             SW.DeleteEventReceiver(ref _buildPrepared);
         }
 
@@ -35,8 +47,20 @@ namespace StaticMlp.Features.Stage1
             foreach (var evt in _workerAssigned)
                 AdvanceFromFact(evt.Value.AnchorId, Stage1SettlementProgressStage.CampRepaired, Stage1SettlementProgressStage.WorkerAssigned);
 
+            foreach (var evt in _stockpilePlaced)
+                AdvanceFromFact(evt.Value.AnchorId, Stage1SettlementProgressStage.WorkerAssigned, Stage1SettlementProgressStage.StockpilePlaced);
+
+            foreach (var evt in _shelterPlaced)
+                AdvanceFromFact(evt.Value.AnchorId, Stage1SettlementProgressStage.StockpilePlaced, Stage1SettlementProgressStage.ShelterPlaced);
+
+            foreach (var evt in _extractionOnline)
+                AdvanceFromFact(evt.Value.AnchorId, Stage1SettlementProgressStage.ShelterPlaced, Stage1SettlementProgressStage.ExtractionOnline);
+
+            foreach (var evt in _workbenchOnline)
+                AdvanceFromFact(evt.Value.AnchorId, Stage1SettlementProgressStage.ExtractionOnline, Stage1SettlementProgressStage.WorkbenchOnline);
+
             foreach (var evt in _buildPrepared)
-                AdvanceFromFact(evt.Value.AnchorId, Stage1SettlementProgressStage.WorkerAssigned, Stage1SettlementProgressStage.LoadoutPrepared);
+                AdvanceFromFact(evt.Value.AnchorId, Stage1SettlementProgressStage.WorkbenchOnline, Stage1SettlementProgressStage.LoadoutPrepared);
         }
 
         private static void AdvanceAutomaticStages()
