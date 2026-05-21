@@ -8,6 +8,8 @@
         "StaticMlp.Editor.Ai",
         "StaticMlp.Features.AiBots",
         "StaticMlp.Features.AiActions",
+        "StaticMlp.Features.AiNavigation.Contracts",
+        "StaticMlp.Features.AiNavigation.Logic",
         "StaticMlp.Features.Buildings.Contracts",
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.Combat.Logic",
@@ -20,7 +22,8 @@
         "StaticMlp.Features.Settlement.Workers.Logic",
         "StaticMlp.Features.Stage1.Contracts",
         "StaticMlp.Features.Npc.Contracts",
-        "StaticMlp.Features.Npc.Logic"
+        "StaticMlp.Features.Npc.Logic",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts"
     ],
     "includePlatforms": [
         "Editor"

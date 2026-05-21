@@ -8,6 +8,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
     public readonly struct OpenWorldChunkGenerationCompleted : IEvent
     {
         public readonly WorldChunkId ChunkId;
+        public readonly float ChunkWorldSize;
         public readonly int Lod;
         public readonly GenerationOutputMask Outputs;
         public readonly TerrainMeshData TerrainMesh;
@@ -18,6 +19,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
         public OpenWorldChunkGenerationCompleted(
             WorldChunkId chunkId,
+            float chunkWorldSize,
             int lod,
             GenerationOutputMask outputs,
             TerrainMeshData terrainMesh,
@@ -27,6 +29,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
             SpawnPlacement[] spawnPlacements)
         {
             ChunkId = chunkId;
+            ChunkWorldSize = chunkWorldSize;
             Lod = lod;
             Outputs = outputs;
             TerrainMesh = terrainMesh;

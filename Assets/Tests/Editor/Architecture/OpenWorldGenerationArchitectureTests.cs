@@ -10,6 +10,7 @@ namespace StaticMlp.Tests.Architecture
         private const string FEATURES_ROOT = "Assets/Scripts/StaticMlp/Features";
         private const string OPEN_WORLD_ROOT = FEATURES_ROOT + "/OpenWorldGeneration";
         private const string OPEN_WORLD_RESOURCES_ROOT = FEATURES_ROOT + "/OpenWorldResources";
+        private const string AI_NAVIGATION_ROOT = FEATURES_ROOT + "/AiNavigation";
         private const string FRONTIER_ROOT = FEATURES_ROOT + "/Frontier";
         private const string CONTRACTS_ROOT = OPEN_WORLD_ROOT + "/Runtime/Contracts";
         private const string LPG_NAMESPACE = "Runevision.LayerProcGen";
@@ -28,12 +29,13 @@ namespace StaticMlp.Tests.Architecture
         }
 
         [Test]
-        public void ExistingFeatures_DoNotReferenceOpenWorldGenerationInV1()
+        public void ExistingFeatures_DoNotReferenceOpenWorldGenerationExceptApprovedConsumers()
         {
             var offenders = Directory
                 .EnumerateDirectories(Path.Combine(ProjectRoot(), FEATURES_ROOT.Replace('/', Path.DirectorySeparatorChar)))
                 .Where(directory => !directory.EndsWith("OpenWorldGeneration", StringComparison.Ordinal))
                 .Where(directory => !directory.EndsWith("OpenWorldResources", StringComparison.Ordinal))
+                .Where(directory => !directory.EndsWith("AiNavigation", StringComparison.Ordinal))
                 .SelectMany(directory => Directory.EnumerateFiles(directory, "*.*", SearchOption.AllDirectories))
                 .Where(path => path.EndsWith(".cs", StringComparison.Ordinal) || path.EndsWith(".asmdef", StringComparison.Ordinal))
                 .Where(path => File.ReadAllText(path).Contains(OPEN_WORLD_NAMESPACE))
@@ -41,6 +43,22 @@ namespace StaticMlp.Tests.Architecture
                 .ToArray();
 
             Assert.That(offenders, Is.Empty);
+        }
+
+        [Test]
+        public void AiNavigation_DependsOnOpenWorldGenerationContractsOnly()
+        {
+            var asmdefPath = Path.Combine(
+                ProjectRoot(),
+                AI_NAVIGATION_ROOT.Replace('/', Path.DirectorySeparatorChar),
+                "Runtime",
+                "Logic",
+                "StaticMlp.Features.AiNavigation.Logic.asmdef");
+            var text = File.ReadAllText(asmdefPath);
+
+            Assert.That(text, Does.Contain("\"StaticMlp.Features.OpenWorldGeneration.Contracts\""));
+            Assert.That(text, Does.Not.Contain("StaticMlp.Features.OpenWorldGeneration.Logic"));
+            Assert.That(text, Does.Not.Contain("StaticMlp.Features.OpenWorldGeneration.Presentation"));
         }
 
         [Test]
@@ -255,6 +273,24 @@ namespace StaticMlp.Tests.Architecture
                 .Where(path => path.EndsWith(".prefab", StringComparison.Ordinal)
                                || path.EndsWith(".Generated.cs", StringComparison.Ordinal))
                 .Select(NormalizeRelativePath)
+                .ToArray();
+
+            Assert.That(offenders, Is.Empty);
+        }
+
+        [Test]
+        public void OpenWorldGeneration_DoesNotOwnRuntimeNavMeshSurfaces()
+        {
+            var forbiddenTokens = new[]
+            {
+                "NavMeshBuilder",
+                "NavMesh.AddNavMeshData",
+                "OpenWorldNavMeshSurfaceRuntime",
+                "ServerOpenWorldNavMeshSurfaceSystem"
+            };
+            var offenders = EnumerateProjectFiles(OPEN_WORLD_ROOT, "*.cs", "*.asmdef")
+                .Where(file => forbiddenTokens.Any(token => File.ReadAllText(file.FullPath).Contains(token)))
+                .Select(file => file.RelativePath)
                 .ToArray();
 
             Assert.That(offenders, Is.Empty);

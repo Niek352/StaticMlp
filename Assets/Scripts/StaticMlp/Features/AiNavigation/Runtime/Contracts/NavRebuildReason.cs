@@ -4,6 +4,7 @@ namespace StaticMlp.Features.AiNavigation
     {
         InitialBuild = 1,
         CombatCellNavAreaChanged = 2,
-        Prewarm = 3
+        SourceGeometryChanged = 3,
+        Prewarm = 4
     }
 }

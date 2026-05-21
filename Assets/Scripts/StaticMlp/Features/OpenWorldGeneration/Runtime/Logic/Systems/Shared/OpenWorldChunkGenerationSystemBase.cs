@@ -128,6 +128,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
             return new PendingChunkGeneration(
                 request.ChunkId,
+                request.Request.ChunkWorldSize,
                 request.Request.Lod,
                 request.Outputs,
                 outputLayers,
@@ -154,11 +155,19 @@ namespace StaticMlp.Features.OpenWorldGeneration
         private OpenWorldChunkGenerationCompleted BuildCompletedEvent(PendingChunkGeneration pending)
         {
             TerrainMeshData mesh = null;
+            TerrainMeshData navMeshSourceMesh = null;
             ResourcePlacement[] resourcePlacements = Array.Empty<ResourcePlacement>();
             SpawnPlacement[] spawnPlacements = Array.Empty<SpawnPlacement>();
 
-            if (HasMeshOutput(pending.Outputs))
-                mesh = BuildManagedMesh(GetLayerData<OpenWorldMeshChunkData>(pending, OpenWorldGenerationLayerIds.MeshData));
+            var meshData = HasMeshOutput(pending.Outputs)
+                ? GetLayerData<OpenWorldMeshChunkData>(pending, OpenWorldGenerationLayerIds.MeshData)
+                : null;
+
+            if ((pending.Outputs & (GenerationOutputMask.VisualMesh | GenerationOutputMask.PhysicsMesh)) != 0)
+                mesh = BuildManagedMesh(meshData);
+
+            if (pending.Outputs.HasFlag(GenerationOutputMask.NavMeshSourceMesh))
+                navMeshSourceMesh = BuildManagedNavMeshSourceMesh(meshData);
 
             if (pending.Outputs.HasFlag(GenerationOutputMask.Placements))
             {
@@ -178,11 +187,12 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
             return new OpenWorldChunkGenerationCompleted(
                 pending.ChunkId,
+                pending.ChunkWorldSize,
                 pending.Lod,
                 pending.Outputs,
                 pending.Outputs.HasFlag(GenerationOutputMask.VisualMesh) ? mesh : null,
                 pending.Outputs.HasFlag(GenerationOutputMask.PhysicsMesh) ? mesh : null,
-                pending.Outputs.HasFlag(GenerationOutputMask.NavMeshSourceMesh) ? mesh : null,
+                navMeshSourceMesh,
                 resourcePlacements,
                 spawnPlacements);
         }
@@ -247,6 +257,28 @@ namespace StaticMlp.Features.OpenWorldGeneration
                 new Vector3(meshData.ChunkWorldSize, boundsHeight, meshData.ChunkWorldSize));
 
             return new TerrainMeshData(vertices, normals, tangents, uvs, colors, triangles, bounds);
+        }
+
+        private static TerrainMeshData BuildManagedNavMeshSourceMesh(OpenWorldMeshChunkData meshData)
+        {
+            var vertices = new Vector3[meshData.Vertices.Length];
+            for (var i = 0; i < meshData.Vertices.Length; i++)
+            {
+                var v = meshData.Vertices[i];
+                vertices[i] = new Vector3(v.x, v.y, v.z);
+            }
+
+            var triangles = new int[meshData.Triangles.Length];
+            meshData.Triangles.CopyTo(triangles);
+
+            var minY = meshData.OutMinY[0];
+            var maxY = meshData.OutMaxY[0];
+            var boundsHeight = maxY - minY;
+            var bounds = new Bounds(
+                new Vector3(meshData.ChunkWorldSize * 0.5f, minY + boundsHeight * 0.5f, meshData.ChunkWorldSize * 0.5f),
+                new Vector3(meshData.ChunkWorldSize, boundsHeight, meshData.ChunkWorldSize));
+
+            return new TerrainMeshData(vertices, null, null, null, null, triangles, bounds);
         }
 
         private void ValidateRequest(in OpenWorldChunkGenerationRequested request)
@@ -335,12 +367,14 @@ namespace StaticMlp.Features.OpenWorldGeneration
         {
             public PendingChunkGeneration(
                 WorldChunkId chunkId,
+                float chunkWorldSize,
                 int lod,
                 GenerationOutputMask outputs,
                 LayerProcLiteLayerId[] outputLayers,
                 LayerProcLiteTopDependencyId[] topDependencies)
             {
                 ChunkId = chunkId;
+                ChunkWorldSize = chunkWorldSize;
                 Lod = lod;
                 Outputs = outputs;
                 OutputLayers = outputLayers;
@@ -348,6 +382,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
             }
 
             public readonly WorldChunkId ChunkId;
+            public readonly float ChunkWorldSize;
             public readonly int Lod;
             public readonly GenerationOutputMask Outputs;
             public readonly LayerProcLiteLayerId[] OutputLayers;

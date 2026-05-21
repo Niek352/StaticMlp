@@ -8,7 +8,10 @@
         "StaticMlp.Features.CombatDirector.Contracts",
         "StaticMlp.Features.Frontier.Contracts",
         "StaticMlp.Features.Combat.Logic",
-        "Ecs.Networking"
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
+        "Unity.Entities",
+        "Ecs.Networking",
+        "Unity.Collections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -154,7 +154,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
             var clusterId = OpenWorldSpatialClusterIds.ToClusterId(chunkId, bounds);
             SW.GetResource<OpenWorldServerChunkGeometryRuntime>().Remove(chunkId);
-            SW.GetResource<OpenWorldNavMeshSurfaceRuntime>().Remove(chunkId);
+            SW.SendEvent(new OpenWorldChunkUnloadEvent(chunkId, clusterId));
             state.SetSnapshot(chunkId, null);
             SW.SetActiveCluster(clusterId, false);
             //TODO:Rework in future

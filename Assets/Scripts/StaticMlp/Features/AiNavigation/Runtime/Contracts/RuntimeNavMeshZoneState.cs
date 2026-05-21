@@ -7,6 +7,9 @@ namespace StaticMlp.Features.AiNavigation
     {
         public int NavVersion;
         public int RequestedNavVersion;
+        public ulong SourceSetVersion;
+        public ulong RequestedSourceSetVersion;
+        public ulong LastObservedRegistryVersion;
         public RuntimeNavMeshBuildState BuildState;
         public uint NextAllowedRebuildTick;
         public float3 LastQueuedCenter;

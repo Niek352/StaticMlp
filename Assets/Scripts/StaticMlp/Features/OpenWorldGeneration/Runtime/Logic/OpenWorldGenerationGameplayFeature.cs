@@ -12,7 +12,6 @@ namespace StaticMlp.Features.OpenWorldGeneration
             SW.SetResource(OpenWorldGenerationServerRuntime.CreateDefault());
             SW.SetResource(new OpenWorldChunkStreamingState());
             SW.SetResource(new OpenWorldServerChunkGeometryRuntime());
-            SW.SetResource(new OpenWorldNavMeshSurfaceRuntime());
             SW.SetResource<IHeightSampler>(CreateHeightSampler(generationRuntime));
         }
 
@@ -22,7 +21,6 @@ namespace StaticMlp.Features.OpenWorldGeneration
             systems.Add(new ServerOpenWorldChunkGenerationBridgeSystem(), GameplaySystemOrder.ServerConnectionGameplay + 31);
             systems.Add(new ServerOpenWorldChunkGenerationSystem(), GameplaySystemOrder.ServerConnectionGameplay + 32);
             systems.Add(new ServerOpenWorldChunkGeometryStoreSystem(), GameplaySystemOrder.ServerConnectionGameplay + 36);
-            systems.Add(new ServerOpenWorldNavMeshSurfaceSystem(), GameplaySystemOrder.ServerConnectionGameplay + 37);
             systems.Add(new ServerOpenWorldChunkGenerationCompleteSystem(), GameplaySystemOrder.ServerConnectionGameplay + 38);
             systems.Add(new ServerOpenWorldChunkSnapshotSystem(), GameplaySystemOrder.ServerConnectionGameplay + 40);
             //systems.Add(new ServerOpenWorldGenerationRuntimeCleanupSystem(), GameplaySystemOrder.CollectReplication + 90);

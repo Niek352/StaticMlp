@@ -26,7 +26,10 @@ namespace StaticMlp.Features.AiNavigation
                     entity.Delete<NavRebuildRequest>();
 
                 if (entity.Has<RuntimeNavMeshZoneState>())
+                {
+                    SW.GetResource<RuntimeNavMeshZoneBackend>().Remove(entity.GID);
                     entity.Delete<RuntimeNavMeshZoneState>();
+                }
 
                 if (entity.Has<NavWorkBudgetCounter>())
                     entity.Delete<NavWorkBudgetCounter>();

@@ -44,6 +44,7 @@ One mesh data layer currently serves all mesh outputs. Keep the output mask expl
 - `OpenWorldGenerationServerRuntime`: server budgets, default request, streaming radius, and server geometry LOD.
 - `OpenWorldChunkStreamingState`: per-peer loaded chunks, server loaded/loading chunk sets, and pending snapshot queue.
 - `OpenWorldServerChunkGeometryRuntime`: generated server geometry cache.
+- `IHeightSampler`: deterministic height sampling contract.
 
 Server systems run in this order:
 
@@ -56,6 +57,7 @@ Server systems run in this order:
 7. `ServerOpenWorldChunkSnapshotSystem` builds one public cluster snapshot packet per cluster per frame budget and sends it to waiting peers.
 
 Server interest owns which replicated ECS clusters a peer should have. It does not send terrain render meshes to clients.
+OpenWorldGeneration publishes `NavMeshSourceMesh` data, but runtime NavMesh bake ownership belongs to AiNavigation zones.
 
 ## Client Flow
 

@@ -1172,6 +1172,7 @@ namespace StaticMlp.Tests.CombatDirector
         {
             SW.SendEvent(new OpenWorldChunkGenerationCompleted(
                 chunkId,
+                128f,
                 lod: 0,
                 outputs: GenerationOutputMask.Placements,
                 terrainMesh: null,

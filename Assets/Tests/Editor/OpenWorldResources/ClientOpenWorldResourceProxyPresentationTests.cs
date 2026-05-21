@@ -141,6 +141,7 @@ namespace StaticMlp.Tests.OpenWorldResources
             {
                 CW.SendEvent(new OpenWorldChunkGenerationCompleted(
                     placement.ChunkId,
+                    128f,
                     0,
                     default,
                     default,
