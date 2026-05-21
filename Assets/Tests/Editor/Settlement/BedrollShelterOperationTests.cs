@@ -1,4 +1,5 @@
 using System;
+using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
@@ -44,11 +45,8 @@ namespace StaticMlp.Tests.Settlement
                 finished.GID,
                 BuildingCatalogData.BedrollShelterId,
                 SettlementAnchorCatalog.HomeCampId,
-                new ConstructionTransform
-                {
-                    Position = Vector3.zero,
-                    Rotation = Quaternion.identity
-                }));
+                Vector3.zero,
+                Quaternion.identity));
             system.Update();
             system.Destroy();
 

@@ -44,7 +44,8 @@ namespace StaticMlp.Features.Buildings
                 owner,
                 definition,
                 anchorRef.Anchor,
-                transform));
+                transform.Position,
+                transform.Rotation));
             if (!finishedGid.TryUnpack<ServerWT>(out _))
                 throw new System.InvalidOperationException("Spawned finished building could not be unpacked in server world.");
 
@@ -52,7 +53,8 @@ namespace StaticMlp.Features.Buildings
                 finishedGid,
                 definition.Id,
                 anchorRef.Anchor,
-                transform));
+                transform.Position,
+                transform.Rotation));
 
             if (definition.Id == BuildingCatalogData.CampCoreId)
                 SW.SendEvent(new Stage1RepairCompletedEvent(anchorRef.Anchor));

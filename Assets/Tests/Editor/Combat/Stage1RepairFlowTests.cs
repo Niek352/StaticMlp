@@ -66,7 +66,7 @@ namespace StaticMlp.Tests.Combat
                 Assert.That(evt.Value.FinishedBuilding, Is.EqualTo(finishedGid));
                 Assert.That(evt.Value.BuildingId, Is.EqualTo(BuildingCatalogData.CampCoreId));
                 Assert.That(evt.Value.AnchorId, Is.EqualTo(SettlementAnchorCatalog.HomeCampId));
-                Assert.That(evt.Value.Transform.Position, Is.EqualTo(Vector3.zero));
+                Assert.That(evt.Value.Position, Is.EqualTo(Vector3.zero));
             }
 
             SW.DeleteEventReceiver(ref completedReceiver);

@@ -54,11 +54,8 @@ namespace StaticMlp.Tests.Settlement
                 finished.GID,
                 BuildingCatalogData.WorkbenchId,
                 SettlementAnchorCatalog.HomeCampId,
-                new ConstructionTransform
-                {
-                    Position = Vector3.zero,
-                    Rotation = Quaternion.identity
-                }));
+                Vector3.zero,
+                Quaternion.identity));
             system.Update();
             system.Destroy();
 

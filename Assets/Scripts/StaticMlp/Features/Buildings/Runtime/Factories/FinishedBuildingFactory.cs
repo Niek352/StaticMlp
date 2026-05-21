@@ -1,4 +1,4 @@
-﻿using FFS.Libraries.StaticEcs;
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game;
 using StaticMlp.Networking;
@@ -33,7 +33,11 @@ namespace StaticMlp.Features.Buildings
                 BuildingId = spec.Definition.Id.Value,
                 Phase = ConstructionPhase.Completed
             });
-            entity.Set(spec.Transform);
+            entity.Set(new ConstructionTransform
+            {
+                Position = spec.Position,
+                Rotation = spec.Rotation
+            });
             entity.Set(new ConstructionResources());
             ConstructionResourcesAccess.InitializeRows(entity, spec.Definition.ConstructionCost);
             SettlementConstructionRules.MarkAllResourcesDelivered(entity);
