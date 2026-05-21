@@ -39,18 +39,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 21,
                 WriteBuildConstructionResultEvent,
                 ReadBuildConstructionResultEvent);
-            NetworkEventRegistry.Register<DepositConstructionResourcesRequestEvent>(
-                ReplicatedNetworkEventIds.DepositConstructionResourcesRequestEvent,
-                NetDelivery.ReliableSequenced,
-                20,
-                WriteDepositConstructionResourcesRequestEvent,
-                ReadDepositConstructionResourcesRequestEvent);
-            NetworkEventRegistry.Register<DepositConstructionResourcesResultEvent>(
-                ReplicatedNetworkEventIds.DepositConstructionResourcesResultEvent,
-                NetDelivery.ReliableSequenced,
-                21,
-                WriteDepositConstructionResourcesResultEvent,
-                ReadDepositConstructionResourcesResultEvent);
             NetworkEventRegistry.Register<PlaceBuildingRequestEvent>(
                 ReplicatedNetworkEventIds.PlaceBuildingRequestEvent,
                 NetDelivery.ReliableSequenced,
@@ -198,40 +186,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 Site = reader.ReadEntityGid(),
                 AcceptedWork = reader.ReadFloat(),
                 BuildWorkDone = reader.ReadFloat(),
-            };
-        }
-
-        private static void WriteDepositConstructionResourcesRequestEvent(ref NetworkWriter writer, in DepositConstructionResourcesRequestEvent evt) {
-            writer.WriteRequestId(evt.RequestId);
-            writer.WriteEntityGid(evt.Site);
-            writer.WriteInt(evt.Wood);
-            writer.WriteInt(evt.Stone);
-        }
-
-        private static DepositConstructionResourcesRequestEvent ReadDepositConstructionResourcesRequestEvent(ref NetworkReader reader) {
-            return new DepositConstructionResourcesRequestEvent {
-                RequestId = reader.ReadRequestId(),
-                Site = reader.ReadEntityGid(),
-                Wood = reader.ReadInt(),
-                Stone = reader.ReadInt(),
-            };
-        }
-
-        private static void WriteDepositConstructionResourcesResultEvent(ref NetworkWriter writer, in DepositConstructionResourcesResultEvent evt) {
-            writer.WriteEntityGid(evt.Site);
-            writer.WriteInt(evt.AcceptedWood);
-            writer.WriteInt(evt.AcceptedStone);
-            writer.WriteRequestId(evt.RequestId);
-            writer.WriteByte((byte)evt.Status);
-        }
-
-        private static DepositConstructionResourcesResultEvent ReadDepositConstructionResourcesResultEvent(ref NetworkReader reader) {
-            return new DepositConstructionResourcesResultEvent {
-                Site = reader.ReadEntityGid(),
-                AcceptedWood = reader.ReadInt(),
-                AcceptedStone = reader.ReadInt(),
-                RequestId = reader.ReadRequestId(),
-                Status = (RequestStatus)reader.ReadByte(),
             };
         }
 

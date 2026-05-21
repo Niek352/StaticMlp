@@ -35,13 +35,12 @@ namespace StaticMlp.Features.Buildings
                 return rejected;
 
             ref var state = ref ReplicationMut.Mut<ConstructionSiteState>(site);
-            ref readonly var resources = ref site.Read<ConstructionResources>();
             ref var progress = ref ReplicationMut.Mut<ConstructionProgress>(site);
             var before = progress.BuildWorkDone;
-            if (!ConstructionRules.ApplyBuildWork(
+            if (!SettlementConstructionRules.ApplyBuildWork(
+                    site,
                     ref state,
                     ref progress,
-                    in resources,
                     request.WorkAmount,
                     _maxWorkPerRequest))
                 return rejected;

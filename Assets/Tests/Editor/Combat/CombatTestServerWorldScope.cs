@@ -40,6 +40,7 @@ namespace StaticMlp.Tests.Combat
             ReplicatedComponentRegistration.RegisterReplicationComponents();
             new LoadoutLogicFeature().RegisterNetworkEvents();
             new CombatLogicFeature().RegisterNetworkEvents();
+            new BuildingsGameplayFeature().RegisterNetworkEvents();
             new FrontierLogicFeature().RegisterNetworkEvents();
             new Stage1CampAnchorGameplayFeature().RegisterNetworkEvents();
             SW.Create(WorldConfig.Default());
@@ -263,11 +264,17 @@ namespace StaticMlp.Tests.Combat
         {
             var entity = SW.NewEntity<Default>();
             entity.Set<SettlementResourceStorageTag>();
-            entity.Set(new SettlementSharedResources
-            {
-                Wood = wood,
-                Stone = stone
-            });
+            entity.Set(new SettlementSharedResources { Capacity = int.MaxValue });
+            ref var rows = ref entity.Add<SW.Multi<SettlementStoredResource>>();
+            rows.Add(new SettlementStoredResource(ResourceCatalog.WoodId, wood));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.StoneId, stone));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.PlanksId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.SimplePartsId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.RepairKitsId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.FoodId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.FuelId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.ResearchDataId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.MedicineId, 0));
             return entity;
         }
 
@@ -297,11 +304,10 @@ namespace StaticMlp.Tests.Combat
             ref var state = ref entity.Mut<ConstructionSiteState>();
             state.Phase = phase;
 
-            ref var resources = ref entity.Mut<ConstructionResources>();
-            resources.WoodRequired = woodRequired;
-            resources.StoneRequired = stoneRequired;
-            resources.WoodDelivered = woodRequired;
-            resources.StoneDelivered = stoneRequired;
+            ref var resources = ref entity.Ref<SW.Multi<ConstructionResourceEntry>>();
+            resources.Clear();
+            resources.Add(new ConstructionResourceEntry(ResourceCatalog.WoodId, woodRequired, woodRequired));
+            resources.Add(new ConstructionResourceEntry(ResourceCatalog.StoneId, stoneRequired, stoneRequired));
 
             ref var progress = ref entity.Mut<ConstructionProgress>();
             progress.BuildWorkRequired = buildWorkRequired;

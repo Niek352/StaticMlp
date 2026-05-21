@@ -1,3 +1,4 @@
+using System;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
@@ -24,7 +25,8 @@ namespace StaticMlp.Features.Buildings
             {
                 RequestId = request.RequestId,
                 Status = RequestStatus.Rejected,
-                Site = request.Site
+                Site = request.Site,
+                AcceptedResources = Array.Empty<ResourceAmount>()
             };
 
             if (!ConstructionSiteQuery.TryGetConstructionSite(request.Site, out var site))
@@ -34,64 +36,60 @@ namespace StaticMlp.Features.Buildings
             if (!ServerPeerPlayers.IsPlayerNear(sourcePeer, transform.Position, _interactionRange))
                 return rejected;
 
-            if (!HasValidAmounts(in request))
+            if (!HasValidAmounts(request.Resources))
                 return rejected;
 
             var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
-            var storage = storageEntity.Read<SettlementSharedResources>();
             var currentState = site.Read<ConstructionSiteState>();
-            var currentResources = site.Read<ConstructionResources>();
             if (!SettlementConstructionRules.TryPlanResourceDeposit(
                     in currentState,
-                    in currentResources,
-                    storage.GetAmount(ResourceCatalog.WoodId),
-                    storage.GetAmount(ResourceCatalog.StoneId),
-                    storage.GetAmount(ResourceCatalog.PlanksId),
-                    storage.GetAmount(ResourceCatalog.SimplePartsId),
-                    request.Wood,
-                    request.Stone,
-                    request.Planks,
-                    request.SimpleParts,
-                    out var wood,
-                    out var stone,
-                    out var planks,
-                    out var simpleParts))
+                    site,
+                    storageEntity,
+                    request.Resources,
+                    out var acceptedResources))
                 return rejected;
 
-            ref var mutableStorage = ref ReplicationMut.Mut<SettlementSharedResources>(storageEntity);
-            var spentWood = mutableStorage.Spend(ResourceCatalog.WoodId, wood);
-            var spentStone = mutableStorage.Spend(ResourceCatalog.StoneId, stone);
-            var spentPlanks = mutableStorage.Spend(ResourceCatalog.PlanksId, planks);
-            var spentSimpleParts = mutableStorage.Spend(ResourceCatalog.SimplePartsId, simpleParts);
+            var spentResources = new ResourceAmount[acceptedResources.Length];
+            var spentCount = 0;
+            for (var i = 0; i < acceptedResources.Length; i++)
+            {
+                var accepted = acceptedResources[i];
+                var spent = SettlementSharedResourcesAccess.Spend(storageEntity, accepted.Id, accepted.Amount);
+                if (spent > 0)
+                    spentResources[spentCount++] = new ResourceAmount(accepted.Id, spent);
+            }
+
+            if (spentCount != spentResources.Length)
+            {
+                var compact = new ResourceAmount[spentCount];
+                Array.Copy(spentResources, compact, spentCount);
+                spentResources = compact;
+            }
 
             ref var state = ref ReplicationMut.Mut<ConstructionSiteState>(site);
-            ref var resources = ref ReplicationMut.Mut<ConstructionResources>(site);
-            SettlementConstructionRules.ApplyResourceDeposit(
-                ref state,
-                ref resources,
-                spentWood,
-                spentStone,
-                spentPlanks,
-                spentSimpleParts);
+            SettlementConstructionRules.ApplyResourceDeposit(site, ref state, spentResources);
 
             return new DepositConstructionResourcesResultEvent
             {
                 RequestId = request.RequestId,
                 Status = RequestStatus.Accepted,
                 Site = request.Site,
-                AcceptedWood = spentWood,
-                AcceptedStone = spentStone,
-                AcceptedPlanks = spentPlanks,
-                AcceptedSimpleParts = spentSimpleParts
+                AcceptedResources = spentResources
             };
         }
 
-        private static bool HasValidAmounts(in DepositConstructionResourcesRequestEvent request)
+        private static bool HasValidAmounts(ResourceAmount[] resources)
         {
-            return request.Wood >= 0
-                   && request.Stone >= 0
-                   && request.Planks >= 0
-                   && request.SimpleParts >= 0;
+            if (resources == null)
+                return false;
+
+            for (var i = 0; i < resources.Length; i++)
+            {
+                if (resources[i].Amount < 0)
+                    return false;
+            }
+
+            return true;
         }
     }
 }

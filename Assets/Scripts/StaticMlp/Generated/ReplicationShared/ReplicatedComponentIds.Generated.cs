@@ -2,6 +2,9 @@
 namespace StaticMlp.Networking.Replication {
     public static class ReplicatedComponentIds {
         public const ushort AiNetState = 19454;
+        public const ushort DirectorState = 52302;
+        public const ushort EnemyArchetype = 42419;
+        public const ushort EnemySpawnSource = 40725;
         public const ushort ActiveExpeditionState = 30396;
         public const ushort BossEncounterState = 20985;
         public const ushort ExpeditionAvailabilityState = 12104;

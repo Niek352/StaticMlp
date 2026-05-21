@@ -59,11 +59,17 @@ namespace StaticMlp.Tests.Ai
         {
             var entity = SW.NewEntity<Default>();
             entity.Set<SettlementResourceStorageTag>();
-            entity.Set(new SettlementSharedResources
-            {
-                Wood = wood,
-                Stone = stone
-            });
+            entity.Set(new SettlementSharedResources { Capacity = int.MaxValue });
+            ref var rows = ref entity.Add<SW.Multi<SettlementStoredResource>>();
+            rows.Add(new SettlementStoredResource(ResourceCatalog.WoodId, wood));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.StoneId, stone));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.PlanksId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.SimplePartsId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.RepairKitsId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.FoodId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.FuelId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.ResearchDataId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.MedicineId, 0));
             return entity;
         }
 
@@ -171,13 +177,10 @@ namespace StaticMlp.Tests.Ai
                 BuildingId = 1,
                 Phase = phase
             });
-            entity.Set(new ConstructionResources
-            {
-                WoodRequired = 10,
-                StoneRequired = 5,
-                WoodDelivered = resourcesComplete ? 10 : 0,
-                StoneDelivered = resourcesComplete ? 5 : 0
-            });
+            entity.Set(new ConstructionResources());
+            ref var rows = ref entity.Add<SW.Multi<ConstructionResourceEntry>>();
+            rows.Add(new ConstructionResourceEntry(ResourceCatalog.WoodId, 10, resourcesComplete ? 10 : 0));
+            rows.Add(new ConstructionResourceEntry(ResourceCatalog.StoneId, 5, resourcesComplete ? 5 : 0));
             entity.Set(new ConstructionTransform
             {
                 Position = position,

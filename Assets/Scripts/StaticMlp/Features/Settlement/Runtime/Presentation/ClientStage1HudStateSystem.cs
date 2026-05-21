@@ -21,8 +21,8 @@ namespace StaticMlp.Features.Settlement
                 Objective = ToPresentationObjective(flow.Objective),
                 ObjectiveHint = ToPresentationHint(flow.Hint),
                 SettlementStage = flow.Stage,
-                Wood = resources.Wood,
-                Stone = resources.Stone,
+                Wood = SettlementSharedResourcesAccess.GetProjectedAmount(resources, ResourceCatalog.WoodId),
+                Stone = SettlementSharedResourcesAccess.GetProjectedAmount(resources, ResourceCatalog.StoneId),
                 CanOpenLoadoutPreparation = flow.CanOpenLoadoutPreparation,
                 CanOpenExpeditionSelection = flow.CanOpenExpeditionSelection,
             };
@@ -75,7 +75,7 @@ namespace StaticMlp.Features.Settlement
         private static bool TryGetRequiredState(
             out CW.Entity anchor,
             out Stage1FlowViewState flow,
-            out SettlementSharedResources resources)
+            out CW.Entity resources)
         {
             if (!Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out anchor))
             {
@@ -148,11 +148,11 @@ namespace StaticMlp.Features.Settlement
             return false;
         }
 
-        private static bool TryReadSharedResources(out SettlementSharedResources resources)
+        private static bool TryReadSharedResources(out CW.Entity resources)
         {
             foreach (var entity in CW.Query<All<SettlementResourceStorageTag, SettlementSharedResources>>().Entities())
             {
-                resources = entity.Read<SettlementSharedResources>();
+                resources = entity;
                 return true;
             }
 

@@ -4,8 +4,6 @@ namespace StaticMlp.Networking.Replication.Generated {
         public const ushort CommandBotEvent = 56001;
         public const ushort BuildConstructionRequestEvent = 31658;
         public const ushort BuildConstructionResultEvent = 31659;
-        public const ushort DepositConstructionResourcesRequestEvent = 32403;
-        public const ushort DepositConstructionResourcesResultEvent = 32404;
         public const ushort PlaceBuildingRequestEvent = 32815;
         public const ushort DamageNumberEvent = 57023;
         public const ushort DeathEvent = 57024;

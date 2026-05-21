@@ -62,8 +62,11 @@ namespace StaticMlp.Features.Settlement
             {
                 var depositRequest = new DepositConstructionResourcesRequestEvent(
                     state.FocusedSite,
-                    Mathf.Max(0, state.WoodRequired - state.WoodDelivered),
-                    Mathf.Max(0, state.StoneRequired - state.StoneDelivered));
+                    new[]
+                    {
+                        new ResourceAmount(ResourceCatalog.WoodId, Mathf.Max(0, state.WoodRequired - state.WoodDelivered)),
+                        new ResourceAmount(ResourceCatalog.StoneId, Mathf.Max(0, state.StoneRequired - state.StoneDelivered))
+                    });
                 RequestApi.Send<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(depositRequest);
                 return;
             }

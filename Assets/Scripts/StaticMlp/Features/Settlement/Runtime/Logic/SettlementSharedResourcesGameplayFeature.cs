@@ -11,6 +11,7 @@ namespace StaticMlp.Features.Settlement
         public override void RegisterNetworkEvents()
         {
             ProjectionRegistry.Register<SettlementSharedResources>();
+            ProjectionRegistry.RegisterMulti<SettlementStoredResource>();
             ProjectionRegistry.Register<Stage1SettlementProgression>();
         }
 
@@ -38,6 +39,7 @@ namespace StaticMlp.Features.Settlement
             systems.Add(new ServerSettlementSharedResourcesSpawnSystem(), (short)(GameplaySystemOrder.ServerConnectionGameplay - 15));
             systems.Add(new ServerDepositConstructionResourcesSystem(), GameplaySystemOrder.Gameplay - 39);
             systems.Add(new ServerApplyConstructionBuildWorkSystem(), GameplaySystemOrder.Gameplay - 39);
+            systems.Add(new ServerStockpileOperationBootstrapSystem(), GameplaySystemOrder.Gameplay - 48);
         }
     }
 }

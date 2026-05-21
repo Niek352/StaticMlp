@@ -33,40 +33,33 @@ namespace StaticMlp.Features.Settlement
             var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
 
             ref readonly var currentState = ref site.Read<ConstructionSiteState>();
-            ref readonly var currentResources = ref site.Read<ConstructionResources>();
-            ref readonly var currentStorage = ref storageEntity.Read<SettlementSharedResources>();
             if (!SettlementConstructionRules.TryPlanResourceDeposit(
                     in currentState,
-                    in currentResources,
-                    currentStorage.GetAmount(ResourceCatalog.WoodId),
-                    currentStorage.GetAmount(ResourceCatalog.StoneId),
-                    currentStorage.GetAmount(ResourceCatalog.PlanksId),
-                    currentStorage.GetAmount(ResourceCatalog.SimplePartsId),
-                    request.Wood,
-                    request.Stone,
-                    request.Planks,
-                    request.SimpleParts,
-                    out var acceptedWood,
-                    out var acceptedStone,
-                    out var acceptedPlanks,
-                    out var acceptedSimpleParts))
+                    site,
+                    storageEntity,
+                    request.Resources,
+                    out var acceptedResources))
                 return;
 
-            ref var storage = ref ReplicationMut.Mut<SettlementSharedResources>(storageEntity);
-            var spentWood = storage.Spend(ResourceCatalog.WoodId, acceptedWood);
-            var spentStone = storage.Spend(ResourceCatalog.StoneId, acceptedStone);
-            var spentPlanks = storage.Spend(ResourceCatalog.PlanksId, acceptedPlanks);
-            var spentSimpleParts = storage.Spend(ResourceCatalog.SimplePartsId, acceptedSimpleParts);
+            var spentResources = new ResourceAmount[acceptedResources.Length];
+            var spentCount = 0;
+            for (var i = 0; i < acceptedResources.Length; i++)
+            {
+                var accepted = acceptedResources[i];
+                var spent = SettlementSharedResourcesAccess.Spend(storageEntity, accepted.Id, accepted.Amount);
+                if (spent > 0)
+                    spentResources[spentCount++] = new ResourceAmount(accepted.Id, spent);
+            }
+
+            if (spentCount != spentResources.Length)
+            {
+                var compact = new ResourceAmount[spentCount];
+                Array.Copy(spentResources, compact, spentCount);
+                spentResources = compact;
+            }
 
             ref var state = ref ReplicationMut.Mut<ConstructionSiteState>(site);
-            ref var resources = ref ReplicationMut.Mut<ConstructionResources>(site);
-            SettlementConstructionRules.ApplyResourceDeposit(
-                ref state,
-                ref resources,
-                spentWood,
-                spentStone,
-                spentPlanks,
-                spentSimpleParts);
+            SettlementConstructionRules.ApplyResourceDeposit(site, ref state, spentResources);
         }
     }
 }

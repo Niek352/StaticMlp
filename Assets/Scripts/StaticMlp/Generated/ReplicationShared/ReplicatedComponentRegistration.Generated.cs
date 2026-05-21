@@ -5,6 +5,7 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.CombatDirector;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Npc;
@@ -28,6 +29,27 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ReplicationAudience.All,
                 NetDelivery.UnreliableSequenced,
                 sendRate: AiNetStateReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<DirectorState>(
+                ReplicatedComponentIds.DirectorState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: DirectorStateReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<EnemyArchetype>(
+                ReplicatedComponentIds.EnemyArchetype,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: EnemyArchetypeReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<EnemySpawnSource>(
+                ReplicatedComponentIds.EnemySpawnSource,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: EnemySpawnSourceReplication.SendRate);
 
             ReplicationRegistry.RegisterComponent<ActiveExpeditionState>(
                 ReplicatedComponentIds.ActiveExpeditionState,

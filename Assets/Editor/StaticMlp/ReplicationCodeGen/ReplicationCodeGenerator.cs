@@ -110,13 +110,12 @@ namespace StaticMlp.Editor.ReplicationCodeGen {
                 .Where(x => x != null)
                 .ToList();
 
-            if (fields.Count == 0)
-                diagnostics.Add($"{type.FullName}: replicated component has no public replicated fields.");
-
             var sourcePath = FindSourcePath(type);
             var hasConfig = SourceDeclaresMethod(sourcePath, "Config");
             var hasWrite = SourceDeclaresMethod(sourcePath, "Write");
             var hasRead = SourceDeclaresMethod(sourcePath, "Read");
+            if (fields.Count == 0 && (!hasWrite || !hasRead))
+                diagnostics.Add($"{type.FullName}: replicated component has no public replicated fields and must declare both Write and Read.");
             if (sourcePath == null)
                 diagnostics.Add($"{type.FullName}: source script path not found; cannot emit same-assembly generated replication.");
             var generatedOutputFolder = sourcePath == null ? null : FindSameAssemblyGeneratedFolder(sourcePath);

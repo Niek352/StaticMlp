@@ -20,15 +20,14 @@ namespace StaticMlp.Features.Buildings
 
             foreach (var e in CW.Query<All<ConstructionSiteState, ConstructionResources, ConstructionProgress, ConstructionViewState>>().Entities())
             {
-                ref readonly var resources = ref ClientProjection.Read<ConstructionResources>(e);
                 ref readonly var progress = ref ClientProjection.Read<ConstructionProgress>(e);
                 var next = new ConstructionViewState
                 {
                     Phase = ClientProjection.Read<ConstructionSiteState>(e).Phase,
-                    WoodRequired = resources.WoodRequired,
-                    StoneRequired = resources.StoneRequired,
-                    WoodDelivered = resources.WoodDelivered,
-                    StoneDelivered = resources.StoneDelivered,
+                    WoodRequired = ConstructionResourcesAccess.GetProjectedRequired(e, ResourceCatalog.WoodId),
+                    StoneRequired = ConstructionResourcesAccess.GetProjectedRequired(e, ResourceCatalog.StoneId),
+                    WoodDelivered = ConstructionResourcesAccess.GetProjectedDelivered(e, ResourceCatalog.WoodId),
+                    StoneDelivered = ConstructionResourcesAccess.GetProjectedDelivered(e, ResourceCatalog.StoneId),
                     Progress01 = progress.Normalized
                 };
 

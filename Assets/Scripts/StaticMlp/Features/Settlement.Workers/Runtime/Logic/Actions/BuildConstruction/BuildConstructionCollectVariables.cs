@@ -29,8 +29,7 @@ namespace StaticMlp.Features.Settlement.Workers
             foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState, ConstructionResources, ConstructionTransform, ConstructionProgress>>().Entities())
             {
                 ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-                ref readonly var resources = ref site.Read<ConstructionResources>();
-                if (!ConstructionRules.CanBuild(in siteState, in resources))
+                if (!ConstructionRules.CanBuild(site, in siteState))
                     continue;
 
                 ref readonly var transform = ref site.Read<ConstructionTransform>();

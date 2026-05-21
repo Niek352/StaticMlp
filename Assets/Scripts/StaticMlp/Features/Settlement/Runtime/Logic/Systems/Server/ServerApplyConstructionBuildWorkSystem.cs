@@ -31,12 +31,11 @@ namespace StaticMlp.Features.Settlement
                 throw new InvalidOperationException($"Construction build work target {request.Site} is not a server entity.");
 
             ref var state = ref ReplicationMut.Mut<ConstructionSiteState>(site);
-            ref readonly var resources = ref site.Read<ConstructionResources>();
             ref var progress = ref ReplicationMut.Mut<ConstructionProgress>(site);
             SettlementConstructionRules.ApplyBuildWork(
+                site,
                 ref state,
                 ref progress,
-                in resources,
                 request.WorkAmount,
                 request.MaxWork);
         }

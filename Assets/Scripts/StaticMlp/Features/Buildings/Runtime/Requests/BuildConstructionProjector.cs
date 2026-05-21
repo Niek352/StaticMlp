@@ -26,11 +26,10 @@ namespace StaticMlp.Features.Buildings
 
             ref var state = ref ClientProjection.Mut<ConstructionSiteState>(site);
             ref var progress = ref ClientProjection.Mut<ConstructionProgress>(site);
-            ref readonly var resources = ref ClientProjection.Read<ConstructionResources>(site);
-            ConstructionRules.ApplyBuildWork(
+            SettlementConstructionRules.ApplyProjectedBuildWork(
+                site,
                 ref state,
                 ref progress,
-                in resources,
                 request.WorkAmount,
                 _maxWorkPerRequest);
         }

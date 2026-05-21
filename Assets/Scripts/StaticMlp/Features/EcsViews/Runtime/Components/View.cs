@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using UnityEditor;
 using UnityEngine;
 
 namespace StaticMlp.Features.EcsViews
@@ -17,6 +18,16 @@ namespace StaticMlp.Features.EcsViews
         {
             Value.Unbind();
 
+#if UNITY_EDITOR
+            if (Value is not MonoBehaviour mono) 
+                return;
+            
+            if (EditorApplication.isPlaying)
+                Object.Destroy(mono.gameObject);
+            else
+                Object.DestroyImmediate(mono.gameObject);
+            return;           
+#endif
             if (Value is MonoBehaviour monoBehaviour)
                 Object.Destroy(monoBehaviour.gameObject);
         }

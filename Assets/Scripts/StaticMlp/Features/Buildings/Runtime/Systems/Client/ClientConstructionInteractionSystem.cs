@@ -41,16 +41,12 @@ namespace StaticMlp.Features.Buildings
             if (!site.Has<ConstructionResources>())
                 return;
 
-            ref readonly var resources = ref ClientProjection.Read<ConstructionResources>(site);
-            if (resources.IsComplete)
+            if (ConstructionResourcesAccess.IsProjectedComplete(site))
                 return;
 
             var request = new DepositConstructionResourcesRequestEvent(
                 site.GID,
-                resources.RemainingWood,
-                resources.RemainingStone,
-                resources.RemainingPlanks,
-                resources.RemainingSimpleParts);
+                ConstructionResourcesAccess.GetProjectedRemainingResources(site));
 
             RequestApi.Send<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(request);
         }
@@ -61,8 +57,7 @@ namespace StaticMlp.Features.Buildings
                 return;
 
             ref readonly var state = ref ClientProjection.Read<ConstructionSiteState>(site);
-            ref readonly var resources = ref ClientProjection.Read<ConstructionResources>(site);
-            if (!resources.IsComplete
+            if (!ConstructionResourcesAccess.IsProjectedComplete(site)
                 || (state.Phase != ConstructionPhase.ReadyToBuild
                     && state.Phase != ConstructionPhase.BuildingInProgress))
                 return;

@@ -24,18 +24,17 @@ namespace StaticMlp.Features.Settlement
                     return;
 
                 ref readonly var state = ref ClientProjection.Read<ConstructionSiteState>(site);
-                ref readonly var resources = ref ClientProjection.Read<ConstructionResources>(site);
                 ref readonly var progress = ref ClientProjection.Read<ConstructionProgress>(site);
 
                 next.HasFocusedSite = true;
                 next.ConstructionPhase = state.Phase;
-                next.WoodRequired = resources.WoodRequired;
-                next.StoneRequired = resources.StoneRequired;
-                next.WoodDelivered = resources.WoodDelivered;
-                next.StoneDelivered = resources.StoneDelivered;
+                next.WoodRequired = ConstructionResourcesAccess.GetProjectedRequired(site, ResourceCatalog.WoodId);
+                next.StoneRequired = ConstructionResourcesAccess.GetProjectedRequired(site, ResourceCatalog.StoneId);
+                next.WoodDelivered = ConstructionResourcesAccess.GetProjectedDelivered(site, ResourceCatalog.WoodId);
+                next.StoneDelivered = ConstructionResourcesAccess.GetProjectedDelivered(site, ResourceCatalog.StoneId);
                 next.Progress01 = progress.Normalized;
-                next.CanDepositResources = !resources.IsComplete;
-                next.CanBuild = resources.IsComplete
+                next.CanDepositResources = !ConstructionResourcesAccess.IsProjectedComplete(site);
+                next.CanBuild = ConstructionResourcesAccess.IsProjectedComplete(site)
                                 && state.Phase is ConstructionPhase.ReadyToBuild or ConstructionPhase.BuildingInProgress;
                 CW.SetResource(next);
                 return;

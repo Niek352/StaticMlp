@@ -24,28 +24,17 @@ namespace StaticMlp.Features.Settlement.Workers
         {
             ref readonly var builderState = ref builder.Read<CharacterNetState>();
             var sharedStorageEntity = SettlementSharedResourcesQuery.GetServerEntity();
-            ref readonly var sharedResources = ref sharedStorageEntity.Read<SettlementSharedResources>();
             var bestDistanceSq = float.MaxValue;
             var bestSite = default(EntityGID);
 
             foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState, ConstructionResources, ConstructionTransform>>().Entities())
             {
                 ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-                ref readonly var siteResources = ref site.Read<ConstructionResources>();
                 if (!SettlementConstructionRules.TryPlanResourceDeposit(
                         in siteState,
-                        in siteResources,
-                        sharedResources.GetAmount(ResourceCatalog.WoodId),
-                        sharedResources.GetAmount(ResourceCatalog.StoneId),
-                        sharedResources.GetAmount(ResourceCatalog.PlanksId),
-                        sharedResources.GetAmount(ResourceCatalog.SimplePartsId),
-                        siteResources.RemainingWood,
-                        siteResources.RemainingStone,
-                        siteResources.RemainingPlanks,
-                        siteResources.RemainingSimpleParts,
-                        out _,
-                        out _,
-                        out _,
+                        site,
+                        sharedStorageEntity,
+                        ConstructionResourcesAccess.GetRemainingResources(site),
                         out _))
                     continue;
 

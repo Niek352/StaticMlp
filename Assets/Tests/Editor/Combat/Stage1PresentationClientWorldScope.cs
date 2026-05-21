@@ -123,11 +123,17 @@ namespace StaticMlp.Tests.Combat
         {
             var entity = CW.NewEntity<Default>();
             entity.Set<SettlementResourceStorageTag>();
-            entity.Set(new SettlementSharedResources
-            {
-                Wood = wood,
-                Stone = stone
-            });
+            entity.Set(new SettlementSharedResources { Capacity = int.MaxValue });
+            ref var rows = ref entity.Add<CW.Multi<SettlementStoredResource>>();
+            rows.Add(new SettlementStoredResource(ResourceCatalog.WoodId, wood));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.StoneId, stone));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.PlanksId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.SimplePartsId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.RepairKitsId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.FoodId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.FuelId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.ResearchDataId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.MedicineId, 0));
             return entity;
         }
 
@@ -163,13 +169,10 @@ namespace StaticMlp.Tests.Combat
             {
                 Phase = phase
             });
-            site.Set(new ConstructionResources
-            {
-                WoodRequired = woodRequired,
-                WoodDelivered = woodDelivered,
-                StoneRequired = stoneRequired,
-                StoneDelivered = stoneDelivered
-            });
+            site.Set(new ConstructionResources());
+            ref var rows = ref site.Add<CW.Multi<ConstructionResourceEntry>>();
+            rows.Add(new ConstructionResourceEntry(ResourceCatalog.WoodId, woodRequired, woodDelivered));
+            rows.Add(new ConstructionResourceEntry(ResourceCatalog.StoneId, stoneRequired, stoneDelivered));
             site.Set(new SettlementAnchorRef(SettlementAnchorCatalog.HomeCampId));
             site.Set(new ConstructionProgress
             {

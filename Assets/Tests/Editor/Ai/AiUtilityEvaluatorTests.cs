@@ -71,7 +71,8 @@ namespace StaticMlp.Tests.Ai
             scope.CreateConstructionSite(new Vector3(3f, 0f, 0f), ConstructionPhase.WaitingForResources, resourcesComplete: false);
 
             var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
-            storageEntity.Set(new SettlementSharedResources());
+            SettlementSharedResourcesAccess.Spend(storageEntity, ResourceCatalog.WoodId, int.MaxValue);
+            SettlementSharedResourcesAccess.Spend(storageEntity, ResourceCatalog.StoneId, int.MaxValue);
 
             new DeliveryBuildResourcesCollectVariables().Collect(bot);
 

@@ -83,13 +83,15 @@ namespace StaticMlp.Features.Stage1
         private static bool HasRequiredRepairResources(SettlementAnchorId anchorId)
         {
             var repairSite = GetRepairSite(anchorId);
-            ref readonly var resources = ref repairSite.Read<ConstructionResources>();
             var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
-            ref readonly var storage = ref storageEntity.Read<SettlementSharedResources>();
-            return storage.GetAmount(ResourceCatalog.WoodId) >= resources.RemainingWood
-                   && storage.GetAmount(ResourceCatalog.StoneId) >= resources.RemainingStone
-                   && storage.GetAmount(ResourceCatalog.PlanksId) >= resources.RemainingPlanks
-                   && storage.GetAmount(ResourceCatalog.SimplePartsId) >= resources.RemainingSimpleParts;
+            var remaining = ConstructionResourcesAccess.GetRemainingResources(repairSite);
+            for (var i = 0; i < remaining.Length; i++)
+            {
+                if (SettlementSharedResourcesAccess.GetAmount(storageEntity, remaining[i].Id) < remaining[i].Amount)
+                    return false;
+            }
+
+            return true;
         }
 
         private static SW.Entity GetRepairSite(SettlementAnchorId anchorId)

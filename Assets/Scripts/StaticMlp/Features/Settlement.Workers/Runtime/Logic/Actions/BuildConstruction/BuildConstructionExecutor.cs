@@ -30,8 +30,7 @@ namespace StaticMlp.Features.Settlement.Workers
             }
 
             ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-            ref readonly var siteResources = ref site.Read<ConstructionResources>();
-            if (!ConstructionRules.CanBuild(in siteState, in siteResources))
+            if (!ConstructionRules.CanBuild(site, in siteState))
             {
                 _transitions.SwitchToIdle(entity, ref task);
                 return;

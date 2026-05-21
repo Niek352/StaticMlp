@@ -34,12 +34,11 @@ namespace StaticMlp.Features.Progression
 
             var reward = RewardPackageCatalog.Get(evt.RewardPackageId);
             var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
-            ref var storage = ref ReplicationMut.Mut<SettlementSharedResources>(storageEntity);
 
             for (var i = 0; i < reward.ResourceGrants.Length; i++)
             {
                 var grant = reward.ResourceGrants[i];
-                Grant(ref storage, grant);
+                SettlementSharedResourcesAccess.Add(storageEntity, grant.Id, grant.Amount);
             }
 
             progression.MarkRewardApplied(evt.RewardPackageId);
@@ -55,9 +54,5 @@ namespace StaticMlp.Features.Progression
             }
         }
 
-        private static void Grant(ref SettlementSharedResources storage, ResourceAmount grant)
-        {
-            storage.Add(grant.Id, grant.Amount);
-        }
     }
 }

@@ -27,8 +27,6 @@ namespace StaticMlp.Features.Buildings
 
         private static void InitializeConstructionSite(SW.Entity entity, in ConstructionSiteSpawnSpec spec)
         {
-            var constructionResources = SettlementConstructionRules.CreateResources(spec.Definition.ConstructionCost);
-
             entity.Set(new SettlementAnchorRef(spec.AnchorId));
             entity.Set<ConstructionSiteTag>();
             entity.Set(new ConstructionSiteState
@@ -41,7 +39,8 @@ namespace StaticMlp.Features.Buildings
                 Position = spec.Position,
                 Rotation = spec.Rotation
             });
-            entity.Set(constructionResources);
+            entity.Set(new ConstructionResources());
+            ConstructionResourcesAccess.InitializeRows(entity, spec.Definition.ConstructionCost);
             entity.Set(new ConstructionProgress
             {
                 BuildWorkRequired = spec.Definition.BuildWorkRequired
@@ -51,8 +50,7 @@ namespace StaticMlp.Features.Buildings
             if (spec.StartReadyToBuild)
             {
                 ref var siteState = ref ReplicationMut.Mut<ConstructionSiteState>(entity);
-                ref var siteResources = ref ReplicationMut.Mut<ConstructionResources>(entity);
-                SettlementConstructionRules.MarkAllResourcesDelivered(ref siteResources);
+                SettlementConstructionRules.MarkAllResourcesDelivered(entity);
                 siteState.Phase = ConstructionPhase.ReadyToBuild;
             }
 
@@ -60,12 +58,11 @@ namespace StaticMlp.Features.Buildings
                 return;
 
             ref var buildState = ref ReplicationMut.Mut<ConstructionSiteState>(entity);
-            ref readonly var buildResources = ref entity.Read<ConstructionResources>();
             ref var progress = ref ReplicationMut.Mut<ConstructionProgress>(entity);
-            ConstructionRules.ApplyBuildWork(
+            SettlementConstructionRules.ApplyBuildWork(
+                entity,
                 ref buildState,
                 ref progress,
-                in buildResources,
                 spec.InitialBuildWork,
                 progress.BuildWorkRequired);
         }

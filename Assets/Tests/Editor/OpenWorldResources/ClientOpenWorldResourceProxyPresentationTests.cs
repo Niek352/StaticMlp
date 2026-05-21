@@ -8,6 +8,7 @@ using StaticMlp.Game.Presentation;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace StaticMlp.Tests.OpenWorldResources
 {
@@ -52,6 +53,7 @@ namespace StaticMlp.Tests.OpenWorldResources
             Assert.That(view.GetComponent<OpenWorldResourceNodeViewPart>(), Is.Not.Null);
             Assert.That(view.transform.position, Is.EqualTo(placement.Position));
             Assert.That(view.transform.Find("Resource Node Visual/Stone Boulder"), Is.Not.Null);
+            
         }
 
         [Test]
@@ -175,6 +177,7 @@ namespace StaticMlp.Tests.OpenWorldResources
 
                 CW.Create(WorldConfig.Default());
                 CW.Types().RegisterAll(
+                    typeof(ViewTransform).Assembly,
                     typeof(ClientCoreWT).Assembly,
                     typeof(OpenWorldChunkGenerationCompleted).Assembly,
                     typeof(OpenWorldResourcesGameplayFeature).Assembly,

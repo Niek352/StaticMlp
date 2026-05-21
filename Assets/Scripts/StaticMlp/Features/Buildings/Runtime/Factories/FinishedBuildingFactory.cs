@@ -26,9 +26,6 @@ namespace StaticMlp.Features.Buildings
 
         private static void InitializeFinishedBuilding(SW.Entity entity, in FinishedBuildingSpawnSpec spec)
         {
-            var constructionResources = SettlementConstructionRules.CreateResources(spec.Definition.ConstructionCost);
-            SettlementConstructionRules.MarkAllResourcesDelivered(ref constructionResources);
-
             entity.Set(new SettlementAnchorRef(spec.AnchorId));
             entity.Set<FinishedBuildingTag>();
             entity.Set(new ConstructionSiteState
@@ -37,7 +34,9 @@ namespace StaticMlp.Features.Buildings
                 Phase = ConstructionPhase.Completed
             });
             entity.Set(spec.Transform);
-            entity.Set(constructionResources);
+            entity.Set(new ConstructionResources());
+            ConstructionResourcesAccess.InitializeRows(entity, spec.Definition.ConstructionCost);
+            SettlementConstructionRules.MarkAllResourcesDelivered(entity);
             entity.Set(new ConstructionProgress
             {
                 BuildWorkRequired = spec.Definition.BuildWorkRequired,

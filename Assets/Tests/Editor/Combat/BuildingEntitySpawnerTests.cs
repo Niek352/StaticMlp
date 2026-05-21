@@ -31,8 +31,8 @@ namespace StaticMlp.Tests.Combat
             Assert.That(site.Read<NetworkIdentity>().Owner, Is.EqualTo(owner));
             Assert.That(site.Read<SettlementAnchorRef>().Anchor, Is.EqualTo(SettlementAnchorCatalog.HomeCampId));
             Assert.That(site.Read<ConstructionSiteState>().Phase, Is.EqualTo(ConstructionPhase.BuildingInProgress));
-            Assert.That(site.Read<ConstructionResources>().WoodDelivered, Is.EqualTo(10));
-            Assert.That(site.Read<ConstructionResources>().StoneDelivered, Is.EqualTo(4));
+            Assert.That(ConstructionResourcesAccess.GetDelivered(site, ResourceCatalog.WoodId), Is.EqualTo(10));
+            Assert.That(ConstructionResourcesAccess.GetDelivered(site, ResourceCatalog.StoneId), Is.EqualTo(4));
             Assert.That(site.Read<ConstructionProgress>().BuildWorkDone, Is.EqualTo(25f));
         }
 

@@ -1,4 +1,6 @@
+using System;
 using FFS.Libraries.StaticEcs;
+using FFS.Libraries.StaticPack;
 using NUnit.Framework;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Features.BuildingCatalog;
@@ -9,6 +11,7 @@ using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Features.Stage1;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Replication;
 using StaticMlp.Networking.Requests;
 using UnityEngine;
 
@@ -31,9 +34,8 @@ namespace StaticMlp.Tests.Combat
             var completedReceiver = SW.RegisterEventReceiver<BuildingConstructionCompletedEvent>();
 
             ref var siteState = ref site.Mut<ConstructionSiteState>();
-            ref readonly var siteResources = ref site.Read<ConstructionResources>();
             ref var siteProgress = ref site.Mut<ConstructionProgress>();
-            var applied = ConstructionRules.ApplyBuildWork(ref siteState, ref siteProgress, in siteResources, 10f, 10f);
+            var applied = SettlementConstructionRules.ApplyBuildWork(site, ref siteState, ref siteProgress, 10f, 10f);
             Assert.That(applied, Is.True);
             Assert.That(siteState.Phase, Is.EqualTo(ConstructionPhase.Completed));
 
@@ -316,24 +318,17 @@ namespace StaticMlp.Tests.Combat
         [Test]
         public void Stage1RepairFlow_OneBuildActionDoesNotCompleteInitialCampRepair()
         {
-            var state = new ConstructionSiteState
-            {
-                Phase = ConstructionPhase.ReadyToBuild
-            };
-            var resources = new ConstructionResources
-            {
-                WoodRequired = 10,
-                WoodDelivered = 10,
-                StoneRequired = 4,
-                StoneDelivered = 4
-            };
-            var progress = new ConstructionProgress
+            using var scope = new CombatTestServerWorldScope();
+            var site = scope.CreateNetworkedConstructionSite(phase: ConstructionPhase.ReadyToBuild);
+            ref var state = ref site.Mut<ConstructionSiteState>();
+            ref var progress = ref site.Mut<ConstructionProgress>();
+            progress = new ConstructionProgress
             {
                 BuildWorkRequired = 100f,
                 BuildWorkDone = 0f
             };
 
-            var applied = ConstructionRules.ApplyBuildWork(ref state, ref progress, in resources, 35f / 30f, 5f);
+            var applied = SettlementConstructionRules.ApplyBuildWork(site, ref state, ref progress, 35f / 30f, 5f);
 
             Assert.That(applied, Is.True);
             Assert.That(state.Phase, Is.EqualTo(ConstructionPhase.BuildingInProgress));
@@ -348,45 +343,220 @@ namespace StaticMlp.Tests.Combat
             {
                 Phase = ConstructionPhase.WaitingForResources
             };
-            var resources = SettlementConstructionRules.CreateResources(new[]
+            using var scope = new CombatTestServerWorldScope();
+            var site = scope.CreateEntity();
+            site.Set(new ConstructionResources());
+            ConstructionResourcesAccess.InitializeRows(site, new[]
             {
                 new ResourceAmount(ResourceCatalog.PlanksId, 3)
             });
+            var storage = scope.CreateSettlementSharedResources(wood: 0, stone: 0);
+            SettlementSharedResourcesAccess.Add(storage, ResourceCatalog.PlanksId, 5);
 
             var planned = SettlementConstructionRules.TryPlanResourceDeposit(
                 in state,
-                in resources,
-                availableWood: 0,
-                availableStone: 0,
-                availablePlanks: 5,
-                availableSimpleParts: 0,
-                requestedWood: 0,
-                requestedStone: 0,
-                requestedPlanks: 5,
-                requestedSimpleParts: 0,
-                out var wood,
-                out var stone,
-                out var planks,
-                out var simpleParts);
+                site,
+                storage,
+                new[] { new ResourceAmount(ResourceCatalog.PlanksId, 5) },
+                out var acceptedResources);
 
             Assert.That(planned, Is.True);
-            Assert.That(wood, Is.EqualTo(0));
-            Assert.That(stone, Is.EqualTo(0));
-            Assert.That(planks, Is.EqualTo(3));
-            Assert.That(simpleParts, Is.EqualTo(0));
+            Assert.That(acceptedResources.Length, Is.EqualTo(1));
+            Assert.That(acceptedResources[0].Id, Is.EqualTo(ResourceCatalog.PlanksId));
+            Assert.That(acceptedResources[0].Amount, Is.EqualTo(3));
 
             var applied = SettlementConstructionRules.ApplyResourceDeposit(
+                site,
                 ref state,
-                ref resources,
-                wood,
-                stone,
-                planks,
-                simpleParts);
+                acceptedResources);
 
             Assert.That(applied, Is.True);
-            Assert.That(resources.PlanksDelivered, Is.EqualTo(3));
-            Assert.That(resources.IsComplete, Is.True);
+            Assert.That(ConstructionResourcesAccess.GetDelivered(site, ResourceCatalog.PlanksId), Is.EqualTo(3));
+            Assert.That(ConstructionResourcesAccess.IsComplete(site), Is.True);
             Assert.That(state.Phase, Is.EqualTo(ConstructionPhase.ReadyToBuild));
+        }
+
+        [Test]
+        public void SettlementSharedResourcesFactory_SpawnCreatesCatalogStorageRows()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var seed = Stage1SettlementSeedManifest.CreateResource();
+            var gid = SW.GetResource<SettlementSharedResourcesFactory>().Spawn(seed);
+
+            Assert.That(gid.TryUnpack<ServerWT>(out var storage), Is.True);
+            ref readonly var rows = ref storage.Ref<SW.Multi<SettlementStoredResource>>();
+            var expectedCount = 0;
+
+            for (var i = 0; i < ResourceCatalog.All.Count; i++)
+            {
+                var definition = ResourceCatalog.All[i];
+                if (!definition.IsSettlementStored)
+                    continue;
+
+                expectedCount++;
+                Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, definition.Id), Is.EqualTo(seed.GetStartingResourceAmount(definition.Id)));
+            }
+
+            Assert.That(rows.Length, Is.EqualTo(expectedCount));
+        }
+
+        [Test]
+        public void SettlementSharedResourcesAccess_AddSpendSupportsArbitraryCatalogResourcesAndCapacity()
+        {
+            using var scope = new CombatTestServerWorldScope();
+            var storage = scope.CreateSettlementSharedResources(wood: 0, stone: 0);
+            ref var host = ref ReplicationMut.Mut<SettlementSharedResources>(storage);
+            host.Capacity = 5;
+
+            Assert.That(SettlementSharedResourcesAccess.Add(storage, ResourceCatalog.PlanksId, 8), Is.EqualTo(5));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.PlanksId), Is.EqualTo(5));
+            Assert.That(SettlementSharedResourcesAccess.Add(storage, ResourceCatalog.WoodId, 1), Is.EqualTo(0));
+            Assert.That(SettlementSharedResourcesAccess.Spend(storage, ResourceCatalog.PlanksId, 3), Is.EqualTo(3));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.PlanksId), Is.EqualTo(2));
+            Assert.Throws<InvalidOperationException>(() => SettlementSharedResourcesAccess.Add(storage, new ResourceId(ushort.MaxValue), 1));
+        }
+
+        [Test]
+        public void SettlementSharedResourcesCodec_CopiesCapacityAndRowsServerToClient()
+        {
+            using var serverScope = new CombatTestServerWorldScope();
+            using var clientScope = new Stage1PresentationClientWorldScope();
+            var storage = serverScope.CreateSettlementSharedResources(wood: 12, stone: 6);
+            ref var serverHost = ref ReplicationMut.Mut<SettlementSharedResources>(storage);
+            serverHost.Capacity = 99;
+            SettlementSharedResourcesAccess.Add(storage, ResourceCatalog.PlanksId, 4);
+
+            var writer = BinaryPackWriter.CreateFromPool();
+            serverHost.Write(ref writer, storage);
+            var bytes = writer.CopyToBytes();
+            writer.Dispose();
+
+            var clientStorage = CW.NewEntity<Default>();
+            clientStorage.Set(new SettlementSharedResources());
+            var reader = new BinaryPackReader(bytes, (uint)bytes.Length, 0);
+            ref var clientHost = ref clientStorage.Mut<SettlementSharedResources>();
+            clientHost.Read(ref reader, clientStorage, version: 1, disabled: false);
+
+            Assert.That(clientHost.Capacity, Is.EqualTo(99));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(clientStorage, ResourceCatalog.WoodId), Is.EqualTo(12));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(clientStorage, ResourceCatalog.StoneId), Is.EqualTo(6));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(clientStorage, ResourceCatalog.PlanksId), Is.EqualTo(4));
+            Assert.That(clientStorage.Ref<CW.Multi<SettlementStoredResource>>().Length, Is.EqualTo(storage.Ref<SW.Multi<SettlementStoredResource>>().Length));
+        }
+
+        [Test]
+        public void DepositConstructionResourcesProjector_MutatesProjectedMultiRowsOnly()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            var storage = scope.CreateSharedResources(wood: 50, stone: 25);
+            var site = scope.CreateConstructionSite(
+                ConstructionPhase.WaitingForResources,
+                woodRequired: 10,
+                woodDelivered: 0,
+                stoneRequired: 0,
+                stoneDelivered: 0,
+                progress01: 0f);
+            scope.RefreshProjections();
+
+            new DepositConstructionResourcesProjector().Project(new DepositConstructionResourcesRequestEvent(
+                site.GID,
+                new[] { new ResourceAmount(ResourceCatalog.WoodId, 10) }));
+
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.WoodId), Is.EqualTo(50));
+            Assert.That(ConstructionResourcesAccess.GetDelivered(site, ResourceCatalog.WoodId), Is.EqualTo(0));
+            Assert.That(storage.Read<SettlementSharedResources>().Capacity, Is.EqualTo(ClientProjection.Read<SettlementSharedResources>(storage).Capacity));
+            Assert.That(SettlementSharedResourcesAccess.GetProjectedAmount(storage, ResourceCatalog.WoodId), Is.EqualTo(40));
+            Assert.That(ConstructionResourcesAccess.GetProjectedDelivered(site, ResourceCatalog.WoodId), Is.EqualTo(10));
+            Assert.That(site.Read<ConstructionSiteState>().Phase, Is.EqualTo(ConstructionPhase.WaitingForResources));
+            Assert.That(ClientProjection.Read<ConstructionSiteState>(site).Phase, Is.EqualTo(ConstructionPhase.ReadyToBuild));
+        }
+
+        [Test]
+        public void DepositConstructionResourcesRequestCodec_RoundTripsResourceArray()
+        {
+            using var serverScope = new CombatTestServerWorldScope();
+            using var clientScope = new Stage1PresentationClientWorldScope();
+            SW.SetResource(new NetInbox());
+            CW.GetResource<NetOutbox>().Clear();
+            var receiver = SW.RegisterEventReceiver<NetworkEventFromClient<DepositConstructionResourcesRequestEvent>>();
+            var request = new DepositConstructionResourcesRequestEvent(
+                default,
+                new[]
+                {
+                    new ResourceAmount(ResourceCatalog.WoodId, 3),
+                    new ResourceAmount(ResourceCatalog.PlanksId, 2)
+                })
+            {
+                RequestId = new RequestId(123)
+            };
+
+            CW.SendToServer(request);
+            CW.GetResource<NetOutbox>().FlushNetworkEventBatches();
+            var packet = CW.GetResource<NetOutbox>().Packets[0];
+
+            Assert.That(PacketCodec.Decode(new NetworkPeerId(1), packet.Payload, SW.GetResource<NetInbox>()), Is.True);
+            new ServerNetworkEventApplySystem().Update();
+
+            var receivedCount = 0;
+            foreach (var received in receiver)
+            {
+                receivedCount++;
+                Assert.That(received.Value.SourcePeer, Is.EqualTo(new NetworkPeerId(1)));
+                Assert.That(received.Value.Value.RequestId, Is.EqualTo(new RequestId(123)));
+                Assert.That(received.Value.Value.Resources.Length, Is.EqualTo(2));
+                Assert.That(received.Value.Value.Resources[0].Id, Is.EqualTo(ResourceCatalog.WoodId));
+                Assert.That(received.Value.Value.Resources[0].Amount, Is.EqualTo(3));
+                Assert.That(received.Value.Value.Resources[1].Id, Is.EqualTo(ResourceCatalog.PlanksId));
+                Assert.That(received.Value.Value.Resources[1].Amount, Is.EqualTo(2));
+            }
+
+            SW.DeleteEventReceiver(ref receiver);
+            Assert.That(receivedCount, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void DepositConstructionResourcesResultCodec_RoundTripsAcceptedResourceArray()
+        {
+            using var serverScope = new CombatTestServerWorldScope();
+            using var clientScope = new Stage1PresentationClientWorldScope();
+            CW.SetResource(new NetInbox());
+            SW.GetResource<NetOutbox>().Clear();
+            var receiver = CW.RegisterEventReceiver<NetworkEventFromServer<DepositConstructionResourcesResultEvent>>();
+            var result = new DepositConstructionResourcesResultEvent
+            {
+                RequestId = new RequestId(456),
+                Status = RequestStatus.Accepted,
+                Site = default,
+                AcceptedResources = new[]
+                {
+                    new ResourceAmount(ResourceCatalog.StoneId, 4),
+                    new ResourceAmount(ResourceCatalog.SimplePartsId, 1)
+                }
+            };
+
+            SW.SendToPeer(new NetworkPeerId(1), result);
+            SW.GetResource<NetOutbox>().FlushNetworkEventBatches();
+            var packet = SW.GetResource<NetOutbox>().Packets[0];
+
+            Assert.That(PacketCodec.Decode(NetworkEvents.ServerPeer, packet.Payload, CW.GetResource<NetInbox>()), Is.True);
+            new ClientNetworkEventApplySystem().Update();
+
+            var receivedCount = 0;
+            foreach (var received in receiver)
+            {
+                receivedCount++;
+                Assert.That(received.Value.SourcePeer, Is.EqualTo(NetworkEvents.ServerPeer));
+                Assert.That(received.Value.Value.RequestId, Is.EqualTo(new RequestId(456)));
+                Assert.That(received.Value.Value.Status, Is.EqualTo(RequestStatus.Accepted));
+                Assert.That(received.Value.Value.AcceptedResources.Length, Is.EqualTo(2));
+                Assert.That(received.Value.Value.AcceptedResources[0].Id, Is.EqualTo(ResourceCatalog.StoneId));
+                Assert.That(received.Value.Value.AcceptedResources[0].Amount, Is.EqualTo(4));
+                Assert.That(received.Value.Value.AcceptedResources[1].Id, Is.EqualTo(ResourceCatalog.SimplePartsId));
+                Assert.That(received.Value.Value.AcceptedResources[1].Amount, Is.EqualTo(1));
+            }
+
+            CW.DeleteEventReceiver(ref receiver);
+            Assert.That(receivedCount, Is.EqualTo(1));
         }
 
         [Test]
@@ -400,18 +570,23 @@ namespace StaticMlp.Tests.Combat
                 phase: ConstructionPhase.WaitingForResources,
                 woodRequired: 10,
                 stoneRequired: 4);
-
-            ref var resources = ref site.Mut<ConstructionResources>();
-            resources.WoodDelivered = 0;
-            resources.StoneDelivered = 0;
+            ref var rows = ref site.Ref<SW.Multi<ConstructionResourceEntry>>();
+            for (var i = 0; i < rows.Length; i++)
+            {
+                ref var row = ref rows[i];
+                row.Delivered = 0;
+            }
 
             var result = new DepositConstructionResourcesHandler().Handle(
                 peer,
-                new DepositConstructionResourcesRequestEvent(site.GID, wood: -1, stone: 0));
+                new DepositConstructionResourcesRequestEvent(site.GID, new[]
+                {
+                    new ResourceAmount(ResourceCatalog.WoodId, -1)
+                }));
 
             Assert.That(result.Status, Is.EqualTo(RequestStatus.Rejected));
-            Assert.That(storage.Read<SettlementSharedResources>().Wood, Is.EqualTo(50));
-            Assert.That(resources.WoodDelivered, Is.EqualTo(0));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.WoodId), Is.EqualTo(50));
+            Assert.That(ConstructionResourcesAccess.GetDelivered(site, ResourceCatalog.WoodId), Is.EqualTo(0));
             Assert.That(site.Read<ConstructionSiteState>().Phase, Is.EqualTo(ConstructionPhase.WaitingForResources));
         }
 

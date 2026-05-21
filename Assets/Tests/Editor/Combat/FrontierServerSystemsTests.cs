@@ -144,9 +144,9 @@ namespace StaticMlp.Tests.Combat
             Assert.That(anchor.Read<RaidScheduleState>().Status, Is.EqualTo(RaidScheduleStatus.Pending));
             Assert.That(anchor.Read<RaidScheduleState>().ActivateAtTick, Is.EqualTo(scope.SimulationTime.DeadlineAfter(5f)));
 
-            var sharedResources = SettlementSharedResourcesQuery.GetServerEntity().Read<SettlementSharedResources>();
-            Assert.That(sharedResources.Wood, Is.EqualTo(70));
-            Assert.That(sharedResources.Stone, Is.EqualTo(35));
+            var sharedResources = SettlementSharedResourcesQuery.GetServerEntity();
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(sharedResources, ResourceCatalog.WoodId), Is.EqualTo(70));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(sharedResources, ResourceCatalog.StoneId), Is.EqualTo(35));
 
             escalateThreatSystem.Destroy();
             applyRewardSystem.Destroy();

@@ -1,23 +1,25 @@
 using System;
 using StaticMlp.Features.Settlement;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Buildings
 {
     public static class ConstructionRules
     {
-        public static bool CanBuild(in ConstructionSiteState state, in ConstructionResources resources)
+        public static bool CanBuild(SW.Entity site, in ConstructionSiteState state)
         {
-            return resources.IsComplete && state.Phase is ConstructionPhase.ReadyToBuild or ConstructionPhase.BuildingInProgress;
+            return ConstructionResourcesAccess.IsComplete(site)
+                   && state.Phase is ConstructionPhase.ReadyToBuild or ConstructionPhase.BuildingInProgress;
         }
 
         public static bool ApplyBuildWork(
+            SW.Entity site,
             ref ConstructionSiteState state,
             ref ConstructionProgress progress,
-            in ConstructionResources resources,
             float requestedWork,
             float maxWork)
         {
-            if (!CanBuild(in state, in resources))
+            if (!CanBuild(site, in state))
                 return false;
 
             var work = Math.Min(Math.Max(0f, requestedWork), maxWork);

@@ -30,7 +30,6 @@ namespace StaticMlp.Features.Settlement.Workers
             }
 
             ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-            ref readonly var siteResources = ref site.Read<ConstructionResources>();
             if (!SettlementConstructionRules.CanDepositResources(in siteState))
             {
                 _transitions.SwitchToIdle(entity, ref task);
@@ -52,33 +51,18 @@ namespace StaticMlp.Features.Settlement.Workers
             }
 
             var sharedStorageEntity = SettlementSharedResourcesQuery.GetServerEntity();
-            var sharedStorage = sharedStorageEntity.Read<SettlementSharedResources>();
             if (!SettlementConstructionRules.TryPlanResourceDeposit(
                     in siteState,
-                    in siteResources,
-                    sharedStorage.GetAmount(ResourceCatalog.WoodId),
-                    sharedStorage.GetAmount(ResourceCatalog.StoneId),
-                    sharedStorage.GetAmount(ResourceCatalog.PlanksId),
-                    sharedStorage.GetAmount(ResourceCatalog.SimplePartsId),
-                    siteResources.RemainingWood,
-                    siteResources.RemainingStone,
-                    siteResources.RemainingPlanks,
-                    siteResources.RemainingSimpleParts,
-                    out var acceptedWood,
-                    out var acceptedStone,
-                    out var acceptedPlanks,
-                    out var acceptedSimpleParts))
+                    site,
+                    sharedStorageEntity,
+                    ConstructionResourcesAccess.GetRemainingResources(site),
+                    out var acceptedResources))
             {
                 _transitions.SwitchToIdle(entity, ref task);
                 return;
             }
 
-            SW.SendEvent(new DepositConstructionResourcesEvent(
-                site.GID,
-                acceptedWood,
-                acceptedStone,
-                acceptedPlanks,
-                acceptedSimpleParts));
+            SW.SendEvent(new DepositConstructionResourcesEvent(site.GID, acceptedResources));
             task.ElapsedTicks++;
         }
     }

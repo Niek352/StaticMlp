@@ -31,7 +31,8 @@
         "StaticMlp.Features.Combat.Contracts",
         "StaticMlp.Features.Combat.Logic",
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
-        "StaticMlp.Features.Effects.Logic"
+        "StaticMlp.Features.Effects.Logic",
+        "StaticMlp.Features.CombatDirector.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

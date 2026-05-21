@@ -17,9 +17,11 @@ namespace StaticMlp.Features.Buildings
         public override void RegisterNetworkEvents()
         {
             ProjectionRegistry.Register<ConstructionResources>();
+            ProjectionRegistry.RegisterMulti<ConstructionResourceEntry>();
             ProjectionRegistry.Register<ConstructionSiteState>();
             ProjectionRegistry.Register<ConstructionProgress>();
             ProjectionRegistry.Register<SettlementAnchorRef>();
+            DepositConstructionResourcesEventCodec.Register();
             RequestRegistry.Register<BuildConstructionRequestEvent, BuildConstructionResultEvent>(
                 new BuildConstructionHandler(),
                 new BuildConstructionProjector(), GameplaySystemOrder.Gameplay - 60);
@@ -48,6 +50,7 @@ namespace StaticMlp.Features.Buildings
             systems.Add(new ServerInitialConstructionSiteSpawnSystem(), (short)(GameplaySystemOrder.ServerConnectionGameplay - 10));
             systems.Add(new ServerPlaceBuildingRequestSystem(), GameplaySystemOrder.Gameplay - 80);
             systems.Add(new ServerCompleteConstructionSystem(), GameplaySystemOrder.Gameplay - 50);
+            systems.Add(new ServerForwardStockpileContributionSystem(), GameplaySystemOrder.Gameplay - 48);
         }
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)

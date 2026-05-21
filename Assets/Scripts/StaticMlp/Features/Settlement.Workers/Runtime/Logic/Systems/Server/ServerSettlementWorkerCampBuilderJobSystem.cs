@@ -138,28 +138,17 @@ namespace StaticMlp.Features.Settlement.Workers
         {
             ref readonly var workerState = ref worker.Read<StaticMlp.Game.Components.CharacterNetState>();
             var storageEntity = SettlementSharedResourcesQuery.GetServerEntity();
-            ref readonly var sharedResources = ref storageEntity.Read<SettlementSharedResources>();
             var bestDistanceSq = float.MaxValue;
             siteGid = default;
 
             foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState, ConstructionResources, ConstructionTransform>>().Entities())
             {
                 ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-                ref readonly var resources = ref site.Read<ConstructionResources>();
                 if (!SettlementConstructionRules.TryPlanResourceDeposit(
                         in siteState,
-                        in resources,
-                        sharedResources.GetAmount(ResourceCatalog.WoodId),
-                        sharedResources.GetAmount(ResourceCatalog.StoneId),
-                        sharedResources.GetAmount(ResourceCatalog.PlanksId),
-                        sharedResources.GetAmount(ResourceCatalog.SimplePartsId),
-                        resources.RemainingWood,
-                        resources.RemainingStone,
-                        resources.RemainingPlanks,
-                        resources.RemainingSimpleParts,
-                        out _,
-                        out _,
-                        out _,
+                        site,
+                        storageEntity,
+                        ConstructionResourcesAccess.GetRemainingResources(site),
                         out _))
                 {
                     continue;
@@ -186,8 +175,7 @@ namespace StaticMlp.Features.Settlement.Workers
             foreach (var site in SW.Query<All<ConstructionSiteTag, ConstructionSiteState, ConstructionResources, ConstructionTransform, ConstructionProgress>>().Entities())
             {
                 ref readonly var siteState = ref site.Read<ConstructionSiteState>();
-                ref readonly var resources = ref site.Read<ConstructionResources>();
-                if (!ConstructionRules.CanBuild(in siteState, in resources))
+                if (!ConstructionRules.CanBuild(site, in siteState))
                     continue;
 
                 ref readonly var transform = ref site.Read<ConstructionTransform>();
