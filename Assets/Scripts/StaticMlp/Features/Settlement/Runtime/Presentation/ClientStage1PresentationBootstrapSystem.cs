@@ -23,6 +23,7 @@ namespace StaticMlp.Features.Settlement
                 Mode = Stage1ContextPanelMode.Worker,
                 WorkerAnchorId = SettlementAnchorCatalog.HomeCampId,
             });
+            CW.SetResource(new Stage1ContextFocusTarget());
             CW.SetResource(new Stage1ContextPanelState
             {
                 Mode = Stage1ContextPanelMode.Worker,

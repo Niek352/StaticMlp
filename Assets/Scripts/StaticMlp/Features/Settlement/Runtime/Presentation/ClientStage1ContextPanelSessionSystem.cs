@@ -26,6 +26,13 @@ namespace StaticMlp.Features.Settlement
 
             var stage = anchor.Read<Stage1SettlementProgression>().Stage;
 
+            if (TryFindExplicitFocusSite(out var focusedSite))
+            {
+                session.Mode = Stage1ContextPanelMode.Building;
+                session.FocusedSite = focusedSite.GID;
+                return;
+            }
+
             if (stage < Stage1SettlementProgressStage.CampRepaired)
             {
                 if (!TryFindRepairFocusSite(out var repairSite))
@@ -53,7 +60,7 @@ namespace StaticMlp.Features.Settlement
                 return;
             }
 
-            if (TryFindNearestSite(playerPosition, out var site))
+            if (TryFindNearestSite(playerPosition, includeCompleted: true, out var site))
             {
                 session.Mode = Stage1ContextPanelMode.Building;
                 session.FocusedSite = site.GID;
@@ -64,13 +71,33 @@ namespace StaticMlp.Features.Settlement
             session.FocusedSite = default;
         }
 
+        private static bool TryFindExplicitFocusSite(out CW.Entity site)
+        {
+            ref readonly var focus = ref CW.GetResource<Stage1ContextFocusTarget>();
+            if (!focus.HasTarget)
+            {
+                site = default;
+                return false;
+            }
+
+            if (!focus.Target.TryUnpack<ClientCoreWT>(out site))
+                throw new InvalidOperationException(
+                    $"Stage 1 context focus target {focus.Target.Raw} does not exist in the client world.");
+
+            if (!site.Has<ConstructionSiteState>())
+                throw new InvalidOperationException(
+                    $"Stage 1 context focus target {focus.Target.Raw} is not a construction-site entity.");
+
+            return true;
+        }
+
         private bool TryFindRepairFocusSite(out CW.Entity site)
         {
             if (TryFindAnchorRepairSite(SettlementAnchorCatalog.HomeCampId, out site))
                 return true;
 
             if (ClientLocalPlayer.TryGetPosition(out var playerPosition)
-                && TryFindNearestSite(playerPosition, out site))
+                && TryFindNearestSite(playerPosition, includeCompleted: false, out site))
             {
                 return true;
             }
@@ -78,7 +105,7 @@ namespace StaticMlp.Features.Settlement
             return false;
         }
 
-        private bool TryFindNearestSite(Vector3 playerPosition, out CW.Entity site)
+        private bool TryFindNearestSite(Vector3 playerPosition, bool includeCompleted, out CW.Entity site)
         {
             var bestDistanceSq = _focusRange * _focusRange;
             var found = false;
@@ -87,7 +114,7 @@ namespace StaticMlp.Features.Settlement
             foreach (var entity in CW.Query<All<ConstructionTransform, ConstructionSiteState>>().Entities())
             {
                 ref readonly var state = ref ClientProjection.Read<ConstructionSiteState>(entity);
-                if (state.Phase == ConstructionPhase.Completed)
+                if (!includeCompleted && state.Phase == ConstructionPhase.Completed)
                     continue;
 
                 var distanceSq = (entity.Read<ConstructionTransform>().Position - playerPosition).sqrMagnitude;

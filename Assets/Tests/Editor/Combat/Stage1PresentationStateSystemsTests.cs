@@ -13,6 +13,7 @@ using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
+using UnityEngine;
 
 namespace StaticMlp.Tests.Combat
 {
@@ -191,6 +192,101 @@ namespace StaticMlp.Tests.Combat
                 stoneRequired: 5,
                 stoneDelivered: 5,
                 progress01: 1f);
+            scope.RefreshProjections();
+
+            new ClientStage1PresentationBootstrapSystem().Init();
+            new ClientStage1ContextPanelSessionSystem().Update();
+
+            ref readonly var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            Assert.That(session.Mode, Is.EqualTo(Stage1ContextPanelMode.Worker));
+            Assert.That(session.FocusedSite, Is.EqualTo(default(EntityGID)));
+        }
+
+        [Test]
+        public void ContextPanelSession_WhenRaycastFocusExists_UsesItBeforeNearestBuilding()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
+            scope.CreateSharedResources();
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.PoisonArrowModuleId);
+            var nearest = scope.CreateConstructionSite(
+                ConstructionPhase.ReadyToBuild,
+                woodRequired: 10,
+                woodDelivered: 0,
+                stoneRequired: 5,
+                stoneDelivered: 0,
+                progress01: 0f,
+                position: new Vector3(0f, 0f, 1f));
+            var raycastFocused = scope.CreateConstructionSite(
+                ConstructionPhase.ReadyToBuild,
+                woodRequired: 10,
+                woodDelivered: 0,
+                stoneRequired: 5,
+                stoneDelivered: 0,
+                progress01: 0f,
+                position: new Vector3(0f, 0f, 3f));
+            scope.RefreshProjections();
+
+            new ClientStage1PresentationBootstrapSystem().Init();
+            ref var focus = ref CW.GetResource<Stage1ContextFocusTarget>();
+            focus.Target = raycastFocused.GID;
+            new ClientStage1ContextPanelSessionSystem().Update();
+
+            ref readonly var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            Assert.That(session.Mode, Is.EqualTo(Stage1ContextPanelMode.Building));
+            Assert.That(session.FocusedSite, Is.EqualTo(raycastFocused.GID));
+            Assert.That(session.FocusedSite, Is.Not.EqualTo(nearest.GID));
+        }
+
+        [Test]
+        public void ContextPanelSession_WhenRaycastFocusIsEmpty_UsesNearestBuildingInRange()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
+            scope.CreateSharedResources();
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.PoisonArrowModuleId);
+            var nearest = scope.CreateConstructionSite(
+                ConstructionPhase.Completed,
+                woodRequired: 10,
+                woodDelivered: 10,
+                stoneRequired: 5,
+                stoneDelivered: 5,
+                progress01: 1f,
+                position: new Vector3(0f, 0f, 1f));
+            var farther = scope.CreateConstructionSite(
+                ConstructionPhase.ReadyToBuild,
+                woodRequired: 10,
+                woodDelivered: 0,
+                stoneRequired: 5,
+                stoneDelivered: 0,
+                progress01: 0f,
+                position: new Vector3(0f, 0f, 3f));
+            scope.RefreshProjections();
+
+            new ClientStage1PresentationBootstrapSystem().Init();
+            new ClientStage1ContextPanelSessionSystem().Update();
+
+            ref readonly var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            Assert.That(session.Mode, Is.EqualTo(Stage1ContextPanelMode.Building));
+            Assert.That(session.FocusedSite, Is.EqualTo(nearest.GID));
+            Assert.That(session.FocusedSite, Is.Not.EqualTo(farther.GID));
+        }
+
+        [Test]
+        public void ContextPanelSession_WhenNoFocusTargetOrNearbyBuilding_UsesWorkerMode()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
+            scope.CreateSharedResources();
+            scope.CreateLocalPlayer(LoadoutModuleCatalog.PoisonArrowModuleId);
+            scope.CreateConstructionSite(
+                ConstructionPhase.ReadyToBuild,
+                woodRequired: 10,
+                woodDelivered: 0,
+                stoneRequired: 5,
+                stoneDelivered: 0,
+                progress01: 0f,
+                position: new Vector3(0f, 0f, 8f));
             scope.RefreshProjections();
 
             new ClientStage1PresentationBootstrapSystem().Init();

@@ -158,11 +158,30 @@ namespace StaticMlp.Tests.Combat
 
         public CW.Entity CreateConstructionSite(ConstructionPhase phase, int woodRequired, int woodDelivered, int stoneRequired, int stoneDelivered, float progress01)
         {
+            return CreateConstructionSite(
+                phase,
+                woodRequired,
+                woodDelivered,
+                stoneRequired,
+                stoneDelivered,
+                progress01,
+                new Vector3(0f, 0f, 1f));
+        }
+
+        public CW.Entity CreateConstructionSite(
+            ConstructionPhase phase,
+            int woodRequired,
+            int woodDelivered,
+            int stoneRequired,
+            int stoneDelivered,
+            float progress01,
+            Vector3 position)
+        {
             var site = CW.NewEntity<Default>();
             site.Set<ConstructionSiteTag>();
             site.Set(new ConstructionTransform
             {
-                Position = new Vector3(0f, 0f, 1f),
+                Position = position,
                 Rotation = Quaternion.identity
             });
             site.Set(new ConstructionSiteState

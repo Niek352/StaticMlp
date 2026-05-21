@@ -83,7 +83,7 @@ Plans:
 
 Plans:
 
-- [ ] 06-01: Change Stage1 context focus to raycast-first with proximity fallback.
+- [x] 06-01: Change Stage1 context focus to raycast-first with proximity fallback.
 - [ ] 06-02: Add generic building action/details presentation state.
 - [ ] 06-03: Expand build menu overlay categories/cards and document required Unity view wiring.
 
@@ -96,4 +96,4 @@ Plans:
 | 3. Storage And Operations | 3/3 | Complete | 2026-05-21 |
 | 4. NPC Worker Economy | 3/3 | Complete | 2026-05-21 |
 | 5. Stage1 Progression And Loadout | 3/3 | Complete | 2026-05-21 |
-| 6. UX And Presentation | 0/3 | Not started | - |
+| 6. UX And Presentation | 1/3 | In progress | - |
