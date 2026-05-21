@@ -10,7 +10,7 @@ This roadmap upgrades the current camp repair prototype into a Stage1 settlement
 - [x] **Phase 2: Building Catalog And Construction** - Add Stage1 buildings and connect them to construction/network/presentation catalogs.
 - [x] **Phase 3: Storage And Operations** - Add stockpile, shelter, and workbench operation contracts that buildings can own after construction.
 - [x] **Phase 4: NPC Worker Economy** - Expand worker roles and make NPC workers discover gather, haul, and process demands.
-- [ ] **Phase 5: Stage1 Progression And Loadout** - Require the first real settlement economy chain before loadout preparation.
+- [x] **Phase 5: Stage1 Progression And Loadout** - Require the first real settlement economy chain before loadout preparation.
 - [ ] **Phase 6: UX And Presentation** - Replace debug-like interaction with raycast-first focus and generic building action/details presentation.
 
 ## Phase Details
@@ -73,7 +73,7 @@ Plans:
 
 - [x] 05-01: Extend Stage1 progress stages with StockpilePlaced, ShelterPlaced, ExtractionOnline, and WorkbenchOnline.
 - [x] 05-02: Update Stage1 objectives, hints, flow view state, and tests around the new economy gates.
-- [ ] 05-03: Add settlement-aware loadout module definitions for utility, build signal, and base infrastructure slots.
+- [x] 05-03: Add settlement-aware loadout module definitions for utility, build signal, and base infrastructure slots.
 
 ### Phase 6: UX And Presentation
 
@@ -95,5 +95,5 @@ Plans:
 | 2. Building Catalog And Construction | 3/3 | Complete | 2026-05-20 |
 | 3. Storage And Operations | 3/3 | Complete | 2026-05-21 |
 | 4. NPC Worker Economy | 3/3 | Complete | 2026-05-21 |
-| 5. Stage1 Progression And Loadout | 2/3 | In progress | - |
+| 5. Stage1 Progression And Loadout | 3/3 | Complete | 2026-05-21 |
 | 6. UX And Presentation | 0/3 | Not started | - |

@@ -34,6 +34,9 @@ namespace StaticMlp.Features.Loadout
             if (!LoadoutModuleCatalog.TryGet(selection.PrimaryModuleId, out var module))
                 throw new InvalidOperationException($"Missing {nameof(LoadoutModuleDefinition)} for build module id {selection.PrimaryModuleId.Value}.");
 
+            if (module.SlotKind != EquipmentSlotKind.Combat || !module.HasArchetype || !module.HasGrantedAbility)
+                throw new InvalidOperationException($"Build preparation requires a combat module, got build module id {module.Id.Value}.");
+
             return new PreparedLoadoutSnapshot
             {
                 ArchetypeId = module.ArchetypeId,
