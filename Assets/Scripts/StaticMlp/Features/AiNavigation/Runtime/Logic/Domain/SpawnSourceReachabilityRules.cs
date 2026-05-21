@@ -21,7 +21,7 @@ namespace StaticMlp.Features.AiNavigation
             };
         }
 
-        public static bool ContainsSource(in CombatCellNavArea navArea, float3 sourcePosition)
+        public static bool ContainsSource(in NavInterestArea navArea, float3 sourcePosition)
         {
             var distanceSq = math.distancesq(navArea.Center, sourcePosition);
             return distanceSq <= navArea.SourceCollectRadius * navArea.SourceCollectRadius;

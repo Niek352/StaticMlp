@@ -94,7 +94,7 @@ namespace StaticMlp.Tests.Ai
             registry.Register(new WorldChunkId(0, 0), 16f, CreateFlatChunkMesh(16f));
             system.Update();
 
-            zone.Mut<CombatCellNavArea>().Center = new float3(2f, 0f, 2f);
+            zone.Mut<NavInterestArea>().Center = new float3(2f, 0f, 2f);
             system.Update();
 
             Assert.That(zone.Read<RuntimeNavMeshZoneState>().RequestedNavVersion, Is.EqualTo(1));
@@ -237,7 +237,7 @@ namespace StaticMlp.Tests.Ai
                 SW.Create(WorldConfig.Default());
                 SW.Types().RegisterAll(
                     typeof(ServerWT).Assembly,
-                    typeof(CombatCellNavArea).Assembly);
+                    typeof(NavInterestArea).Assembly);
                 SW.Initialize();
                 SW.SetResource(new SimulationTime
                 {
@@ -250,9 +250,10 @@ namespace StaticMlp.Tests.Ai
             public SW.Entity CreateZone(float3 center, float sourceCollectRadius)
             {
                 var zone = SW.NewEntity<Default>();
-                zone.Set(new CombatCellNavArea
+                zone.Set(new NavInterestArea
                 {
-                    CellId = 1,
+                    AreaId = 1,
+                    Kind = NavInterestAreaKind.CombatCell,
                     Center = center,
                     Radius = 12f,
                     NavBuildRadius = 24f,

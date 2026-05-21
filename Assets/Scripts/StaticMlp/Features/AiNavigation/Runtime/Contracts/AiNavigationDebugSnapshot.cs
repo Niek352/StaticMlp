@@ -6,7 +6,7 @@ namespace StaticMlp.Features.AiNavigation
 {
     public struct AiNavigationDebugSnapshot : IComponent
     {
-        public int CombatCellId;
+        public int NavAreaId;
         public float3 NavAreaCenter;
         public float NavAreaRadius;
         public float NavBuildRadius;

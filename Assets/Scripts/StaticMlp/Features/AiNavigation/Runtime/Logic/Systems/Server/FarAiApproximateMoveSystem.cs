@@ -18,7 +18,7 @@ namespace StaticMlp.Features.AiNavigation
         private static void UpdateEntity(SW.Entity entity, float currentTime, float fixedStepSeconds)
         {
             ref var modeState = ref entity.Mut<AiNavigationModeState>();
-            if (modeState.CurrentMode != AiNavigationMode.ApproximateMove)
+            if (!FarAiMovementRules.IsFarSimulationMode(modeState.CurrentMode))
                 return;
 
             ref var farState = ref entity.Mut<AiFarSimulationState>();

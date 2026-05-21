@@ -5,7 +5,7 @@ namespace StaticMlp.Features.AiNavigation
 {
     public sealed class SpawnSourcePointResolver : ISpawnSourcePointResolver
     {
-        public float3 Resolve(in SpawnSource source, in CombatCellNavArea navArea, int navVersion)
+        public float3 Resolve(in SpawnSource source, in NavInterestArea navArea, int navVersion)
         {
             var offset = source.Position - navArea.Center;
             var distance = math.length(offset);

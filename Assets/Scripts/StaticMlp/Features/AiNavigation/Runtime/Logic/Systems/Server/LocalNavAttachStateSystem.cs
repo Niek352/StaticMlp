@@ -29,9 +29,9 @@ namespace StaticMlp.Features.AiNavigation
             var bestDistanceSq = float.MaxValue;
             var bestState = default(LocalNavAttachState);
 
-            foreach (var navAreaEntity in SW.Query<All<CombatCellNavArea, RuntimeNavMeshZoneState>>().Entities())
+            foreach (var navAreaEntity in SW.Query<All<NavInterestArea, RuntimeNavMeshZoneState>>().Entities())
             {
-                ref readonly var navArea = ref navAreaEntity.Read<CombatCellNavArea>();
+                ref readonly var navArea = ref navAreaEntity.Read<NavInterestArea>();
                 if (!Contains(in navArea, logicalPosition))
                     continue;
 
@@ -44,7 +44,7 @@ namespace StaticMlp.Features.AiNavigation
                 bestState = new LocalNavAttachState
                 {
                     IsReady = isReady,
-                    ZoneId = navArea.CellId,
+                    ZoneId = navArea.AreaId,
                     NavVersion = zoneState.NavVersion
                 };
                 bestReady = isReady;
@@ -56,7 +56,7 @@ namespace StaticMlp.Features.AiNavigation
             return bestState;
         }
 
-        private static bool Contains(in CombatCellNavArea navArea, float3 logicalPosition)
+        private static bool Contains(in NavInterestArea navArea, float3 logicalPosition)
         {
             return math.distancesq(navArea.Center, logicalPosition) <= navArea.Radius * navArea.Radius;
         }

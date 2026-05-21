@@ -4,7 +4,7 @@ using Unity.Mathematics;
 
 namespace StaticMlp.Features.AiNavigation
 {
-    public static class CombatCellNavAreaRules
+    public static class NavInterestAreaRules
     {
         private const float NAV_BUILD_RADIUS_MULTIPLIER = 1.6f;
         private const float SOURCE_COLLECT_RADIUS_MULTIPLIER = 2f;
@@ -12,17 +12,21 @@ namespace StaticMlp.Features.AiNavigation
         private const int PRIORITY_BASE = 1000;
         private const float PRIORITY_RADIUS_WEIGHT = 10f;
 
-        public static CombatCellNavArea Create(in CombatCell combatCell)
+        public static NavInterestArea CreateFromCombatCell(in CombatCell combatCell)
         {
             Validate(in combatCell);
 
-            return new CombatCellNavArea
+            var navBuildRadius = math.max(combatCell.Radius, combatCell.Radius * NAV_BUILD_RADIUS_MULTIPLIER);
+            var sourceCollectRadius = math.max(combatCell.Radius * NAV_BUILD_RADIUS_MULTIPLIER, combatCell.Radius * SOURCE_COLLECT_RADIUS_MULTIPLIER);
+
+            return new NavInterestArea
             {
-                CellId = combatCell.CellId,
+                AreaId = combatCell.CellId,
+                Kind = NavInterestAreaKind.CombatCell,
                 Center = combatCell.Center,
                 Radius = combatCell.Radius,
-                NavBuildRadius = math.max(combatCell.Radius, combatCell.Radius * NAV_BUILD_RADIUS_MULTIPLIER),
-                SourceCollectRadius = math.max(combatCell.Radius * NAV_BUILD_RADIUS_MULTIPLIER, combatCell.Radius * SOURCE_COLLECT_RADIUS_MULTIPLIER),
+                NavBuildRadius = navBuildRadius,
+                SourceCollectRadius = sourceCollectRadius,
                 Priority = checked(PRIORITY_BASE + (int)math.ceil(combatCell.Radius * PRIORITY_RADIUS_WEIGHT))
             };
         }

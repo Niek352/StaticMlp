@@ -28,7 +28,7 @@ namespace StaticMlp.Features.AiNavigation
                 return;
             }
 
-            ref readonly var navArea = ref navAreaEntity.Read<CombatCellNavArea>();
+            ref readonly var navArea = ref navAreaEntity.Read<NavInterestArea>();
             ref readonly var zoneState = ref navAreaEntity.Read<RuntimeNavMeshZoneState>();
 
             if (zoneState.NavVersion != navState.NavVersion)
@@ -40,7 +40,7 @@ namespace StaticMlp.Features.AiNavigation
             var candidate = new ReachableSpawnSourceCandidate
             {
                 Source = sourceEntity.GID,
-                ZoneId = navArea.CellId,
+                ZoneId = navArea.AreaId,
                 NavVersion = navState.NavVersion,
                 ApproxPathCost = navState.ApproxPathCost
             };
@@ -74,9 +74,9 @@ namespace StaticMlp.Features.AiNavigation
             var bestPriority = int.MinValue;
             var bestDistanceSq = float.MaxValue;
 
-            foreach (var entity in SW.Query<All<CombatCellNavArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
+            foreach (var entity in SW.Query<All<NavInterestArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
             {
-                ref readonly var navArea = ref entity.Read<CombatCellNavArea>();
+                ref readonly var navArea = ref entity.Read<NavInterestArea>();
                 if (!SpawnSourceReachabilityRules.ContainsSource(in navArea, sourcePosition))
                     continue;
 

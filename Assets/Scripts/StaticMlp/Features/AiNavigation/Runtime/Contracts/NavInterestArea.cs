@@ -3,9 +3,10 @@ using Unity.Mathematics;
 
 namespace StaticMlp.Features.AiNavigation
 {
-    public struct CombatCellNavArea : IComponent
+    public struct NavInterestArea : IComponent
     {
-        public int CellId;
+        public int AreaId;
+        public NavInterestAreaKind Kind;
         public float3 Center;
         public float Radius;
         public float NavBuildRadius;

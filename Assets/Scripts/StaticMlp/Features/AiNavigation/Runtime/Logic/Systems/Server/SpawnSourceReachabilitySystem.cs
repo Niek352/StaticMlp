@@ -15,7 +15,7 @@ namespace StaticMlp.Features.AiNavigation
             foreach (var entity in SW.Query<All<SpawnSource>>().Entities())
                 ScheduleReachability(entity, currentTime);
 
-            foreach (var navAreaEntity in SW.Query<All<CombatCellNavArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
+            foreach (var navAreaEntity in SW.Query<All<NavInterestArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
                 ProcessReachability(navAreaEntity, currentTime);
 
             CleanupStaleRequests();
@@ -44,7 +44,7 @@ namespace StaticMlp.Features.AiNavigation
                 return;
             }
 
-            ref readonly var navArea = ref navAreaEntity.Read<CombatCellNavArea>();
+            ref readonly var navArea = ref navAreaEntity.Read<NavInterestArea>();
             ref readonly var zoneState = ref navAreaEntity.Read<RuntimeNavMeshZoneState>();
             var approxPathCost = math.distance(navArea.Center, spawnSource.Position);
 
@@ -54,7 +54,7 @@ namespace StaticMlp.Features.AiNavigation
                 return;
             }
 
-            var request = SpawnSourceReachabilityRules.CreateRequest(navArea.CellId, zoneState.NavVersion, currentTime, approxPathCost);
+            var request = SpawnSourceReachabilityRules.CreateRequest(navArea.AreaId, zoneState.NavVersion, currentTime, approxPathCost);
             if (sourceEntity.Has<SpawnSourceReachabilityRequest>())
             {
                 ref var currentRequest = ref sourceEntity.Mut<SpawnSourceReachabilityRequest>();
@@ -70,13 +70,13 @@ namespace StaticMlp.Features.AiNavigation
 
         private static void ProcessReachability(SW.Entity navAreaEntity, float currentTime)
         {
-            ref readonly var navArea = ref navAreaEntity.Read<CombatCellNavArea>();
+            ref readonly var navArea = ref navAreaEntity.Read<NavInterestArea>();
             ref readonly var zoneState = ref navAreaEntity.Read<RuntimeNavMeshZoneState>();
             ref readonly var budget = ref navAreaEntity.Read<CombatCellPerformanceBudget>();
             ref var counters = ref navAreaEntity.Mut<NavWorkBudgetCounter>();
 
             var remainingBudget = budget.MaxReachabilityChecksPerTick - counters.ReachabilityChecksThisTick;
-            while (remainingBudget > 0 && TrySelectRequest(navArea.CellId, out var requestEntity))
+            while (remainingBudget > 0 && TrySelectRequest(navArea.AreaId, out var requestEntity))
             {
                 var request = requestEntity.Read<SpawnSourceReachabilityRequest>();
                 var status = zoneState.BuildState == RuntimeNavMeshBuildState.Ready
@@ -123,9 +123,9 @@ namespace StaticMlp.Features.AiNavigation
             var bestPriority = int.MinValue;
             var bestDistanceSq = float.MaxValue;
 
-            foreach (var entity in SW.Query<All<CombatCellNavArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
+            foreach (var entity in SW.Query<All<NavInterestArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
             {
-                ref readonly var navArea = ref entity.Read<CombatCellNavArea>();
+                ref readonly var navArea = ref entity.Read<NavInterestArea>();
                 if (!SpawnSourceReachabilityRules.ContainsSource(in navArea, sourcePosition))
                     continue;
 

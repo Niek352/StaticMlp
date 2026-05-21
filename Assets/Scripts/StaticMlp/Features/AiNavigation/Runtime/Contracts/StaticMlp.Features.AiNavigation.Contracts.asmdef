@@ -1,6 +1,6 @@
 {
     "name": "StaticMlp.Features.AiNavigation.Contracts",
-    "rootNamespace": "StaticMlp.Features.AiNavigation",
+    "rootNamespace": "StaticMlp.Features.AiNavigation.Contracts",
     "references": [
         "FFS.StaticEcs",
         "Game.Core",

@@ -11,7 +11,8 @@
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
         "Unity.Entities",
         "Ecs.Networking",
-        "Unity.Collections"
+        "Unity.Collections",
+        "StaticMlp.Features.Settlement.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

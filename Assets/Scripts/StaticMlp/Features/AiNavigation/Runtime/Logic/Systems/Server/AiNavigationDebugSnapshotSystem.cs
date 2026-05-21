@@ -12,20 +12,20 @@ namespace StaticMlp.Features.AiNavigation
     {
         public void Update()
         {
-            foreach (var navAreaEntity in SW.Query<All<CombatCellNavArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
+            foreach (var navAreaEntity in SW.Query<All<NavInterestArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
                 UpdateSnapshot(navAreaEntity);
         }
 
         private static void UpdateSnapshot(SW.Entity navAreaEntity)
         {
-            ref readonly var navArea = ref navAreaEntity.Read<CombatCellNavArea>();
+            ref readonly var navArea = ref navAreaEntity.Read<NavInterestArea>();
             ref readonly var zoneState = ref navAreaEntity.Read<RuntimeNavMeshZoneState>();
             ref readonly var budget = ref navAreaEntity.Read<CombatCellPerformanceBudget>();
             ref readonly var counters = ref navAreaEntity.Read<NavWorkBudgetCounter>();
 
             var snapshot = new AiNavigationDebugSnapshot
             {
-                CombatCellId = navArea.CellId,
+                NavAreaId = navArea.AreaId,
                 NavAreaCenter = navArea.Center,
                 NavAreaRadius = navArea.Radius,
                 NavBuildRadius = navArea.NavBuildRadius,
@@ -71,7 +71,7 @@ namespace StaticMlp.Features.AiNavigation
             }
         }
 
-        private static void PopulateSpawnSourceFacts(in CombatCellNavArea navArea, ref AiNavigationDebugSnapshot snapshot)
+        private static void PopulateSpawnSourceFacts(in NavInterestArea navArea, ref AiNavigationDebugSnapshot snapshot)
         {
             var bestReachableApproxPathCost = float.MaxValue;
             var bestResolvedApproxPathCost = float.MaxValue;
@@ -85,7 +85,7 @@ namespace StaticMlp.Features.AiNavigation
                 if (!TryResolveNavArea(spawnSource.Position, out var resolvedNavAreaEntity))
                     continue;
 
-                if (resolvedNavAreaEntity.GID != default && resolvedNavAreaEntity.Read<CombatCellNavArea>().CellId != navArea.CellId)
+                if (resolvedNavAreaEntity.GID != default && resolvedNavAreaEntity.Read<NavInterestArea>().AreaId != navArea.AreaId)
                     continue;
 
                 ref readonly var navState = ref sourceEntity.Read<SpawnSourceNavState>();
@@ -127,7 +127,7 @@ namespace StaticMlp.Features.AiNavigation
             }
         }
 
-        private static int CountAliveEnemies(in CombatCellNavArea navArea)
+        private static int CountAliveEnemies(in NavInterestArea navArea)
         {
             var aliveEnemyCount = 0;
 
@@ -151,9 +151,9 @@ namespace StaticMlp.Features.AiNavigation
             var bestPriority = int.MinValue;
             var bestDistanceSq = float.MaxValue;
 
-            foreach (var entity in SW.Query<All<CombatCellNavArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
+            foreach (var entity in SW.Query<All<NavInterestArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
             {
-                ref readonly var navArea = ref entity.Read<CombatCellNavArea>();
+                ref readonly var navArea = ref entity.Read<NavInterestArea>();
                 if (!SpawnSourceReachabilityRules.ContainsSource(in navArea, sourcePosition))
                     continue;
 
@@ -170,7 +170,7 @@ namespace StaticMlp.Features.AiNavigation
             return found;
         }
 
-        private static bool Contains(in CombatCellNavArea navArea, float3 position)
+        private static bool Contains(in NavInterestArea navArea, float3 position)
         {
             return math.distancesq(navArea.Center, position) <= navArea.Radius * navArea.Radius;
         }

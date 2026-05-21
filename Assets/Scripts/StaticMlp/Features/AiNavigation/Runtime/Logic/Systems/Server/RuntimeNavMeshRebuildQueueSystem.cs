@@ -13,7 +13,7 @@ namespace StaticMlp.Features.AiNavigation
 
             var simulationTime = SW.GetResource<SimulationTime>();
             var registry = SW.GetResource<ChunkNavSourceRegistry>();
-            foreach (var entity in SW.Query<All<CombatCellNavArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
+            foreach (var entity in SW.Query<All<NavInterestArea, RuntimeNavMeshZoneState, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
                 QueueRebuildIfNeeded(entity, simulationTime.ServerTick, registry);
         }
 
@@ -25,10 +25,10 @@ namespace StaticMlp.Features.AiNavigation
 
         private static void QueueRebuildIfNeeded(SW.Entity entity, uint currentTick, ChunkNavSourceRegistry registry)
         {
-            ref readonly var navArea = ref entity.Read<CombatCellNavArea>();
+            ref readonly var navArea = ref entity.Read<NavInterestArea>();
             ref var zoneState = ref entity.Mut<RuntimeNavMeshZoneState>();
             ref var counters = ref entity.Mut<NavWorkBudgetCounter>();
-            var queuedCenter = CombatCellNavAreaRules.QuantizeNavCenter(navArea.Center);
+            var queuedCenter = NavInterestAreaRules.QuantizeNavCenter(navArea.Center);
             var sourceCollectBounds = RuntimeNavMeshZoneBounds.Create(queuedCenter, navArea.SourceCollectRadius);
             var sourceSetVersion = registry.CalculateSourceSetVersion(sourceCollectBounds, out _);
 
@@ -41,7 +41,7 @@ namespace StaticMlp.Features.AiNavigation
                 ? NavRebuildReason.InitialBuild
                 : sourceSetVersion != zoneState.RequestedSourceSetVersion
                     ? NavRebuildReason.SourceGeometryChanged
-                    : NavRebuildReason.CombatCellNavAreaChanged;
+                    : NavRebuildReason.NavAreaChanged;
 
             if (!hasPendingRequest || isBuilding)
                 zoneState.RequestedNavVersion++;
@@ -85,7 +85,7 @@ namespace StaticMlp.Features.AiNavigation
         }
 
         private static bool NeedsRebuild(
-            in CombatCellNavArea navArea,
+            in NavInterestArea navArea,
             in RuntimeNavMeshZoneState zoneState,
             float3 queuedCenter,
             ulong sourceSetVersion)

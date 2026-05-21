@@ -81,9 +81,9 @@ namespace StaticMlp.Features.AiNavigation
             var bestPriority = int.MinValue;
             var bestDistanceSq = float.MaxValue;
 
-            foreach (var entity in SW.Query<All<CombatCellNavArea, AiNavigationDebugSnapshot>>().Entities())
+            foreach (var entity in SW.Query<All<NavInterestArea, AiNavigationDebugSnapshot>>().Entities())
             {
-                ref readonly var navArea = ref entity.Read<CombatCellNavArea>();
+                ref readonly var navArea = ref entity.Read<NavInterestArea>();
                 if (!SpawnSourceReachabilityRules.ContainsSource(in navArea, position))
                     continue;
 
@@ -166,7 +166,7 @@ namespace StaticMlp.Features.AiNavigation
                 : "n/a";
 
             return
-                $"AiNavigation Cell {snapshot.CombatCellId}\n" +
+                $"AiNavigation Area {snapshot.NavAreaId}\n" +
                 $"Build: {snapshot.NavBuildState} | NavVersion: {snapshot.NavVersion}/{snapshot.RequestedNavVersion}\n" +
                 $"Director Phase: {phaseText}\n" +
                 $"Sources R/U/P: {snapshot.ReachableSourceCount}/{snapshot.UnreachableSourceCount}/{snapshot.PendingSourceCount}\n" +

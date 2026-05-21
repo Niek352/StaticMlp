@@ -130,7 +130,7 @@ namespace StaticMlp.Features.AiNavigation
             var bestPriority = int.MinValue;
             uint bestTick = uint.MaxValue;
 
-            foreach (var entity in SW.Query<All<CombatCellNavArea, RuntimeNavMeshZoneState, NavRebuildRequest, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
+            foreach (var entity in SW.Query<All<NavInterestArea, RuntimeNavMeshZoneState, NavRebuildRequest, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
             {
                 hasRequests = true;
             }
@@ -140,7 +140,7 @@ namespace StaticMlp.Features.AiNavigation
 
             phase = ResolvePhase();
 
-            foreach (var entity in SW.Query<All<CombatCellNavArea, RuntimeNavMeshZoneState, NavRebuildRequest, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
+            foreach (var entity in SW.Query<All<NavInterestArea, RuntimeNavMeshZoneState, NavRebuildRequest, CombatCellPerformanceBudget, NavWorkBudgetCounter>>().Entities())
             {
                 ref readonly var request = ref entity.Read<NavRebuildRequest>();
                 ref readonly var zoneState = ref entity.Read<RuntimeNavMeshZoneState>();

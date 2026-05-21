@@ -33,7 +33,7 @@ namespace StaticMlp.Features.AiNavigation
                 return;
             }
 
-            ref readonly var navArea = ref navAreaEntity.Read<CombatCellNavArea>();
+            ref readonly var navArea = ref navAreaEntity.Read<NavInterestArea>();
             ref readonly var zoneState = ref navAreaEntity.Read<RuntimeNavMeshZoneState>();
             if (zoneState.NavVersion != candidate.NavVersion)
             {
@@ -81,9 +81,9 @@ namespace StaticMlp.Features.AiNavigation
 
         private static bool TryResolveNavArea(int zoneId, out SW.Entity navAreaEntity)
         {
-            foreach (var entity in SW.Query<All<CombatCellNavArea, RuntimeNavMeshZoneState>>().Entities())
+            foreach (var entity in SW.Query<All<NavInterestArea, RuntimeNavMeshZoneState>>().Entities())
             {
-                if (entity.Read<CombatCellNavArea>().CellId != zoneId)
+                if (entity.Read<NavInterestArea>().AreaId != zoneId)
                     continue;
 
                 navAreaEntity = entity;
