@@ -1,6 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Replication;
 
 namespace StaticMlp.Features.Settlement
 {
@@ -29,7 +30,7 @@ namespace StaticMlp.Features.Settlement
             if (!request.ExtractionBuilding.TryUnpack<ServerWT>(out var extractionBuilding))
                 throw new InvalidOperationException($"Extraction transfer target {request.ExtractionBuilding} is not a server entity.");
 
-            ref var extraction = ref extractionBuilding.Mut<ExtractionOperationState>();
+            ref var extraction = ref ReplicationMut.Mut<ExtractionOperationState>(extractionBuilding);
             if (!ExtractionRules.HasOutput(in extraction))
                 return;
 

@@ -19,9 +19,14 @@ namespace StaticMlp.Features.Settlement.Workers
         {
             ProjectionRegistry.Register<SettlementWorkerSummary>();
             ProjectionRegistry.Register<SettlementCampBuilderJobState>();
+            ProjectionRegistry.Register<BuildingWorkerAssignmentState>();
 
             RequestRegistry.Register<SetSettlementWorkerAssignmentRequestEvent, SetSettlementWorkerAssignmentResultEvent>(
                 new SetSettlementWorkerAssignmentHandler(),
+                projector: null,
+                serverOrder: GameplaySystemOrder.Gameplay - 46);
+            RequestRegistry.Register<SetBuildingWorkerAssignmentRequestEvent, SetBuildingWorkerAssignmentResultEvent>(
+                new SetBuildingWorkerAssignmentHandler(),
                 projector: null,
                 serverOrder: GameplaySystemOrder.Gameplay - 46);
         }

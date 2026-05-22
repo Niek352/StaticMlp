@@ -2,6 +2,7 @@ using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Settlement;
+using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 
@@ -18,6 +19,8 @@ namespace StaticMlp.Tests.Settlement
             SW.Types().RegisterAll(
                 typeof(ServerWT).Assembly,
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
+                typeof(BuildingWorkerAssignmentState).Assembly,
+                typeof(SettlementWorkerTag).Assembly,
                 typeof(BuildingConstructionCompletedEvent).Assembly);
             SW.Initialize();
         }

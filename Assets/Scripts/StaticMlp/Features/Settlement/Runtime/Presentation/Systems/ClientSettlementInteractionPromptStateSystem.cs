@@ -17,7 +17,7 @@ namespace StaticMlp.Features.Settlement
             ref var prompt = ref CW.GetResource<InteractionPromptState>();
             prompt.Hide();
 
-            ref readonly var panelSession = ref CW.GetResource<BuildingManagementPanelSession>();
+            ref readonly var panelSession = ref CW.GetResource<BuildingPanelSession>();
             if (panelSession.IsOpen)
                 return;
 

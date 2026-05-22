@@ -1,8 +1,8 @@
 using System;
 using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
+using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
 
@@ -11,7 +11,7 @@ namespace StaticMlp.Features.Settlement
     public sealed class BuildingManagementPanelController
         : ControllerBase<BuildingManagementPanelView>
     {
-        private BuildingManagementPanelState _lastState;
+        private BuildingPanelState _lastState;
 
         public BuildingManagementPanelController(
             ViewFactoryMethod<BuildingManagementPanelView> viewFactory,
@@ -24,7 +24,7 @@ namespace StaticMlp.Features.Settlement
         public override ViewLayer Layer => ViewLayer.Persistent;
         public override int? PersistentSortOrder => 100;
 
-        public void Apply(in BuildingManagementPanelState state)
+        public void Apply(in BuildingPanelState state)
         {
             _lastState = state;
             View.Render(in state);
@@ -45,46 +45,41 @@ namespace StaticMlp.Features.Settlement
 
         private void HandlePrimaryAction()
         {
-            HandleBuildingAction(_lastState.PrimaryBuildingAction);
+            HandlePanelAction(_lastState.PrimaryAction);
         }
 
         private void HandleSecondaryAction()
         {
-            HandleBuildingAction(_lastState.SecondaryBuildingAction);
+            HandlePanelAction(_lastState.SecondaryAction);
         }
 
-        private static void HandleBuildingAction(in BuildingAvailableActionPresentation action)
+        private static void HandlePanelAction(in BuildingPanelAction action)
         {
             if (!action.IsDefined)
-                throw new InvalidOperationException("Building management action requires a defined action.");
+                throw new InvalidOperationException("Building panel action requires a defined action.");
 
             if (!action.Enabled)
-                throw new InvalidOperationException($"Building management action {action.Kind} is disabled: {action.DisabledReason}");
+                throw new InvalidOperationException($"Building panel action {action.Kind} is disabled: {action.DisabledReason}");
 
             switch (action.Kind)
             {
-                case BuildingInteractionKind.DepositConstructionResources:
+                case BuildingPanelActionKind.DepositConstructionResources:
                     SendDeposit(action.Target);
                     return;
-                case BuildingInteractionKind.ContributeBuildWork:
+                case BuildingPanelActionKind.ContributeBuildWork:
                     SendBuild(action.Target);
                     return;
-                case BuildingInteractionKind.OpenDetails:
-                case BuildingInteractionKind.AssignWorker:
-                case BuildingInteractionKind.OpenProductionQueue:
-                case BuildingInteractionKind.SetRecipe:
-                case BuildingInteractionKind.ClaimOutput:
-                case BuildingInteractionKind.AssignBed:
-                case BuildingInteractionKind.ToggleEnabled:
-                case BuildingInteractionKind.TriggerRepair:
-                case BuildingInteractionKind.Extract:
-                case BuildingInteractionKind.Rest:
-                case BuildingInteractionKind.StoreItems:
-                case BuildingInteractionKind.WithdrawItems:
-                    OpenOperationIntent(action.Target, action.Kind);
+                case BuildingPanelActionKind.AssignWorker:
+                    SendWorkerAssignment(action, assigned: true);
+                    return;
+                case BuildingPanelActionKind.UnassignWorker:
+                    SendWorkerAssignment(action, assigned: false);
+                    return;
+                case BuildingPanelActionKind.CollectExtractionOutput:
+                    SendCollectExtractionOutput(action);
                     return;
                 default:
-                    throw new InvalidOperationException($"Unsupported building management action {action.Kind}.");
+                    throw new InvalidOperationException($"Unsupported building panel action {action.Kind}.");
             }
         }
 
@@ -107,19 +102,29 @@ namespace StaticMlp.Features.Settlement
             RequestApi.Send<BuildConstructionRequestEvent, BuildConstructionResultEvent>(buildRequest);
         }
 
-        private static void OpenOperationIntent(EntityGID target, BuildingInteractionKind kind)
+        private static void SendWorkerAssignment(in BuildingPanelAction action, bool assigned)
         {
-            ref var intent = ref CW.GetResource<BuildingManagementOperationOpenIntent>();
-            intent.Set(target, kind);
+            var request = new SetBuildingWorkerAssignmentRequestEvent(
+                action.Worker,
+                action.Target,
+                action.SlotIndex,
+                assigned);
+            RequestApi.Send<SetBuildingWorkerAssignmentRequestEvent, SetBuildingWorkerAssignmentResultEvent>(request);
+        }
+
+        private static void SendCollectExtractionOutput(in BuildingPanelAction action)
+        {
+            var request = new CollectExtractionOutputRequestEvent(
+                action.Target,
+                action.Resource,
+                action.Amount);
+            RequestApi.Send<CollectExtractionOutputRequestEvent, CollectExtractionOutputResultEvent>(request);
         }
 
         private static void HandleClose()
         {
-            ref var session = ref CW.GetResource<BuildingManagementPanelSession>();
+            ref var session = ref CW.GetResource<BuildingPanelSession>();
             session.Close();
-
-            ref var intent = ref CW.GetResource<BuildingManagementOperationOpenIntent>();
-            intent.Clear();
         }
     }
 }

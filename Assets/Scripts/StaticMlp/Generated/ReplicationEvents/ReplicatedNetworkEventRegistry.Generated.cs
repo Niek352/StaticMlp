@@ -123,6 +123,30 @@ namespace StaticMlp.Networking.Replication.Generated {
                 16,
                 WriteOpenWorldChunkUnloadEvent,
                 ReadOpenWorldChunkUnloadEvent);
+            NetworkEventRegistry.Register<CollectExtractionOutputRequestEvent>(
+                ReplicatedNetworkEventIds.CollectExtractionOutputRequestEvent,
+                NetDelivery.ReliableSequenced,
+                18,
+                WriteCollectExtractionOutputRequestEvent,
+                ReadCollectExtractionOutputRequestEvent);
+            NetworkEventRegistry.Register<CollectExtractionOutputResultEvent>(
+                ReplicatedNetworkEventIds.CollectExtractionOutputResultEvent,
+                NetDelivery.ReliableSequenced,
+                19,
+                WriteCollectExtractionOutputResultEvent,
+                ReadCollectExtractionOutputResultEvent);
+            NetworkEventRegistry.Register<SetBuildingWorkerAssignmentRequestEvent>(
+                ReplicatedNetworkEventIds.SetBuildingWorkerAssignmentRequestEvent,
+                NetDelivery.ReliableSequenced,
+                22,
+                WriteSetBuildingWorkerAssignmentRequestEvent,
+                ReadSetBuildingWorkerAssignmentRequestEvent);
+            NetworkEventRegistry.Register<SetBuildingWorkerAssignmentResultEvent>(
+                ReplicatedNetworkEventIds.SetBuildingWorkerAssignmentResultEvent,
+                NetDelivery.ReliableSequenced,
+                25,
+                WriteSetBuildingWorkerAssignmentResultEvent,
+                ReadSetBuildingWorkerAssignmentResultEvent);
             NetworkEventRegistry.Register<SetSettlementWorkerAssignmentRequestEvent>(
                 ReplicatedNetworkEventIds.SetSettlementWorkerAssignmentRequestEvent,
                 NetDelivery.ReliableSequenced,
@@ -376,6 +400,80 @@ namespace StaticMlp.Networking.Replication.Generated {
             return new OpenWorldChunkUnloadEvent {
                 ChunkId = reader.ReadWorldChunkId(),
                 ClusterId = reader.ReadUshort(),
+            };
+        }
+
+        private static void WriteCollectExtractionOutputRequestEvent(ref NetworkWriter writer, in CollectExtractionOutputRequestEvent evt) {
+            writer.WriteRequestId(evt.RequestId);
+            writer.WriteEntityGid(evt.Building);
+            writer.WriteUshort(evt.ResourceId);
+            writer.WriteInt(evt.RequestedAmount);
+        }
+
+        private static CollectExtractionOutputRequestEvent ReadCollectExtractionOutputRequestEvent(ref NetworkReader reader) {
+            return new CollectExtractionOutputRequestEvent {
+                RequestId = reader.ReadRequestId(),
+                Building = reader.ReadEntityGid(),
+                ResourceId = reader.ReadUshort(),
+                RequestedAmount = reader.ReadInt(),
+            };
+        }
+
+        private static void WriteCollectExtractionOutputResultEvent(ref NetworkWriter writer, in CollectExtractionOutputResultEvent evt) {
+            writer.WriteRequestId(evt.RequestId);
+            writer.WriteByte((byte)evt.Status);
+            writer.WriteEntityGid(evt.Building);
+            writer.WriteUshort(evt.ResourceId);
+            writer.WriteInt(evt.TransferredAmount);
+        }
+
+        private static CollectExtractionOutputResultEvent ReadCollectExtractionOutputResultEvent(ref NetworkReader reader) {
+            return new CollectExtractionOutputResultEvent {
+                RequestId = reader.ReadRequestId(),
+                Status = (RequestStatus)reader.ReadByte(),
+                Building = reader.ReadEntityGid(),
+                ResourceId = reader.ReadUshort(),
+                TransferredAmount = reader.ReadInt(),
+            };
+        }
+
+        private static void WriteSetBuildingWorkerAssignmentRequestEvent(ref NetworkWriter writer, in SetBuildingWorkerAssignmentRequestEvent evt) {
+            writer.WriteRequestId(evt.RequestId);
+            writer.WriteEntityGid(evt.Worker);
+            writer.WriteEntityGid(evt.Building);
+            writer.WriteByte(evt.SlotIndex);
+            writer.WriteBool(evt.Assigned);
+        }
+
+        private static SetBuildingWorkerAssignmentRequestEvent ReadSetBuildingWorkerAssignmentRequestEvent(ref NetworkReader reader) {
+            return new SetBuildingWorkerAssignmentRequestEvent {
+                RequestId = reader.ReadRequestId(),
+                Worker = reader.ReadEntityGid(),
+                Building = reader.ReadEntityGid(),
+                SlotIndex = reader.ReadByte(),
+                Assigned = reader.ReadBool(),
+            };
+        }
+
+        private static void WriteSetBuildingWorkerAssignmentResultEvent(ref NetworkWriter writer, in SetBuildingWorkerAssignmentResultEvent evt) {
+            writer.WriteRequestId(evt.RequestId);
+            writer.WriteByte((byte)evt.Status);
+            writer.WriteEntityGid(evt.Worker);
+            writer.WriteEntityGid(evt.Building);
+            writer.WriteUshort(evt.AnchorId);
+            writer.WriteByte(evt.SlotIndex);
+            writer.WriteByte((byte)evt.AssignmentStatus);
+        }
+
+        private static SetBuildingWorkerAssignmentResultEvent ReadSetBuildingWorkerAssignmentResultEvent(ref NetworkReader reader) {
+            return new SetBuildingWorkerAssignmentResultEvent {
+                RequestId = reader.ReadRequestId(),
+                Status = (RequestStatus)reader.ReadByte(),
+                Worker = reader.ReadEntityGid(),
+                Building = reader.ReadEntityGid(),
+                AnchorId = reader.ReadUshort(),
+                SlotIndex = reader.ReadByte(),
+                AssignmentStatus = (SettlementWorkerAssignmentStatus)reader.ReadByte(),
             };
         }
 

@@ -8,6 +8,7 @@
         "FFS.StaticPack",
         "Game.Core",
         "StaticMlp.Features.Settlement.Contracts",
+        "StaticMlp.Features.Settlement.Workers.Contracts",
         "StaticMlp.Features.Stage1.Contracts",
         "StaticMlp.Features.BuildingCatalog",
         "StaticMlp.Features.Buildings.Contracts"

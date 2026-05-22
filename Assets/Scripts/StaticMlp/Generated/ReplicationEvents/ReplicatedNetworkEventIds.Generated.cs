@@ -18,6 +18,10 @@ namespace StaticMlp.Networking.Replication.Generated {
         public const ushort RescueNpcRequestEvent = 47012;
         public const ushort RescueNpcResultEvent = 59127;
         public const ushort OpenWorldChunkUnloadEvent = 59031;
+        public const ushort CollectExtractionOutputRequestEvent = 40175;
+        public const ushort CollectExtractionOutputResultEvent = 40176;
+        public const ushort SetBuildingWorkerAssignmentRequestEvent = 40173;
+        public const ushort SetBuildingWorkerAssignmentResultEvent = 40174;
         public const ushort SetSettlementWorkerAssignmentRequestEvent = 40171;
         public const ushort SetSettlementWorkerAssignmentResultEvent = 40172;
         public const ushort SpawnPhysicsCubeRequestEvent = 22135;

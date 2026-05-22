@@ -1,7 +1,6 @@
 using System;
 using System.Text;
 using Code.EcsUi.Mvc;
-using StaticMlp.Features.Buildings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -70,44 +69,170 @@ namespace StaticMlp.Features.Settlement
             closeButton.onClick.RemoveListener(HandleCloseClicked);
         }
 
-        public void Render(in BuildingManagementPanelState state)
+        public void Render(in BuildingPanelState state)
         {
             panelRoot.SetActive(true);
-            primaryButton.gameObject.SetActive(true);
-            secondaryButton.gameObject.SetActive(true);
 
-            primaryButton.interactable = state.PrimaryBuildingAction.Enabled;
-            secondaryButton.interactable = state.SecondaryBuildingAction.Enabled;
-            primaryButtonLabel.text = state.PrimaryBuildingAction.Label;
-            secondaryButtonLabel.text = state.SecondaryBuildingAction.Label;
+            RenderAction(primaryButton, primaryButtonLabel, in state.PrimaryAction);
+            RenderAction(secondaryButton, secondaryButtonLabel, in state.SecondaryAction);
 
-            var summaryBuilder = new StringBuilder();
-            summaryBuilder.Append(state.BuildingDisplayName);
-            summaryBuilder.Append("\nPhase: ");
-            summaryBuilder.Append(state.ConstructionPhase);
+            summaryLabel.text = BuildSummary(in state);
+        }
 
-            if (state.ConstructionResources.Length > 0)
+        private static void RenderAction(Button button, TextMeshProUGUI label, in BuildingPanelAction action)
+        {
+            button.gameObject.SetActive(action.IsDefined);
+            if (!action.IsDefined)
+                return;
+
+            button.interactable = action.Enabled;
+            label.text = action.Label;
+        }
+
+        private static string BuildSummary(in BuildingPanelState state)
+        {
+            var builder = new StringBuilder();
+            switch (state.Kind)
             {
-                summaryBuilder.Append("\nResources: ");
-                summaryBuilder.Append(FormatConstructionResources(in state));
+                case BuildingPanelKind.ConstructionSitePanel:
+                    AppendConstruction(builder, in state.Construction);
+                    AppendActionStatus(builder, in state.PrimaryAction);
+                    AppendActionStatus(builder, in state.SecondaryAction);
+                    break;
+                case BuildingPanelKind.StockpilePanel:
+                    AppendStockpile(builder, in state.Stockpile);
+                    break;
+                case BuildingPanelKind.ExtractionPanel:
+                    AppendExtraction(builder, in state.Extraction);
+                    AppendActionStatus(builder, in state.PrimaryAction);
+                    AppendActionStatus(builder, in state.SecondaryAction);
+                    break;
+                case BuildingPanelKind.WorkbenchPanel:
+                    AppendWorkbench(builder, in state.Workbench);
+                    break;
+                case BuildingPanelKind.ShelterPanel:
+                    AppendShelter(builder, in state.Shelter);
+                    break;
+                case BuildingPanelKind.CampCorePanel:
+                    AppendCampCore(builder, in state.CampCore);
+                    break;
+                default:
+                    builder.Append("No building selected.");
+                    break;
             }
 
-            summaryBuilder.Append("\nProgress: ");
-            summaryBuilder.Append(Mathf.RoundToInt(state.Progress01 * 100f));
-            summaryBuilder.Append('%');
+            return builder.ToString();
+        }
 
-            AppendActionStatus(summaryBuilder, "Primary", in state.PrimaryBuildingAction);
-            AppendActionStatus(summaryBuilder, "Secondary", in state.SecondaryBuildingAction);
+        private static void AppendConstruction(StringBuilder builder, in ConstructionPanelState state)
+        {
+            builder.Append(state.DisplayName);
+            builder.Append("\nConstruction Site");
+            builder.Append("\nPhase: ");
+            builder.Append(state.Phase);
+            builder.Append("\nResources: ");
+            builder.Append(FormatConstructionResources(in state));
+            builder.Append("\nProgress: ");
+            builder.Append(Mathf.RoundToInt(state.Progress01 * 100f));
+            builder.Append('%');
+        }
 
-            if (state.HasOpenedBuildingAction)
+        private static void AppendStockpile(StringBuilder builder, in StockpilePanelState state)
+        {
+            builder.Append(state.DisplayName);
+            builder.Append("\nStockpile");
+            builder.Append("\nUsed: ");
+            builder.Append(state.UsedCapacity);
+            builder.Append(" / ");
+            builder.Append(state.Capacity);
+            builder.Append("\nBuilding capacity: ");
+            builder.Append(state.ContributedCapacity);
+
+            if (state.Resources.Length == 0)
             {
-                summaryBuilder.Append("\n\n");
-                summaryBuilder.Append(state.OpenedBuildingActionLabel);
-                summaryBuilder.Append("\n");
-                summaryBuilder.Append(state.OpenedBuildingActionSummary);
+                builder.Append("\nResources: empty");
+                return;
             }
 
-            summaryLabel.text = summaryBuilder.ToString();
+            builder.Append("\nResources: ");
+            for (var i = 0; i < state.Resources.Length; i++)
+            {
+                if (i > 0)
+                    builder.Append(" / ");
+
+                var resource = state.Resources[i];
+                builder.Append(ResourceCatalog.Get(resource.Id).DisplayName);
+                builder.Append(' ');
+                builder.Append(resource.Amount);
+            }
+        }
+
+        private static void AppendExtraction(StringBuilder builder, in ExtractionPanelState state)
+        {
+            builder.Append(state.DisplayName);
+            builder.Append("\nExtraction");
+            builder.Append("\nOutput: ");
+            builder.Append(ResourceCatalog.Get(state.OutputResource).DisplayName);
+            builder.Append("\nBuffer: ");
+            builder.Append(state.BufferAmount);
+            builder.Append(" / ");
+            builder.Append(state.BufferCapacity);
+            builder.Append("\nWorkers: ");
+            builder.Append(state.AssignedWorkerCount);
+            builder.Append(" / ");
+            builder.Append(state.WorkerSlotCount);
+
+            for (var i = 0; i < state.WorkerSlots.Length; i++)
+            {
+                var slot = state.WorkerSlots[i];
+                builder.Append("\nSlot ");
+                builder.Append(slot.SlotIndex + 1);
+                builder.Append(": ");
+                builder.Append(slot.Assigned ? $"Worker {slot.Worker.Raw}" : "Empty");
+            }
+        }
+
+        private static void AppendWorkbench(StringBuilder builder, in WorkbenchPanelState state)
+        {
+            builder.Append(state.DisplayName);
+            builder.Append("\nWorkbench");
+            builder.Append("\nRecipe: ");
+            builder.Append(state.RecipeName);
+            builder.Append("\nWork: ");
+            builder.Append(Mathf.RoundToInt(state.WorkDone));
+            builder.Append(" / ");
+            builder.Append(Mathf.RoundToInt(state.WorkRequired));
+            builder.Append("\nWorkers: ");
+            builder.Append(state.AssignedWorkerCount);
+            builder.Append(" / ");
+            builder.Append(state.WorkerSlotCount);
+            AppendAmounts(builder, "Inputs", in state.Inputs);
+            AppendAmounts(builder, "Outputs", in state.Outputs);
+            builder.Append("\nRecipe and claim actions are unavailable until server requests exist.");
+        }
+
+        private static void AppendShelter(StringBuilder builder, in ShelterPanelState state)
+        {
+            builder.Append(state.DisplayName);
+            builder.Append("\nShelter");
+            builder.Append("\nBeds: ");
+            builder.Append(state.FreeSlots);
+            builder.Append(" free / ");
+            builder.Append(state.SlotCount);
+            builder.Append("\nStatus: ");
+            builder.Append(state.Enabled ? "Enabled" : "Disabled");
+            builder.Append("\nBed and rest actions are unavailable until server requests exist.");
+        }
+
+        private static void AppendCampCore(StringBuilder builder, in CampCorePanelState state)
+        {
+            builder.Append(state.DisplayName);
+            builder.Append("\nCamp Core");
+            builder.Append("\nPhase: ");
+            builder.Append(state.Phase);
+            builder.Append("\nProgress: ");
+            builder.Append(Mathf.RoundToInt(state.Progress01 * 100f));
+            builder.Append('%');
         }
 
         private void HandlePrimaryClicked()
@@ -125,18 +250,18 @@ namespace StaticMlp.Features.Settlement
             _onCloseClicked.Invoke();
         }
 
-        private static string FormatConstructionResources(in BuildingManagementPanelState state)
+        private static string FormatConstructionResources(in ConstructionPanelState state)
         {
-            if (state.ConstructionResources.Length == 0)
-                return string.Empty;
+            if (state.Resources.Length == 0)
+                return "none";
 
             var builder = new StringBuilder();
-            for (var i = 0; i < state.ConstructionResources.Length; i++)
+            for (var i = 0; i < state.Resources.Length; i++)
             {
                 if (i > 0)
                     builder.Append(" / ");
 
-                var resource = state.ConstructionResources[i];
+                var resource = state.Resources[i];
                 builder.Append(ResourceCatalog.Get(resource.Id).DisplayName);
                 builder.Append(' ');
                 builder.Append(resource.Delivered);
@@ -147,28 +272,40 @@ namespace StaticMlp.Features.Settlement
             return builder.ToString();
         }
 
-        private static void AppendActionStatus(
+        private static void AppendAmounts(
             StringBuilder builder,
-            string slot,
-            in BuildingAvailableActionPresentation action)
+            string label,
+            in Unity.Collections.FixedList128Bytes<ResourceAmount> amounts)
         {
             builder.Append('\n');
-            builder.Append(slot);
+            builder.Append(label);
             builder.Append(": ");
+            if (amounts.Length == 0)
+            {
+                builder.Append("none");
+                return;
+            }
+
+            for (var i = 0; i < amounts.Length; i++)
+            {
+                if (i > 0)
+                    builder.Append(" / ");
+
+                var amount = amounts[i];
+                builder.Append(ResourceCatalog.Get(amount.Id).DisplayName);
+                builder.Append(' ');
+                builder.Append(amount.Amount);
+            }
+        }
+
+        private static void AppendActionStatus(StringBuilder builder, in BuildingPanelAction action)
+        {
+            if (!action.IsDefined)
+                return;
+
+            builder.Append('\n');
             builder.Append(action.Label);
             builder.Append(action.Enabled ? " (ready)" : " (locked)");
-
-            if (!string.IsNullOrEmpty(action.InputHint))
-            {
-                builder.Append(" via ");
-                builder.Append(action.InputHint);
-            }
-
-            if (!string.IsNullOrEmpty(action.EffectDescription))
-            {
-                builder.Append("\nEffect: ");
-                builder.Append(action.EffectDescription);
-            }
 
             if (!action.Enabled && !string.IsNullOrEmpty(action.DisabledReason))
             {

@@ -1,7 +1,10 @@
+using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Settlement;
+using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using UnityEngine;
 
@@ -21,9 +24,9 @@ namespace StaticMlp.Tests.Settlement
                 WorkerSlotCount = 2
             };
 
-            Assert.That(ExtractionRules.FillBuffer(ref state), Is.EqualTo(2));
+            Assert.That(ExtractionRules.FillBuffer(ref state, assignedWorkerCount: 2), Is.EqualTo(2));
             Assert.That(state.OutputBufferAmount, Is.EqualTo(40));
-            Assert.That(ExtractionRules.FillBuffer(ref state), Is.EqualTo(0));
+            Assert.That(ExtractionRules.FillBuffer(ref state, assignedWorkerCount: 2), Is.EqualTo(0));
             Assert.That(state.OutputBufferAmount, Is.EqualTo(40));
         }
 
@@ -77,6 +80,15 @@ namespace StaticMlp.Tests.Settlement
                 OutputBufferCapacity = 40,
                 Enabled = true,
                 WorkerSlotCount = 2
+            });
+            var worker = SW.NewEntity<Default>();
+            worker.Set<SettlementWorkerTag>();
+            worker.Set(new BuildingWorkerAssignmentState
+            {
+                Status = SettlementWorkerAssignmentStatus.Assigned,
+                AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                Building = building.GID,
+                SlotIndex = 0
             });
 
             new ServerExtractionOperationSystem().Update();

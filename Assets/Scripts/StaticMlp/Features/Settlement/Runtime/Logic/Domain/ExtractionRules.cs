@@ -12,12 +12,12 @@ namespace StaticMlp.Features.Settlement
             return resourceId.Value != 0;
         }
 
-        public static int FillBuffer(ref ExtractionOperationState state)
+        public static int FillBuffer(ref ExtractionOperationState state, int assignedWorkerCount)
         {
-            if (!state.Enabled || state.WorkerSlotCount == 0)
+            if (!state.Enabled || assignedWorkerCount <= 0)
                 return 0;
 
-            return AddToBuffer(ref state, state.WorkerSlotCount);
+            return AddToBuffer(ref state, assignedWorkerCount);
         }
 
         public static int AddToBuffer(ref ExtractionOperationState state, int requestedAmount)

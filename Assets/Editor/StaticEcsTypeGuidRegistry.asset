@@ -423,6 +423,51 @@ MonoBehaviour:
       - className: EnemySpawnSource
         namespaceName: StaticMlp.Features.CombatDirector
         assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 1dbd74af-ce56-4e7f-9220-df2aea692e5e
+      current:
+        className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 81cc0b9a-2497-4926-8561-ac701776a1a9
+      current:
+        className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 23efe9a1-a281-40d2-b288-c8dcdd3220e5
+      current:
+        className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 934eb4df-f887-40dd-b8bf-8750466e74b8
+      current:
+        className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: e9cc6b5e-b289-4855-b926-26b14830f97c
+      current:
+        className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -647,6 +692,42 @@ MonoBehaviour:
       - className: NpcIncubationJobStartedEvent
         namespaceName: StaticMlp.Features.Npc
         assembly: StaticMlp.Features.Npc.Logic
+    - guid: 5f01bc7a-7dbd-4b65-8adc-b120c440e628
+      current:
+        className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: da08195c-38df-4d75-a487-9de75ffe9bb5
+      current:
+        className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 12082f54-6fde-4583-b6c6-61879520d99c
+      current:
+        className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: f591b513-010f-479b-bfc7-9b91423e0801
+      current:
+        className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
     links: []
     linksList: []
     multi: []
@@ -1060,6 +1141,51 @@ MonoBehaviour:
       - className: EnemySpawnSource
         namespaceName: StaticMlp.Features.CombatDirector
         assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 1dbd74af-ce56-4e7f-9220-df2aea692e5e
+      current:
+        className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 81cc0b9a-2497-4926-8561-ac701776a1a9
+      current:
+        className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 23efe9a1-a281-40d2-b288-c8dcdd3220e5
+      current:
+        className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 934eb4df-f887-40dd-b8bf-8750466e74b8
+      current:
+        className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: e9cc6b5e-b289-4855-b926-26b14830f97c
+      current:
+        className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -1284,6 +1410,42 @@ MonoBehaviour:
       - className: NpcIncubationJobStartedEvent
         namespaceName: StaticMlp.Features.Npc
         assembly: StaticMlp.Features.Npc.Logic
+    - guid: 5f01bc7a-7dbd-4b65-8adc-b120c440e628
+      current:
+        className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: da08195c-38df-4d75-a487-9de75ffe9bb5
+      current:
+        className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 12082f54-6fde-4583-b6c6-61879520d99c
+      current:
+        className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: f591b513-010f-479b-bfc7-9b91423e0801
+      current:
+        className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
     links: []
     linksList: []
     multi: []

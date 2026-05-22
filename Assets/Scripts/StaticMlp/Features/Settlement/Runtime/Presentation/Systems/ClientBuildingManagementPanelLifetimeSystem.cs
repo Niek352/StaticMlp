@@ -8,7 +8,7 @@ namespace StaticMlp.Features.Settlement
     {
         public void Update()
         {
-            ref var session = ref CW.GetResource<BuildingManagementPanelSession>();
+            ref var session = ref CW.GetResource<BuildingPanelSession>();
             if (!session.IsOpen)
                 return;
 
@@ -19,8 +19,6 @@ namespace StaticMlp.Features.Settlement
             }
 
             session.Close();
-            ref var operationIntent = ref CW.GetResource<BuildingManagementOperationOpenIntent>();
-            operationIntent.Clear();
         }
     }
 }

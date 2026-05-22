@@ -13,6 +13,14 @@ namespace StaticMlp.Features.Settlement
             ProjectionRegistry.Register<SettlementSharedResources>();
             ProjectionRegistry.RegisterMulti<SettlementStoredResource>();
             ProjectionRegistry.Register<Stage1SettlementProgression>();
+            ProjectionRegistry.Register<StockpileOperationState>();
+            ProjectionRegistry.Register<ExtractionOperationState>();
+            ProjectionRegistry.Register<WorkbenchOperationState>();
+            ProjectionRegistry.Register<BedrollShelterState>();
+            RequestRegistry.Register<CollectExtractionOutputRequestEvent, CollectExtractionOutputResultEvent>(
+                new CollectExtractionOutputHandler(),
+                projector: null,
+                serverOrder: GameplaySystemOrder.Gameplay - 40);
         }
 
         public override void RegisterPrefabs()

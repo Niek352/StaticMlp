@@ -7,8 +7,8 @@ namespace StaticMlp.Features.Settlement
     {
         protected override void SyncPresentation()
         {
-            ref readonly var session = ref CW.GetResource<BuildingManagementPanelSession>();
-            var state = BuildingManagementPanelPresentation.Build(in session);
+            ref readonly var session = ref CW.GetResource<BuildingPanelSession>();
+            var state = BuildingPanelPresentation.Build(in session);
             Controller.Apply(in state);
         }
     }

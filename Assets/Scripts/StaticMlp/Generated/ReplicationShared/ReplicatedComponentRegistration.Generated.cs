@@ -142,6 +142,13 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 sendRate: ResourcesInventoryReplication.SendRate);
 
+            ReplicationRegistry.RegisterComponent<BedrollShelterState>(
+                ReplicatedComponentIds.BedrollShelterState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: BedrollShelterStateReplication.SendRate);
+
             ReplicationRegistry.RegisterComponent<ConstructionProgress>(
                 ReplicatedComponentIds.ConstructionProgress,
                 ReplicationAuthority.Server,
@@ -170,6 +177,13 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 sendRate: ConstructionTransformReplication.SendRate);
 
+            ReplicationRegistry.RegisterComponent<ExtractionOperationState>(
+                ReplicatedComponentIds.ExtractionOperationState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: ExtractionOperationStateReplication.SendRate);
+
             ReplicationRegistry.RegisterComponent<SettlementAnchorRef>(
                 ReplicatedComponentIds.SettlementAnchorRef,
                 ReplicationAuthority.Server,
@@ -197,6 +211,27 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ReplicationAudience.All,
                 NetDelivery.ReliableSequenced,
                 sendRate: Stage1SettlementProgressionReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<StockpileOperationState>(
+                ReplicatedComponentIds.StockpileOperationState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: StockpileOperationStateReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<WorkbenchOperationState>(
+                ReplicatedComponentIds.WorkbenchOperationState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: WorkbenchOperationStateReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<BuildingWorkerAssignmentState>(
+                ReplicatedComponentIds.BuildingWorkerAssignmentState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: BuildingWorkerAssignmentStateReplication.SendRate);
 
             ReplicationRegistry.RegisterComponent<SettlementCampBuilderJobState>(
                 ReplicatedComponentIds.SettlementCampBuilderJobState,

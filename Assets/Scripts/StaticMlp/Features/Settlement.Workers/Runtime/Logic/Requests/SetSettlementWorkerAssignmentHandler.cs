@@ -51,6 +51,12 @@ namespace StaticMlp.Features.Settlement.Workers
                 : SettlementWorkerAssignmentStatus.Unassigned;
             assignment.AnchorId = request.Assigned ? request.AnchorId : (ushort)0;
 
+            ref var buildingAssignment = ref ReplicationMut.Mut<BuildingWorkerAssignmentState>(worker);
+            buildingAssignment.Status = SettlementWorkerAssignmentStatus.Unassigned;
+            buildingAssignment.AnchorId = 0;
+            buildingAssignment.Building = default;
+            buildingAssignment.SlotIndex = 0;
+
             if (request.Assigned && identity.Role == WorkerRoleCatalog.CampBuilderId)
                 SW.SendEvent(new Stage1WorkerAssignmentAcceptedEvent(new SettlementAnchorId(request.AnchorId)));
 

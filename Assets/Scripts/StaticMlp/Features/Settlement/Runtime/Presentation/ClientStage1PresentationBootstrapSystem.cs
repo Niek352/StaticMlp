@@ -12,8 +12,7 @@ namespace StaticMlp.Features.Settlement
                 IsVisible = true,
             });
             CW.SetResource(new InteractionPromptState());
-            CW.SetResource(new BuildingManagementPanelSession());
-            CW.SetResource(new BuildingManagementOperationOpenIntent());
+            CW.SetResource(new BuildingPanelSession());
         }
     }
 }

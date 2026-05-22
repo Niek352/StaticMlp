@@ -31,7 +31,7 @@ namespace StaticMlp.Features.Settlement
                     promptBridge),
                 state => state.IsVisible), GameplaySystemOrder.ClientPresentation + 10);
             systems.Add(promptBridge, GameplaySystemOrder.ClientPresentation + 11);
-            systems.Add(new StateDrivenPersistentControllerHostSystem<BuildingManagementPanelView, BuildingManagementPanelController, BuildingManagementPanelSession>(
+            systems.Add(new StateDrivenPersistentControllerHostSystem<BuildingManagementPanelView, BuildingManagementPanelController, BuildingPanelSession>(
                 _ => new BuildingManagementPanelController(
                     ResourcesViewFactory.CreateLazy<BuildingManagementPanelView>(BUILDING_MANAGEMENT_PANEL_VIEW_RESOURCE_PATH),
                     buildingPanelBridge),

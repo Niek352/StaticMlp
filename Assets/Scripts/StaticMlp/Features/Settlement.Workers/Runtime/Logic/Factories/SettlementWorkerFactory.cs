@@ -45,6 +45,13 @@ namespace StaticMlp.Features.Settlement.Workers
                 Status = SettlementWorkerAssignmentStatus.Unassigned,
                 AnchorId = 0
             });
+            entity.Set(new BuildingWorkerAssignmentState
+            {
+                Status = SettlementWorkerAssignmentStatus.Unassigned,
+                AnchorId = 0,
+                Building = default,
+                SlotIndex = 0
+            });
             SW.GetResource<AiBotFactory>().ApplyServerAiAgentState(entity, new AiAgentSpawnStateSpec(
                 spec.Position,
                 spec.Rotation,

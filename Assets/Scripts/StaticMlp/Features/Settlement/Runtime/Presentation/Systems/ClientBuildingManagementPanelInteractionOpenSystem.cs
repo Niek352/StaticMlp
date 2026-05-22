@@ -37,11 +37,8 @@ namespace StaticMlp.Features.Settlement
                 if (!target.Has<ConstructionSiteState>())
                     throw new InvalidOperationException($"Interact target {press.Target.Raw} is not a construction/building entity.");
 
-                ref var session = ref CW.GetResource<BuildingManagementPanelSession>();
-                session.Open(press.Target, openedFromInteraction: true);
-
-                ref var operationIntent = ref CW.GetResource<BuildingManagementOperationOpenIntent>();
-                operationIntent.Clear();
+                ref var session = ref CW.GetResource<BuildingPanelSession>();
+                session.Open(BuildingPanelRoute.Resolve(target), openedFromInteraction: true);
             }
         }
     }
