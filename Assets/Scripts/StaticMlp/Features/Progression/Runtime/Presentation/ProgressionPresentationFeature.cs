@@ -13,10 +13,11 @@ namespace StaticMlp.Features.Progression
 
             systems.Add(new ClientProgressionPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 40);
             systems.Add(new ClientRewardResultPopupStateSystem(), GameplaySystemOrder.ClientPresentation + 41);
+            systems.Add(new ClientProgressionHudStateSystem(), GameplaySystemOrder.ClientPresentation + 42);
             systems.Add(new PopupControllerHostSystem<RewardResultPopupView, RewardResultPopupController, RewardResultPopupState>(
                 _ => new RewardResultPopupController(ResourcesViewFactory.CreateLazy<RewardResultPopupView>(REWARD_RESULT_POPUP_VIEW_RESOURCE_PATH), bridge),
-                state => state.IsVisible), GameplaySystemOrder.ClientPresentation + 43);
-            systems.Add(bridge, GameplaySystemOrder.ClientPresentation + 44);
+                state => state.IsVisible), GameplaySystemOrder.ClientPresentation + 44);
+            systems.Add(bridge, GameplaySystemOrder.ClientPresentation + 45);
         }
     }
 }

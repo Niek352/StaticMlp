@@ -20,7 +20,7 @@ namespace StaticMlp.Tests.Combat
                 typeof(ClientCoreWT).Assembly,
                 typeof(SettlementPresentationFeature).Assembly);
             CW.Initialize();
-            CW.SetResource(new Stage1HudState());
+            CW.SetResource(new SettlementHudState());
         }
 
         [TearDown]
@@ -33,7 +33,7 @@ namespace StaticMlp.Tests.Combat
         [Test]
         public void Update_WhenUnboundOrInactive_DoesNotApplyState()
         {
-            var bridge = new ControllerResourceBridgeSystem<TestController, Stage1HudState>();
+            var bridge = new ControllerResourceBridgeSystem<TestController, SettlementHudState>();
             bridge.Update();
 
             var controller = new TestController(ControllerState.ViewFocused);
@@ -49,7 +49,7 @@ namespace StaticMlp.Tests.Combat
         public void SyncOnce_AppliesCurrentResource()
         {
             var controller = new TestController(ControllerState.ViewFocused);
-            var bridge = new ControllerResourceBridgeSystem<TestController, Stage1HudState>();
+            var bridge = new ControllerResourceBridgeSystem<TestController, SettlementHudState>();
             bridge.Bind(controller);
             CW.SetResource(CreateHudState(12));
 
@@ -63,7 +63,7 @@ namespace StaticMlp.Tests.Combat
         public void Update_WhenActivated_AppliesLatestResource()
         {
             var controller = new TestController(ControllerState.ViewFocused);
-            var bridge = new ControllerResourceBridgeSystem<TestController, Stage1HudState>();
+            var bridge = new ControllerResourceBridgeSystem<TestController, SettlementHudState>();
             bridge.Bind(controller);
             bridge.Activate();
 
@@ -80,7 +80,7 @@ namespace StaticMlp.Tests.Combat
         public void Update_WhenDeactivated_StopsApplyingState()
         {
             var controller = new TestController(ControllerState.ViewFocused);
-            var bridge = new ControllerResourceBridgeSystem<TestController, Stage1HudState>();
+            var bridge = new ControllerResourceBridgeSystem<TestController, SettlementHudState>();
             bridge.Bind(controller);
             bridge.Activate();
 
@@ -98,8 +98,8 @@ namespace StaticMlp.Tests.Combat
         public void Update_WhenControllerIsBlurredButVisible_AppliesState()
         {
             var controller = new TestController(ControllerState.ViewBlurred);
-            var bridge = new ControllerResourceBridgeSystem<TestController, Stage1HudState>();
-            var binding = new BridgeSystemBinding<ControllerResourceBridgeSystem<TestController, Stage1HudState>, TestController>(controller, bridge);
+            var bridge = new ControllerResourceBridgeSystem<TestController, SettlementHudState>();
+            var binding = new BridgeSystemBinding<ControllerResourceBridgeSystem<TestController, SettlementHudState>, TestController>(controller, bridge);
             ((IMvcControllerModule)binding).OnBlur();
 
             CW.SetResource(CreateHudState(9));
@@ -113,8 +113,8 @@ namespace StaticMlp.Tests.Combat
         public void Binding_OnFocusAndViewShow_RefreshesImmediately()
         {
             var controller = new TestController(ControllerState.ViewBlurred);
-            var bridge = new ControllerResourceBridgeSystem<TestController, Stage1HudState>();
-            var binding = new BridgeSystemBinding<ControllerResourceBridgeSystem<TestController, Stage1HudState>, TestController>(controller, bridge);
+            var bridge = new ControllerResourceBridgeSystem<TestController, SettlementHudState>();
+            var binding = new BridgeSystemBinding<ControllerResourceBridgeSystem<TestController, SettlementHudState>, TestController>(controller, bridge);
 
             CW.SetResource(CreateHudState(7));
             ((IMvcControllerModule)binding).OnFocus();
@@ -125,14 +125,14 @@ namespace StaticMlp.Tests.Combat
             Assert.That(controller.LastValue, Is.EqualTo(8));
         }
 
-        private static Stage1HudState CreateHudState(int wood)
+        private static SettlementHudState CreateHudState(int wood)
         {
-            var state = new Stage1HudState();
+            var state = new SettlementHudState();
             state.Resources.Add(new SettlementResourceViewEntry(ResourceCatalog.WoodId, wood));
             return state;
         }
 
-        private sealed class TestController : ControllerBase<Stage1HudView>, IResourcePresentationController<Stage1HudState>
+        private sealed class TestController : ControllerBase<Stage1HudView>, IResourcePresentationController<SettlementHudState>
         {
             private static readonly MethodInfo StateSetter = typeof(ControllerBase<Stage1HudView, ControllerNoData>)
                 .GetProperty(nameof(State), BindingFlags.Instance | BindingFlags.Public)
@@ -149,7 +149,7 @@ namespace StaticMlp.Tests.Combat
             public override ViewLayer Layer => ViewLayer.Persistent;
             public override int? PersistentSortOrder => 0;
 
-            public void Apply(in Stage1HudState state)
+            public void Apply(in SettlementHudState state)
             {
                 ApplyCount++;
                 LastValue = state.Resources[0].Amount;

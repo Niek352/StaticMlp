@@ -17,12 +17,16 @@ namespace StaticMlp.Features.Frontier
             systems.Add(new ClientFrontierPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 30);
             systems.Add(new ClientThreatBannerStateSystem(), GameplaySystemOrder.ClientPresentation + 31);
             systems.Add(new ClientExpeditionSelectionScreenStateSystem(), GameplaySystemOrder.ClientPresentation + 32);
+            systems.Add(new ClientExpeditionHudStateSystem(), GameplaySystemOrder.ClientPresentation + 33);
+            systems.Add(new ClientThreatHudStateSystem(), GameplaySystemOrder.ClientPresentation + 34);
+            systems.Add(new ClientRaidHudStateSystem(), GameplaySystemOrder.ClientPresentation + 35);
+            systems.Add(new ClientBossHudStateSystem(), GameplaySystemOrder.ClientPresentation + 36);
             systems.Add(new ControllerRegistrationSystem<ExpeditionSelectionView, ExpeditionSelectionController>(
-                new ExpeditionSelectionController(ResourcesViewFactory.CreateLazy<ExpeditionSelectionView>(EXPEDITION_SELECTION_VIEW_RESOURCE_PATH), expeditionBridge)), GameplaySystemOrder.ClientPresentation + 34);
-            systems.Add(expeditionBridge, GameplaySystemOrder.ClientPresentation + 35);
+                new ExpeditionSelectionController(ResourcesViewFactory.CreateLazy<ExpeditionSelectionView>(EXPEDITION_SELECTION_VIEW_RESOURCE_PATH), expeditionBridge)), GameplaySystemOrder.ClientPresentation + 38);
+            systems.Add(expeditionBridge, GameplaySystemOrder.ClientPresentation + 39);
             systems.Add(new PersistentControllerHostSystem<ThreatBannerView, ThreatBannerController>(
-                _ => new ThreatBannerController(ResourcesViewFactory.CreateLazy<ThreatBannerView>(THREAT_BANNER_VIEW_RESOURCE_PATH), threatBridge)), GameplaySystemOrder.ClientPresentation + 36);
-            systems.Add(threatBridge, GameplaySystemOrder.ClientPresentation + 37);
+                _ => new ThreatBannerController(ResourcesViewFactory.CreateLazy<ThreatBannerView>(THREAT_BANNER_VIEW_RESOURCE_PATH), threatBridge)), GameplaySystemOrder.ClientPresentation + 40);
+            systems.Add(threatBridge, GameplaySystemOrder.ClientPresentation + 41);
         }
     }
 }

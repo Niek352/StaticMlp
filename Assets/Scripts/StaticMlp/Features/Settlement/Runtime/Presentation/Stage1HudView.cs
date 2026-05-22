@@ -1,6 +1,9 @@
 using System;
 using System.Text;
 using Code.EcsUi.Mvc;
+using StaticMlp.Features.Frontier;
+using StaticMlp.Features.Loadout;
+using StaticMlp.Features.Progression;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -63,25 +66,32 @@ namespace StaticMlp.Features.Settlement
             expeditionButton.onClick.RemoveListener(HandleExpeditionClicked);
         }
 
-        public void Render(in Stage1HudState state)
+        public void Render(
+            in SettlementHudState settlement,
+            in ExpeditionHudState expedition,
+            in LoadoutHudState loadout,
+            in ThreatHudState threat,
+            in RaidHudState raid,
+            in BossHudState boss,
+            in ProgressionHudState progression)
         {
             panelRoot.SetActive(true);
-            var hintLine = string.IsNullOrEmpty(state.ObjectiveHint)
+            var hintLine = string.IsNullOrEmpty(settlement.ObjectiveHint)
                 ? string.Empty
-                : $"\nHint: {state.ObjectiveHint}";
+                : $"\nHint: {settlement.ObjectiveHint}";
             summaryLabel.text =
-                $"Objective: {Stage1HudController.DescribeObjective(state.Objective)}\n" +
-                $"Camp stage: {state.SettlementStage}\n" +
-                $"Resources: {FormatResources(in state)}\n" +
-                $"Workers: {state.AssignedWorkers}/{state.TotalWorkers} assigned\n" +
-                $"Prepared build: {Stage1HudController.DescribeBuild(state.PreparedPrimaryModuleId)}\n" +
-                $"Expedition: {state.ExpeditionAvailability} / {state.ExpeditionActivity}\n" +
-                $"Threat: {state.ThreatPhase} / Raid {state.RaidScheduleStatus}\n" +
-                $"Boss flags: Unlocked={state.HasBossUnlocked} Tokens={state.BossPreparationTokens}" +
+                $"Objective: {Stage1HudController.DescribeObjective(settlement.Objective)}\n" +
+                $"Camp stage: {settlement.SettlementStage}\n" +
+                $"Resources: {FormatResources(in settlement)}\n" +
+                $"Workers: {settlement.AssignedWorkers}/{settlement.TotalWorkers} assigned\n" +
+                $"Prepared build: {Stage1HudController.DescribeBuild(loadout.PreparedPrimaryModuleId)}\n" +
+                $"Expedition: {expedition.Availability} / {expedition.Activity}\n" +
+                $"Threat: {threat.ThreatPhase} / Raid {raid.Status}\n" +
+                $"Boss flags: Unlocked={progression.HasBossUnlocked} Tokens={progression.BossPreparationTokens}" +
                 hintLine;
 
-            buildButton.interactable = state.CanOpenLoadoutPreparation;
-            expeditionButton.interactable = state.CanOpenExpeditionSelection;
+            buildButton.interactable = settlement.CanOpenLoadoutPreparation;
+            expeditionButton.interactable = settlement.CanOpenExpeditionSelection;
         }
 
         private void HandleCloseClicked()
@@ -99,7 +109,7 @@ namespace StaticMlp.Features.Settlement
             _onExpeditionClicked.Invoke();
         }
 
-        private static string FormatResources(in Stage1HudState state)
+        private static string FormatResources(in SettlementHudState state)
         {
             if (state.Resources.Length == 0)
                 return string.Empty;

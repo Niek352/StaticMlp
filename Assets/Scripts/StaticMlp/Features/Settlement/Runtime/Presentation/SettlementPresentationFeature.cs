@@ -11,11 +11,11 @@ namespace StaticMlp.Features.Settlement
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
-            var hudBridge = new ControllerResourceBridgeSystem<Stage1HudController, Stage1HudState>();
+            var hudBridge = new Stage1HudCompositeBridgeSystem();
             var contextBridge = new ControllerResourceBridgeSystem<Stage1ContextPanelController, Stage1ContextPanelState>();
 
             systems.Add(new ClientStage1PresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 1);
-            systems.Add(new ClientStage1HudStateSystem(), GameplaySystemOrder.ClientPresentation + 2);
+            systems.Add(new ClientSettlementHudStateSystem(), GameplaySystemOrder.ClientPresentation + 2);
             systems.Add(new ClientStage1ContextPanelSessionSystem(), GameplaySystemOrder.ClientPresentation + 3);
             systems.Add(new ClientStage1ContextPanelStateSystem(), GameplaySystemOrder.ClientPresentation + 4);
             systems.Add(new StateDrivenPersistentControllerHostSystem<Stage1HudView, Stage1HudController, Stage1HudSession>(

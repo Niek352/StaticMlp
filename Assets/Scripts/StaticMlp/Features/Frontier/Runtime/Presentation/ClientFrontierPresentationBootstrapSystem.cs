@@ -20,6 +20,10 @@ namespace StaticMlp.Features.Frontier
                 ExpeditionId = ExpeditionCatalog.NearbyRaiderCampId,
                 RewardPackageId = RewardPackageCatalog.RecoveredWarCacheId,
             });
+            CW.SetResource(new ExpeditionHudState());
+            CW.SetResource(new ThreatHudState());
+            CW.SetResource(new RaidHudState());
+            CW.SetResource(new BossHudState());
         }
     }
 }

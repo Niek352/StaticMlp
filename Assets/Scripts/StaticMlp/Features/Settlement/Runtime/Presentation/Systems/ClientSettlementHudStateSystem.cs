@@ -1,23 +1,18 @@
 using System;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Loadout;
-using StaticMlp.Features.Frontier;
-using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement.Workers;
-using StaticMlp.Networking;
-using StaticMlp.Networking.Requests;
 using Unity.Collections;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class ClientStage1HudStateSystem : ISystem
+    public sealed class ClientSettlementHudStateSystem : ISystem
     {
         public void Update()
         {
             if (!TryGetRequiredState(out var anchor, out var flow, out var resources))
                 return;
 
-            var next = new Stage1HudState
+            var next = new SettlementHudState
             {
                 AnchorId = flow.Anchor,
                 Objective = ToPresentationObjective(flow.Objective),
@@ -28,46 +23,12 @@ namespace StaticMlp.Features.Settlement
             };
             CopyProjectedResources(resources, ref next.Resources);
 
-            if (anchor.Has<Projected<Stage1ProgressionState>>())
-            {
-                ref readonly var progression = ref ClientProjection.Read<Stage1ProgressionState>(anchor);
-                next.HasRecoveredWarCache = progression.HasFlag(ProgressFlagCatalog.RecoveredWarCacheAppliedId);
-                next.HasCounterattackDefended = progression.HasFlag(ProgressFlagCatalog.CounterattackDefendedId);
-                next.HasBossUnlocked = progression.HasFlag(ProgressFlagCatalog.BossUnlockedId);
-                next.BossPreparationTokens = progression.BossPreparationTokens;
-            }
-
             if (anchor.Has<Projected<SettlementWorkerSummary>>())
             {
                 ref readonly var summary = ref ClientProjection.Read<SettlementWorkerSummary>(anchor);
                 next.TotalWorkers = summary.TotalWorkers;
                 next.AssignedWorkers = summary.AssignedWorkers;
                 next.WorkerBlockingReason = summary.BlockingReason;
-            }
-
-            if (anchor.Has<Projected<ExpeditionAvailabilityState>>())
-                next.ExpeditionAvailability = ClientProjection.Read<ExpeditionAvailabilityState>(anchor).Status;
-
-            if (anchor.Has<Projected<ActiveExpeditionState>>())
-                next.ExpeditionActivity = ClientProjection.Read<ActiveExpeditionState>(anchor).Status;
-
-            if (anchor.Has<Projected<ThreatState>>())
-                next.ThreatPhase = ClientProjection.Read<ThreatState>(anchor).Phase;
-
-            if (anchor.Has<Projected<RaidScheduleState>>())
-            {
-                ref readonly var raid = ref ClientProjection.Read<RaidScheduleState>(anchor);
-                next.RaidScheduleStatus = raid.Status;
-                next.RaidActivateAtTick = raid.ActivateAtTick;
-            }
-
-            if (anchor.Has<Projected<BossEncounterState>>())
-                next.BossEncounterStatus = ClientProjection.Read<BossEncounterState>(anchor).Status;
-
-            if (TryReadPreparedBuild(out var preparedBuild))
-            {
-                next.PreparedPrimaryModuleId = preparedBuild.PrimaryModuleId;
-                next.HasPreparedBuild = preparedBuild.PrimaryModuleId.Value != 0;
             }
 
             CW.SetResource(next);
@@ -153,18 +114,6 @@ namespace StaticMlp.Features.Settlement
             }
         }
 
-        private static bool TryReadPreparedBuild(out PreparedLoadoutSnapshot snapshot)
-        {
-            foreach (var player in CW.Query<All<PreparedLoadoutSnapshot>>().Entities())
-            {
-                snapshot = player.Read<PreparedLoadoutSnapshot>();
-                return true;
-            }
-
-            snapshot = default;
-            return false;
-        }
-
         private static bool TryReadSharedResources(out CW.Entity resources)
         {
             foreach (var entity in CW.Query<All<SettlementResourceStorageTag, SettlementSharedResources>>().Entities())
@@ -186,7 +135,7 @@ namespace StaticMlp.Features.Settlement
             {
                 if (target.Length == target.Capacity)
                     throw new InvalidOperationException(
-                        $"{nameof(Stage1HudState)} cannot hold more than {target.Capacity} settlement resource rows.");
+                        $"{nameof(SettlementHudState)} cannot hold more than {target.Capacity} settlement resource rows.");
 
                 var row = rows[i].Value;
                 target.Add(new SettlementResourceViewEntry(row.Id, row.Amount));

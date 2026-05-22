@@ -1,25 +1,26 @@
 using System;
 using Code.EcsUi.Mvc;
 using Cysharp.Threading.Tasks;
-using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Frontier;
+using StaticMlp.Features.Loadout;
+using StaticMlp.Features.Progression;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement
 {
     public sealed class Stage1HudController
-        : ControllerBase<Stage1HudView>, IResourcePresentationController<Stage1HudState>
+        : ControllerBase<Stage1HudView>
     {
         private readonly IMvcManager _mvcManager;
 
         public Stage1HudController(
             IMvcManager mvcManager,
             ViewFactoryMethod<Stage1HudView> viewFactory,
-            ControllerResourceBridgeSystem<Stage1HudController, Stage1HudState> bridge)
+            Stage1HudCompositeBridgeSystem bridge)
             : base(viewFactory)
         {
             _mvcManager = mvcManager ?? throw new ArgumentNullException(nameof(mvcManager));
-            AddModule(new BridgeSystemBinding<ControllerResourceBridgeSystem<Stage1HudController, Stage1HudState>, Stage1HudController>(this, bridge));
+            AddModule(new BridgeSystemBinding<Stage1HudCompositeBridgeSystem, Stage1HudController>(this, bridge));
         }
 
         public override ViewLayer Layer => ViewLayer.Persistent;
@@ -58,9 +59,16 @@ namespace StaticMlp.Features.Settlement
             return "Not prepared";
         }
 
-        public void Apply(in Stage1HudState state)
+        public void Apply(
+            in SettlementHudState settlement,
+            in ExpeditionHudState expedition,
+            in LoadoutHudState loadout,
+            in ThreatHudState threat,
+            in RaidHudState raid,
+            in BossHudState boss,
+            in ProgressionHudState progression)
         {
-            View.Render(in state);
+            View.Render(in settlement, in expedition, in loadout, in threat, in raid, in boss, in progression);
         }
 
         protected override void OnViewInstantiated()

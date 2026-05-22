@@ -11,6 +11,7 @@ namespace StaticMlp.Features.Loadout
             {
                 SelectedPrimaryModuleId = LoadoutModuleCatalog.PoisonArrowModuleId
             });
+            CW.SetResource(new LoadoutHudState());
         }
     }
 }

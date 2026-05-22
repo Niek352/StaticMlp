@@ -11,7 +11,7 @@ namespace StaticMlp.Features.Settlement
             {
                 IsVisible = true,
             });
-            CW.SetResource(new Stage1HudState
+            CW.SetResource(new SettlementHudState
             {
                 AnchorId = SettlementAnchorCatalog.HomeCampId,
                 Objective = Stage1ObjectiveKind.RepairCamp,

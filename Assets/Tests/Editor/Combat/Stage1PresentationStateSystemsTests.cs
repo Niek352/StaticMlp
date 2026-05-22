@@ -29,9 +29,9 @@ namespace StaticMlp.Tests.Combat
             scope.CreateSharedResources(wood: 50, stone: 25);
             scope.RefreshProjections();
 
-            new ClientStage1HudStateSystem().Update();
+            new ClientSettlementHudStateSystem().Update();
 
-            ref readonly var hud = ref CW.GetResource<Stage1HudState>();
+            ref readonly var hud = ref CW.GetResource<SettlementHudState>();
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.RepairCamp));
             Assert.That(GetHudResourceAmount(in hud, ResourceCatalog.WoodId), Is.EqualTo(50));
             Assert.That(GetHudResourceAmount(in hud, ResourceCatalog.StoneId), Is.EqualTo(25));
@@ -50,14 +50,18 @@ namespace StaticMlp.Tests.Combat
             scope.CreateLocalPlayer(LoadoutModuleCatalog.FireFlaskModuleId);
             scope.RefreshProjections();
 
-            new ClientStage1HudStateSystem().Update();
+            new ClientSettlementHudStateSystem().Update();
+            new ClientLoadoutHudStateSystem().Update();
+            new ClientExpeditionHudStateSystem().Update();
 
-            ref readonly var hud = ref CW.GetResource<Stage1HudState>();
+            ref readonly var hud = ref CW.GetResource<SettlementHudState>();
+            ref readonly var loadout = ref CW.GetResource<LoadoutHudState>();
+            ref readonly var expedition = ref CW.GetResource<ExpeditionHudState>();
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.StartExpedition));
             Assert.That(GetHudResourceAmount(in hud, ResourceCatalog.WoodId), Is.EqualTo(70));
             Assert.That(GetHudResourceAmount(in hud, ResourceCatalog.StoneId), Is.EqualTo(30));
-            Assert.That(hud.PreparedPrimaryModuleId, Is.EqualTo(LoadoutModuleCatalog.FireFlaskModuleId));
-            Assert.That(hud.ExpeditionAvailability, Is.EqualTo(ExpeditionAvailabilityStatus.Available));
+            Assert.That(loadout.PreparedPrimaryModuleId, Is.EqualTo(LoadoutModuleCatalog.FireFlaskModuleId));
+            Assert.That(expedition.Availability, Is.EqualTo(ExpeditionAvailabilityStatus.Available));
         }
 
         [Test]
@@ -70,9 +74,9 @@ namespace StaticMlp.Tests.Combat
             SetStoredAmount(ref rows, ResourceCatalog.PlanksId, 3);
             scope.RefreshProjections();
 
-            new ClientStage1HudStateSystem().Update();
+            new ClientSettlementHudStateSystem().Update();
 
-            ref readonly var hud = ref CW.GetResource<Stage1HudState>();
+            ref readonly var hud = ref CW.GetResource<SettlementHudState>();
             Assert.That(hud.Resources.Length, Is.EqualTo(ResourceCatalog.All.Count));
             Assert.That(GetHudResourceAmount(in hud, ResourceCatalog.PlanksId), Is.EqualTo(3));
         }
@@ -91,9 +95,9 @@ namespace StaticMlp.Tests.Combat
             scope.CreateSharedResources();
             scope.RefreshProjections();
 
-            new ClientStage1HudStateSystem().Update();
+            new ClientSettlementHudStateSystem().Update();
 
-            ref readonly var hud = ref CW.GetResource<Stage1HudState>();
+            ref readonly var hud = ref CW.GetResource<SettlementHudState>();
             Assert.That(hud.Objective, Is.EqualTo(expectedObjective));
             Assert.That(hud.ObjectiveHint, Is.EqualTo(expectedHint));
             Assert.That(hud.CanOpenLoadoutPreparation, Is.False);
@@ -108,9 +112,9 @@ namespace StaticMlp.Tests.Combat
             scope.CreateSharedResources();
             scope.RefreshProjections();
 
-            new ClientStage1HudStateSystem().Update();
+            new ClientSettlementHudStateSystem().Update();
 
-            ref readonly var hud = ref CW.GetResource<Stage1HudState>();
+            ref readonly var hud = ref CW.GetResource<SettlementHudState>();
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.PrepareBuild));
             Assert.That(hud.ObjectiveHint, Is.Empty);
             Assert.That(hud.CanOpenLoadoutPreparation, Is.True);
@@ -129,10 +133,10 @@ namespace StaticMlp.Tests.Combat
             scope.CreateLocalPlayer(LoadoutModuleCatalog.PoisonArrowModuleId);
             scope.RefreshProjections();
 
-            new ClientStage1HudStateSystem().Update();
+            new ClientSettlementHudStateSystem().Update();
             new ClientThreatBannerStateSystem().Update();
 
-            ref readonly var hud = ref CW.GetResource<Stage1HudState>();
+            ref readonly var hud = ref CW.GetResource<SettlementHudState>();
             ref readonly var banner = ref CW.GetResource<ThreatBannerState>();
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.DefendCamp));
             Assert.That(banner.Phase, Is.EqualTo(ThreatPhase.RaidPending));
@@ -787,7 +791,7 @@ namespace StaticMlp.Tests.Combat
             method.Invoke(null, null);
         }
 
-        private static int GetHudResourceAmount(in Stage1HudState state, ResourceId resourceId)
+        private static int GetHudResourceAmount(in SettlementHudState state, ResourceId resourceId)
         {
             for (var i = 0; i < state.Resources.Length; i++)
             {

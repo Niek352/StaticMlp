@@ -14,9 +14,10 @@ namespace StaticMlp.Features.Loadout
 
             systems.Add(new ClientLoadoutPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 20);
             systems.Add(new ClientLoadoutPreparationScreenStateSystem(), GameplaySystemOrder.ClientPresentation + 21);
+            systems.Add(new ClientLoadoutHudStateSystem(), GameplaySystemOrder.ClientPresentation + 22);
             systems.Add(new ControllerRegistrationSystem<LoadoutPreparationView, LoadoutPreparationController>(
-                new LoadoutPreparationController(ResourcesViewFactory.CreateLazy<LoadoutPreparationView>(BUILD_PREPARATION_VIEW_RESOURCE_PATH), bridge)), GameplaySystemOrder.ClientPresentation + 23);
-            systems.Add(bridge, GameplaySystemOrder.ClientPresentation + 24);
+                new LoadoutPreparationController(ResourcesViewFactory.CreateLazy<LoadoutPreparationView>(BUILD_PREPARATION_VIEW_RESOURCE_PATH), bridge)), GameplaySystemOrder.ClientPresentation + 24);
+            systems.Add(bridge, GameplaySystemOrder.ClientPresentation + 25);
         }
     }
 }
