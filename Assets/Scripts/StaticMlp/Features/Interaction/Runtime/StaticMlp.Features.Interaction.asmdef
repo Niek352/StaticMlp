@@ -1,0 +1,20 @@
+{
+    "name": "StaticMlp.Features.Interaction",
+    "rootNamespace": "StaticMlp.Features.Interaction",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.Player",
+        "StaticMlp.Features.Settlement.Logic"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

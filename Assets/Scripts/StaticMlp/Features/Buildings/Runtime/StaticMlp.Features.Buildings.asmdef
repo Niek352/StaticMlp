@@ -18,6 +18,7 @@
         "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Stage1.Contracts",
         "StaticMlp.Features.Settlement.Logic",
+        "StaticMlp.Features.Interaction",
         "StaticMlp.Features.OpenWorldGeneration.Contracts"
     ],
     "includePlatforms": [],

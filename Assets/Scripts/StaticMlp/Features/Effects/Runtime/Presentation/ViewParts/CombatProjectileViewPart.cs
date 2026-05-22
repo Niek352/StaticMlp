@@ -7,12 +7,18 @@ namespace StaticMlp.Features.Effects
 {
     public sealed class CombatProjectileViewPart : MonoBehaviour, IEntityViewPart<CombatProjectileVisualState>
     {
+        [Header("Fallback Colors")]
         [SerializeField] private Color _poisonColor = new(0.3f, 0.9f, 0.35f, 1f);
         [SerializeField] private Color _fireColor = new(1f, 0.45f, 0.1f, 1f);
         [SerializeField] private Color _defaultColor = new(0.95f, 0.85f, 0.35f, 1f);
+
+        [Header("Fallback Scales")]
         [SerializeField] private float _poisonScale = 0.22f;
         [SerializeField] private float _fireScale = 0.32f;
         [SerializeField] private float _defaultScale = 0.16f;
+
+        [Header("Particle Systems (optional — overrides primitive fallback when assigned)")]
+        [SerializeField] private ParticleSystem _projectileTrailParticles;
 
         private GameObject _visual;
         private Material _material;
@@ -30,6 +36,7 @@ namespace StaticMlp.Features.Effects
 
         public void OnUnbind()
         {
+            StopTrailParticles();
             if (_visual != null)
                 _visual.SetActive(false);
         }
@@ -39,6 +46,7 @@ namespace StaticMlp.Features.Effects
             EnsureVisual();
             if (component.RemainingLifetime <= 0f || component.TotalLifetime <= 0f)
             {
+                StopTrailParticles();
                 _visual.SetActive(false);
                 return;
             }
@@ -49,8 +57,20 @@ namespace StaticMlp.Features.Effects
             if (direction.sqrMagnitude <= 0.0001f)
                 direction = Vector3.forward;
 
+            var rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+
+            if (_projectileTrailParticles != null)
+            {
+                _visual.SetActive(false);
+                _projectileTrailParticles.transform.SetPositionAndRotation(position, rotation);
+                if (!_projectileTrailParticles.isPlaying)
+                    _projectileTrailParticles.Play();
+                return;
+            }
+
+            // Primitive fallback
             transform.position = position;
-            transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+            transform.rotation = rotation;
 
             var color = ResolveColor(component.AbilityId);
             _material.color = color;
@@ -75,6 +95,12 @@ namespace StaticMlp.Features.Effects
             _material = RuntimeVisualMaterial.Create(_defaultColor);
             _visual.GetComponent<Renderer>().sharedMaterial = _material;
             _visual.SetActive(false);
+        }
+
+        private void StopTrailParticles()
+        {
+            if (_projectileTrailParticles != null && _projectileTrailParticles.isPlaying)
+                _projectileTrailParticles.Stop(withChildren: true, ParticleSystemStopBehavior.StopEmitting);
         }
 
         private Color ResolveColor(CombatAbilityId abilityId)

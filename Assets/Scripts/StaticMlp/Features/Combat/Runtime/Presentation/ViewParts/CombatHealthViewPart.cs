@@ -8,14 +8,20 @@ namespace StaticMlp.Features.Combat
         IEntityViewPart<CombatHealthViewState>,
         IEntityViewPart<DamageFeedbackViewState>
     {
+        [Header("Damage Flash (Fallback Primitive)")]
         [SerializeField] private Color _damageFlashColor = new(1f, 0.15f, 0.15f, 0.75f);
         [SerializeField] private Vector3 _damageFlashLocalPosition = new(0f, 1f, 0f);
         [SerializeField] private Vector3 _damageFlashBaseScale = new(1.1f, 1.1f, 1.1f);
+
+        [Header("Particle Systems (optional — supplement or replace primitive fallback when assigned)")]
+        [SerializeField] private ParticleSystem _damageHitParticles;
+        [SerializeField] private ParticleSystem _deathParticles;
 
         private GameObject _damageFlashObject;
         private Material _damageFlashMaterial;
         private float _healthNormalized = 1f;
         private bool _isDead;
+        private bool _wasDeadLastFrame;
 
         public void OnBind(IEntityView view)
         {
@@ -41,12 +47,20 @@ namespace StaticMlp.Features.Combat
         public void OnUnbind()
         {
             HideDamageFlash();
+            StopParticles(_damageHitParticles);
+            StopParticles(_deathParticles);
+            _wasDeadLastFrame = false;
         }
 
         public void Apply(in CombatHealthViewState component)
         {
             _healthNormalized = Mathf.Clamp01(component.HealthNormalized);
+
+            var justDied = component.IsDead && !_isDead;
             _isDead = component.IsDead;
+
+            if (justDied && _deathParticles != null)
+                _deathParticles.Play();
         }
 
         public void Apply(in DamageFeedbackViewState component)
@@ -57,6 +71,9 @@ namespace StaticMlp.Features.Combat
                 HideDamageFlash();
                 return;
             }
+
+            if (_damageHitParticles != null && !_damageHitParticles.isPlaying)
+                _damageHitParticles.Play();
 
             var color = _damageFlashColor;
             color.a *= Mathf.Clamp01(component.Intensity);
@@ -106,6 +123,12 @@ namespace StaticMlp.Features.Combat
         {
             if (_damageFlashMaterial != null)
                 DestroyUnityObject(_damageFlashMaterial);
+        }
+
+        private static void StopParticles(ParticleSystem ps)
+        {
+            if (ps != null && ps.isPlaying)
+                ps.Stop(withChildren: true, ParticleSystemStopBehavior.StopEmitting);
         }
 
         private static void DestroyUnityObject(Object target)

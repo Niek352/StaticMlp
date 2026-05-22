@@ -1,6 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Buildings;
+using StaticMlp.Features.Interaction;
 using StaticMlp.Features.Player;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
@@ -53,17 +54,20 @@ namespace StaticMlp.Features.Settlement
                 return;
             }
 
-            if (!ClientLocalPlayer.TryGetPosition(out var playerPosition))
+            if (!ClientLocalPlayer.TryGetPosition(out _))
             {
                 session.Mode = Stage1ContextPanelMode.Worker;
                 session.FocusedSite = default;
                 return;
             }
 
-            if (TryFindNearestSite(playerPosition, includeCompleted: true, out var site))
+            ref readonly var focus = ref CW.GetResource<InteractionFocus>();
+            if (focus.HasFocus
+                && (focus.Kind == InteractableKind.ConstructionSite
+                    || focus.Kind == InteractableKind.FinishedBuilding))
             {
                 session.Mode = Stage1ContextPanelMode.Building;
-                session.FocusedSite = site.GID;
+                session.FocusedSite = focus.Target;
                 return;
             }
 

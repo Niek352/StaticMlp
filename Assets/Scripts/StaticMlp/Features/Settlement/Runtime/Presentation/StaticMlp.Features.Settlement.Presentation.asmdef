@@ -24,7 +24,8 @@
         "StaticMlp.Features.Frontier.Presentation",
         "StaticMlp.Features.Loadout.Presentation",
         "StaticMlp.Features.Settlement.Workers.Contracts",
-        "StaticMlp.Features.BuildingCatalog"
+        "StaticMlp.Features.BuildingCatalog",
+        "StaticMlp.Features.Interaction"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,6 +1,7 @@
 using System;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.EcsViews;
+using StaticMlp.Features.Interaction;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Presentation;
@@ -83,6 +84,8 @@ namespace StaticMlp.Features.Buildings
             NetArchetypeRegistry.RegisterClient(network.BlueprintArchetypeId, e =>
             {
                 e.Set<ConstructionSiteTag>();
+                e.Set<InteractableTag>();
+                e.Set(new Interactable { Kind = InteractableKind.ConstructionSite });
                 e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
                 e.Set(new ViewTransform
                 {
@@ -101,6 +104,8 @@ namespace StaticMlp.Features.Buildings
             NetArchetypeRegistry.RegisterClient(network.FinishedArchetypeId, e =>
             {
                 e.Set<FinishedBuildingTag>();
+                e.Set<InteractableTag>();
+                e.Set(new Interactable { Kind = InteractableKind.FinishedBuilding });
                 e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
                 e.Set(new ViewTransform
                 {

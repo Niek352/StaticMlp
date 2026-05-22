@@ -8,17 +8,25 @@ namespace StaticMlp.Features.Combat
         IEntityViewPart<PassiveAutoAttackViewState>,
         IEntityViewPart<PassiveAutoAttackTargetViewState>
     {
+        [Header("Tracer (Fallback LineRenderer)")]
         [SerializeField] private Color _tracerColor = new(1f, 0.35f, 0.15f, 0.95f);
-        [SerializeField] private Color _highlightColor = new(1f, 0.75f, 0.2f, 0.45f);
         [SerializeField] private float _tracerWidth = 0.08f;
+
+        [Header("Target Highlight (Fallback Primitive)")]
+        [SerializeField] private Color _highlightColor = new(1f, 0.75f, 0.2f, 0.45f);
         [SerializeField] private Vector3 _highlightLocalPosition = new(0f, 0.1f, 0f);
         [SerializeField] private Vector3 _highlightBaseScale = new(1.5f, 0.04f, 1.5f);
+
+        [Header("Particle Systems (optional — supplement primitive fallbacks when assigned)")]
+        [SerializeField] private ParticleSystem _muzzleFlashParticles;
+        [SerializeField] private ParticleSystem _impactParticles;
 
         private GameObject _tracerObject;
         private LineRenderer _tracer;
         private Material _tracerMaterial;
         private GameObject _highlightObject;
         private Material _highlightMaterial;
+        private uint _lastShotSequence;
 
         public void OnBind(IEntityView view)
         {
@@ -49,6 +57,9 @@ namespace StaticMlp.Features.Combat
         {
             HideTracer();
             HideHighlight();
+            StopParticles(_muzzleFlashParticles);
+            StopParticles(_impactParticles);
+            _lastShotSequence = 0;
         }
 
         public void Apply(in PassiveAutoAttackViewState component)
@@ -58,6 +69,14 @@ namespace StaticMlp.Features.Combat
             {
                 HideTracer();
                 return;
+            }
+
+            // Play muzzle flash once per new shot sequence
+            if (_muzzleFlashParticles != null && component.ShotSequence != _lastShotSequence)
+            {
+                _lastShotSequence = component.ShotSequence;
+                _muzzleFlashParticles.transform.position = component.TracerStart;
+                _muzzleFlashParticles.Play();
             }
 
             _tracerObject.SetActive(true);
@@ -78,6 +97,10 @@ namespace StaticMlp.Features.Combat
                 HideHighlight();
                 return;
             }
+
+            // Play impact PS on the moment the entity becomes newly highlighted
+            if (_impactParticles != null && component.IsHighlighted && !_impactParticles.isPlaying)
+                _impactParticles.Play();
 
             var color = _highlightColor;
             color.a *= Mathf.Clamp01(component.HighlightIntensity);
@@ -143,6 +166,12 @@ namespace StaticMlp.Features.Combat
                 return;
 
             _highlightObject.SetActive(false);
+        }
+
+        private static void StopParticles(ParticleSystem ps)
+        {
+            if (ps != null && ps.isPlaying)
+                ps.Stop(withChildren: true, ParticleSystemStopBehavior.StopEmitting);
         }
 
         private void OnDestroy()

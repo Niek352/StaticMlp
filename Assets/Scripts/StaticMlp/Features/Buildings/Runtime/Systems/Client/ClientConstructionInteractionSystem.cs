@@ -1,39 +1,58 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Player;
+using StaticMlp.Features.Interaction;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Game.Input;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
-using UnityEngine;
 
 namespace StaticMlp.Features.Buildings
 {
     public sealed class ClientConstructionInteractionSystem : ISystem
     {
-        private readonly float _interactionRange;
         private readonly float _buildWorkPerSecond;
+        private EventReceiver<ClientCoreWT, InteractPressedEvent> _interactEvents;
 
-        public ClientConstructionInteractionSystem(float interactionRange = 4f, float buildWorkPerSecond = ConstructionActionProfiles.PlayerBuildHoldWorkPerSecond)
+        public ClientConstructionInteractionSystem(float buildWorkPerSecond = ConstructionActionProfiles.PlayerBuildHoldWorkPerSecond)
         {
-            _interactionRange = interactionRange;
             _buildWorkPerSecond = buildWorkPerSecond;
+        }
+
+        public void Init()
+        {
+            _interactEvents = CW.RegisterEventReceiver<InteractPressedEvent>();
+        }
+
+        public void Destroy()
+        {
+            CW.DeleteEventReceiver(ref _interactEvents);
         }
 
         public void Update()
         {
-            var inputState = CW.GetResource<ClientInputState>();
+            // Deposit: реакция на E-press от Interaction фичи
+            foreach (var evt in _interactEvents)
+            {
+                ref readonly var press = ref evt.Value;
+                if (press.Kind != InteractableKind.ConstructionSite)
+                    continue;
 
-            if (!ClientLocalPlayer.TryGetPosition(out var playerPosition))
-                return;
+                if (!press.Target.TryUnpack<ClientCoreWT>(out var site))
+                    continue;
 
-            if (!TryFindNearestSite(playerPosition, out var site))
-                return;
-
-            if (inputState.WasPressed(CoreInputActions.Interact))
                 SendDeposit(site);
+            }
 
+            // Hold-build: прямое чтение input + текущий фокус (поток нажатий, не единичный press)
+            ref readonly var focus = ref CW.GetResource<InteractionFocus>();
+            if (!focus.HasFocus || focus.Kind != InteractableKind.ConstructionSite)
+                return;
+
+            if (!focus.Target.TryUnpack<ClientCoreWT>(out var buildSite))
+                return;
+
+            var inputState = CW.GetResource<ClientInputState>();
             if (inputState.IsPressed(BuildingsInputActions.BuildConstruction))
-                SendBuild(site);
+                SendBuild(buildSite, UnityEngine.Time.deltaTime);
         }
 
         private void SendDeposit(CW.Entity site)
@@ -51,7 +70,7 @@ namespace StaticMlp.Features.Buildings
             RequestApi.Send<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(request);
         }
 
-        private void SendBuild(CW.Entity site)
+        private void SendBuild(CW.Entity site, float deltaTime)
         {
             if (!site.Has<ConstructionSiteState>() || !site.Has<ConstructionResources>())
                 return;
@@ -64,35 +83,9 @@ namespace StaticMlp.Features.Buildings
 
             var request = new BuildConstructionRequestEvent(
                 site.GID,
-                _buildWorkPerSecond * Time.deltaTime);
+                _buildWorkPerSecond * deltaTime);
 
             RequestApi.Send<BuildConstructionRequestEvent, BuildConstructionResultEvent>(request);
         }
-
-        private bool TryFindNearestSite(Vector3 playerPosition, out CW.Entity site)
-        {
-            var bestDistanceSq = _interactionRange * _interactionRange;
-            var found = false;
-            site = default;
-
-            foreach (var e in CW.Query<All<ConstructionTransform, ConstructionSiteState>>().Entities())
-            {
-                ref readonly var state = ref ClientProjection.Read<ConstructionSiteState>(e);
-                if (state.Phase == ConstructionPhase.Completed)
-                    continue;
-
-                var position = e.Read<ConstructionTransform>().Position;
-                var distanceSq = (position - playerPosition).sqrMagnitude;
-                if (distanceSq > bestDistanceSq)
-                    continue;
-
-                bestDistanceSq = distanceSq;
-                site = e;
-                found = true;
-            }
-
-            return found;
-        }
-
     }
 }
