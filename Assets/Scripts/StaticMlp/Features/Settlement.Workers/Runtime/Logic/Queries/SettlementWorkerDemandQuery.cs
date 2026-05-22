@@ -152,7 +152,7 @@ namespace StaticMlp.Features.Settlement.Workers
                     if (resource.Family != ResourceFamily.Raw)
                         continue;
 
-                    var missing = input.Amount - WorkbenchResourceAccess.GetInput(in state, input.Id);
+                    var missing = input.Amount - WorkbenchResourceAccess.GetInput(workbench, input.Id);
                     if (missing <= 0)
                         continue;
 
@@ -191,7 +191,7 @@ namespace StaticMlp.Features.Settlement.Workers
                 for (var i = 0; i < recipe.Outputs.Length; i++)
                 {
                     var output = recipe.Outputs[i];
-                    var amount = WorkbenchResourceAccess.GetOutput(in state, output.Id);
+                    var amount = WorkbenchResourceAccess.GetOutput(workbench, output.Id);
                     if (amount <= 0)
                         continue;
 
@@ -253,7 +253,7 @@ namespace StaticMlp.Features.Settlement.Workers
                     continue;
 
                 var recipe = WorkbenchRecipeCatalog.Get(state.ActiveRecipe);
-                if (state.WorkDone >= recipe.WorkRequired || !HasRecipeInputs(in state, recipe))
+                if (state.WorkDone >= recipe.WorkRequired || !HasRecipeInputs(workbench, in recipe))
                     continue;
 
                 var output = recipe.Outputs[0];
@@ -270,12 +270,12 @@ namespace StaticMlp.Features.Settlement.Workers
             return false;
         }
 
-        private static bool HasRecipeInputs(in WorkbenchOperationState state, in WorkbenchRecipeDefinition recipe)
+        private static bool HasRecipeInputs(SW.Entity workbench, in WorkbenchRecipeDefinition recipe)
         {
             for (var i = 0; i < recipe.Inputs.Length; i++)
             {
                 var input = recipe.Inputs[i];
-                if (WorkbenchResourceAccess.GetInput(in state, input.Id) < input.Amount)
+                if (WorkbenchResourceAccess.GetInput(workbench, input.Id) < input.Amount)
                     return false;
             }
 

@@ -25,7 +25,8 @@
         "StaticMlp.Features.Loadout.Presentation",
         "StaticMlp.Features.Settlement.Workers.Contracts",
         "StaticMlp.Features.BuildingCatalog",
-        "StaticMlp.Features.Interaction"
+        "StaticMlp.Features.Interaction",
+        "Unity.Collections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

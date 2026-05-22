@@ -37,10 +37,28 @@ namespace StaticMlp.Tests.Settlement
             {
                 new ResourceDefinition(
                     new ResourceId(1),
+                    "Broken",
                     ResourceFamily.Raw,
                     ResourceUsageFlags.Construction,
                     isSettlementStored: true,
                     startingSettlementAmount: -1)
+            };
+
+            Assert.Throws<InvalidOperationException>(() => ResourceCatalogValidator.Validate(definitions));
+        }
+
+        [Test]
+        public void Validate_MissingDisplayName_Throws()
+        {
+            var definitions = new[]
+            {
+                new ResourceDefinition(
+                    new ResourceId(1),
+                    "",
+                    ResourceFamily.Raw,
+                    ResourceUsageFlags.Construction,
+                    isSettlementStored: true,
+                    startingSettlementAmount: 0)
             };
 
             Assert.Throws<InvalidOperationException>(() => ResourceCatalogValidator.Validate(definitions));
@@ -84,6 +102,7 @@ namespace StaticMlp.Tests.Settlement
         {
             ref readonly var definition = ref ResourceCatalog.Get(resourceId);
             Assert.That(definition.Family, Is.EqualTo(family));
+            Assert.That(definition.DisplayName, Is.Not.Empty);
             Assert.That(definition.Usage.HasFlag(expectedUsage), Is.True);
             Assert.That(definition.IsSettlementStored, Is.True);
             Assert.That(definition.StartingSettlementAmount, Is.EqualTo(startingAmount));
@@ -93,6 +112,7 @@ namespace StaticMlp.Tests.Settlement
         {
             return new ResourceDefinition(
                 id,
+                $"Resource {id.Value}",
                 family,
                 ResourceUsageFlags.Construction,
                 isSettlementStored: true,

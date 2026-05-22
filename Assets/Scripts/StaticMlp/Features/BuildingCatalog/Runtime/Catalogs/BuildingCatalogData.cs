@@ -120,7 +120,8 @@ namespace StaticMlp.Features.BuildingCatalog
                     | BuildingCapabilityFlags.ProducesResources
                     | BuildingCapabilityFlags.ExtractsFromNode,
                     storageCapacity: 40,
-                    workerSlots: 2)),
+                    workerSlots: 2,
+                    outputResourceId: ResourceCatalog.WoodId)),
             new(
                 StoneMineId,
                 code: "stone_mine",
@@ -146,7 +147,8 @@ namespace StaticMlp.Features.BuildingCatalog
                     | BuildingCapabilityFlags.ProducesResources
                     | BuildingCapabilityFlags.ExtractsFromNode,
                     storageCapacity: 40,
-                    workerSlots: 2)),
+                    workerSlots: 2,
+                    outputResourceId: ResourceCatalog.StoneId)),
             new(
                 WorkbenchId,
                 code: "workbench",

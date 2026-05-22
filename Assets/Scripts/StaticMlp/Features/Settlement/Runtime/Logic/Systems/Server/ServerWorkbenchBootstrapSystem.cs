@@ -47,6 +47,7 @@ namespace StaticMlp.Features.Settlement
                 WorkerSlotCount = definition.Operation.WorkerSlots,
                 WorkDone = 0f
             });
+            WorkbenchResourceAccess.InitializeRows(finishedEntity);
         }
     }
 }

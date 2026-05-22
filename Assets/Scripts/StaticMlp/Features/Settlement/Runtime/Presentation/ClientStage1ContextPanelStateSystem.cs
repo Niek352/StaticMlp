@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
@@ -5,6 +6,7 @@ using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
+using Unity.Collections;
 
 namespace StaticMlp.Features.Settlement
 {
@@ -32,10 +34,7 @@ namespace StaticMlp.Features.Settlement
                 next.HasFocusedSite = true;
                 next.BuildingDisplayName = definition.DisplayName;
                 next.ConstructionPhase = state.Phase;
-                next.WoodRequired = ConstructionResourcesAccess.GetProjectedRequired(site, ResourceCatalog.WoodId);
-                next.StoneRequired = ConstructionResourcesAccess.GetProjectedRequired(site, ResourceCatalog.StoneId);
-                next.WoodDelivered = ConstructionResourcesAccess.GetProjectedDelivered(site, ResourceCatalog.WoodId);
-                next.StoneDelivered = ConstructionResourcesAccess.GetProjectedDelivered(site, ResourceCatalog.StoneId);
+                CopyProjectedConstructionResources(site, ref next.ConstructionResources);
                 next.Progress01 = progress.Normalized;
                 next.PrimaryBuildingAction = CreatePrimaryBuildingAction(site, in state, in definition);
                 next.SecondaryBuildingAction = CreateSecondaryBuildingAction(site.GID);
@@ -300,7 +299,7 @@ namespace StaticMlp.Features.Settlement
                 throw new System.InvalidOperationException($"Extraction action requested for non-extraction building {definition.Id.Value}.");
 
             return
-                $"Output: {ResolveResourceLabel(output)}\n" +
+                $"Output: {ResourceCatalog.Get(output).DisplayName}\n" +
                 $"Buffer capacity: {definition.Operation.StorageCapacity}\n" +
                 $"Worker slots: {definition.Operation.WorkerSlots}";
         }
@@ -314,7 +313,7 @@ namespace StaticMlp.Features.Settlement
                 if (i > 0)
                     builder.Append(", ");
 
-                builder.Append(ResolveResourceLabel(amounts[i].Id));
+                builder.Append(ResourceCatalog.Get(amounts[i].Id).DisplayName);
                 builder.Append(' ');
                 builder.Append(amounts[i].Amount);
             }
@@ -345,29 +344,20 @@ namespace StaticMlp.Features.Settlement
             }
         }
 
-        private static string ResolveResourceLabel(ResourceId id)
+        private static void CopyProjectedConstructionResources(
+            CW.Entity site,
+            ref FixedList512Bytes<ConstructionResourceViewEntry> target)
         {
-            if (id == ResourceCatalog.WoodId)
-                return "Wood";
-            if (id == ResourceCatalog.StoneId)
-                return "Stone";
-            if (id == ResourceCatalog.PlanksId)
-                return "Planks";
-            if (id == ResourceCatalog.SimplePartsId)
-                return "Simple Parts";
-            if (id == ResourceCatalog.RepairKitsId)
-                return "Repair Kits";
-            if (id == ResourceCatalog.FoodId)
-                return "Food";
-            if (id == ResourceCatalog.FuelId)
-                return "Fuel";
-            if (id == ResourceCatalog.ResearchDataId)
-                return "Research Data";
-            if (id == ResourceCatalog.MedicineId)
-                return "Medicine";
+            ref readonly var rows = ref ClientProjection.ReadMulti<ConstructionResourceEntry>(site);
+            for (var i = 0; i < rows.Length; i++)
+            {
+                if (target.Length == target.Capacity)
+                    throw new InvalidOperationException(
+                        $"{nameof(Stage1ContextPanelState)} cannot hold more than {target.Capacity} construction resource rows.");
 
-            ResourceCatalog.Get(id);
-            return $"Resource {id.Value}";
+                var row = rows[i].Value;
+                target.Add(new ConstructionResourceViewEntry(row.Id, row.Required, row.Delivered));
+            }
         }
 
         private static bool TryGetConstructionSite(EntityGID gid, out CW.Entity site)

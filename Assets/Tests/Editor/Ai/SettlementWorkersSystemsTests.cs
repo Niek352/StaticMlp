@@ -470,11 +470,44 @@ namespace StaticMlp.Tests.Ai
                 ActiveRecipeId = WorkbenchRecipeCatalog.PlanksId.Value,
                 Enabled = enabled,
                 WorkerSlotCount = 1,
-                WorkDone = 0f,
-                InputWood = inputWood,
-                OutputPlanks = outputPlanks
+                WorkDone = 0f
             });
+            WorkbenchResourceAccess.InitializeRows(entity);
+            ref var inputs = ref entity.Ref<SW.Multi<WorkbenchInputResource>>();
+            SetWorkbenchInput(ref inputs, ResourceCatalog.WoodId, inputWood);
+            ref var outputs = ref entity.Ref<SW.Multi<WorkbenchOutputResource>>();
+            SetWorkbenchOutput(ref outputs, ResourceCatalog.PlanksId, outputPlanks);
             return entity;
+        }
+
+        private static void SetWorkbenchInput(ref SW.Multi<WorkbenchInputResource> rows, ResourceId resourceId, int amount)
+        {
+            for (var i = 0; i < rows.Length; i++)
+            {
+                if (rows[i].Id != resourceId)
+                    continue;
+
+                ref var row = ref rows[i];
+                row.Amount = amount;
+                return;
+            }
+
+            throw new InvalidOperationException($"Missing workbench input resource id {resourceId.Value}.");
+        }
+
+        private static void SetWorkbenchOutput(ref SW.Multi<WorkbenchOutputResource> rows, ResourceId resourceId, int amount)
+        {
+            for (var i = 0; i < rows.Length; i++)
+            {
+                if (rows[i].Id != resourceId)
+                    continue;
+
+                ref var row = ref rows[i];
+                row.Amount = amount;
+                return;
+            }
+
+            throw new InvalidOperationException($"Missing workbench output resource id {resourceId.Value}.");
         }
 
         private static SW.Entity CreateStockpile(bool enabled = true)

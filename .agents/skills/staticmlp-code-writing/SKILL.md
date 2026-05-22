@@ -28,6 +28,7 @@ Before writing code, classify the work:
 3. Is the actor `LocalOwned`, `RemoteOwned`, `ServerOwned`, or `ClientOwned`?
 4. Is the correct boundary `Game.Core`, a feature `Contracts` asmdef, feature `Runtime/Logic`, feature `Runtime/Presentation`, `Networking`, or `Composition`?
 5. Should this be a component, tag, event component, resource, domain rule, spawner, system, or passive view?
+6. What exact files/asmdefs are in write scope, what is read-only context, and what is out of scope?
 
 If the answer is unclear, inspect nearby features and stop before adding a new abstraction.
 
@@ -143,6 +144,10 @@ Use event components for transient requests or facts that systems consume in the
 
 Use resources only for composition-owned global state that is intentionally world-scoped. Do not store feature-specific controllers, Unity objects, or bridge systems in ordinary gameplay resources by default.
 
+Keep state shapes narrow. A `*State` component or `IResource` should have one owner, authority, lifecycle, writer, and UI section. Split it before adding fields from another feature, another mode, another replication cadence, or another presentation section.
+
+For composite presentation, prefer owner feature read models and section states over one flattened screen state. The composite shell may assemble sections, but it should not become the source of truth for foreign feature data.
+
 Required mutable state should already exist by architecture. Access it directly:
 
 ```csharp
@@ -213,6 +218,7 @@ Do not write `Ensure*`, `Require*`, `TryGetOrCreate*`, scene search, or null-gua
 Check:
 
 - The code respects `Logic` versus `Presentation`.
+- Any new or touched `*State` remains cohesive by owner, lifecycle, writer, and UI section.
 - Required state fails fast instead of being hidden behind guards.
 - No new mutable runtime state lives in a `static class`.
 - No `.Generated.cs` files were edited manually.

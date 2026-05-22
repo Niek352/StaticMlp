@@ -7,20 +7,9 @@ namespace StaticMlp.Features.Settlement
     {
         public static bool TryGetOutputResource(BuildingId buildingId, out ResourceId resourceId)
         {
-            if (buildingId == BuildingCatalogData.LumberCampId)
-            {
-                resourceId = ResourceCatalog.WoodId;
-                return true;
-            }
-
-            if (buildingId == BuildingCatalogData.StoneMineId)
-            {
-                resourceId = ResourceCatalog.StoneId;
-                return true;
-            }
-
-            resourceId = default;
-            return false;
+            var definition = BuildingCatalogData.Get(buildingId);
+            resourceId = definition.Operation.OutputResourceId;
+            return resourceId.Value != 0;
         }
 
         public static int FillBuffer(ref ExtractionOperationState state)

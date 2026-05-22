@@ -97,6 +97,14 @@ When adding a window/controller:
 
 Do not store feature-specific controllers or Unity objects in ordinary gameplay resources unless there is a clear project-wide composition contract.
 
+## Composite UI
+
+A screen may contain sections from multiple features, but each section should read state owned by the feature that owns the data. Use owner-provided contracts, projected read models, or feature-local presentation resources; do not make the screen depend on foreign `*.Logic` internals.
+
+If a composite screen needs new data, add a narrow read model or presentation state in the owner feature first, then let the shell/controller assemble sections. Do not keep adding unrelated fields to one flattened `*State` resource.
+
+Split screen state when fields belong to different owners, modes, write systems, or UI sections. Mode-specific state should be separate, for example a building context state and a worker context state instead of one nullable/flag-heavy panel state.
+
 ## UI To Gameplay Flow
 
 For local UX that changes gameplay:
@@ -176,6 +184,8 @@ Check:
 - MonoBehaviours remain passive views.
 - Required UI references fail fast.
 - MVC lifecycle is owned by ECS/bootstrap/presentation systems.
+- Composite screens read owner feature contracts/read models instead of foreign logic internals.
+- Screen `*State` resources are split by owner, mode, and UI section instead of flattened across features.
 - UI intent crosses into gameplay through typed events or network commands.
 - No prefab assets, prefab YAML, or Canvas hierarchies were generated.
 - The user is asked to verify Unity scene/prefab wiring when needed.

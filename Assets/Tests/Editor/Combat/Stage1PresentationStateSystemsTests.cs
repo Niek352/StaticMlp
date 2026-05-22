@@ -33,8 +33,8 @@ namespace StaticMlp.Tests.Combat
 
             ref readonly var hud = ref CW.GetResource<Stage1HudState>();
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.RepairCamp));
-            Assert.That(hud.Wood, Is.EqualTo(50));
-            Assert.That(hud.Stone, Is.EqualTo(25));
+            Assert.That(GetHudResourceAmount(in hud, ResourceCatalog.WoodId), Is.EqualTo(50));
+            Assert.That(GetHudResourceAmount(in hud, ResourceCatalog.StoneId), Is.EqualTo(25));
             Assert.That(hud.CanOpenLoadoutPreparation, Is.False);
             Assert.That(hud.CanOpenExpeditionSelection, Is.False);
         }
@@ -54,10 +54,27 @@ namespace StaticMlp.Tests.Combat
 
             ref readonly var hud = ref CW.GetResource<Stage1HudState>();
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.StartExpedition));
-            Assert.That(hud.Wood, Is.EqualTo(70));
-            Assert.That(hud.Stone, Is.EqualTo(30));
+            Assert.That(GetHudResourceAmount(in hud, ResourceCatalog.WoodId), Is.EqualTo(70));
+            Assert.That(GetHudResourceAmount(in hud, ResourceCatalog.StoneId), Is.EqualTo(30));
             Assert.That(hud.PreparedPrimaryModuleId, Is.EqualTo(LoadoutModuleCatalog.FireFlaskModuleId));
             Assert.That(hud.ExpeditionAvailability, Is.EqualTo(ExpeditionAvailabilityStatus.Available));
+        }
+
+        [Test]
+        public void HudState_IncludesEveryStoredResource()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.RepairObjectiveActive);
+            var resources = scope.CreateSharedResources(wood: 50, stone: 25);
+            ref var rows = ref resources.Ref<CW.Multi<SettlementStoredResource>>();
+            SetStoredAmount(ref rows, ResourceCatalog.PlanksId, 3);
+            scope.RefreshProjections();
+
+            new ClientStage1HudStateSystem().Update();
+
+            ref readonly var hud = ref CW.GetResource<Stage1HudState>();
+            Assert.That(hud.Resources.Length, Is.EqualTo(ResourceCatalog.All.Count));
+            Assert.That(GetHudResourceAmount(in hud, ResourceCatalog.PlanksId), Is.EqualTo(3));
         }
 
         [TestCase(Stage1SettlementProgressStage.WorkerAssigned, Stage1ObjectiveKind.PlaceStockpile, "Place a stockpile so the settlement can hold expanded resources.")]
@@ -187,6 +204,35 @@ namespace StaticMlp.Tests.Combat
             Assert.That(state.PrimaryBuildingAction.Target, Is.EqualTo(site.GID));
             Assert.That(state.CanDepositResources, Is.True);
             Assert.That(state.CanBuild, Is.False);
+        }
+
+        [Test]
+        public void ContextPanel_WhenConstructionSiteUsesPlanks_IncludesPlanksResourceProgress()
+        {
+            using var scope = new Stage1PresentationClientWorldScope();
+            scope.CreateAnchor(stage: Stage1SettlementProgressStage.CampRepaired);
+            scope.CreateSharedResources();
+            var site = scope.CreateConstructionSite(
+                ConstructionPhase.WaitingForResources,
+                woodRequired: 0,
+                woodDelivered: 0,
+                stoneRequired: 0,
+                stoneDelivered: 0,
+                progress01: 0f);
+            ref var rows = ref site.Ref<CW.Multi<ConstructionResourceEntry>>();
+            rows.Add(new ConstructionResourceEntry(ResourceCatalog.PlanksId, 4, 2));
+            scope.RefreshProjections();
+
+            new ClientStage1PresentationBootstrapSystem().Init();
+            ref var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            session.Mode = Stage1ContextPanelMode.Building;
+            session.FocusedSite = site.GID;
+            new ClientStage1ContextPanelStateSystem().Update();
+
+            ref readonly var state = ref CW.GetResource<Stage1ContextPanelState>();
+            var planks = GetConstructionResource(in state, ResourceCatalog.PlanksId);
+            Assert.That(planks.Required, Is.EqualTo(4));
+            Assert.That(planks.Delivered, Is.EqualTo(2));
         }
 
         [Test]
@@ -739,6 +785,45 @@ namespace StaticMlp.Tests.Combat
             var method = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic);
             Assert.That(method, Is.Not.Null, $"Expected private static method '{methodName}' on {type.Name}.");
             method.Invoke(null, null);
+        }
+
+        private static int GetHudResourceAmount(in Stage1HudState state, ResourceId resourceId)
+        {
+            for (var i = 0; i < state.Resources.Length; i++)
+            {
+                if (state.Resources[i].Id == resourceId)
+                    return state.Resources[i].Amount;
+            }
+
+            throw new InvalidOperationException($"Missing HUD resource id {resourceId.Value}.");
+        }
+
+        private static void SetStoredAmount(ref CW.Multi<SettlementStoredResource> rows, ResourceId resourceId, int amount)
+        {
+            for (var i = 0; i < rows.Length; i++)
+            {
+                if (rows[i].Id != resourceId)
+                    continue;
+
+                ref var row = ref rows[i];
+                row.Amount = amount;
+                return;
+            }
+
+            throw new InvalidOperationException($"Missing stored resource id {resourceId.Value}.");
+        }
+
+        private static ConstructionResourceViewEntry GetConstructionResource(
+            in Stage1ContextPanelState state,
+            ResourceId resourceId)
+        {
+            for (var i = 0; i < state.ConstructionResources.Length; i++)
+            {
+                if (state.ConstructionResources[i].Id == resourceId)
+                    return state.ConstructionResources[i];
+            }
+
+            throw new InvalidOperationException($"Missing construction resource id {resourceId.Value}.");
         }
 
         private sealed class TestThreatBannerController : IController, IResourcePresentationController<ThreatBannerState>

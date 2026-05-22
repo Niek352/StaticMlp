@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using Code.EcsUi.Mvc;
 using TMPro;
 using UnityEngine;
@@ -71,7 +72,7 @@ namespace StaticMlp.Features.Settlement
             summaryLabel.text =
                 $"Objective: {Stage1HudController.DescribeObjective(state.Objective)}\n" +
                 $"Camp stage: {state.SettlementStage}\n" +
-                $"Resources: Wood {state.Wood} / Stone {state.Stone}\n" +
+                $"Resources: {FormatResources(in state)}\n" +
                 $"Workers: {state.AssignedWorkers}/{state.TotalWorkers} assigned\n" +
                 $"Prepared build: {Stage1HudController.DescribeBuild(state.PreparedPrimaryModuleId)}\n" +
                 $"Expedition: {state.ExpeditionAvailability} / {state.ExpeditionActivity}\n" +
@@ -96,6 +97,26 @@ namespace StaticMlp.Features.Settlement
         private void HandleExpeditionClicked()
         {
             _onExpeditionClicked.Invoke();
+        }
+
+        private static string FormatResources(in Stage1HudState state)
+        {
+            if (state.Resources.Length == 0)
+                return string.Empty;
+
+            var builder = new StringBuilder();
+            for (var i = 0; i < state.Resources.Length; i++)
+            {
+                if (i > 0)
+                    builder.Append(" / ");
+
+                var resource = state.Resources[i];
+                builder.Append(ResourceCatalog.Get(resource.Id).DisplayName);
+                builder.Append(' ');
+                builder.Append(resource.Amount);
+            }
+
+            return builder.ToString();
         }
     }
 }

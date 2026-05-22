@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using Code.EcsUi.Mvc;
 using TMPro;
 using UnityEngine;
@@ -69,8 +70,7 @@ namespace StaticMlp.Features.Settlement
                 summaryLabel.text =
                     $"{state.BuildingDisplayName}\n" +
                     $"Phase: {state.ConstructionPhase}\n" +
-                    $"Wood: {state.WoodDelivered}/{state.WoodRequired}\n" +
-                    $"Stone: {state.StoneDelivered}/{state.StoneRequired}\n" +
+                    FormatConstructionResources(in state) +
                     $"Progress: {Mathf.RoundToInt(state.Progress01 * 100f)}%" +
                     FormatDisabledReason(state.PrimaryBuildingAction.DisabledReason) +
                     FormatOpenedBuildingAction(in state);
@@ -114,6 +114,26 @@ namespace StaticMlp.Features.Settlement
             return state.HasOpenedBuildingAction
                 ? $"\n\n{state.OpenedBuildingActionLabel}\n{state.OpenedBuildingActionSummary}"
                 : string.Empty;
+        }
+
+        private static string FormatConstructionResources(in Stage1ContextPanelState state)
+        {
+            if (state.ConstructionResources.Length == 0)
+                return string.Empty;
+
+            var builder = new StringBuilder();
+            for (var i = 0; i < state.ConstructionResources.Length; i++)
+            {
+                var resource = state.ConstructionResources[i];
+                builder.Append(ResourceCatalog.Get(resource.Id).DisplayName);
+                builder.Append(": ");
+                builder.Append(resource.Delivered);
+                builder.Append('/');
+                builder.Append(resource.Required);
+                builder.Append('\n');
+            }
+
+            return builder.ToString();
         }
     }
 }

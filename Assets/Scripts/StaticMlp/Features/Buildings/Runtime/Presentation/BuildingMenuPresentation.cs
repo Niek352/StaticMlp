@@ -148,7 +148,7 @@ namespace StaticMlp.Features.Buildings
                 if (i > 0)
                     builder.Append("  ");
 
-                builder.Append(ResourceLabel(constructionCost[i].Id));
+                builder.Append(ResourceCatalog.Get(constructionCost[i].Id).DisplayName);
                 builder.Append(' ');
                 builder.Append(constructionCost[i].Amount);
             }
@@ -179,29 +179,5 @@ namespace StaticMlp.Features.Buildings
             }
         }
 
-        private static string ResourceLabel(ResourceId id)
-        {
-            if (id == ResourceCatalog.WoodId)
-                return "Wood";
-            if (id == ResourceCatalog.StoneId)
-                return "Stone";
-            if (id == ResourceCatalog.PlanksId)
-                return "Planks";
-            if (id == ResourceCatalog.SimplePartsId)
-                return "Parts";
-            if (id == ResourceCatalog.RepairKitsId)
-                return "Repair Kits";
-            if (id == ResourceCatalog.FoodId)
-                return "Food";
-            if (id == ResourceCatalog.FuelId)
-                return "Fuel";
-            if (id == ResourceCatalog.ResearchDataId)
-                return "Research";
-            if (id == ResourceCatalog.MedicineId)
-                return "Medicine";
-
-            ResourceCatalog.Get(id);
-            return $"Resource {id.Value}";
-        }
     }
 }

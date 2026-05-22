@@ -3,6 +3,7 @@ using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement.Workers;
+using Unity.Collections;
 
 namespace StaticMlp.Features.Settlement
 {
@@ -12,8 +13,7 @@ namespace StaticMlp.Features.Settlement
         public Stage1ObjectiveKind Objective;
         public string ObjectiveHint;
         public Stage1SettlementProgressStage SettlementStage;
-        public int Wood;
-        public int Stone;
+        public FixedList512Bytes<SettlementResourceViewEntry> Resources;
         public ushort TotalWorkers;
         public ushort AssignedWorkers;
         public SettlementWorkerBlockingReason WorkerBlockingReason;

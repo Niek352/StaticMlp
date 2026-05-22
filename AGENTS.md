@@ -23,6 +23,7 @@ Load the relevant project skill before changing code:
 - [MVC package review](ai/mvc_package_review.md)
 - [ECS feature architecture layout](ai/ECS_Feature_Architecture_Layout_StaticEcs.md)
 - [Replication codegen notes](ai/replication_codegen_notes.md)
+- [Refactor backlog](ai/refactor/README.md)
 - [PrefabXML skill](ai/prefabxml/SKILL.md)
 - [Full StaticEcs documentation](ai/static-ecs%20FULL.txt)
 
@@ -58,6 +59,8 @@ Gameplay systems should only:
 - Systems communicate through event components, not hidden direct calls across feature boundaries.
 - A feature must not write another feature's component or tag state through `Mut<T>()`, `ReplicationMut.Mut<T>()`, or `ClientProjection.Mut<T>()`.
 - Cross-feature writes must go through `IEvent`: the foreign feature sends the request or fact, and the owner feature system applies the state mutation.
+- Composite UI may aggregate multiple feature sections, but it must read owner-provided contracts or read models. Do not add dependencies on foreign `*.Logic` assemblies to make UI composition convenient.
+- Keep `*State` and `IResource` types cohesive: one owner, authority, lifecycle, writer, and UI section. If a new field crosses one of those boundaries, split the state or add an owner-provided read model instead.
 - Do not create vague extraction buckets such as `Helper`, `Utility`, or generic static orchestration classes.
 - Allowed extracted logic intents are explicit `Domain/Rules` and explicit `Spawner` abstractions.
 - `StaticMlp.Features.Settlement` owns settlement resource ids, resource families, resource catalog validation, and settlement storage; other features may read stable resource contracts from `Settlement.Contracts` but must not create a parallel `Resources` or `DesignLock` feature.

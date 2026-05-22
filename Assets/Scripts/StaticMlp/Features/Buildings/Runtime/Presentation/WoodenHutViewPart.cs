@@ -64,10 +64,21 @@ namespace StaticMlp.Features.Buildings
             var width = _progressFillFullScale.x * progress;
             _progressFill.localScale = new Vector3(width, _progressFillFullScale.y, _progressFillFullScale.z);
             _progressFill.localPosition = new Vector3(-_progressFillFullScale.x * 0.5f + width * 0.5f, 1.8f, -2.68f);
-            _progressRenderer.sharedMaterial.color = component.WoodDelivered >= component.WoodRequired
-                                               && component.StoneDelivered >= component.StoneRequired
+            _progressRenderer.sharedMaterial.color = HasAllResources(in component)
                 ? progressColor
                 : missingResourcesColor;
+        }
+
+        private static bool HasAllResources(in ConstructionViewState component)
+        {
+            for (var i = 0; i < component.Resources.Length; i++)
+            {
+                var resource = component.Resources[i];
+                if (resource.Delivered < resource.Required)
+                    return false;
+            }
+
+            return true;
         }
 
         private void BuildVisual()

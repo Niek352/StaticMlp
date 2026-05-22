@@ -24,6 +24,9 @@ Rules for `StaticMlp.Features.*` modules. This file inherits the root `AGENTS.md
 - Split `Runtime/Logic` and `Runtime/Presentation` when a feature has both gameplay state and Unity-facing views.
 - Keep feature `MonoBehaviour` classes passive: inspector references, Unity callbacks, rendering, and forwarding UI intent only.
 - Read another feature's public contracts only when the dependency direction is valid.
+- If a screen spans features, use an explicit composite presentation owner/shell; keep feature sections and their read models owned by the features that own the data.
+- Missing UI data should become an owner feature contract or read model, not a direct dependency on that feature's internal `Logic` assembly.
+- Do not grow monolithic `*State` resources across feature concerns. Split by owner, lifecycle, writer, or UI section before adding unrelated fields.
 - Cross-feature state changes go through typed events or commands owned by the target feature.
 - Queries scoped to a concrete entity or network archetype must include `EntityIs<T>` or `EntityIsAny<...>`, unless the system is intentionally generic across entity types.
 

@@ -1,4 +1,6 @@
+using System.Text;
 using StaticMlp.Features.EcsViews;
+using StaticMlp.Features.Settlement;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,8 +40,29 @@ namespace StaticMlp.Features.Buildings
         {
             progressSlider.value = component.Progress01;
             phaseLabel.text = component.Phase.ToString();
-            resourcesLabel.text =
-                $"Wood {component.WoodDelivered}/{component.WoodRequired}  Stone {component.StoneDelivered}/{component.StoneRequired}";
+            resourcesLabel.text = FormatResources(in component);
+        }
+
+        private static string FormatResources(in ConstructionViewState component)
+        {
+            if (component.Resources.Length == 0)
+                return string.Empty;
+
+            var builder = new StringBuilder();
+            for (var i = 0; i < component.Resources.Length; i++)
+            {
+                if (i > 0)
+                    builder.Append("  ");
+
+                var resource = component.Resources[i];
+                builder.Append(ResourceCatalog.Get(resource.Id).DisplayName);
+                builder.Append(' ');
+                builder.Append(resource.Delivered);
+                builder.Append('/');
+                builder.Append(resource.Required);
+            }
+
+            return builder.ToString();
         }
     }
 }

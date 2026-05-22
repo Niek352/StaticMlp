@@ -42,7 +42,8 @@
         "StaticMlp.Features.Progression.Logic",
         "StaticMlp.Features.BuildingCatalog",
         "UniTask",
-        "StaticMlp.Features.Npc.Contracts"
+        "StaticMlp.Features.Npc.Contracts",
+        "Unity.Collections"
     ],
     "includePlatforms": [
         "Editor"

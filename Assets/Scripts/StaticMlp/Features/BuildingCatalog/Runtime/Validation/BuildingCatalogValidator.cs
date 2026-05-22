@@ -45,6 +45,7 @@ namespace StaticMlp.Features.BuildingCatalog
                 ValidateConstructionCost(in definition);
                 ValidateInteractions(in definition);
                 ValidateProfiles(in definition);
+                ValidateOperationOutput(in definition);
             }
         }
 
@@ -99,6 +100,28 @@ namespace StaticMlp.Features.BuildingCatalog
             if (definition.Capabilities.HasFlag(BuildingCapabilityFlags.SupportsNpcInteraction)
                 && !definition.NpcProfile.IsDefined)
                 throw new InvalidOperationException($"Building id {definition.Id.Value} supports NPC interaction without an NPC profile.");
+        }
+
+        private static void ValidateOperationOutput(in BuildingDefinition definition)
+        {
+            var extractsFromNode = definition.Capabilities.HasFlag(BuildingCapabilityFlags.ExtractsFromNode)
+                                   || definition.Operation.OperationCapabilities.HasFlag(BuildingCapabilityFlags.ExtractsFromNode);
+
+            if (!extractsFromNode)
+            {
+                if (definition.Operation.OutputResourceId.Value != 0)
+                    throw new InvalidOperationException($"Building id {definition.Id.Value} defines output resource without extraction capability.");
+
+                return;
+            }
+
+            if (definition.Operation.OutputResourceId.Value == 0)
+                throw new InvalidOperationException($"Extraction building id {definition.Id.Value} has no output resource.");
+
+            ref readonly var output = ref ResourceCatalog.Get(definition.Operation.OutputResourceId);
+            if (!output.Usage.HasFlag(ResourceUsageFlags.ProductionOutput))
+                throw new InvalidOperationException(
+                    $"Extraction building id {definition.Id.Value} outputs non-production resource {output.Id.Value}.");
         }
     }
 }

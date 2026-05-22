@@ -132,6 +132,62 @@ namespace StaticMlp.Tests.Settlement
             Assert.Throws<InvalidOperationException>(() => BuildingCatalogValidator.Validate(definitions));
         }
 
+        [Test]
+        public void Validate_ExtractionBuildingWithoutOutputResource_Throws()
+        {
+            var definitions = new[]
+            {
+                CreateExtractionDefinition(
+                    new BuildingId(22),
+                    new BuildingOperationDefinition(
+                        BuildingCapabilityFlags.ProvidesWorkplace
+                        | BuildingCapabilityFlags.ProducesResources
+                        | BuildingCapabilityFlags.ExtractsFromNode,
+                        storageCapacity: 10,
+                        workerSlots: 1))
+            };
+
+            Assert.Throws<InvalidOperationException>(() => BuildingCatalogValidator.Validate(definitions));
+        }
+
+        [Test]
+        public void Validate_ExtractionBuildingWithMissingOutputResource_Throws()
+        {
+            var definitions = new[]
+            {
+                CreateExtractionDefinition(
+                    new BuildingId(23),
+                    new BuildingOperationDefinition(
+                        BuildingCapabilityFlags.ProvidesWorkplace
+                        | BuildingCapabilityFlags.ProducesResources
+                        | BuildingCapabilityFlags.ExtractsFromNode,
+                        storageCapacity: 10,
+                        workerSlots: 1,
+                        outputResourceId: new ResourceId(ushort.MaxValue)))
+            };
+
+            Assert.Throws<InvalidOperationException>(() => BuildingCatalogValidator.Validate(definitions));
+        }
+
+        [Test]
+        public void Validate_ExtractionBuildingWithNonProductionOutputResource_Throws()
+        {
+            var definitions = new[]
+            {
+                CreateExtractionDefinition(
+                    new BuildingId(24),
+                    new BuildingOperationDefinition(
+                        BuildingCapabilityFlags.ProvidesWorkplace
+                        | BuildingCapabilityFlags.ProducesResources
+                        | BuildingCapabilityFlags.ExtractsFromNode,
+                        storageCapacity: 10,
+                        workerSlots: 1,
+                        outputResourceId: ResourceCatalog.ResearchDataId))
+            };
+
+            Assert.Throws<InvalidOperationException>(() => BuildingCatalogValidator.Validate(definitions));
+        }
+
         private static BuildingDefinition CreateDefinition(BuildingId id)
         {
             return new BuildingDefinition(
@@ -152,6 +208,29 @@ namespace StaticMlp.Tests.Settlement
                 },
                 BuildingNpcProfileDefinition.None,
                 BuildingOperationDefinition.None);
+        }
+
+        private static BuildingDefinition CreateExtractionDefinition(
+            BuildingId id,
+            BuildingOperationDefinition operation)
+        {
+            return new BuildingDefinition(
+                id,
+                code: $"extraction_{id.Value}",
+                displayName: $"Extraction {id.Value}",
+                BuildingCategory.Extraction,
+                BuildingCapabilityFlags.ProvidesWorkplace
+                | BuildingCapabilityFlags.ProducesResources
+                | BuildingCapabilityFlags.ExtractsFromNode,
+                new[]
+                {
+                    new ResourceAmount(ResourceCatalog.WoodId, 1)
+                },
+                new int2(1, 1),
+                buildWorkRequired: 1f,
+                Array.Empty<BuildingInteractionDefinition>(),
+                BuildingNpcProfileDefinition.None,
+                operation);
         }
 
         private static void AssertCatalogContainsOnce(BuildingId id, string code)

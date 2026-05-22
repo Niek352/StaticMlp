@@ -64,8 +64,61 @@ namespace StaticMlp.Tests.Settlement
             Assert.That(state.ActiveRecipe, Is.EqualTo(WorkbenchRecipeCatalog.PlanksId));
             Assert.That(state.WorkerSlotCount, Is.EqualTo(2));
             Assert.That(state.WorkDone, Is.EqualTo(0f));
-            Assert.That(state.InputWood, Is.EqualTo(0));
-            Assert.That(state.OutputPlanks, Is.EqualTo(0));
+            Assert.That(WorkbenchResourceAccess.GetInput(finished, ResourceCatalog.WoodId), Is.EqualTo(0));
+            Assert.That(WorkbenchResourceAccess.GetOutput(finished, ResourceCatalog.PlanksId), Is.EqualTo(0));
+            Assert.That(finished.Ref<SW.Multi<WorkbenchInputResource>>().Length, Is.EqualTo(4));
+            Assert.That(finished.Ref<SW.Multi<WorkbenchOutputResource>>().Length, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void WorkbenchResourceAccess_ReadsArbitraryRecipeResourceRows()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var workbench = scope.CreateFinishedBuilding();
+            workbench.Set(new WorkbenchOperationState
+            {
+                ActiveRecipeId = WorkbenchRecipeCatalog.RepairKitsId.Value,
+                Enabled = true,
+                WorkerSlotCount = 1
+            });
+            WorkbenchResourceAccess.InitializeRows(workbench);
+            ref var inputs = ref workbench.Ref<SW.Multi<WorkbenchInputResource>>();
+            SetInput(ref inputs, ResourceCatalog.SimplePartsId, 2);
+            ref var outputs = ref workbench.Ref<SW.Multi<WorkbenchOutputResource>>();
+            SetOutput(ref outputs, ResourceCatalog.RepairKitsId, 1);
+
+            Assert.That(WorkbenchResourceAccess.GetInput(workbench, ResourceCatalog.SimplePartsId), Is.EqualTo(2));
+            Assert.That(WorkbenchResourceAccess.GetOutput(workbench, ResourceCatalog.RepairKitsId), Is.EqualTo(1));
+        }
+
+        private static void SetInput(ref SW.Multi<WorkbenchInputResource> rows, ResourceId resourceId, int amount)
+        {
+            for (var i = 0; i < rows.Length; i++)
+            {
+                if (rows[i].Id != resourceId)
+                    continue;
+
+                ref var row = ref rows[i];
+                row.Amount = amount;
+                return;
+            }
+
+            throw new InvalidOperationException($"Missing workbench input resource id {resourceId.Value}.");
+        }
+
+        private static void SetOutput(ref SW.Multi<WorkbenchOutputResource> rows, ResourceId resourceId, int amount)
+        {
+            for (var i = 0; i < rows.Length; i++)
+            {
+                if (rows[i].Id != resourceId)
+                    continue;
+
+                ref var row = ref rows[i];
+                row.Amount = amount;
+                return;
+            }
+
+            throw new InvalidOperationException($"Missing workbench output resource id {resourceId.Value}.");
         }
     }
 }

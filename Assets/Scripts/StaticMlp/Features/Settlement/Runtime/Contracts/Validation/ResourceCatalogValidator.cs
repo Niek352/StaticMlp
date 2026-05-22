@@ -16,6 +16,9 @@ namespace StaticMlp.Features.Settlement
                 if (!ids.Add(definition.Id))
                     throw new InvalidOperationException($"Duplicate settlement resource id {definition.Id.Value}.");
 
+                if (string.IsNullOrWhiteSpace(definition.DisplayName))
+                    throw new InvalidOperationException($"Settlement resource id {definition.Id.Value} has no display name.");
+
                 if (definition.Family == ResourceFamily.None)
                     throw new InvalidOperationException($"Settlement resource id {definition.Id.Value} has no resource family.");
 

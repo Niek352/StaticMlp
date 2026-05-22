@@ -4,6 +4,7 @@ using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
+using Unity.Collections;
 
 namespace StaticMlp.Features.Settlement
 {
@@ -23,10 +24,7 @@ namespace StaticMlp.Features.Settlement
         public string OpenedBuildingActionSummary;
         public bool HasWorker;
         public ConstructionPhase ConstructionPhase;
-        public int WoodRequired;
-        public int StoneRequired;
-        public int WoodDelivered;
-        public int StoneDelivered;
+        public FixedList512Bytes<ConstructionResourceViewEntry> ConstructionResources;
         public float Progress01;
         public bool CanDepositResources;
         public bool CanBuild;

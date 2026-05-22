@@ -19,7 +19,8 @@
         "StaticMlp.Features.Stage1.Contracts",
         "StaticMlp.Features.Settlement.Logic",
         "StaticMlp.Features.Interaction",
-        "StaticMlp.Features.OpenWorldGeneration.Contracts"
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
+        "Unity.Collections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

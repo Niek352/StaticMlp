@@ -78,9 +78,6 @@ namespace StaticMlp.Features.Buildings
             if (!BuildingPresentationCatalog.TryGet(definition.Id, out var presentation))
                 throw new InvalidOperationException($"Missing presentation catalog entry for building {definition.Id}.");
 
-            var woodCost = definition.GetConstructionCost(ResourceCatalog.WoodId);
-            var stoneCost = definition.GetConstructionCost(ResourceCatalog.StoneId);
-
             NetArchetypeRegistry.RegisterClient(network.BlueprintArchetypeId, e =>
             {
                 e.Set<ConstructionSiteTag>();
@@ -111,15 +108,7 @@ namespace StaticMlp.Features.Buildings
                 {
                     RenderRotation = Quaternion.identity
                 });
-                e.Set(new ConstructionViewState
-                {
-                    Phase = ConstructionPhase.Completed,
-                    WoodRequired = woodCost,
-                    StoneRequired = stoneCost,
-                    WoodDelivered = woodCost,
-                    StoneDelivered = stoneCost,
-                    Progress01 = 1f
-                });
+                e.Set(CreateCompletedConstructionViewState(definition.ConstructionCost));
                 e.Set(new ViewPath(presentation.FinishedViewPath));
             });
 
@@ -128,6 +117,27 @@ namespace StaticMlp.Features.Buildings
                 e.Set<FinishedBuildingTag>();
                 e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
             });
+        }
+
+        private static ConstructionViewState CreateCompletedConstructionViewState(ResourceAmount[] constructionCost)
+        {
+            var state = new ConstructionViewState
+            {
+                Phase = ConstructionPhase.Completed,
+                Progress01 = 1f
+            };
+
+            for (var i = 0; i < constructionCost.Length; i++)
+            {
+                if (state.Resources.Length == state.Resources.Capacity)
+                    throw new InvalidOperationException(
+                        $"{nameof(ConstructionViewState)} cannot hold more than {state.Resources.Capacity} resource rows.");
+
+                var cost = constructionCost[i];
+                state.Resources.Add(new ConstructionResourceViewEntry(cost.Id, cost.Amount, cost.Amount));
+            }
+
+            return state;
         }
     }
 }

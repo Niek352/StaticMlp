@@ -38,7 +38,7 @@ namespace StaticMlp.Tests.Combat
 
             var controller = new TestController(ControllerState.ViewFocused);
             bridge.Bind(controller);
-            CW.SetResource(new Stage1HudState { Wood = 10 });
+            CW.SetResource(CreateHudState(10));
 
             bridge.Update();
 
@@ -51,7 +51,7 @@ namespace StaticMlp.Tests.Combat
             var controller = new TestController(ControllerState.ViewFocused);
             var bridge = new ControllerResourceBridgeSystem<TestController, Stage1HudState>();
             bridge.Bind(controller);
-            CW.SetResource(new Stage1HudState { Wood = 12 });
+            CW.SetResource(CreateHudState(12));
 
             bridge.SyncOnce();
 
@@ -67,9 +67,9 @@ namespace StaticMlp.Tests.Combat
             bridge.Bind(controller);
             bridge.Activate();
 
-            CW.SetResource(new Stage1HudState { Wood = 3 });
+            CW.SetResource(CreateHudState(3));
             bridge.Update();
-            CW.SetResource(new Stage1HudState { Wood = 4 });
+            CW.SetResource(CreateHudState(4));
             bridge.Update();
 
             Assert.That(controller.ApplyCount, Is.EqualTo(2));
@@ -84,10 +84,10 @@ namespace StaticMlp.Tests.Combat
             bridge.Bind(controller);
             bridge.Activate();
 
-            CW.SetResource(new Stage1HudState { Wood = 5 });
+            CW.SetResource(CreateHudState(5));
             bridge.Update();
             bridge.Deactivate();
-            CW.SetResource(new Stage1HudState { Wood = 6 });
+            CW.SetResource(CreateHudState(6));
             bridge.Update();
 
             Assert.That(controller.ApplyCount, Is.EqualTo(1));
@@ -102,7 +102,7 @@ namespace StaticMlp.Tests.Combat
             var binding = new BridgeSystemBinding<ControllerResourceBridgeSystem<TestController, Stage1HudState>, TestController>(controller, bridge);
             ((IMvcControllerModule)binding).OnBlur();
 
-            CW.SetResource(new Stage1HudState { Wood = 9 });
+            CW.SetResource(CreateHudState(9));
             bridge.Update();
 
             Assert.That(controller.ApplyCount, Is.EqualTo(2));
@@ -116,13 +116,20 @@ namespace StaticMlp.Tests.Combat
             var bridge = new ControllerResourceBridgeSystem<TestController, Stage1HudState>();
             var binding = new BridgeSystemBinding<ControllerResourceBridgeSystem<TestController, Stage1HudState>, TestController>(controller, bridge);
 
-            CW.SetResource(new Stage1HudState { Wood = 7 });
+            CW.SetResource(CreateHudState(7));
             ((IMvcControllerModule)binding).OnFocus();
-            CW.SetResource(new Stage1HudState { Wood = 8 });
+            CW.SetResource(CreateHudState(8));
             ((IMvcControllerModule)binding).OnViewShow();
 
             Assert.That(controller.ApplyCount, Is.EqualTo(3));
             Assert.That(controller.LastValue, Is.EqualTo(8));
+        }
+
+        private static Stage1HudState CreateHudState(int wood)
+        {
+            var state = new Stage1HudState();
+            state.Resources.Add(new SettlementResourceViewEntry(ResourceCatalog.WoodId, wood));
+            return state;
         }
 
         private sealed class TestController : ControllerBase<Stage1HudView>, IResourcePresentationController<Stage1HudState>
@@ -145,7 +152,7 @@ namespace StaticMlp.Tests.Combat
             public void Apply(in Stage1HudState state)
             {
                 ApplyCount++;
-                LastValue = state.Wood;
+                LastValue = state.Resources[0].Amount;
             }
         }
     }

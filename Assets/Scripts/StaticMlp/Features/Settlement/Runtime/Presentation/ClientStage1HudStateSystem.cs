@@ -1,3 +1,4 @@
+using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Frontier;
@@ -5,6 +6,7 @@ using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
+using Unity.Collections;
 
 namespace StaticMlp.Features.Settlement
 {
@@ -21,11 +23,10 @@ namespace StaticMlp.Features.Settlement
                 Objective = ToPresentationObjective(flow.Objective),
                 ObjectiveHint = ToPresentationHint(flow.Hint),
                 SettlementStage = flow.Stage,
-                Wood = SettlementSharedResourcesAccess.GetProjectedAmount(resources, ResourceCatalog.WoodId),
-                Stone = SettlementSharedResourcesAccess.GetProjectedAmount(resources, ResourceCatalog.StoneId),
                 CanOpenLoadoutPreparation = flow.CanOpenLoadoutPreparation,
                 CanOpenExpeditionSelection = flow.CanOpenExpeditionSelection,
             };
+            CopyProjectedResources(resources, ref next.Resources);
 
             if (anchor.Has<Projected<Stage1ProgressionState>>())
             {
@@ -174,6 +175,22 @@ namespace StaticMlp.Features.Settlement
 
             resources = default;
             return false;
+        }
+
+        private static void CopyProjectedResources(
+            CW.Entity resources,
+            ref FixedList512Bytes<SettlementResourceViewEntry> target)
+        {
+            ref readonly var rows = ref ClientProjection.ReadMulti<SettlementStoredResource>(resources);
+            for (var i = 0; i < rows.Length; i++)
+            {
+                if (target.Length == target.Capacity)
+                    throw new InvalidOperationException(
+                        $"{nameof(Stage1HudState)} cannot hold more than {target.Capacity} settlement resource rows.");
+
+                var row = rows[i].Value;
+                target.Add(new SettlementResourceViewEntry(row.Id, row.Amount));
+            }
         }
     }
 }
