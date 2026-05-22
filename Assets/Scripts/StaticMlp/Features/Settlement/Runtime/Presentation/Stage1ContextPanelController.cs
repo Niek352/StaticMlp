@@ -10,22 +10,30 @@ using StaticMlp.Networking.Requests;
 namespace StaticMlp.Features.Settlement
 {
     public sealed class Stage1ContextPanelController
-        : ControllerBase<Stage1ContextPanelView>, IResourcePresentationController<Stage1ContextPanelState>
+        : ControllerBase<Stage1ContextPanelView>
     {
+        private BuildingContextPanelState _lastBuildingState;
+        private WorkerContextPanelState _lastWorkerState;
+
         public Stage1ContextPanelController(
             ViewFactoryMethod<Stage1ContextPanelView> viewFactory,
-            ControllerResourceBridgeSystem<Stage1ContextPanelController, Stage1ContextPanelState> bridge)
+            Stage1ContextPanelCompositeBridgeSystem bridge)
             : base(viewFactory)
         {
-            AddModule(new BridgeSystemBinding<ControllerResourceBridgeSystem<Stage1ContextPanelController, Stage1ContextPanelState>, Stage1ContextPanelController>(this, bridge));
+            AddModule(new BridgeSystemBinding<Stage1ContextPanelCompositeBridgeSystem, Stage1ContextPanelController>(this, bridge));
         }
 
         public override ViewLayer Layer => ViewLayer.Persistent;
         public override int? PersistentSortOrder => 100;
 
-        public void Apply(in Stage1ContextPanelState state)
+        public void Apply(
+            in BuildingContextPanelState building,
+            in WorkerContextPanelState worker,
+            Stage1ContextPanelMode mode)
         {
-            View.Render(in state);
+            _lastBuildingState = building;
+            _lastWorkerState = worker;
+            View.Render(in building, in worker, mode);
         }
 
         protected override void OnViewInstantiated()
@@ -41,23 +49,25 @@ namespace StaticMlp.Features.Settlement
             base.Dispose();
         }
 
-        private static void HandlePrimaryAction()
+        private void HandlePrimaryAction()
         {
-            ref readonly var state = ref CW.GetResource<Stage1ContextPanelState>();
-            if (state.Mode == Stage1ContextPanelMode.Building)
+            ref readonly var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            if (session.Mode == Stage1ContextPanelMode.Building)
             {
-                HandleBuildingAction(state.PrimaryBuildingAction);
+                HandleBuildingAction(_lastBuildingState.PrimaryBuildingAction);
                 return;
             }
 
-            ToggleWorkerAssignment(state);
+            ToggleWorkerAssignment(in _lastWorkerState);
         }
 
-        private static void HandleSecondaryAction()
+        private void HandleSecondaryAction()
         {
-            ref readonly var state = ref CW.GetResource<Stage1ContextPanelState>();
-            if (state.Mode == Stage1ContextPanelMode.Building)
-                HandleBuildingAction(state.SecondaryBuildingAction);
+            ref readonly var session = ref CW.GetResource<Stage1ContextPanelSession>();
+            if (session.Mode == Stage1ContextPanelMode.Building)
+            {
+                HandleBuildingAction(_lastBuildingState.SecondaryBuildingAction);
+            }
         }
 
         private static void HandleBuildingAction(in BuildingAvailableActionPresentation action)
@@ -120,7 +130,7 @@ namespace StaticMlp.Features.Settlement
             intent.Set(target, kind);
         }
 
-        private static void ToggleWorkerAssignment(in Stage1ContextPanelState state)
+        private static void ToggleWorkerAssignment(in WorkerContextPanelState state)
         {
             if (!state.HasWorker)
                 throw new InvalidOperationException("Worker context action requires a replicated worker entity.");

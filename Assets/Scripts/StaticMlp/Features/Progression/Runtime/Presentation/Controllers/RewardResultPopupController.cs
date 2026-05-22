@@ -4,14 +4,16 @@ using StaticMlp.Networking;
 namespace StaticMlp.Features.Progression
 {
     public sealed class RewardResultPopupController
-        : ControllerBase<RewardResultPopupView>, IResourcePresentationController<RewardResultPopupState>
+        : ControllerBase<RewardResultPopupView>
     {
+        private RewardResultPopupViewData _lastViewData;
+
         public RewardResultPopupController(
             ViewFactoryMethod<RewardResultPopupView> viewFactory,
-            ControllerResourceBridgeSystem<RewardResultPopupController, RewardResultPopupState> bridge)
+            RewardResultPopupBridgeSystem bridge)
             : base(viewFactory)
         {
-            AddModule(new BridgeSystemBinding<ControllerResourceBridgeSystem<RewardResultPopupController, RewardResultPopupState>, RewardResultPopupController>(this, bridge));
+            AddModule(new BridgeSystemBinding<RewardResultPopupBridgeSystem, RewardResultPopupController>(this, bridge));
         }
 
         public override ViewLayer Layer => ViewLayer.Popup;
@@ -24,9 +26,10 @@ namespace StaticMlp.Features.Progression
             return $"Reward {rewardPackageId.Value}";
         }
 
-        public void Apply(in RewardResultPopupState state)
+        public void Apply(in RewardResultPopupViewData data)
         {
-            View.Render(in state);
+            _lastViewData = data;
+            View.Render(in data);
         }
 
         protected override void OnViewInstantiated()
@@ -44,9 +47,9 @@ namespace StaticMlp.Features.Progression
 
         private static void ClosePopup()
         {
-            ref var state = ref CW.GetResource<RewardResultPopupState>();
-            state.IsVisible = false;
-            state.LastPresentedRewardsMask = state.CurrentAppliedRewardsMask;
+            ref var session = ref CW.GetResource<RewardResultPopupSession>();
+            session.IsVisible = false;
+            session.LastPresentedRewardsMask = session.CurrentAppliedRewardsMask;
         }
     }
 }

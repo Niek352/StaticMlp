@@ -7,14 +7,16 @@ using StaticMlp.Networking;
 namespace StaticMlp.Features.Frontier
 {
     public sealed class ExpeditionSelectionController
-        : ControllerBase<ExpeditionSelectionView>, IResourcePresentationController<ExpeditionSelectionScreenState>
+        : ControllerBase<ExpeditionSelectionView>
     {
+        private ExpeditionSelectionScreenState _lastState;
+
         public ExpeditionSelectionController(
             ViewFactoryMethod<ExpeditionSelectionView> viewFactory,
-            ControllerResourceBridgeSystem<ExpeditionSelectionController, ExpeditionSelectionScreenState> bridge)
+            ExpeditionSelectionBridgeSystem bridge)
             : base(viewFactory)
         {
-            AddModule(new BridgeSystemBinding<ControllerResourceBridgeSystem<ExpeditionSelectionController, ExpeditionSelectionScreenState>, ExpeditionSelectionController>(this, bridge));
+            AddModule(new BridgeSystemBinding<ExpeditionSelectionBridgeSystem, ExpeditionSelectionController>(this, bridge));
         }
 
         public override ViewLayer Layer => ViewLayer.Fullscreen;
@@ -32,6 +34,7 @@ namespace StaticMlp.Features.Frontier
 
         public void Apply(in ExpeditionSelectionScreenState state)
         {
+            _lastState = state;
             View.Render(in state);
         }
 
@@ -50,16 +53,15 @@ namespace StaticMlp.Features.Frontier
 
         private void StartExpedition()
         {
-            ref readonly var state = ref CW.GetResource<ExpeditionSelectionScreenState>();
-            if (state.IsBossEncounterMode)
+            if (_lastState.IsBossEncounterMode)
             {
-                var bossRequest = new StartBossEncounterRequestEvent(state.AnchorId, state.BossId);
+                var bossRequest = new StartBossEncounterRequestEvent(_lastState.AnchorId, _lastState.BossId);
                 CW.SendToServer(in bossRequest);
                 RequestClose();
                 return;
             }
 
-            var request = new StartExpeditionRequestEvent(state.AnchorId, state.ExpeditionId);
+            var request = new StartExpeditionRequestEvent(_lastState.AnchorId, _lastState.ExpeditionId);
             CW.SendToServer(in request);
             RequestClose();
         }

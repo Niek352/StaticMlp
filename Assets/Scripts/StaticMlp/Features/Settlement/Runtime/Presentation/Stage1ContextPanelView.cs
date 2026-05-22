@@ -1,6 +1,9 @@
 using System;
 using System.Text;
 using Code.EcsUi.Mvc;
+using StaticMlp.Features.AiBots;
+using StaticMlp.Features.Buildings;
+using StaticMlp.Features.Settlement.Workers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -61,35 +64,92 @@ namespace StaticMlp.Features.Settlement
             secondaryButton.onClick.RemoveListener(HandleSecondaryClicked);
         }
 
-        public void Render(in Stage1ContextPanelState state)
+        public void Render(
+            in BuildingContextPanelState building,
+            in WorkerContextPanelState worker,
+            Stage1ContextPanelMode mode)
+        {
+            if (mode == Stage1ContextPanelMode.Building)
+                RenderBuilding(in building);
+            else
+                RenderWorker(in worker);
+        }
+        
+
+        private void RenderBuilding(in BuildingContextPanelState state)
         {
             panelRoot.SetActive(true);
+            primaryButton.gameObject.SetActive(true);
+            secondaryButton.gameObject.SetActive(true);
 
-            if (state.Mode == Stage1ContextPanelMode.Building)
+            primaryButton.interactable = state.PrimaryBuildingAction.Enabled;
+            secondaryButton.interactable = state.SecondaryBuildingAction.Enabled;
+            primaryButtonLabel.text = state.PrimaryBuildingAction.Label;
+            secondaryButtonLabel.text = state.SecondaryBuildingAction.Label;
+
+            var summaryBuilder = new StringBuilder();
+            summaryBuilder.Append(state.BuildingDisplayName);
+            summaryBuilder.Append("\nPhase: ");
+            summaryBuilder.Append(state.ConstructionPhase);
+
+            if (state.ConstructionResources.Length > 0)
             {
-                summaryLabel.text =
-                    $"{state.BuildingDisplayName}\n" +
-                    $"Phase: {state.ConstructionPhase}\n" +
-                    FormatConstructionResources(in state) +
-                    $"Progress: {Mathf.RoundToInt(state.Progress01 * 100f)}%" +
-                    FormatDisabledReason(state.PrimaryBuildingAction.DisabledReason) +
-                    FormatOpenedBuildingAction(in state);
-                primaryButtonLabel.text = state.PrimaryBuildingAction.Label;
-                secondaryButtonLabel.text = state.SecondaryBuildingAction.Label;
-                primaryButton.interactable = state.PrimaryBuildingAction.Enabled;
-                secondaryButton.interactable = state.SecondaryBuildingAction.Enabled;
+                summaryBuilder.Append("\nResources: ");
+                summaryBuilder.Append(FormatConstructionResources(in state));
+            }
+
+            summaryBuilder.Append("\nProgress: ");
+            summaryBuilder.Append(Mathf.RoundToInt(state.Progress01 * 100f));
+            summaryBuilder.Append('%');
+
+            if (!string.IsNullOrEmpty(state.PrimaryBuildingAction.DisabledReason))
+            {
+                summaryBuilder.Append("\n");
+                summaryBuilder.Append(state.PrimaryBuildingAction.DisabledReason);
+            }
+
+            if (state.HasOpenedBuildingAction)
+            {
+                summaryBuilder.Append("\n\n");
+                summaryBuilder.Append(state.OpenedBuildingActionLabel);
+                summaryBuilder.Append("\n");
+                summaryBuilder.Append(state.OpenedBuildingActionSummary);
+            }
+
+            summaryLabel.text = summaryBuilder.ToString();
+        }
+
+        private void RenderWorker(in WorkerContextPanelState state)
+        {
+            panelRoot.SetActive(true);
+            primaryButton.gameObject.SetActive(true);
+            secondaryButton.gameObject.SetActive(false);
+
+            if (!state.HasWorker)
+            {
+                primaryButton.interactable = false;
+                primaryButtonLabel.text = "No worker";
+                summaryLabel.text = "No worker available.";
                 return;
             }
 
-            summaryLabel.text =
-                $"Worker focus\n" +
-                $"Assigned: {state.WorkerAssigned}\n" +
-                $"Task: {state.WorkerActiveTask}\n" +
-                $"Blocked: {state.WorkerBlockingReason}";
-            primaryButtonLabel.text = state.WorkerAssigned ? "Unassign Worker" : "Assign Worker";
-            secondaryButtonLabel.text = "Refresh";
-            primaryButton.interactable = state.CanToggleWorkerAssignment && state.HasWorker;
-            secondaryButton.interactable = false;
+            primaryButton.interactable = state.CanToggleWorkerAssignment;
+            primaryButtonLabel.text = state.WorkerAssigned ? "Unassign" : "Assign";
+
+            var summaryBuilder = new StringBuilder();
+            summaryBuilder.Append("Worker\n");
+            summaryBuilder.Append("Status: ");
+            summaryBuilder.Append(state.WorkerAssigned ? "Assigned" : "Unassigned");
+            summaryBuilder.Append("\nTask: ");
+            summaryBuilder.Append(state.WorkerActiveTask);
+
+            if (state.WorkerBlockingReason != SettlementWorkerBlockingReason.None)
+            {
+                summaryBuilder.Append("\n");
+                summaryBuilder.Append(FormatWorkerBlockingReason(state.WorkerBlockingReason));
+            }
+
+            summaryLabel.text = summaryBuilder.ToString();
         }
 
         private void HandlePrimaryClicked()
@@ -102,21 +162,7 @@ namespace StaticMlp.Features.Settlement
             _onSecondaryClicked.Invoke();
         }
 
-        private static string FormatDisabledReason(string disabledReason)
-        {
-            return string.IsNullOrEmpty(disabledReason)
-                ? string.Empty
-                : $"\nBlocked: {disabledReason}";
-        }
-
-        private static string FormatOpenedBuildingAction(in Stage1ContextPanelState state)
-        {
-            return state.HasOpenedBuildingAction
-                ? $"\n\n{state.OpenedBuildingActionLabel}\n{state.OpenedBuildingActionSummary}"
-                : string.Empty;
-        }
-
-        private static string FormatConstructionResources(in Stage1ContextPanelState state)
+        private static string FormatConstructionResources(in BuildingContextPanelState state)
         {
             if (state.ConstructionResources.Length == 0)
                 return string.Empty;
@@ -124,16 +170,23 @@ namespace StaticMlp.Features.Settlement
             var builder = new StringBuilder();
             for (var i = 0; i < state.ConstructionResources.Length; i++)
             {
+                if (i > 0)
+                    builder.Append(" / ");
+
                 var resource = state.ConstructionResources[i];
                 builder.Append(ResourceCatalog.Get(resource.Id).DisplayName);
-                builder.Append(": ");
+                builder.Append(' ');
                 builder.Append(resource.Delivered);
-                builder.Append('/');
+                builder.Append(" / ");
                 builder.Append(resource.Required);
-                builder.Append('\n');
             }
 
             return builder.ToString();
+        }
+
+        private static string FormatWorkerBlockingReason(SettlementWorkerBlockingReason reason)
+        {
+            return reason.ToString();
         }
     }
 }

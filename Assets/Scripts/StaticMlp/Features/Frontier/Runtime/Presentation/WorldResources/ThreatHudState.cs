@@ -1,8 +1,6 @@
-using FFS.Libraries.StaticEcs;
-
 namespace StaticMlp.Features.Frontier
 {
-    public struct ThreatHudState : IResource
+    public struct ThreatHudState
     {
         public ThreatPhase ThreatPhase;
     }

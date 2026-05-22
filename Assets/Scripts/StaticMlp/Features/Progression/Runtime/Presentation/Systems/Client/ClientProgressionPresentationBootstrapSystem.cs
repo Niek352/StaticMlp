@@ -7,7 +7,7 @@ namespace StaticMlp.Features.Progression
     {
         public void Init()
         {
-            CW.SetResource(new RewardResultPopupState());
+            CW.SetResource(new RewardResultPopupSession());
             CW.SetResource(new ProgressionHudState());
         }
     }

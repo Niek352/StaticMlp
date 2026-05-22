@@ -11,13 +11,6 @@ namespace StaticMlp.Features.Settlement
             {
                 IsVisible = true,
             });
-            CW.SetResource(new SettlementHudState
-            {
-                AnchorId = SettlementAnchorCatalog.HomeCampId,
-                Objective = Stage1ObjectiveKind.RepairCamp,
-                ObjectiveHint = "Gather the camp resources needed to begin repairs.",
-                SettlementStage = Stage1SettlementProgressStage.DamagedCampStart,
-            });
             CW.SetResource(new Stage1ContextPanelSession
             {
                 Mode = Stage1ContextPanelMode.Worker,
@@ -25,11 +18,6 @@ namespace StaticMlp.Features.Settlement
             });
             CW.SetResource(new Stage1ContextFocusTarget());
             CW.SetResource(new Stage1BuildingOperationOpenIntent());
-            CW.SetResource(new Stage1ContextPanelState
-            {
-                Mode = Stage1ContextPanelMode.Worker,
-                AnchorId = SettlementAnchorCatalog.HomeCampId,
-            });
         }
     }
 }

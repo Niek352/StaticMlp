@@ -341,9 +341,7 @@ namespace StaticMlp.Tests.Combat
             scope.CreateSharedResources();
             scope.RefreshProjections();
 
-            new ClientSettlementHudStateSystem().Update();
-
-            ref readonly var hud = ref CW.GetResource<SettlementHudState>();
+            var hud = SettlementHudPresentation.Build();
             Assert.That(hud.Objective, Is.Not.EqualTo(Stage1ObjectiveKind.RepairCamp));
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.AssignWorker));
             Assert.That(hud.CanOpenLoadoutPreparation, Is.False);
@@ -633,9 +631,7 @@ namespace StaticMlp.Tests.Combat
             scope.CreateSharedResources();
             scope.RefreshProjections();
 
-            new ClientSettlementHudStateSystem().Update();
-
-            ref readonly var hud = ref CW.GetResource<SettlementHudState>();
+            var hud = SettlementHudPresentation.Build();
             Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.RepairCamp));
             Assert.That(hud.ObjectiveHint, Is.EqualTo("Resources delivered. Keep building the camp core to finish repairs."));
         }

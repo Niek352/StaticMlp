@@ -1,8 +1,6 @@
-using FFS.Libraries.StaticEcs;
-
 namespace StaticMlp.Features.Frontier
 {
-    public struct ThreatBannerState : IResource
+    public struct ThreatBannerState
     {
         public bool IsVisible;
         public ThreatPhase Phase;

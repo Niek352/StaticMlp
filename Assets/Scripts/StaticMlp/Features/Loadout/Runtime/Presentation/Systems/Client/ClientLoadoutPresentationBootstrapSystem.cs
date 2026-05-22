@@ -7,11 +7,7 @@ namespace StaticMlp.Features.Loadout
     {
         public void Init()
         {
-            CW.SetResource(new LoadoutPreparationScreenState
-            {
-                SelectedPrimaryModuleId = LoadoutModuleCatalog.PoisonArrowModuleId
-            });
-            CW.SetResource(new LoadoutHudState());
+            // No IResource presentation states to initialize; bridges read directly from logic components.
         }
     }
 }

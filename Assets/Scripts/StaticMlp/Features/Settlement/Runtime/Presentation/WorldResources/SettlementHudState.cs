@@ -1,10 +1,9 @@
-using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Settlement.Workers;
 using Unity.Collections;
 
 namespace StaticMlp.Features.Settlement
 {
-    public struct SettlementHudState : IResource
+    public struct SettlementHudState
     {
         public SettlementAnchorId AnchorId;
         public Stage1ObjectiveKind Objective;

@@ -1,8 +1,6 @@
-using FFS.Libraries.StaticEcs;
-
 namespace StaticMlp.Features.Loadout
 {
-    public struct LoadoutPreparationScreenState : IResource
+    public struct LoadoutPreparationScreenState
     {
         public bool IsAvailable;
         public bool CanConfirm;

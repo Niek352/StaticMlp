@@ -1,8 +1,6 @@
-using FFS.Libraries.StaticEcs;
-
 namespace StaticMlp.Features.Frontier
 {
-    public struct ExpeditionHudState : IResource
+    public struct ExpeditionHudState
     {
         public ExpeditionAvailabilityStatus Availability;
         public ExpeditionActivityStatus Activity;

@@ -1,5 +1,6 @@
 using Code.EcsUi.Mvc;
 using StaticMlp.Game.Bootstrap;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Progression
 {
@@ -9,14 +10,13 @@ namespace StaticMlp.Features.Progression
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
-            var bridge = new ControllerResourceBridgeSystem<RewardResultPopupController, RewardResultPopupState>();
+            var bridge = new RewardResultPopupBridgeSystem();
 
             systems.Add(new ClientProgressionPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 40);
             systems.Add(new ClientRewardResultPopupStateSystem(), GameplaySystemOrder.ClientPresentation + 41);
-            systems.Add(new ClientProgressionHudStateSystem(), GameplaySystemOrder.ClientPresentation + 42);
-            systems.Add(new PopupControllerHostSystem<RewardResultPopupView, RewardResultPopupController, RewardResultPopupState>(
+            systems.Add(new PopupControllerHostSystem<RewardResultPopupView, RewardResultPopupController>(
                 _ => new RewardResultPopupController(ResourcesViewFactory.CreateLazy<RewardResultPopupView>(REWARD_RESULT_POPUP_VIEW_RESOURCE_PATH), bridge),
-                state => state.IsVisible), GameplaySystemOrder.ClientPresentation + 44);
+                () => CW.GetResource<RewardResultPopupSession>().IsVisible), GameplaySystemOrder.ClientPresentation + 44);
             systems.Add(bridge, GameplaySystemOrder.ClientPresentation + 45);
         }
     }

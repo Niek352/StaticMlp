@@ -11,16 +11,10 @@ namespace StaticMlp.Features.Frontier
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
-            var expeditionBridge = new ControllerResourceBridgeSystem<ExpeditionSelectionController, ExpeditionSelectionScreenState>();
-            var threatBridge = new ControllerResourceBridgeSystem<ThreatBannerController, ThreatBannerState>();
+            var expeditionBridge = new ExpeditionSelectionBridgeSystem();
+            var threatBridge = new ThreatBannerBridgeSystem();
 
             systems.Add(new ClientFrontierPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 30);
-            systems.Add(new ClientThreatBannerStateSystem(), GameplaySystemOrder.ClientPresentation + 31);
-            systems.Add(new ClientExpeditionSelectionScreenStateSystem(), GameplaySystemOrder.ClientPresentation + 32);
-            systems.Add(new ClientExpeditionHudStateSystem(), GameplaySystemOrder.ClientPresentation + 33);
-            systems.Add(new ClientThreatHudStateSystem(), GameplaySystemOrder.ClientPresentation + 34);
-            systems.Add(new ClientRaidHudStateSystem(), GameplaySystemOrder.ClientPresentation + 35);
-            systems.Add(new ClientBossHudStateSystem(), GameplaySystemOrder.ClientPresentation + 36);
             systems.Add(new ControllerRegistrationSystem<ExpeditionSelectionView, ExpeditionSelectionController>(
                 new ExpeditionSelectionController(ResourcesViewFactory.CreateLazy<ExpeditionSelectionView>(EXPEDITION_SELECTION_VIEW_RESOURCE_PATH), expeditionBridge)), GameplaySystemOrder.ClientPresentation + 38);
             systems.Add(expeditionBridge, GameplaySystemOrder.ClientPresentation + 39);

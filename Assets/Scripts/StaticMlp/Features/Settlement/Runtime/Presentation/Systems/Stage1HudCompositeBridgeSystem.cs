@@ -1,4 +1,4 @@
-using FFS.Libraries.StaticEcs;
+using Code.EcsUi.Mvc;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Progression;
@@ -9,13 +9,13 @@ namespace StaticMlp.Features.Settlement
     {
         protected override void SyncPresentation()
         {
-            var settlement = CW.GetResource<SettlementHudState>();
-            var expedition = CW.GetResource<ExpeditionHudState>();
-            var loadout = CW.GetResource<LoadoutHudState>();
-            var threat = CW.GetResource<ThreatHudState>();
-            var raid = CW.GetResource<RaidHudState>();
-            var boss = CW.GetResource<BossHudState>();
-            var progression = CW.GetResource<ProgressionHudState>();
+            var settlement = SettlementHudPresentation.Build();
+            var expedition = ExpeditionHudPresentation.Build();
+            var loadout = LoadoutHudPresentation.Build();
+            var threat = ThreatHudPresentation.Build();
+            var raid = RaidHudPresentation.Build();
+            var boss = BossHudPresentation.Build();
+            var progression = ProgressionHudPresentation.Build();
 
             Controller.Apply(in settlement, in expedition, in loadout, in threat, in raid, in boss, in progression);
         }

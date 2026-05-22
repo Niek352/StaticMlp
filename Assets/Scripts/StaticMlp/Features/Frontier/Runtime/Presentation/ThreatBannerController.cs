@@ -1,16 +1,17 @@
+using System;
 using Code.EcsUi.Mvc;
 
 namespace StaticMlp.Features.Frontier
 {
     public sealed class ThreatBannerController
-        : ControllerBase<ThreatBannerView>, IResourcePresentationController<ThreatBannerState>
+        : ControllerBase<ThreatBannerView>
     {
         public ThreatBannerController(
             ViewFactoryMethod<ThreatBannerView> viewFactory,
-            ControllerResourceBridgeSystem<ThreatBannerController, ThreatBannerState> bridge)
+            ThreatBannerBridgeSystem bridge)
             : base(viewFactory)
         {
-            AddModule(new BridgeSystemBinding<ControllerResourceBridgeSystem<ThreatBannerController, ThreatBannerState>, ThreatBannerController>(this, bridge));
+            AddModule(new BridgeSystemBinding<ThreatBannerBridgeSystem, ThreatBannerController>(this, bridge));
         }
 
         public override ViewLayer Layer => ViewLayer.Persistent;

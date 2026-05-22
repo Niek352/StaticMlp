@@ -1,10 +1,11 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using Unity.Collections;
 
 namespace StaticMlp.Features.Settlement
 {
-    public struct BuildingContextPanelState : IResource
+    public struct BuildingContextPanelState
     {
         public SettlementAnchorId AnchorId;
         public EntityGID FocusedSite;

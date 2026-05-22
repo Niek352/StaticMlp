@@ -1,4 +1,3 @@
-using System;
 using Code.EcsUi.Mvc;
 using TMPro;
 using UnityEngine;
@@ -12,7 +11,7 @@ namespace StaticMlp.Features.Progression
         [SerializeField] private Button closeButton;
         [SerializeField] private TextMeshProUGUI summaryLabel;
 
-        private Action _onCloseClicked;
+        private System.Action _onCloseClicked;
 
         protected override void Awake()
         {
@@ -26,9 +25,9 @@ namespace StaticMlp.Features.Progression
                 throw new MissingReferenceException($"{nameof(RewardResultPopupView)} requires {nameof(summaryLabel)}.");
         }
 
-        public void Bind(Action onCloseClicked)
+        public void Bind(System.Action onCloseClicked)
         {
-            _onCloseClicked = onCloseClicked ?? throw new ArgumentNullException(nameof(onCloseClicked));
+            _onCloseClicked = onCloseClicked ?? throw new System.ArgumentNullException(nameof(onCloseClicked));
         }
 
         public void Unbind()
@@ -46,17 +45,20 @@ namespace StaticMlp.Features.Progression
             closeButton.onClick.RemoveListener(HandleCloseClicked);
         }
 
-        public void Render(in RewardResultPopupState state)
+        public void Render(in RewardResultPopupViewData data)
         {
             panelRoot.SetActive(true);
             summaryLabel.text =
-                $"Reward Return\n" +
-                $"Reward: {RewardResultPopupController.DescribeReward(state.RewardPackageId)}\n" +
-                $"Wood: +{state.GrantedWood}\n" +
-                $"Stone: +{state.GrantedStone}\n" +
-                $"Threat raised: {state.ThreatRaised}";
+                $"Reward: {RewardResultPopupController.DescribeReward(data.RewardPackageId)}\n" +
+                $"Wood: {data.GrantedWood}\n" +
+                $"Stone: {data.GrantedStone}\n" +
+                $"WarCache: {data.GrantsRecoveredWarCacheFlag}\n" +
+                $"ThreatRaised: {data.ThreatRaised}";
         }
 
-        private void HandleCloseClicked() => _onCloseClicked.Invoke();
+        private void HandleCloseClicked()
+        {
+            _onCloseClicked.Invoke();
+        }
     }
 }

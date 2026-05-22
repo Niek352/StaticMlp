@@ -9,14 +9,16 @@ using StaticMlp.Networking.Ownership;
 namespace StaticMlp.Features.Loadout
 {
     public sealed class LoadoutPreparationController
-        : ControllerBase<LoadoutPreparationView>, IResourcePresentationController<LoadoutPreparationScreenState>
+        : ControllerBase<LoadoutPreparationView>
     {
+        private LoadoutPreparationScreenState _lastState;
+
         public LoadoutPreparationController(
             ViewFactoryMethod<LoadoutPreparationView> viewFactory,
-            ControllerResourceBridgeSystem<LoadoutPreparationController, LoadoutPreparationScreenState> bridge)
+            LoadoutPreparationBridgeSystem bridge)
             : base(viewFactory)
         {
-            AddModule(new BridgeSystemBinding<ControllerResourceBridgeSystem<LoadoutPreparationController, LoadoutPreparationScreenState>, LoadoutPreparationController>(this, bridge));
+            AddModule(new BridgeSystemBinding<LoadoutPreparationBridgeSystem, LoadoutPreparationController>(this, bridge));
         }
 
         public override ViewLayer Layer => ViewLayer.Fullscreen;
@@ -34,6 +36,7 @@ namespace StaticMlp.Features.Loadout
 
         public void Apply(in LoadoutPreparationScreenState state)
         {
+            _lastState = state;
             View.Render(in state);
         }
 
@@ -75,8 +78,7 @@ namespace StaticMlp.Features.Loadout
 
         private void ConfirmBuild()
         {
-            ref readonly var state = ref CW.GetResource<LoadoutPreparationScreenState>();
-            if (state.CanPrepareBoss)
+            if (_lastState.CanPrepareBoss)
             {
                 var request = new PrepareBossRequestEvent(SettlementAnchorCatalog.HomeCampId);
                 CW.SendToServer(in request);
