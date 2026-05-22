@@ -22,6 +22,8 @@ namespace StaticMlp.Features.Settlement
                 SettlementStage = flow.Stage,
                 CanOpenLoadoutPreparation = flow.CanOpenLoadoutPreparation,
                 CanOpenExpeditionSelection = flow.CanOpenExpeditionSelection,
+                LoadoutPreparationAction = CreateLoadoutPreparationAction(flow.CanOpenLoadoutPreparation),
+                ExpeditionSelectionAction = CreateExpeditionSelectionAction(flow.CanOpenExpeditionSelection),
             };
             CopyProjectedResources(resources, ref state.Resources);
 
@@ -34,6 +36,24 @@ namespace StaticMlp.Features.Settlement
             }
 
             return state;
+        }
+
+        private static Stage1HudActionPresentation CreateLoadoutPreparationAction(bool enabled)
+        {
+            return new Stage1HudActionPresentation(
+                "Prepare Build",
+                enabled,
+                enabled ? string.Empty : "Locked until the workbench objective is online.",
+                "Opens the loadout preparation screen.");
+        }
+
+        private static Stage1HudActionPresentation CreateExpeditionSelectionAction(bool enabled)
+        {
+            return new Stage1HudActionPresentation(
+                "Open Expedition",
+                enabled,
+                enabled ? string.Empty : "Locked until expedition selection is available.",
+                "Opens the expedition selection screen.");
         }
 
         private static bool TryGetRequiredState(

@@ -1,5 +1,8 @@
 # Settlement — текущий UX и архитектура
 
+> Canonical UX status: [`docs/ux/settlement-stage1.md`](../../../docs/ux/settlement-stage1.md). Этот файл остается research overview по текущей архитектуре и player flow.
+> Current UX direction: interaction-first. Building controls open through `Interaction -> InteractPressedEvent -> BuildingManagementPanelSession`; the old always-on `Stage1ContextPanel` is legacy and no longer the canonical building UX.
+
 ## Общая модель
 
 Settlement в Stage1 — это «база» игрока, привязанная к `SettlementAnchorId` (`HomeCampId`). Все состояние settlement хранится в ECS (`StaticEcs`) и реплицируется через Networking.Replication.

@@ -15,5 +15,7 @@ namespace StaticMlp.Features.Settlement
         public SettlementWorkerBlockingReason WorkerBlockingReason;
         public bool CanOpenLoadoutPreparation;
         public bool CanOpenExpeditionSelection;
+        public Stage1HudActionPresentation LoadoutPreparationAction;
+        public Stage1HudActionPresentation ExpeditionSelectionAction;
     }
 }

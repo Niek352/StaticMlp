@@ -7,25 +7,21 @@ using Unity.Collections;
 
 namespace StaticMlp.Features.Settlement
 {
-    public static class BuildingContextPanelPresentation
+    public static class BuildingManagementPanelPresentation
     {
-        public static BuildingContextPanelState Build(in Stage1ContextPanelSession session)
+        public static BuildingManagementPanelState Build(in BuildingManagementPanelSession session)
         {
-            if (session.Mode != Stage1ContextPanelMode.Building)
+            if (!session.IsOpen)
                 return default;
 
-            if (!TryGetConstructionSite(session.FocusedSite, out var site))
-                return default;
-
+            var site = GetConstructionSite(session.Target);
             ref readonly var state = ref ClientProjection.Read<ConstructionSiteState>(site);
             ref readonly var progress = ref ClientProjection.Read<ConstructionProgress>(site);
             var definition = BuildingCatalogData.Get(new BuildingId(state.BuildingId));
 
-            var next = new BuildingContextPanelState
+            var next = new BuildingManagementPanelState
             {
-                AnchorId = session.WorkerAnchorId,
-                FocusedSite = session.FocusedSite,
-                HasFocusedSite = true,
+                Target = session.Target,
                 BuildingDisplayName = definition.DisplayName,
                 ConstructionPhase = state.Phase,
                 Progress01 = progress.Normalized,
@@ -34,11 +30,8 @@ namespace StaticMlp.Features.Settlement
             };
             CopyProjectedConstructionResources(site, ref next.ConstructionResources);
             PopulateOpenedBuildingAction(ref next, site.GID, in definition);
-            next.CanDepositResources = next.PrimaryBuildingAction.Kind == BuildingInteractionKind.DepositConstructionResources
-                                       && next.PrimaryBuildingAction.Enabled;
-            next.CanBuild = next.PrimaryBuildingAction.Kind == BuildingInteractionKind.ContributeBuildWork
-                            && next.PrimaryBuildingAction.Enabled;
-
+            next.CanDepositResources = next.PrimaryBuildingAction is { Kind: BuildingInteractionKind.DepositConstructionResources, Enabled: true };
+            next.CanBuild = next.PrimaryBuildingAction is { Kind: BuildingInteractionKind.ContributeBuildWork, Enabled: true };
             return next;
         }
 
@@ -50,14 +43,7 @@ namespace StaticMlp.Features.Settlement
             if (state.Phase == ConstructionPhase.Completed)
             {
                 var kind = SelectCompletedPrimaryAction(in definition);
-                return new BuildingAvailableActionPresentation(
-                    kind,
-                    BuildingActionPresentationCatalog.ResolveLabel(kind),
-                    BuildingActionPresentationCatalog.ResolveInputHint(kind, isPrimaryAction: true),
-                    BuildingActionPresentationCatalog.ResolveEffectDescription(kind),
-                    enabled: true,
-                    disabledReason: string.Empty,
-                    target: site.GID);
+                return CreateAction(kind, enabled: true, disabledReason: string.Empty, site.GID, isPrimaryAction: true);
             }
 
             var resourcesComplete = ConstructionResourcesAccess.IsProjectedComplete(site);
@@ -65,43 +51,49 @@ namespace StaticMlp.Features.Settlement
             {
                 RequireInteraction(in definition, BuildingInteractionKind.DepositConstructionResources);
                 var enabled = SettlementConstructionRules.CanDepositResources(in state);
-                return new BuildingAvailableActionPresentation(
+                return CreateAction(
                     BuildingInteractionKind.DepositConstructionResources,
-                    BuildingActionPresentationCatalog.ResolveLabel(BuildingInteractionKind.DepositConstructionResources),
-                    BuildingActionPresentationCatalog.ResolveInputHint(
-                        BuildingInteractionKind.DepositConstructionResources,
-                        isPrimaryAction: true),
-                    BuildingActionPresentationCatalog.ResolveEffectDescription(
-                        BuildingInteractionKind.DepositConstructionResources),
                     enabled,
                     enabled ? string.Empty : "Construction is not waiting for resources.",
-                    target: site.GID);
+                    site.GID,
+                    isPrimaryAction: true);
             }
 
             RequireInteraction(in definition, BuildingInteractionKind.ContributeBuildWork);
             var canBuild = SettlementConstructionRules.CanProjectedBuild(in state, site);
-            return new BuildingAvailableActionPresentation(
+            return CreateAction(
                 BuildingInteractionKind.ContributeBuildWork,
-                BuildingActionPresentationCatalog.ResolveLabel(BuildingInteractionKind.ContributeBuildWork),
-                BuildingActionPresentationCatalog.ResolveInputHint(
-                    BuildingInteractionKind.ContributeBuildWork,
-                    isPrimaryAction: true),
-                BuildingActionPresentationCatalog.ResolveEffectDescription(BuildingInteractionKind.ContributeBuildWork),
                 canBuild,
                 canBuild ? string.Empty : "Construction is not ready for build work.",
-                target: site.GID);
+                site.GID,
+                isPrimaryAction: true);
         }
 
         private static BuildingAvailableActionPresentation CreateSecondaryBuildingAction(EntityGID target)
         {
-            return new BuildingAvailableActionPresentation(
+            return CreateAction(
                 BuildingInteractionKind.OpenDetails,
-                BuildingActionPresentationCatalog.ResolveLabel(BuildingInteractionKind.OpenDetails),
-                BuildingActionPresentationCatalog.ResolveInputHint(BuildingInteractionKind.OpenDetails, isPrimaryAction: false),
-                BuildingActionPresentationCatalog.ResolveEffectDescription(BuildingInteractionKind.OpenDetails),
                 enabled: true,
                 disabledReason: string.Empty,
-                target: target);
+                target,
+                isPrimaryAction: false);
+        }
+
+        private static BuildingAvailableActionPresentation CreateAction(
+            BuildingInteractionKind kind,
+            bool enabled,
+            string disabledReason,
+            EntityGID target,
+            bool isPrimaryAction)
+        {
+            return new BuildingAvailableActionPresentation(
+                kind,
+                BuildingActionPresentationCatalog.ResolveLabel(kind),
+                BuildingActionPresentationCatalog.ResolveInputHint(kind, isPrimaryAction),
+                BuildingActionPresentationCatalog.ResolveEffectDescription(kind),
+                enabled,
+                disabledReason,
+                target);
         }
 
         private static BuildingInteractionKind SelectCompletedPrimaryAction(in BuildingDefinition definition)
@@ -135,21 +127,19 @@ namespace StaticMlp.Features.Settlement
         {
             for (var i = 0; i < definition.Interactions.Length; i++)
             {
-                if (definition.Interactions[i].Kind != kind)
-                    continue;
-
-                return true;
+                if (definition.Interactions[i].Kind == kind)
+                    return true;
             }
 
             return false;
         }
 
         private static void PopulateOpenedBuildingAction(
-            ref BuildingContextPanelState state,
+            ref BuildingManagementPanelState state,
             EntityGID target,
             in BuildingDefinition definition)
         {
-            ref readonly var intent = ref CW.GetResource<Stage1BuildingOperationOpenIntent>();
+            ref readonly var intent = ref CW.GetResource<BuildingManagementOperationOpenIntent>();
             if (!intent.HasIntent || intent.Target != target)
                 return;
 
@@ -168,19 +158,22 @@ namespace StaticMlp.Features.Settlement
             {
                 if (target.Length == target.Capacity)
                     throw new System.InvalidOperationException(
-                        $"{nameof(BuildingContextPanelState)} cannot hold more than {target.Capacity} construction resource rows.");
+                        $"{nameof(BuildingManagementPanelState)} cannot hold more than {target.Capacity} construction resource rows.");
 
                 var row = rows[i].Value;
                 target.Add(new ConstructionResourceViewEntry(row.Id, row.Required, row.Delivered));
             }
         }
 
-        private static bool TryGetConstructionSite(EntityGID gid, out CW.Entity site)
+        private static CW.Entity GetConstructionSite(EntityGID gid)
         {
-            if (!gid.TryUnpack<ClientCoreWT>(out site))
-                return false;
+            if (!gid.TryUnpack<ClientCoreWT>(out var site))
+                throw new System.InvalidOperationException($"Building management target {gid.Raw} is not a client entity.");
 
-            return site.Has<ConstructionSiteState>();
+            if (!site.Has<ConstructionSiteState>())
+                throw new System.InvalidOperationException($"Building management target {gid.Raw} is not a construction/building entity.");
+
+            return site;
         }
     }
 }

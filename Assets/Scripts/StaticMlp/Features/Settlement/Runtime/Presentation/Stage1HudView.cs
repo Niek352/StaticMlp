@@ -81,6 +81,7 @@ namespace StaticMlp.Features.Settlement
                 : $"\nHint: {settlement.ObjectiveHint}";
             summaryLabel.text =
                 $"Objective: {Stage1HudController.DescribeObjective(settlement.Objective)}\n" +
+                $"Actions: {FormatActionStatus(in settlement.LoadoutPreparationAction)} / {FormatActionStatus(in settlement.ExpeditionSelectionAction)}\n" +
                 $"Camp stage: {settlement.SettlementStage}\n" +
                 $"Resources: {FormatResources(in settlement)}\n" +
                 $"Workers: {settlement.AssignedWorkers}/{settlement.TotalWorkers} assigned\n" +
@@ -90,8 +91,8 @@ namespace StaticMlp.Features.Settlement
                 $"Boss flags: Unlocked={progression.HasBossUnlocked} Tokens={progression.BossPreparationTokens}" +
                 hintLine;
 
-            buildButton.interactable = settlement.CanOpenLoadoutPreparation;
-            expeditionButton.interactable = settlement.CanOpenExpeditionSelection;
+            buildButton.interactable = settlement.LoadoutPreparationAction.Enabled;
+            expeditionButton.interactable = settlement.ExpeditionSelectionAction.Enabled;
         }
 
         private void HandleCloseClicked()
@@ -127,6 +128,17 @@ namespace StaticMlp.Features.Settlement
             }
 
             return builder.ToString();
+        }
+
+        private static string FormatActionStatus(in Stage1HudActionPresentation action)
+        {
+            var label = string.IsNullOrEmpty(action.Label) ? "Action" : action.Label;
+            if (action.Enabled)
+                return $"{label}: ready -> {action.EffectDescription}";
+
+            return string.IsNullOrEmpty(action.DisabledReason)
+                ? $"{label}: locked"
+                : $"{label}: locked - {action.DisabledReason}";
         }
     }
 }

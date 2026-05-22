@@ -1,82 +1,76 @@
 using System;
 using System.Text;
 using Code.EcsUi.Mvc;
-using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Buildings;
-using StaticMlp.Features.Settlement.Workers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class Stage1ContextPanelView : PrefabViewBase
+    public sealed class BuildingManagementPanelView : PrefabViewBase
     {
         [SerializeField] private GameObject panelRoot;
         [SerializeField] private Button primaryButton;
         [SerializeField] private Button secondaryButton;
+        [SerializeField] private Button closeButton;
         [SerializeField] private TextMeshProUGUI primaryButtonLabel;
         [SerializeField] private TextMeshProUGUI secondaryButtonLabel;
         [SerializeField] private TextMeshProUGUI summaryLabel;
 
         private Action _onPrimaryClicked;
         private Action _onSecondaryClicked;
+        private Action _onCloseClicked;
 
         protected override void Awake()
         {
             base.Awake();
 
             if (panelRoot == null)
-                throw new MissingReferenceException($"{nameof(Stage1ContextPanelView)} requires {nameof(panelRoot)}.");
+                throw new MissingReferenceException($"{nameof(BuildingManagementPanelView)} requires {nameof(panelRoot)}.");
             if (primaryButton == null)
-                throw new MissingReferenceException($"{nameof(Stage1ContextPanelView)} requires {nameof(primaryButton)}.");
+                throw new MissingReferenceException($"{nameof(BuildingManagementPanelView)} requires {nameof(primaryButton)}.");
             if (secondaryButton == null)
-                throw new MissingReferenceException($"{nameof(Stage1ContextPanelView)} requires {nameof(secondaryButton)}.");
+                throw new MissingReferenceException($"{nameof(BuildingManagementPanelView)} requires {nameof(secondaryButton)}.");
+            if (closeButton == null)
+                throw new MissingReferenceException($"{nameof(BuildingManagementPanelView)} requires {nameof(closeButton)}.");
             if (primaryButtonLabel == null)
-                throw new MissingReferenceException($"{nameof(Stage1ContextPanelView)} requires {nameof(primaryButtonLabel)}.");
+                throw new MissingReferenceException($"{nameof(BuildingManagementPanelView)} requires {nameof(primaryButtonLabel)}.");
             if (secondaryButtonLabel == null)
-                throw new MissingReferenceException($"{nameof(Stage1ContextPanelView)} requires {nameof(secondaryButtonLabel)}.");
+                throw new MissingReferenceException($"{nameof(BuildingManagementPanelView)} requires {nameof(secondaryButtonLabel)}.");
             if (summaryLabel == null)
-                throw new MissingReferenceException($"{nameof(Stage1ContextPanelView)} requires {nameof(summaryLabel)}.");
+                throw new MissingReferenceException($"{nameof(BuildingManagementPanelView)} requires {nameof(summaryLabel)}.");
         }
 
-        public void Bind(Action onPrimaryClicked, Action onSecondaryClicked)
+        public void Bind(Action onPrimaryClicked, Action onSecondaryClicked, Action onCloseClicked)
         {
             _onPrimaryClicked = onPrimaryClicked ?? throw new ArgumentNullException(nameof(onPrimaryClicked));
             _onSecondaryClicked = onSecondaryClicked ?? throw new ArgumentNullException(nameof(onSecondaryClicked));
+            _onCloseClicked = onCloseClicked ?? throw new ArgumentNullException(nameof(onCloseClicked));
         }
 
         public void Unbind()
         {
             _onPrimaryClicked = null;
             _onSecondaryClicked = null;
+            _onCloseClicked = null;
         }
 
         private void OnEnable()
         {
             primaryButton.onClick.AddListener(HandlePrimaryClicked);
             secondaryButton.onClick.AddListener(HandleSecondaryClicked);
+            closeButton.onClick.AddListener(HandleCloseClicked);
         }
 
         private void OnDisable()
         {
             primaryButton.onClick.RemoveListener(HandlePrimaryClicked);
             secondaryButton.onClick.RemoveListener(HandleSecondaryClicked);
+            closeButton.onClick.RemoveListener(HandleCloseClicked);
         }
 
-        public void Render(
-            in BuildingContextPanelState building,
-            in WorkerContextPanelState worker,
-            Stage1ContextPanelMode mode)
-        {
-            if (mode == Stage1ContextPanelMode.Building)
-                RenderBuilding(in building);
-            else
-                RenderWorker(in worker);
-        }
-        
-
-        private void RenderBuilding(in BuildingContextPanelState state)
+        public void Render(in BuildingManagementPanelState state)
         {
             panelRoot.SetActive(true);
             primaryButton.gameObject.SetActive(true);
@@ -116,43 +110,6 @@ namespace StaticMlp.Features.Settlement
             summaryLabel.text = summaryBuilder.ToString();
         }
 
-        private void RenderWorker(in WorkerContextPanelState state)
-        {
-            panelRoot.SetActive(true);
-            primaryButton.gameObject.SetActive(true);
-            secondaryButton.gameObject.SetActive(false);
-
-            if (!state.HasWorker)
-            {
-                primaryButton.interactable = false;
-                primaryButtonLabel.text = "No worker";
-                summaryLabel.text = "No worker available.";
-                return;
-            }
-
-            primaryButton.interactable = state.CanToggleWorkerAssignment;
-            primaryButtonLabel.text = state.WorkerAssigned ? "Unassign" : "Assign";
-
-            var summaryBuilder = new StringBuilder();
-            summaryBuilder.Append("Worker\n");
-            summaryBuilder.Append("Status: ");
-            summaryBuilder.Append(state.WorkerAssigned ? "Assigned" : "Unassigned");
-            summaryBuilder.Append("\nTask: ");
-            summaryBuilder.Append(state.WorkerActiveTask);
-            summaryBuilder.Append("\nPrimary: ");
-            summaryBuilder.Append(state.WorkerAssigned ? "Unassign" : "Assign");
-            summaryBuilder.Append(state.CanToggleWorkerAssignment ? " (ready)" : " (locked)");
-            summaryBuilder.Append("\nEffect: Sends worker assignment request.");
-
-            if (state.WorkerBlockingReason != SettlementWorkerBlockingReason.None)
-            {
-                summaryBuilder.Append("\n");
-                summaryBuilder.Append(FormatWorkerBlockingReason(state.WorkerBlockingReason));
-            }
-
-            summaryLabel.text = summaryBuilder.ToString();
-        }
-
         private void HandlePrimaryClicked()
         {
             _onPrimaryClicked.Invoke();
@@ -163,7 +120,12 @@ namespace StaticMlp.Features.Settlement
             _onSecondaryClicked.Invoke();
         }
 
-        private static string FormatConstructionResources(in BuildingContextPanelState state)
+        private void HandleCloseClicked()
+        {
+            _onCloseClicked.Invoke();
+        }
+
+        private static string FormatConstructionResources(in BuildingManagementPanelState state)
         {
             if (state.ConstructionResources.Length == 0)
                 return string.Empty;
@@ -213,11 +175,6 @@ namespace StaticMlp.Features.Settlement
                 builder.Append("\nBlocked: ");
                 builder.Append(action.DisabledReason);
             }
-        }
-
-        private static string FormatWorkerBlockingReason(SettlementWorkerBlockingReason reason)
-        {
-            return reason.ToString();
         }
     }
 }

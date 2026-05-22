@@ -12,13 +12,15 @@ namespace StaticMlp.Features.Interaction
     {
         public EntityGID        Target;
         public InteractableKind Kind;
+        public float            Distance;
 
         public bool HasFocus => Kind != InteractableKind.None;
 
         public void Clear()
         {
-            Target = default;
-            Kind   = InteractableKind.None;
+            Target   = default;
+            Kind     = InteractableKind.None;
+            Distance = 0f;
         }
     }
 }

@@ -5,8 +5,7 @@
         "FFS.StaticEcs",
         "Ecs.Networking",
         "Game.Core",
-        "StaticMlp.Features.Player",
-        "StaticMlp.Features.Settlement.Logic"
+        "StaticMlp.Features.Player"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

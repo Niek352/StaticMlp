@@ -1,0 +1,53 @@
+<UnityPrefab>
+    <GameObject name="InteractionPromptView" id="Root">
+        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="0, 0" m_Pivot="0, 0" m_SizeDelta="0, 0" />
+        <Canvas m_RenderMode="ScreenSpaceOverlay" m_SortingOrder="0" />
+        <CanvasScaler m_UiScaleMode="ScaleWithScreenSize" m_ReferenceResolution="1920, 1080" m_ScreenMatchMode="MatchWidthOrHeight" m_MatchWidthOrHeight="0.5" />
+        <InteractionPromptView
+            canvas="#Root"
+            panelRoot="#Panel"
+            promptLabel="#PromptLabel"
+            effectLabel="#EffectLabel" />
+
+        <GameObject name="Panel" id="Panel" active="false">
+            <RectTransform m_AnchorMin="0.5, 0" m_AnchorMax="0.5, 0" m_Pivot="0.5, 0" m_SizeDelta="420, 74" m_AnchoredPosition="0, 130" />
+            <Image m_Color="#121A20DD" m_RaycastTarget="false" />
+            <VerticalLayoutGroup
+                m_Padding.m_Left="18"
+                m_Padding.m_Right="18"
+                m_Padding.m_Top="10"
+                m_Padding.m_Bottom="10"
+                m_Spacing="4"
+                m_ChildControlWidth="true"
+               
+                m_ChildForceExpandWidth="true"
+                m_ChildForceExpandHeight="false" />
+
+            <GameObject name="PromptLabel" id="PromptLabel">
+                <RectTransform m_SizeDelta="0, 28" />
+                <TextMeshProUGUI
+                    m_text="Press E to Open"
+                    m_fontSize="20"
+                    m_fontStyle="Bold"
+                    m_fontColor="#FFFFFF"
+                    m_HorizontalAlignment="Center"
+                    m_VerticalAlignment="Middle"
+                    m_RaycastTarget="false" />
+                <LayoutElement m_PreferredHeight="28" />
+            </GameObject>
+
+            <GameObject name="EffectLabel" id="EffectLabel">
+                <RectTransform m_SizeDelta="0, 20" />
+                <TextMeshProUGUI
+                    m_text="Opens the building management panel."
+                    m_fontSize="14"
+                    m_fontColor="#C9D6CE"
+                    m_HorizontalAlignment="Center"
+                    m_VerticalAlignment="Middle"
+                    m_TextWrappingMode="Normal"
+                    m_RaycastTarget="false" />
+                <LayoutElement m_PreferredHeight="20" />
+            </GameObject>
+        </GameObject>
+    </GameObject>
+</UnityPrefab>

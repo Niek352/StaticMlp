@@ -11,13 +11,9 @@ namespace StaticMlp.Features.Settlement
             {
                 IsVisible = true,
             });
-            CW.SetResource(new Stage1ContextPanelSession
-            {
-                Mode = Stage1ContextPanelMode.Worker,
-                WorkerAnchorId = SettlementAnchorCatalog.HomeCampId,
-            });
-            CW.SetResource(new Stage1ContextFocusTarget());
-            CW.SetResource(new Stage1BuildingOperationOpenIntent());
+            CW.SetResource(new InteractionPromptState());
+            CW.SetResource(new BuildingManagementPanelSession());
+            CW.SetResource(new BuildingManagementOperationOpenIntent());
         }
     }
 }

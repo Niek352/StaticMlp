@@ -72,6 +72,59 @@ namespace StaticMlp.Features.Settlement
             }
         }
 
+        public static string ResolveInputHint(BuildingInteractionKind kind, bool isPrimaryAction)
+        {
+            if (!isPrimaryAction)
+                return "Building panel secondary button";
+
+            switch (kind)
+            {
+                case BuildingInteractionKind.DepositConstructionResources:
+                    return "Building panel primary button";
+                case BuildingInteractionKind.ContributeBuildWork:
+                    return "Building panel primary button / BuildConstruction hold";
+                default:
+                    return "Building panel primary button";
+            }
+        }
+
+        public static string ResolveEffectDescription(BuildingInteractionKind kind)
+        {
+            switch (kind)
+            {
+                case BuildingInteractionKind.OpenDetails:
+                    return "Opens the building details summary.";
+                case BuildingInteractionKind.DepositConstructionResources:
+                    return "Sends a request to deposit the remaining required construction resources.";
+                case BuildingInteractionKind.ContributeBuildWork:
+                    return "Sends a request to add construction work to the focused site.";
+                case BuildingInteractionKind.AssignWorker:
+                    return "Opens the worker assignment operation summary.";
+                case BuildingInteractionKind.OpenProductionQueue:
+                    return "Opens the production queue operation summary.";
+                case BuildingInteractionKind.SetRecipe:
+                    return "Opens the recipe selection operation summary.";
+                case BuildingInteractionKind.ClaimOutput:
+                    return "Opens the production output operation summary.";
+                case BuildingInteractionKind.AssignBed:
+                    return "Opens the bed assignment operation summary.";
+                case BuildingInteractionKind.ToggleEnabled:
+                    return "Opens the enabled-state operation summary.";
+                case BuildingInteractionKind.TriggerRepair:
+                    return "Opens the repair operation summary.";
+                case BuildingInteractionKind.Extract:
+                    return "Opens the extraction buffer operation summary.";
+                case BuildingInteractionKind.Rest:
+                    return "Opens the rest operation summary.";
+                case BuildingInteractionKind.StoreItems:
+                    return "Opens the storage operation summary.";
+                case BuildingInteractionKind.WithdrawItems:
+                    return "Opens the withdraw operation summary.";
+                default:
+                    return string.Empty;
+            }
+        }
+
         private static string BuildDetailsSummary(in BuildingDefinition definition)
         {
             return

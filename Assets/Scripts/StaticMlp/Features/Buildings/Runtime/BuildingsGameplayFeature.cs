@@ -55,6 +55,7 @@ namespace StaticMlp.Features.Buildings
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
+            systems.Add(new ClientConstructionInteractableFocusPointSystem(), (short)(GameplaySystemOrder.ClientInput + 10));
             systems.Add(new ClientBuildingMenuSystem(), (short)(GameplaySystemOrder.ClientInput + 20));
             systems.Add(new ClientPlacementInputSystem(), (short)(GameplaySystemOrder.Gameplay - 90));
             systems.Add(new ClientPlacementValidationPreviewSystem(), (short)(GameplaySystemOrder.Gameplay - 85));
@@ -83,6 +84,7 @@ namespace StaticMlp.Features.Buildings
                 e.Set<ConstructionSiteTag>();
                 e.Set<InteractableTag>();
                 e.Set(new Interactable { Kind = InteractableKind.ConstructionSite });
+                e.Set(new InteractableFocusPoint { Radius = ResolveInteractionRadius(definition) });
                 e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
                 e.Set(new ViewTransform
                 {
@@ -103,6 +105,7 @@ namespace StaticMlp.Features.Buildings
                 e.Set<FinishedBuildingTag>();
                 e.Set<InteractableTag>();
                 e.Set(new Interactable { Kind = InteractableKind.FinishedBuilding });
+                e.Set(new InteractableFocusPoint { Radius = ResolveInteractionRadius(definition) });
                 e.Set(new BuildingFootprint(definition.FootprintWidth, definition.FootprintLength));
                 e.Set(new ViewTransform
                 {
@@ -138,6 +141,13 @@ namespace StaticMlp.Features.Buildings
             }
 
             return state;
+        }
+
+        private static float ResolveInteractionRadius(BuildingDefinition definition)
+        {
+            return Mathf.Max(1.25f, Mathf.Sqrt(
+                definition.FootprintWidth * definition.FootprintWidth
+                + definition.FootprintLength * definition.FootprintLength) * 0.5f);
         }
     }
 }
