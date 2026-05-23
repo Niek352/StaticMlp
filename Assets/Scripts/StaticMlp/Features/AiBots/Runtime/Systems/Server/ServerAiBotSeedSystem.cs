@@ -17,7 +17,7 @@ namespace StaticMlp.Features.AiBots
                 return;
             }
 
-            var resource = SW.GetResource<Stage1FrontierSeed>();
+            var resource = SW.GetResource<FrontierSeed>();
             var definitions = resource.InitialBotSpawns;
             var spawnedBots = new EntityGID[definitions.Length];
 

@@ -57,7 +57,7 @@ namespace StaticMlp.Features.Buildings
                 transform.Rotation));
 
             if (definition.Id == BuildingCatalogData.CampCoreId)
-                SW.SendEvent(new Stage1RepairCompletedEvent(anchorRef.Anchor));
+                SW.SendEvent(new CampFlowRepairCompletedEvent(anchorRef.Anchor));
 
             NetworkEntityDespawner.DespawnAndDestroy(site);
         }

@@ -36,8 +36,8 @@ namespace StaticMlp.Features.Frontier
                 return;
             }
 
-            var anchor = Stage1SettlementProgressionQuery.GetServerAnchor(new SettlementAnchorId(request.Value.AnchorId));
-            ref readonly var progression = ref anchor.Read<Stage1ProgressionState>();
+            var anchor = CampFlowProgressionQuery.GetServerAnchor(new SettlementAnchorId(request.Value.AnchorId));
+            ref readonly var progression = ref anchor.Read<ProgressionState>();
             ref readonly var activeExpedition = ref anchor.Read<ActiveExpeditionState>();
             ref readonly var threat = ref anchor.Read<ThreatState>();
             ref readonly var raidSchedule = ref anchor.Read<RaidScheduleState>();

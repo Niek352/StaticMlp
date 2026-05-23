@@ -20,7 +20,7 @@ namespace StaticMlp.Features.Frontier
                 RewardPackageId = RewardPackageCatalog.RecoveredWarCacheId,
             };
 
-            if (Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
+            if (CampFlowProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
             {
                 if (anchor.Has<Projected<ExpeditionAvailabilityState>>())
                 {

@@ -9,9 +9,9 @@ namespace StaticMlp.Features.Settlement
 {
     public static class BuildingContextPanelPresentation
     {
-        public static BuildingContextPanelState Build(in Stage1ContextPanelSession session)
+        public static BuildingContextPanelState Build(in SettlementContextPanelSession session)
         {
-            if (session.Mode != Stage1ContextPanelMode.Building)
+            if (session.Mode != SettlementContextPanelMode.Building)
                 return default;
 
             if (!TryGetConstructionSite(session.FocusedSite, out var site))
@@ -30,7 +30,7 @@ namespace StaticMlp.Features.Settlement
                 ConstructionPhase = state.Phase,
                 Progress01 = progress.Normalized,
                 PrimaryBuildingAction = CreatePrimaryBuildingAction(site, in state, in definition),
-                SecondaryBuildingAction = CreateSecondaryBuildingAction(site.GID),
+                SecondaryBuildingAction = CreateSecondaryBuildingAction(site.GID, in definition),
             };
             CopyProjectedConstructionResources(site, ref next.ConstructionResources);
             PopulateOpenedBuildingAction(ref next, site.GID, in definition);
@@ -50,14 +50,13 @@ namespace StaticMlp.Features.Settlement
             if (state.Phase == ConstructionPhase.Completed)
             {
                 var kind = SelectCompletedPrimaryAction(in definition);
-                return new BuildingAvailableActionPresentation(
+                return CreateBuildingAction(
                     kind,
-                    BuildingActionPresentationCatalog.ResolveLabel(kind),
-                    BuildingActionPresentationCatalog.ResolveInputHint(kind, isPrimaryAction: true),
-                    BuildingActionPresentationCatalog.ResolveEffectDescription(kind),
-                    enabled: true,
-                    disabledReason: string.Empty,
-                    target: site.GID);
+                    true,
+                    true,
+                    string.Empty,
+                    site.GID,
+                    in definition);
             }
 
             var resourcesComplete = ConstructionResourcesAccess.IsProjectedComplete(site);
@@ -65,61 +64,78 @@ namespace StaticMlp.Features.Settlement
             {
                 RequireInteraction(in definition, BuildingInteractionKind.DepositConstructionResources);
                 var enabled = SettlementConstructionRules.CanDepositResources(in state);
-                return new BuildingAvailableActionPresentation(
+                return CreateBuildingAction(
                     BuildingInteractionKind.DepositConstructionResources,
-                    BuildingActionPresentationCatalog.ResolveLabel(BuildingInteractionKind.DepositConstructionResources),
-                    BuildingActionPresentationCatalog.ResolveInputHint(
-                        BuildingInteractionKind.DepositConstructionResources,
-                        isPrimaryAction: true),
-                    BuildingActionPresentationCatalog.ResolveEffectDescription(
-                        BuildingInteractionKind.DepositConstructionResources),
+                    true,
                     enabled,
                     enabled ? string.Empty : "Construction is not waiting for resources.",
-                    target: site.GID);
+                    site.GID,
+                    in definition);
             }
 
             RequireInteraction(in definition, BuildingInteractionKind.ContributeBuildWork);
             var canBuild = SettlementConstructionRules.CanProjectedBuild(in state, site);
-            return new BuildingAvailableActionPresentation(
+            return CreateBuildingAction(
                 BuildingInteractionKind.ContributeBuildWork,
-                BuildingActionPresentationCatalog.ResolveLabel(BuildingInteractionKind.ContributeBuildWork),
-                BuildingActionPresentationCatalog.ResolveInputHint(
-                    BuildingInteractionKind.ContributeBuildWork,
-                    isPrimaryAction: true),
-                BuildingActionPresentationCatalog.ResolveEffectDescription(BuildingInteractionKind.ContributeBuildWork),
+                true,
                 canBuild,
                 canBuild ? string.Empty : "Construction is not ready for build work.",
-                target: site.GID);
+                site.GID,
+                in definition);
         }
 
-        private static BuildingAvailableActionPresentation CreateSecondaryBuildingAction(EntityGID target)
+        private static BuildingAvailableActionPresentation CreateSecondaryBuildingAction(
+            EntityGID target,
+            in BuildingDefinition definition)
         {
-            return new BuildingAvailableActionPresentation(
+            return CreateBuildingAction(
                 BuildingInteractionKind.OpenDetails,
-                BuildingActionPresentationCatalog.ResolveLabel(BuildingInteractionKind.OpenDetails),
-                BuildingActionPresentationCatalog.ResolveInputHint(BuildingInteractionKind.OpenDetails, isPrimaryAction: false),
-                BuildingActionPresentationCatalog.ResolveEffectDescription(BuildingInteractionKind.OpenDetails),
-                enabled: true,
-                disabledReason: string.Empty,
-                target: target);
+                false,
+                true,
+                string.Empty,
+                target,
+                in definition);
+        }
+
+        private static BuildingAvailableActionPresentation CreateBuildingAction(
+            BuildingInteractionKind kind,
+            bool isPrimaryAction,
+            bool enabled,
+            string disabledReason,
+            EntityGID target,
+            in BuildingDefinition definition)
+        {
+            var handler = BuildingInteractionHandlerRegistry.Get(kind);
+            return new BuildingAvailableActionPresentation(
+                kind,
+                GetInteraction(in definition, kind).DisplayName,
+                handler.ResolveInputHint(kind, isPrimaryAction),
+                handler.ResolveEffectDescription(kind),
+                enabled,
+                disabledReason,
+                target);
         }
 
         private static BuildingInteractionKind SelectCompletedPrimaryAction(in BuildingDefinition definition)
         {
-            if (HasInteraction(in definition, BuildingInteractionKind.OpenProductionQueue))
-                return BuildingInteractionKind.OpenProductionQueue;
-            if (HasInteraction(in definition, BuildingInteractionKind.StoreItems))
-                return BuildingInteractionKind.StoreItems;
-            if (HasInteraction(in definition, BuildingInteractionKind.AssignBed))
-                return BuildingInteractionKind.AssignBed;
-            if (HasInteraction(in definition, BuildingInteractionKind.Extract))
-                return BuildingInteractionKind.Extract;
-            if (HasInteraction(in definition, BuildingInteractionKind.Rest))
-                return BuildingInteractionKind.Rest;
-            if (HasInteraction(in definition, BuildingInteractionKind.AssignWorker))
-                return BuildingInteractionKind.AssignWorker;
-            if (HasInteraction(in definition, BuildingInteractionKind.OpenDetails))
-                return BuildingInteractionKind.OpenDetails;
+            var selected = BuildingInteractionKind.None;
+            byte selectedPriority = 0;
+
+            for (var i = 0; i < definition.Interactions.Length; i++)
+            {
+                var interaction = definition.Interactions[i];
+                if (!interaction.RequiresCompletedBuilding && interaction.Priority == 0)
+                    continue;
+
+                if (selected != BuildingInteractionKind.None && interaction.Priority <= selectedPriority)
+                    continue;
+
+                selected = interaction.Kind;
+                selectedPriority = interaction.Priority;
+            }
+
+            if (selected != BuildingInteractionKind.None)
+                return selected;
 
             throw new System.InvalidOperationException(
                 $"Completed building {definition.Id.Value} has no completed player interaction.");
@@ -127,21 +143,20 @@ namespace StaticMlp.Features.Settlement
 
         private static void RequireInteraction(in BuildingDefinition definition, BuildingInteractionKind kind)
         {
-            if (!HasInteraction(in definition, kind))
-                throw new System.InvalidOperationException($"Building {definition.Id.Value} is missing interaction {kind}.");
+            GetInteraction(in definition, kind);
         }
 
-        private static bool HasInteraction(in BuildingDefinition definition, BuildingInteractionKind kind)
+        private static BuildingInteractionDefinition GetInteraction(in BuildingDefinition definition, BuildingInteractionKind kind)
         {
             for (var i = 0; i < definition.Interactions.Length; i++)
             {
                 if (definition.Interactions[i].Kind != kind)
                     continue;
 
-                return true;
+                return definition.Interactions[i];
             }
 
-            return false;
+            throw new System.InvalidOperationException($"Building {definition.Id.Value} is missing interaction {kind}.");
         }
 
         private static void PopulateOpenedBuildingAction(
@@ -149,14 +164,15 @@ namespace StaticMlp.Features.Settlement
             EntityGID target,
             in BuildingDefinition definition)
         {
-            ref readonly var intent = ref CW.GetResource<Stage1BuildingOperationOpenIntent>();
+            ref readonly var intent = ref CW.GetResource<SettlementBuildingOperationOpenIntent>();
             if (!intent.HasIntent || intent.Target != target)
                 return;
 
             state.HasOpenedBuildingAction = true;
             state.OpenedBuildingActionKind = intent.Kind;
-            state.OpenedBuildingActionLabel = BuildingActionPresentationCatalog.ResolveLabel(intent.Kind);
-            state.OpenedBuildingActionSummary = BuildingActionPresentationCatalog.ResolveSummary(intent.Kind, in definition);
+            var handler = BuildingInteractionHandlerRegistry.Get(intent.Kind);
+            state.OpenedBuildingActionLabel = GetInteraction(in definition, intent.Kind).DisplayName;
+            state.OpenedBuildingActionSummary = handler.ResolveSummary(intent.Kind, in definition);
         }
 
         private static void CopyProjectedConstructionResources(

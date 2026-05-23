@@ -1,0 +1,20 @@
+{
+    "name": "StaticMlp.Features.CampFlow.Contracts",
+    "rootNamespace": "StaticMlp.Features.CampFlow",
+    "references": [
+        "FFS.StaticEcs",
+        "FFS.StaticPack",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.Settlement.Contracts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

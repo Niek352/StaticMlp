@@ -18,7 +18,7 @@ namespace StaticMlp.Tests.Combat
         public void CreateSettlementAnchor_AddsDefaultFrontierStateComponents()
         {
             using var scope = new CombatTestServerWorldScope();
-            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.LoadoutPrepared);
+            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
 
             Assert.That(anchor.Has<ExpeditionAvailabilityState>(), Is.True);
             Assert.That(anchor.Has<ActiveExpeditionState>(), Is.True);
@@ -37,16 +37,16 @@ namespace StaticMlp.Tests.Combat
         public void ExpeditionAvailabilitySystem_UnlocksOnlyAfterLoadoutPrepared()
         {
             using var scope = new CombatTestServerWorldScope();
-            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.CampRepaired);
+            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.CampRepaired);
 
             new ServerFrontierExpeditionAvailabilitySystem().Update();
 
             Assert.That(anchor.Read<ExpeditionAvailabilityState>().Status, Is.EqualTo(ExpeditionAvailabilityStatus.Unavailable));
 
-            anchor.Set(new Stage1SettlementProgression
+            anchor.Set(new CampFlowProgression
             {
                 AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
-                Stage = Stage1SettlementProgressStage.LoadoutPrepared
+                Stage = CampFlowStage.LoadoutPrepared
             });
 
             new ServerFrontierExpeditionAvailabilitySystem().Update();
@@ -61,7 +61,7 @@ namespace StaticMlp.Tests.Combat
             using var scope = new CombatTestServerWorldScope();
             var owner = new NetworkPeerId(1);
             scope.CreatePlayer(owner, Vector3.zero);
-            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.LoadoutPrepared);
+            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
             new ServerFrontierExpeditionAvailabilitySystem().Update();
 
             var startSystem = new ServerFrontierStartExpeditionSystem();
@@ -79,7 +79,7 @@ namespace StaticMlp.Tests.Combat
             var existingParticipants = CountParticipants(FrontierEncounterKind.Expedition, ExpeditionCatalog.NearbyRaiderCampId.Value);
             Assert.That(existingParticipants, Is.GreaterThan(0));
 
-            var blockedAnchor = scope.CreateSettlementAnchor(new SettlementAnchorId(2), new Vector3(10f, 0f, 0f), Stage1SettlementProgressStage.LoadoutPrepared);
+            var blockedAnchor = scope.CreateSettlementAnchor(new SettlementAnchorId(2), new Vector3(10f, 0f, 0f), CampFlowStage.LoadoutPrepared);
             blockedAnchor.Set(new ExpeditionAvailabilityState
             {
                 ExpeditionIdValue = ExpeditionCatalog.NearbyRaiderCampId.Value,
@@ -120,14 +120,14 @@ namespace StaticMlp.Tests.Combat
             using var scope = new CombatTestServerWorldScope();
             var owner = new NetworkPeerId(1);
             scope.CreatePlayer(owner, Vector3.zero);
-            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.LoadoutPrepared);
+            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
             scope.CreateSettlementSharedResources();
             new ServerFrontierExpeditionAvailabilitySystem().Update();
 
             StartExpedition(scope, owner);
             MarkParticipantsAsDead(FrontierEncounterKind.Expedition, ExpeditionCatalog.NearbyRaiderCampId.Value);
             new ServerBotAiDeathSystem().Update();
-            var applyRewardSystem = new ServerStage1RewardApplicationSystem();
+            var applyRewardSystem = new ServerRewardApplicationSystem();
             var escalateThreatSystem = new ServerFrontierProgressionFlagThreatEscalationSystem();
             applyRewardSystem.Init();
             escalateThreatSystem.Init();
@@ -137,9 +137,9 @@ namespace StaticMlp.Tests.Combat
             escalateThreatSystem.Update();
 
             Assert.That(anchor.Read<ActiveExpeditionState>().Status, Is.EqualTo(ExpeditionActivityStatus.Cleared));
-            Assert.That(anchor.Read<Stage1ProgressionState>().HasAppliedReward(RewardPackageCatalog.RecoveredWarCacheId), Is.True);
-            Assert.That(anchor.Read<Stage1ProgressionState>().HasFlag(ProgressFlagCatalog.RecoveredWarCacheAppliedId), Is.True);
-            Assert.That(anchor.Read<Stage1ProgressionState>().BossPreparationTokens, Is.EqualTo(1));
+            Assert.That(anchor.Read<ProgressionState>().HasAppliedReward(RewardPackageCatalog.RecoveredWarCacheId), Is.True);
+            Assert.That(anchor.Read<ProgressionState>().HasFlag(ProgressFlagCatalog.RecoveredWarCacheAppliedId), Is.True);
+            Assert.That(anchor.Read<ProgressionState>().BossPreparationTokens, Is.EqualTo(1));
             Assert.That(anchor.Read<ThreatState>().Phase, Is.EqualTo(ThreatPhase.RaidPending));
             Assert.That(anchor.Read<RaidScheduleState>().Status, Is.EqualTo(RaidScheduleStatus.Pending));
             Assert.That(anchor.Read<RaidScheduleState>().ActivateAtTick, Is.EqualTo(scope.SimulationTime.DeadlineAfter(5f)));
@@ -156,7 +156,7 @@ namespace StaticMlp.Tests.Combat
         public void RaidActivationSystem_SpawnsRaidWhenTickDeadlineIsReached()
         {
             using var scope = new CombatTestServerWorldScope();
-            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.LoadoutPrepared);
+            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
 
             anchor.Set(new ThreatState
             {
@@ -193,7 +193,7 @@ namespace StaticMlp.Tests.Combat
         public void RaidResolution_ClearsThreatAndScheduleAfterRaidDeaths()
         {
             using var scope = new CombatTestServerWorldScope();
-            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.LoadoutPrepared);
+            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
 
             anchor.Set(new ThreatState
             {
@@ -217,7 +217,7 @@ namespace StaticMlp.Tests.Combat
             participant.Set<AiAgentTag>();
             participant.Set<IsDiedTag>();
 
-            var applyRaidDefenseProgressionSystem = new ServerStage1RaidDefenseProgressionSystem();
+            var applyRaidDefenseProgressionSystem = new ServerRaidDefenseProgressionSystem();
             applyRaidDefenseProgressionSystem.Init();
             new ServerBotAiDeathSystem().Update();
             new ServerFrontierRaidResolutionSystem().Update();
@@ -227,7 +227,7 @@ namespace StaticMlp.Tests.Combat
             Assert.That(anchor.Read<RaidScheduleState>().ActivateAtTick, Is.EqualTo(0));
             Assert.That(anchor.Read<ThreatState>().Phase, Is.EqualTo(ThreatPhase.Calm));
             Assert.That(anchor.Read<ThreatState>().ThreatValue, Is.EqualTo(0));
-            Assert.That(anchor.Read<Stage1ProgressionState>().HasFlag(ProgressFlagCatalog.CounterattackDefendedId), Is.True);
+            Assert.That(anchor.Read<ProgressionState>().HasFlag(ProgressFlagCatalog.CounterattackDefendedId), Is.True);
 
             applyRaidDefenseProgressionSystem.Destroy();
         }
@@ -238,26 +238,26 @@ namespace StaticMlp.Tests.Combat
             using var scope = new CombatTestServerWorldScope();
             var owner = new NetworkPeerId(1);
             var player = scope.CreatePlayer(owner, Vector3.zero);
-            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.LoadoutPrepared);
+            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
             InitializeStage1BossPath(scope);
 
-            ref var progression = ref anchor.Mut<Stage1ProgressionState>();
+            ref var progression = ref anchor.Mut<ProgressionState>();
             progression.GrantBossPreparationTokens(1);
 
             player.Set(new OwnerLoadoutSelection
             {
                 PrimaryModuleId = LoadoutModuleCatalog.FireFlaskModuleId
             });
-            player.Set(Stage1LoadoutRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
+            player.Set(LoadoutPreparationRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
 
-            var bossPreparationSystem = new ServerStage1BossPreparationProgressionSystem();
+            var bossPreparationSystem = new ServerBossPreparationProgressionSystem();
             bossPreparationSystem.Init();
             var request = new PrepareBossRequestEvent(SettlementAnchorCatalog.HomeCampId);
             SW.SendEvent(new NetworkEventFromClient<PrepareBossRequestEvent>(owner, in request));
             bossPreparationSystem.Update();
 
-            Assert.That(anchor.Read<Stage1ProgressionState>().BossPreparationTokens, Is.EqualTo(1));
-            Assert.That(anchor.Read<Stage1ProgressionState>().HasFlag(ProgressFlagCatalog.BossUnlockedId), Is.False);
+            Assert.That(anchor.Read<ProgressionState>().BossPreparationTokens, Is.EqualTo(1));
+            Assert.That(anchor.Read<ProgressionState>().HasFlag(ProgressFlagCatalog.BossUnlockedId), Is.False);
             Assert.That(anchor.Read<BossLoadoutPreparationState>().Status, Is.EqualTo(BossLoadoutPreparationStatus.None));
             Assert.That(anchor.Read<BossPreparedLoadoutSnapshot>().PrimaryModuleIdValue, Is.EqualTo(0));
 
@@ -270,10 +270,10 @@ namespace StaticMlp.Tests.Combat
             using var scope = new CombatTestServerWorldScope();
             var owner = new NetworkPeerId(1);
             var player = scope.CreatePlayer(owner, Vector3.zero);
-            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.LoadoutPrepared);
+            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
             InitializeStage1BossPath(scope);
 
-            ref var progression = ref anchor.Mut<Stage1ProgressionState>();
+            ref var progression = ref anchor.Mut<ProgressionState>();
             progression.ApplyFlag(ProgressFlagCatalog.CounterattackDefendedId);
             progression.GrantBossPreparationTokens(1);
 
@@ -281,9 +281,9 @@ namespace StaticMlp.Tests.Combat
             {
                 PrimaryModuleId = LoadoutModuleCatalog.FireFlaskModuleId
             });
-            player.Set(Stage1LoadoutRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
+            player.Set(LoadoutPreparationRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
 
-            var bossPreparationSystem = new ServerStage1BossPreparationProgressionSystem();
+            var bossPreparationSystem = new ServerBossPreparationProgressionSystem();
             bossPreparationSystem.Init();
             var request = new PrepareBossRequestEvent(SettlementAnchorCatalog.HomeCampId);
             SW.SendEvent(new NetworkEventFromClient<PrepareBossRequestEvent>(owner, in request));
@@ -293,8 +293,8 @@ namespace StaticMlp.Tests.Combat
             ref readonly var committedSnapshot = ref anchor.Read<BossPreparedLoadoutSnapshot>();
             ref readonly var playerSnapshot = ref player.Read<PreparedLoadoutSnapshot>();
 
-            Assert.That(anchor.Read<Stage1ProgressionState>().BossPreparationTokens, Is.EqualTo(0));
-            Assert.That(anchor.Read<Stage1ProgressionState>().HasFlag(ProgressFlagCatalog.BossUnlockedId), Is.True);
+            Assert.That(anchor.Read<ProgressionState>().BossPreparationTokens, Is.EqualTo(0));
+            Assert.That(anchor.Read<ProgressionState>().HasFlag(ProgressFlagCatalog.BossUnlockedId), Is.True);
             Assert.That(committedState.Status, Is.EqualTo(BossLoadoutPreparationStatus.Committed));
             Assert.That(committedSnapshot.ArchetypeIdValue, Is.EqualTo(playerSnapshot.ArchetypeId.Value));
             Assert.That(committedSnapshot.PrimaryModuleIdValue, Is.EqualTo(playerSnapshot.PrimaryModuleId.Value));
@@ -319,7 +319,7 @@ namespace StaticMlp.Tests.Combat
         public void BossAvailabilitySystem_UnlocksOnlyThroughBossEncounterState()
         {
             using var scope = new CombatTestServerWorldScope();
-            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.LoadoutPrepared);
+            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
             InitializeStage1BossPath(scope);
 
             new ServerFrontierExpeditionAvailabilitySystem().Update();
@@ -328,7 +328,7 @@ namespace StaticMlp.Tests.Combat
             Assert.That(anchor.Read<ExpeditionAvailabilityState>().ExpeditionIdValue, Is.EqualTo(ExpeditionCatalog.NearbyRaiderCampId.Value));
             Assert.That(anchor.Read<BossEncounterState>().Status, Is.EqualTo(BossEncounterStatus.Unavailable));
 
-            ref var progression = ref anchor.Mut<Stage1ProgressionState>();
+            ref var progression = ref anchor.Mut<ProgressionState>();
             progression.ApplyFlag(ProgressFlagCatalog.BossUnlockedId);
 
             new ServerFrontierBossAvailabilitySystem().Update();
@@ -344,10 +344,10 @@ namespace StaticMlp.Tests.Combat
             using var scope = new CombatTestServerWorldScope();
             var owner = new NetworkPeerId(1);
             var player = scope.CreatePlayer(owner, Vector3.zero);
-            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, Stage1SettlementProgressStage.LoadoutPrepared);
+            var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
             InitializeStage1BossPath(scope);
 
-            ref var progression = ref anchor.Mut<Stage1ProgressionState>();
+            ref var progression = ref anchor.Mut<ProgressionState>();
             progression.ApplyFlag(ProgressFlagCatalog.CounterattackDefendedId);
             progression.GrantBossPreparationTokens(1);
 
@@ -355,9 +355,9 @@ namespace StaticMlp.Tests.Combat
             {
                 PrimaryModuleId = LoadoutModuleCatalog.FireFlaskModuleId
             });
-            player.Set(Stage1LoadoutRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
+            player.Set(LoadoutPreparationRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
 
-            var bossPreparationSystem = new ServerStage1BossPreparationProgressionSystem();
+            var bossPreparationSystem = new ServerBossPreparationProgressionSystem();
             bossPreparationSystem.Init();
             var prepareRequest = new PrepareBossRequestEvent(SettlementAnchorCatalog.HomeCampId);
             SW.SendEvent(new NetworkEventFromClient<PrepareBossRequestEvent>(owner, in prepareRequest));

@@ -19,6 +19,7 @@ namespace StaticMlp.Features.BuildingCatalog
         public static void Validate(IReadOnlyList<BuildingDefinition> definitions)
         {
             var ids = new HashSet<BuildingId>();
+            var categoryDisplayNames = new Dictionary<BuildingCategory, string>();
 
             for (var i = 0; i < definitions.Count; i++)
             {
@@ -36,6 +37,11 @@ namespace StaticMlp.Features.BuildingCatalog
                 if (definition.Category == BuildingCategory.None)
                     throw new InvalidOperationException($"Building id {definition.Id.Value} has no category.");
 
+                if (string.IsNullOrWhiteSpace(definition.CategoryDisplayName))
+                    throw new InvalidOperationException($"Building id {definition.Id.Value} has no category display name.");
+
+                ValidateCategoryDisplayName(in definition, categoryDisplayNames);
+
                 if (definition.FootprintWidth <= 0 || definition.FootprintLength <= 0)
                     throw new InvalidOperationException($"Building id {definition.Id.Value} has invalid footprint {definition.FootprintWidth}x{definition.FootprintLength}.");
 
@@ -47,6 +53,21 @@ namespace StaticMlp.Features.BuildingCatalog
                 ValidateProfiles(in definition);
                 ValidateOperationOutput(in definition);
             }
+        }
+
+        private static void ValidateCategoryDisplayName(
+            in BuildingDefinition definition,
+            Dictionary<BuildingCategory, string> categoryDisplayNames)
+        {
+            if (!categoryDisplayNames.TryGetValue(definition.Category, out var existing))
+            {
+                categoryDisplayNames.Add(definition.Category, definition.CategoryDisplayName);
+                return;
+            }
+
+            if (!string.Equals(existing, definition.CategoryDisplayName, StringComparison.Ordinal))
+                throw new InvalidOperationException(
+                    $"Building category {definition.Category} has inconsistent display names '{existing}' and '{definition.CategoryDisplayName}'.");
         }
 
         private static void ValidateConstructionCost(in BuildingDefinition definition)
@@ -85,6 +106,9 @@ namespace StaticMlp.Features.BuildingCatalog
                 var interaction = definition.Interactions[i];
                 if (interaction.Kind == BuildingInteractionKind.None)
                     throw new InvalidOperationException($"Building id {definition.Id.Value} has an interaction with no kind.");
+
+                if (string.IsNullOrWhiteSpace(interaction.DisplayName))
+                    throw new InvalidOperationException($"Building id {definition.Id.Value} interaction {interaction.Kind} has no display name.");
 
                 if (!kinds.Add(interaction.Kind))
                     throw new InvalidOperationException($"Building id {definition.Id.Value} has duplicate interaction {interaction.Kind}.");

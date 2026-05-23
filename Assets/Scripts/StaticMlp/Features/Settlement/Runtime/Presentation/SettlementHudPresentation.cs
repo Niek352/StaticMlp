@@ -38,18 +38,18 @@ namespace StaticMlp.Features.Settlement
             return state;
         }
 
-        private static Stage1HudActionPresentation CreateLoadoutPreparationAction(bool enabled)
+        private static HudActionPresentation CreateLoadoutPreparationAction(bool enabled)
         {
-            return new Stage1HudActionPresentation(
+            return new HudActionPresentation(
                 "Prepare Build",
                 enabled,
                 enabled ? string.Empty : "Locked until the workbench objective is online.",
                 "Opens the loadout preparation screen.");
         }
 
-        private static Stage1HudActionPresentation CreateExpeditionSelectionAction(bool enabled)
+        private static HudActionPresentation CreateExpeditionSelectionAction(bool enabled)
         {
-            return new Stage1HudActionPresentation(
+            return new HudActionPresentation(
                 "Open Expedition",
                 enabled,
                 enabled ? string.Empty : "Locked until expedition selection is available.",
@@ -58,17 +58,17 @@ namespace StaticMlp.Features.Settlement
 
         private static bool TryGetRequiredState(
             out CW.Entity anchor,
-            out Stage1FlowViewState flow,
+            out CampFlowViewState flow,
             out CW.Entity resources)
         {
-            if (!Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out anchor))
+            if (!CampFlowProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out anchor))
             {
                 flow = default;
                 resources = default;
                 return false;
             }
 
-            flow = ClientProjection.Read<Stage1FlowViewState>(anchor);
+            flow = ClientProjection.Read<CampFlowViewState>(anchor);
 
             if (!TryReadSharedResources(out resources))
                 return false;

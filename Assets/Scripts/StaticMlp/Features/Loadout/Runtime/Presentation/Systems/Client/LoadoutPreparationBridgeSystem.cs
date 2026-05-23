@@ -24,13 +24,13 @@ namespace StaticMlp.Features.Loadout
                 break;
             }
 
-            if (Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
+            if (CampFlowProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
             {
-                state.IsAvailable = ClientProjection.Read<Stage1FlowViewState>(anchor).CanOpenLoadoutPreparation;
+                state.IsAvailable = ClientProjection.Read<CampFlowViewState>(anchor).CanOpenLoadoutPreparation;
 
-                if (anchor.Has<Projected<Stage1ProgressionState>>())
+                if (anchor.Has<Projected<ProgressionState>>())
                 {
-                    ref readonly var progression = ref ClientProjection.Read<Stage1ProgressionState>(anchor);
+                    ref readonly var progression = ref ClientProjection.Read<ProgressionState>(anchor);
                     state.CanPrepareBoss = progression.HasFlag(ProgressFlagCatalog.CounterattackDefendedId)
                                           && !progression.HasFlag(ProgressFlagCatalog.BossUnlockedId)
                                           && progression.HasBossPreparationToken();

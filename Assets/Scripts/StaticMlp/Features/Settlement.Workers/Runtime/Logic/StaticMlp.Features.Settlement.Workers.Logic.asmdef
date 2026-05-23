@@ -17,7 +17,7 @@
         "StaticMlp.Features.Settlement.Logic",
         "StaticMlp.Features.Settlement.Workers.Contracts",
         "StaticMlp.Features.Shared.Logic",
-        "StaticMlp.Features.Stage1.Contracts",
+        "StaticMlp.Features.CampFlow.Contracts",
         "StaticMlp.Features.Npc.Contracts",
         "StaticMlp.Features.Npc.Logic",
         "StaticMlp.Features.OpenWorldGeneration.Contracts"

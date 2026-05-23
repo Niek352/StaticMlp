@@ -45,7 +45,7 @@ namespace StaticMlp.Features.Combat
             if (source.Has<PlayerTag>())
             {
                 ref readonly var preparedBuild = ref source.Read<PreparedLoadoutSnapshot>();
-                if (!Stage1LoadoutRules.IsAbilityPrepared(preparedBuild, data.AbilityId))
+                if (!LoadoutPreparationRules.IsAbilityPrepared(preparedBuild, data.AbilityId))
                 {
                     request.Destroy();
                     return;

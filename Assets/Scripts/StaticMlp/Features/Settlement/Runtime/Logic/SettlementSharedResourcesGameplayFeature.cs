@@ -12,7 +12,7 @@ namespace StaticMlp.Features.Settlement
         {
             ProjectionRegistry.Register<SettlementSharedResources>();
             ProjectionRegistry.RegisterMulti<SettlementStoredResource>();
-            ProjectionRegistry.Register<Stage1SettlementProgression>();
+            ProjectionRegistry.Register<CampFlowProgression>();
             ProjectionRegistry.Register<StockpileOperationState>();
             ProjectionRegistry.Register<ExtractionOperationState>();
             ProjectionRegistry.Register<WorkbenchOperationState>();

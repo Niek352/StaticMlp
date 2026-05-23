@@ -80,8 +80,8 @@ namespace StaticMlp.Tests.Combat
                 Position = position,
                 Rotation = Quaternion.identity
             });
-            player.Set(Stage1LoadoutRules.DefaultSelection());
-            player.Set(Stage1LoadoutRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
+            player.Set(LoadoutPreparationRules.DefaultSelection());
+            player.Set(LoadoutPreparationRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
             return player;
         }
 

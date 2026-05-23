@@ -16,7 +16,7 @@ namespace StaticMlp.Features.Frontier
                 Phase = ThreatPhase.Calm,
             };
 
-            if (Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
+            if (CampFlowProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
             {
                 if (anchor.Has<Projected<ThreatState>>())
                     state.Phase = ClientProjection.Read<ThreatState>(anchor).Phase;

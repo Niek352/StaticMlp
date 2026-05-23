@@ -1,0 +1,28 @@
+{
+    "name": "StaticMlp.Features.CampFlow.Logic",
+    "rootNamespace": "StaticMlp.Features.CampFlow",
+    "references": [
+        "FFS.StaticEcs",
+        "Ecs.Networking",
+        "Game.Core",
+        "StaticMlp.Features.CampFlow.Contracts",
+        "StaticMlp.Features.Settlement.Contracts",
+        "StaticMlp.Features.Loadout.Logic",
+        "StaticMlp.Features.Frontier.Logic",
+        "StaticMlp.Features.Progression.Logic",
+        "StaticMlp.Features.Settlement.Logic",
+        "StaticMlp.Features.Settlement.Workers.Logic",
+        "StaticMlp.Features.Progression.Contracts",
+        "StaticMlp.Features.Frontier.Contracts",
+        "StaticMlp.Features.OpenWorldGeneration.Contracts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

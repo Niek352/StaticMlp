@@ -9,7 +9,7 @@
         "Game.Core",
         "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Settlement.Workers.Contracts",
-        "StaticMlp.Features.Stage1.Contracts",
+        "StaticMlp.Features.CampFlow.Contracts",
         "StaticMlp.Features.BuildingCatalog",
         "StaticMlp.Features.Buildings.Contracts"
     ],

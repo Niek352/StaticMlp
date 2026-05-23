@@ -235,9 +235,9 @@ namespace StaticMlp.Composition
             {
                 FixedStepSeconds = 1f / Mathf.Max(1, serverTickRateHz),
             });
-            SW.SetResource(Stage1SettlementSeedManifest.CreateResource());
-            SW.SetResource(Stage1FrontierSeedManifest.CreateResource());
-            SW.SetResource(Stage1ProgressionSeedManifest.CreateResource());
+            SW.SetResource(SettlementSeedManifest.CreateResource());
+            SW.SetResource(FrontierSeedManifest.CreateResource());
+            SW.SetResource(ProgressionSeedManifest.CreateResource());
             _serverSimulationAccumulator = 0f;
 
             if (transportBackend == TransportBackend.Steam) {

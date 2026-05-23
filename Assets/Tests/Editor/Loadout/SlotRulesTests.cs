@@ -132,14 +132,14 @@ namespace StaticMlp.Tests.Loadout
         }
 
         [Test]
-        public void Stage1LoadoutRules_CreatePreparedSnapshot_RejectsNonCombatModuleSelection()
+        public void LoadoutPreparationRules_CreatePreparedSnapshot_RejectsNonCombatModuleSelection()
         {
             var selection = new OwnerLoadoutSelection
             {
                 PrimaryModuleId = LoadoutModuleCatalog.ConstructionUtilityModuleId
             };
 
-            Assert.Throws<InvalidOperationException>(() => Stage1LoadoutRules.CreatePreparedSnapshot(selection));
+            Assert.Throws<InvalidOperationException>(() => LoadoutPreparationRules.CreatePreparedSnapshot(selection));
         }
 
         [Test]

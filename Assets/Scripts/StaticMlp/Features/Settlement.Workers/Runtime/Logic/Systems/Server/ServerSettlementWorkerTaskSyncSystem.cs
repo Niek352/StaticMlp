@@ -17,7 +17,7 @@ namespace StaticMlp.Features.Settlement.Workers
                 ref var task = ref worker.Mut<AiTaskState>();
 
                 if (!assignment.IsAssigned
-                    || !Stage1SettlementProgressionQuery.TryGetServerAnchor(assignment.Anchor, out var anchor))
+                    || !CampFlowProgressionQuery.TryGetServerAnchor(assignment.Anchor, out var anchor))
                 {
                     ClearTargets(worker);
                     _transitions.SwitchToIdle(worker, ref task);

@@ -19,7 +19,7 @@ namespace StaticMlp.Features.Settlement
                 return;
             }
 
-            SW.GetResource<SettlementSharedResourcesFactory>().Spawn(SW.GetResource<Stage1SettlementSeed>());
+            SW.GetResource<SettlementSharedResourcesFactory>().Spawn(SW.GetResource<SettlementSeed>());
 
             _spawned = true;
         }

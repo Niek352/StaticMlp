@@ -16,7 +16,7 @@ namespace StaticMlp.Features.Settlement.Workers
                 return;
             }
 
-            var seed = SW.GetResource<Stage1SettlementSeed>();
+            var seed = SW.GetResource<SettlementSeed>();
             var heightSampler = SW.GetResource<IHeightSampler>();
             var workers = seed.InitialWorkers;
             for (var i = 0; i < workers.Length; i++)
@@ -25,7 +25,7 @@ namespace StaticMlp.Features.Settlement.Workers
             _spawned = true;
         }
 
-        private static void Spawn(Stage1SettlementWorkerSeed seed, IHeightSampler heightSampler)
+        private static void Spawn(SettlementWorkerSeed seed, IHeightSampler heightSampler)
         {
             var profile = SettlementWorkerRuntimeProfileCatalog.Get(seed.Role);
             var position = seed.Position;

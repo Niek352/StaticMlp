@@ -14,7 +14,7 @@ using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Statuses;
-using StaticMlp.Features.Stage1;
+using StaticMlp.Features.CampFlow;
 using StaticMlp.Features.Player;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
@@ -43,7 +43,7 @@ namespace StaticMlp.Tests.Combat
             new CombatLogicFeature().RegisterNetworkEvents();
             new BuildingsGameplayFeature().RegisterNetworkEvents();
             new FrontierLogicFeature().RegisterNetworkEvents();
-            new Stage1CampAnchorGameplayFeature().RegisterNetworkEvents();
+            new CampFlowGameplayFeature().RegisterNetworkEvents();
             SW.Create(WorldConfig.Default());
             SW.Types().RegisterAll(
                 typeof(NpcTag).Assembly,
@@ -61,8 +61,8 @@ namespace StaticMlp.Tests.Combat
                 typeof(SettlementAnchorRef).Assembly,
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
                 typeof(SettlementWorkersGameplayFeature).Assembly,
-                typeof(Stage1FlowViewState).Assembly,
-                typeof(Stage1CampAnchorGameplayFeature).Assembly,
+                typeof(CampFlowViewState).Assembly,
+                typeof(CampFlowGameplayFeature).Assembly,
                 typeof(PoisonStatus).Assembly,
                 typeof(StatusesLogicFeature).Assembly,
                 typeof(CharacterNetState).Assembly,
@@ -78,15 +78,15 @@ namespace StaticMlp.Tests.Combat
             SW.SetResource(new NetOutbox());
             SW.SetResource(new CombatConfig());
             SW.SetResource<IHeightSampler>(new FlatTestHeightSampler());
-            SW.SetResource(Stage1FrontierSeedManifest.CreateResource());
-            SW.SetResource(Stage1ProgressionSeedManifest.CreateResource());
+            SW.SetResource(FrontierSeedManifest.CreateResource());
+            SW.SetResource(ProgressionSeedManifest.CreateResource());
             SW.SetResource(new StatusesConfig());
             SW.SetResource(new AiBotFactory());
             SW.SetResource(new BuildingEntityFactory());
             SW.SetResource(new PlayerFactory());
             SW.SetResource(new SettlementSharedResourcesFactory());
             SW.SetResource(new SettlementWorkerFactory());
-            SW.SetResource(new Stage1CampAnchorFactory());
+            SW.SetResource(new CampFlowAnchorFactory());
             SW.SetResource(new StatusEntityFactory());
         }
 
@@ -163,8 +163,8 @@ namespace StaticMlp.Tests.Combat
                 Current = 100f,
                 Max = 100f
             });
-            entity.Set(Stage1LoadoutRules.DefaultSelection());
-            entity.Set(Stage1LoadoutRules.CreatePreparedSnapshot(entity.Read<OwnerLoadoutSelection>()));
+            entity.Set(LoadoutPreparationRules.DefaultSelection());
+            entity.Set(LoadoutPreparationRules.CreatePreparedSnapshot(entity.Read<OwnerLoadoutSelection>()));
             return entity;
         }
 
@@ -195,50 +195,50 @@ namespace StaticMlp.Tests.Combat
         public SW.Entity CreateSettlementAnchor(
             SettlementAnchorId anchorId,
             Vector3 position,
-            Stage1SettlementProgressStage stage = Stage1SettlementProgressStage.LoadoutPrepared)
+            CampFlowStage stage = CampFlowStage.LoadoutPrepared)
         {
             var entity = SW.NewEntity<Default>();
-            entity.Set(new Stage1SettlementProgression
+            entity.Set(new CampFlowProgression
             {
                 AnchorId = anchorId.Value,
                 Stage = stage
             });
-            entity.Set(new Stage1FlowViewState
+            entity.Set(new CampFlowViewState
             {
                 AnchorId = anchorId.Value,
                 Stage = stage,
-                Objective = stage < Stage1SettlementProgressStage.CampRepaired
+                Objective = stage < CampFlowStage.CampRepaired
                     ? Stage1FlowObjective.RepairCamp
-                    : stage < Stage1SettlementProgressStage.WorkerAssigned
+                    : stage < CampFlowStage.WorkerAssigned
                         ? Stage1FlowObjective.AssignWorker
-                        : stage < Stage1SettlementProgressStage.StockpilePlaced
+                        : stage < CampFlowStage.StockpilePlaced
                             ? Stage1FlowObjective.PlaceStockpile
-                            : stage < Stage1SettlementProgressStage.ShelterPlaced
+                            : stage < CampFlowStage.ShelterPlaced
                                 ? Stage1FlowObjective.PlaceShelter
-                                : stage < Stage1SettlementProgressStage.ExtractionOnline
+                                : stage < CampFlowStage.ExtractionOnline
                                     ? Stage1FlowObjective.BringExtractionOnline
-                                    : stage < Stage1SettlementProgressStage.WorkbenchOnline
+                                    : stage < CampFlowStage.WorkbenchOnline
                                         ? Stage1FlowObjective.BringWorkbenchOnline
                                         : Stage1FlowObjective.PrepareBuild,
-                Hint = stage == Stage1SettlementProgressStage.RepairResourcesReady
+                Hint = stage == CampFlowStage.RepairResourcesReady
                     ? Stage1FlowHint.ContinueRepairBuild
-                    : stage < Stage1SettlementProgressStage.RepairResourcesReady
+                    : stage < CampFlowStage.RepairResourcesReady
                         ? Stage1FlowHint.GatherRepairResources
-                        : stage == Stage1SettlementProgressStage.CampRepaired
+                        : stage == CampFlowStage.CampRepaired
                             ? Stage1FlowHint.AssignWorker
-                            : stage == Stage1SettlementProgressStage.WorkerAssigned
+                            : stage == CampFlowStage.WorkerAssigned
                                 ? Stage1FlowHint.PlaceStockpile
-                                : stage == Stage1SettlementProgressStage.StockpilePlaced
+                                : stage == CampFlowStage.StockpilePlaced
                                     ? Stage1FlowHint.PlaceShelter
-                                    : stage == Stage1SettlementProgressStage.ShelterPlaced
+                                    : stage == CampFlowStage.ShelterPlaced
                                         ? Stage1FlowHint.BringExtractionOnline
-                                        : stage == Stage1SettlementProgressStage.ExtractionOnline
+                                        : stage == CampFlowStage.ExtractionOnline
                                             ? Stage1FlowHint.BringWorkbenchOnline
                                             : Stage1FlowHint.None,
-                CanToggleWorkerAssignment = stage >= Stage1SettlementProgressStage.CampRepaired,
-                CanOpenLoadoutPreparation = stage >= Stage1SettlementProgressStage.WorkbenchOnline
+                CanToggleWorkerAssignment = stage >= CampFlowStage.CampRepaired,
+                CanOpenLoadoutPreparation = stage >= CampFlowStage.WorkbenchOnline
             });
-            entity.Set(new Stage1ProgressionState(anchorId, 0u));
+            entity.Set(new ProgressionState(anchorId, 0u));
             entity.Set(new SettlementAnchorLocation(position, Quaternion.identity));
             entity.Set(new SettlementWorkerSummary
             {

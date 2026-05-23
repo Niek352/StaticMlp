@@ -14,10 +14,10 @@ namespace StaticMlp.Features.Progression
 
             var data = new RewardResultPopupViewData();
 
-            if (Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor)
-                && anchor.Has<Projected<Stage1ProgressionState>>())
+            if (CampFlowProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor)
+                && anchor.Has<Projected<ProgressionState>>())
             {
-                ref readonly var progression = ref ClientProjection.Read<Stage1ProgressionState>(anchor);
+                ref readonly var progression = ref ClientProjection.Read<ProgressionState>(anchor);
                 var newlyAppliedMask = progression.AppliedRewardsMask & ~session.LastPresentedRewardsMask;
                 if (newlyAppliedMask != 0u)
                 {

@@ -56,7 +56,7 @@ namespace StaticMlp.Features.Buildings
 
                 categories[writeIndex++] = new BuildingMenuCategoryPresentation(
                     category,
-                    LabelForCategory(category),
+                    definitions[i].CategoryDisplayName,
                     CountCards(category),
                     selectedCategory == category);
             }
@@ -77,7 +77,7 @@ namespace StaticMlp.Features.Buildings
                     definition.Id,
                     definition.Category,
                     presentation.DisplayName,
-                    LabelForCategory(definition.Category),
+                    definition.CategoryDisplayName,
                     FormatConstructionCost(definition.ConstructionCost),
                     selectedBuildingId == definition.Id);
             }
@@ -154,29 +154,6 @@ namespace StaticMlp.Features.Buildings
             }
 
             return builder.ToString();
-        }
-
-        private static string LabelForCategory(BuildingCategory category)
-        {
-            switch (category)
-            {
-                case BuildingCategory.Housing:
-                    return "Housing";
-                case BuildingCategory.Logistics:
-                    return "Logistics";
-                case BuildingCategory.Extraction:
-                    return "Extraction";
-                case BuildingCategory.Production:
-                    return "Production";
-                case BuildingCategory.Service:
-                    return "Service";
-                case BuildingCategory.Defense:
-                    return "Defense";
-                case BuildingCategory.Research:
-                    return "Research";
-                default:
-                    return "Uncategorized";
-            }
         }
 
     }

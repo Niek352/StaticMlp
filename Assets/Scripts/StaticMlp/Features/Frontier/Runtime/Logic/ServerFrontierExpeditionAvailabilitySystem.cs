@@ -10,11 +10,11 @@ namespace StaticMlp.Features.Frontier
     {
         public void Update()
         {
-            foreach (var anchor in SW.Query<All<Stage1SettlementProgression, ExpeditionAvailabilityState, ActiveExpeditionState, ThreatState, RaidScheduleState>>().Entities())
+            foreach (var anchor in SW.Query<All<CampFlowProgression, ExpeditionAvailabilityState, ActiveExpeditionState, ThreatState, RaidScheduleState>>().Entities())
             {
-                ref readonly var progression = ref anchor.Read<Stage1SettlementProgression>();
+                ref readonly var progression = ref anchor.Read<CampFlowProgression>();
                 var shouldBeAvailable =
-                    progression.Stage == Stage1SettlementProgressStage.LoadoutPrepared
+                    progression.Stage == CampFlowStage.LoadoutPrepared
                     && anchor.Read<ActiveExpeditionState>().Status == ExpeditionActivityStatus.None
                     && anchor.Read<ThreatState>().Phase != ThreatPhase.RaidPending
                     && anchor.Read<ThreatState>().Phase != ThreatPhase.RaidActive

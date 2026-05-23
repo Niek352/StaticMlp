@@ -8,14 +8,14 @@ namespace StaticMlp.Features.Progression
     {
         public static ProgressionHudState Build()
         {
-            if (!Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
+            if (!CampFlowProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
                 return default;
 
             var state = new ProgressionHudState();
 
-            if (anchor.Has<Projected<Stage1ProgressionState>>())
+            if (anchor.Has<Projected<ProgressionState>>())
             {
-                ref readonly var progression = ref ClientProjection.Read<Stage1ProgressionState>(anchor);
+                ref readonly var progression = ref ClientProjection.Read<ProgressionState>(anchor);
                 state.HasRecoveredWarCache = progression.HasFlag(ProgressFlagCatalog.RecoveredWarCacheAppliedId);
                 state.HasCounterattackDefended = progression.HasFlag(ProgressFlagCatalog.CounterattackDefendedId);
                 state.HasBossUnlocked = progression.HasFlag(ProgressFlagCatalog.BossUnlockedId);

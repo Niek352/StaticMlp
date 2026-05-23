@@ -7,9 +7,9 @@ namespace StaticMlp.Features.Settlement
 {
     public static class WorkerContextPanelPresentation
     {
-        public static WorkerContextPanelState Build(in Stage1ContextPanelSession session)
+        public static WorkerContextPanelState Build(in SettlementContextPanelSession session)
         {
-            if (session.Mode != Stage1ContextPanelMode.Worker)
+            if (session.Mode != SettlementContextPanelMode.Worker)
                 return default;
 
             var state = new WorkerContextPanelState
@@ -24,9 +24,9 @@ namespace StaticMlp.Features.Settlement
 
         private static void PopulateWorkerState(ref WorkerContextPanelState state)
         {
-            if (Stage1SettlementProgressionQuery.TryGetClientAnchor(state.AnchorId, out var anchor))
+            if (CampFlowProgressionQuery.TryGetClientAnchor(state.AnchorId, out var anchor))
             {
-                ref readonly var flow = ref ClientProjection.Read<Stage1FlowViewState>(anchor);
+                ref readonly var flow = ref ClientProjection.Read<CampFlowViewState>(anchor);
                 if (anchor.Has<Projected<SettlementWorkerSummary>>())
                 {
                     ref readonly var summary = ref ClientProjection.Read<SettlementWorkerSummary>(anchor);

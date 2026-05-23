@@ -120,7 +120,7 @@ namespace StaticMlp.Tests.Combat
             {
                 PrimaryModuleId = LoadoutModuleCatalog.FireFlaskModuleId
             });
-            source.Set(Stage1LoadoutRules.CreatePreparedSnapshot(source.Read<OwnerLoadoutSelection>()));
+            source.Set(LoadoutPreparationRules.CreatePreparedSnapshot(source.Read<OwnerLoadoutSelection>()));
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
             SW.GetResource<StatusEntityFactory>().SpawnOiled(target, target.GID, new AddStatusSpec
             {
@@ -175,7 +175,7 @@ namespace StaticMlp.Tests.Combat
             {
                 PrimaryModuleId = LoadoutModuleCatalog.FireFlaskModuleId
             });
-            source.Set(Stage1LoadoutRules.CreatePreparedSnapshot(source.Read<OwnerLoadoutSelection>()));
+            source.Set(LoadoutPreparationRules.CreatePreparedSnapshot(source.Read<OwnerLoadoutSelection>()));
             var target = scope.CreateMonsterWithHealth(new Vector3(2f, 0f, 0f));
             var receive = new ServerReceiveCombatCommandsSystem();
 

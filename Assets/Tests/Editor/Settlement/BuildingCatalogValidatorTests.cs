@@ -17,8 +17,10 @@ namespace StaticMlp.Tests.Settlement
             Assert.That(definition.Code, Is.EqualTo("camp_core"));
             Assert.That(definition.DisplayName, Is.EqualTo("Camp Core"));
             Assert.That(definition.Category, Is.EqualTo(BuildingCategory.Service));
+            Assert.That(definition.CategoryDisplayName, Is.EqualTo("Service"));
             Assert.That(definition.Capabilities.HasFlag(BuildingCapabilityFlags.SupportsPlayerInteraction), Is.True);
             Assert.That(definition.Interactions.Length, Is.EqualTo(3));
+            Assert.That(definition.Interactions[0].DisplayName, Is.EqualTo("Open"));
         }
 
         [Test]
@@ -89,6 +91,7 @@ namespace StaticMlp.Tests.Settlement
                     code: "missing_display",
                     displayName: "",
                     BuildingCategory.Service,
+                    categoryDisplayName: "Service",
                     BuildingCapabilityFlags.SupportsPlayerInteraction,
                     new[]
                     {
@@ -98,7 +101,92 @@ namespace StaticMlp.Tests.Settlement
                     buildWorkRequired: 1f,
                     new[]
                     {
-                        new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, requiresCompletedBuilding: false)
+                        new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, displayName: "Open", requiresCompletedBuilding: false)
+                    },
+                    BuildingNpcProfileDefinition.None,
+                    BuildingOperationDefinition.None)
+            };
+
+            Assert.Throws<InvalidOperationException>(() => BuildingCatalogValidator.Validate(definitions));
+        }
+
+        [Test]
+        public void Validate_MissingCategoryDisplayName_Throws()
+        {
+            var definitions = new[]
+            {
+                new BuildingDefinition(
+                    new BuildingId(25),
+                    code: "missing_category_display",
+                    displayName: "Missing Category Display",
+                    BuildingCategory.Service,
+                    categoryDisplayName: "",
+                    BuildingCapabilityFlags.SupportsPlayerInteraction,
+                    new[]
+                    {
+                        new ResourceAmount(ResourceCatalog.WoodId, 1)
+                    },
+                    new int2(1, 1),
+                    buildWorkRequired: 1f,
+                    new[]
+                    {
+                        new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, displayName: "Open", requiresCompletedBuilding: false)
+                    },
+                    BuildingNpcProfileDefinition.None,
+                    BuildingOperationDefinition.None)
+            };
+
+            Assert.Throws<InvalidOperationException>(() => BuildingCatalogValidator.Validate(definitions));
+        }
+
+        [Test]
+        public void Validate_InconsistentCategoryDisplayName_Throws()
+        {
+            var first = CreateDefinition(new BuildingId(26));
+            var second = new BuildingDefinition(
+                new BuildingId(27),
+                code: "building_27",
+                displayName: "Building 27",
+                BuildingCategory.Housing,
+                categoryDisplayName: "Shelters",
+                BuildingCapabilityFlags.SupportsPlayerInteraction,
+                new[]
+                {
+                    new ResourceAmount(ResourceCatalog.WoodId, 1)
+                },
+                new int2(1, 1),
+                buildWorkRequired: 1f,
+                new[]
+                {
+                    new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, displayName: "Open", requiresCompletedBuilding: false)
+                },
+                BuildingNpcProfileDefinition.None,
+                BuildingOperationDefinition.None);
+
+            Assert.Throws<InvalidOperationException>(() => BuildingCatalogValidator.Validate(new[] { first, second }));
+        }
+
+        [Test]
+        public void Validate_MissingInteractionDisplayName_Throws()
+        {
+            var definitions = new[]
+            {
+                new BuildingDefinition(
+                    new BuildingId(28),
+                    code: "missing_interaction_display",
+                    displayName: "Missing Interaction Display",
+                    BuildingCategory.Service,
+                    categoryDisplayName: "Service",
+                    BuildingCapabilityFlags.SupportsPlayerInteraction,
+                    new[]
+                    {
+                        new ResourceAmount(ResourceCatalog.WoodId, 1)
+                    },
+                    new int2(1, 1),
+                    buildWorkRequired: 1f,
+                    new[]
+                    {
+                        new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, displayName: "", requiresCompletedBuilding: false)
                     },
                     BuildingNpcProfileDefinition.None,
                     BuildingOperationDefinition.None)
@@ -117,6 +205,7 @@ namespace StaticMlp.Tests.Settlement
                     code: "storage_without_operation",
                     displayName: "Storage Without Operation",
                     BuildingCategory.Logistics,
+                    categoryDisplayName: "Logistics",
                     BuildingCapabilityFlags.ProvidesStorage,
                     new[]
                     {
@@ -195,6 +284,7 @@ namespace StaticMlp.Tests.Settlement
                 code: $"building_{id.Value}",
                 displayName: $"Building {id.Value}",
                 BuildingCategory.Housing,
+                categoryDisplayName: "Housing",
                 BuildingCapabilityFlags.SupportsPlayerInteraction,
                 new[]
                 {
@@ -204,7 +294,7 @@ namespace StaticMlp.Tests.Settlement
                 buildWorkRequired: 1f,
                 new[]
                 {
-                    new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, requiresCompletedBuilding: false)
+                    new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, displayName: "Open", requiresCompletedBuilding: false)
                 },
                 BuildingNpcProfileDefinition.None,
                 BuildingOperationDefinition.None);
@@ -219,6 +309,7 @@ namespace StaticMlp.Tests.Settlement
                 code: $"extraction_{id.Value}",
                 displayName: $"Extraction {id.Value}",
                 BuildingCategory.Extraction,
+                categoryDisplayName: "Extraction",
                 BuildingCapabilityFlags.ProvidesWorkplace
                 | BuildingCapabilityFlags.ProducesResources
                 | BuildingCapabilityFlags.ExtractsFromNode,

@@ -1,5 +1,24 @@
 # Проблема: Flattening presentation state и cross-feature чтения (найдена при аудите)
 
+> **СТАТУС РЕФАКТОРА (2025-05-22): частично выполнен**
+>
+> ## Сделано
+> - Монолитный `Stage1HudState` удалён. Созданы owner-scoped ресурсы:
+>   `SettlementHudState`, `ExpeditionHudState`, `ThreatHudState`, `RaidHudState`, `BossHudState`, `LoadoutHudState`, `ProgressionHudState`.
+> - Смешанный `Stage1ContextPanelState` удалён. Созданы `BuildingContextPanelState` + `WorkerContextPanelState`.
+> - Удалены старые builder-системы: `ClientStage1HudStateSystem`, `ClientStage1ContextPanelStateSystem`.
+> - Созданы composite bridge-системы: `Stage1HudCompositeBridgeSystem`, `Stage1ContextPanelCompositeBridgeSystem`.
+> - Создан `PresentationDependencyScopeTests` — архитектурный guardrail, предотвращающий новые cross-feature чтения в `Settlement.Presentation`.
+>
+> ## Осталось
+> 1. **Writer-системы (`ISystem`) не созданы**. Вместо `ClientSettlementHudStateSystem`, `ClientBuildingContextPanelStateSystem` и т.д. используются static классы (`SettlementHudPresentation.Build()`, `BuildingContextPanelPresentation.Build()`), вызываемые из bridge каждый кадр. Это работает, но не соответствует изначальному плану (Task 1–3 в `06.02_problem_fixing.md`).
+> 2. **Cross-feature reads в presentation остаются** (например, `ExpeditionHudPresentation` читает `ExpeditionAvailabilityState`, `LoadoutHudPresentation` читает `PreparedLoadoutSnapshot`). Это задокументировано как baseline debt, но требует дальнейшего выноса read model в owner features.
+> 3. **Остаточный долг**: `Settlement.Presentation` всё ещё читает `ConstructionSiteState` / `ConstructionProgress` (Buildings feature) в `BuildingContextPanelPresentation`. Это отражено в baseline `PresentationDependencyScopeTests`.
+
+---
+
+# Проблема: Flattening presentation state и cross-feature чтения (найдена при аудите)
+
 ## Краткое описание
 
 `Stage1HudState` — это монолитный `IResource` с 30+ полей, собирающий данные из 6 разных фич: Settlement, Loadout, Frontier, Progression, Threat, Raid, Boss. `ClientStage1HudStateSystem` читает компоненты, которые ей не принадлежат, нарушая архитектурные границы.

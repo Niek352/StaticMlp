@@ -13,7 +13,7 @@ namespace StaticMlp.Features.Loadout
                 if (player.Has<OwnerLoadoutSelection>())
                     continue;
 
-                player.Set(Stage1LoadoutRules.DefaultSelection());
+                player.Set(LoadoutPreparationRules.DefaultSelection());
             }
         }
     }

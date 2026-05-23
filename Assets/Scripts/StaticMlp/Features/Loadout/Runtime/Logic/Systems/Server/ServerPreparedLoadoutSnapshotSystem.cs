@@ -9,7 +9,7 @@ namespace StaticMlp.Features.Loadout
         public void Update()
         {
             foreach (var player in SW.Query<All<PlayerTag, NetworkIdentity, OwnerLoadoutSelection>>().Entities())
-                player.Set(Stage1LoadoutRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
+                player.Set(LoadoutPreparationRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
         }
     }
 }

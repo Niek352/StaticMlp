@@ -55,12 +55,12 @@ namespace StaticMlp.Tests.Architecture
             new Violation("ClientProjection.Mut", "Assets/Scripts/StaticMlp/Features/Buildings/Runtime/Requests/DepositConstructionResourcesProjector.cs", 49, "ConstructionSiteState", "Buildings", "Settlement"),
             new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Combat/Runtime/Logic/Systems/Server/ServerDamageApplySystem.cs", 52, "Health", "Combat", "Shared"),
             new Violation("Mut", "Assets/Scripts/StaticMlp/Features/Effects/Runtime/Presentation/Systems/Client/ClientCombatVisualSpawnSystem.cs", 31, "LocalCombatPredictionState", "Effects", "Combat"),
-            new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Progression/Runtime/Logic/ServerStage1BossPreparationProgressionSystem.cs", 46, "BossLoadoutPreparationState", "Progression", "Build"),
-            new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Progression/Runtime/Logic/ServerStage1BossPreparationProgressionSystem.cs", 53, "BossPreparedLoadoutSnapshot", "Progression", "Build"),
+            new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Progression/Runtime/Logic/ServerBossPreparationProgressionSystem.cs", 46, "BossLoadoutPreparationState", "Progression", "Build"),
+            new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Progression/Runtime/Logic/ServerBossPreparationProgressionSystem.cs", 53, "BossPreparedLoadoutSnapshot", "Progression", "Build"),
             new Violation("Mut", "Assets/Scripts/StaticMlp/Features/Settlement.Workers/Runtime/Logic/Systems/Server/ServerSettlementWorkerTaskSyncSystem.cs", 17, "AiTaskState", "Settlement.Workers", "AiBots"),
-            new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Stage1/Runtime/Logic/Systems/Server/ServerStage1FlowSystem.cs", 52, "Stage1SettlementProgression", "Stage1", "Settlement"),
-            new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Stage1/Runtime/Logic/Systems/Server/ServerStage1FlowSystem.cs", 61, "Stage1SettlementProgression", "Stage1", "Settlement"),
-            new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Stage1/Runtime/Logic/Systems/Server/ServerStage1FlowSystem.cs", 79, "Stage1SettlementProgression", "Stage1", "Settlement")
+            new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Stage1/Runtime/Logic/Systems/Server/ServerCampFlowProgressionSystem.cs", 52, "CampFlowProgression", "Stage1", "Settlement"),
+            new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Stage1/Runtime/Logic/Systems/Server/ServerCampFlowProgressionSystem.cs", 61, "CampFlowProgression", "Stage1", "Settlement"),
+            new Violation("ReplicationMut.Mut", "Assets/Scripts/StaticMlp/Features/Stage1/Runtime/Logic/Systems/Server/ServerCampFlowProgressionSystem.cs", 79, "CampFlowProgression", "Stage1", "Settlement")
         };
 
         [Test]

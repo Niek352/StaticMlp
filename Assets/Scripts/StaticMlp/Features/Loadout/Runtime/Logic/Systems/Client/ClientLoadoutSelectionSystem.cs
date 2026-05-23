@@ -15,13 +15,13 @@ namespace StaticMlp.Features.Loadout
             foreach (var player in CW.Query<All<LocalOwned, PlayerTag>>().Entities())
             {
                 if (!player.Has<OwnerLoadoutSelection>())
-                    player.Set(Stage1LoadoutRules.DefaultSelection());
+                    player.Set(LoadoutPreparationRules.DefaultSelection());
 
                 if (!player.Has<ClientLoadoutSelectionSyncState>())
                     player.Set(new ClientLoadoutSelectionSyncState());
 
                 ref var selection = ref player.Mut<OwnerLoadoutSelection>();
-                player.Set(Stage1LoadoutRules.CreatePreparedSnapshot(selection));
+                player.Set(LoadoutPreparationRules.CreatePreparedSnapshot(selection));
 
                 ref var syncState = ref player.Mut<ClientLoadoutSelectionSyncState>();
                 if (!syncState.ShouldCommitSelection)

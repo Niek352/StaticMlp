@@ -97,7 +97,7 @@ namespace StaticMlp.Features.Settlement
             return SpendProjected(ref rows, resourceId, requested);
         }
 
-        public static void InitializeRows(SW.Entity entity, Stage1SettlementSeed seed)
+        public static void InitializeRows(SW.Entity entity, SettlementSeed seed)
         {
             ref var rows = ref entity.Add<SW.Multi<SettlementStoredResource>>();
             rows.Clear();

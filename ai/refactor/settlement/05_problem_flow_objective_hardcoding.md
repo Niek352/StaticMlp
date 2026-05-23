@@ -1,5 +1,24 @@
 # Проблема: Хардкод Stage1Flow objective/hint (найдена при аудите)
 
+> **СТАТУС РЕФАКТОРА (2025-05-22): НЕ выполнен — практически не начат**
+>
+> ## Сделано
+> - Нет значимых изменений по этой проблеме.
+>
+> ## Осталось (весь план рефактора)
+> 1. **`ServerStage1FlowViewStateSystem.ResolveObjective()`** — всё ещё содержит длинную if/else цепочку, маппящую `Stage1SettlementProgressStage` + world state → `Stage1FlowObjective`.
+> 2. **`ServerStage1FlowViewStateSystem.ResolveHint()`** — всё ещё содержит if/else цепочку stage → `Stage1FlowHint`.
+> 3. **`SettlementHudPresentation.ToPresentationObjective()`** — switch `Stage1FlowObjective` → `Stage1ObjectiveKind` (лишний enum-уровень).
+> 4. **`SettlementHudPresentation.ToPresentationHint()`** — switch `Stage1FlowHint` → string.
+> 5. **`Stage1HudController.DescribeObjective()`** — switch `Stage1ObjectiveKind` → display string.
+> 6. **`Stage1FlowCatalog` не создан**. Нужен статический каталог `Stage1FlowStageDefinition`, декларирующий objective/hint строки и флаг `AutoAdvance`.
+> 7. **`IStage1ObjectiveOverride` не создан**. Boss/Threat/Expedition overrides всё ещё захардкожены в `ResolveObjective()`.
+> 8. **Избыточные enum-ы** (`Stage1FlowObjective`, `Stage1FlowHint`, `Stage1ObjectiveKind`) всё ещё существуют вместо прямых строк в `Stage1FlowViewState` / `SettlementHudState`.
+
+---
+
+# Проблема: Хардкод Stage1Flow objective/hint (найдена при аудите)
+
 ## Краткое описание
 
 Stage1 progression использует линейную цепочку стадий. Каждая стадия должна показывать игроку objective (что делать) и hint (подсказка). Вместо того чтобы каждая стадия декларировать свои строки в данных, маппинг размазан по 4+ файлам через if/else и switch.

@@ -7,6 +7,14 @@ namespace StaticMlp.Features.BuildingCatalog
 {
     public static class BuildingCatalogData
     {
+        private const byte OPEN_DETAILS_PRIORITY = 10;
+        private const byte ASSIGN_WORKER_PRIORITY = 50;
+        private const byte REST_PRIORITY = 60;
+        private const byte EXTRACT_PRIORITY = 70;
+        private const byte ASSIGN_BED_PRIORITY = 80;
+        private const byte STORE_ITEMS_PRIORITY = 90;
+        private const byte OPEN_PRODUCTION_QUEUE_PRIORITY = 100;
+
         public static readonly BuildingId CampCoreId = new(1);
         public static readonly BuildingId StockpileId = new(2);
         public static readonly BuildingId BedrollShelterId = new(3);
@@ -23,6 +31,7 @@ namespace StaticMlp.Features.BuildingCatalog
                 code: "camp_core",
                 displayName: "Camp Core",
                 BuildingCategory.Service,
+                categoryDisplayName: "Service",
                 BuildingCapabilityFlags.SupportsNpcInteraction
                     | BuildingCapabilityFlags.SupportsPlayerInteraction
                     | BuildingCapabilityFlags.BlocksPathing,
@@ -41,6 +50,7 @@ namespace StaticMlp.Features.BuildingCatalog
                 code: "stockpile",
                 displayName: "Stockpile",
                 BuildingCategory.Logistics,
+                categoryDisplayName: "Logistics",
                 BuildingCapabilityFlags.ProvidesStorage
                     | BuildingCapabilityFlags.SupportsNpcInteraction
                     | BuildingCapabilityFlags.SupportsPlayerInteraction
@@ -54,11 +64,19 @@ namespace StaticMlp.Features.BuildingCatalog
                 buildWorkRequired: 80f,
                 new[]
                 {
-                    new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, requiresCompletedBuilding: false),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, requiresCompletedBuilding: false),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, requiresCompletedBuilding: false),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.StoreItems, requiresCompletedBuilding: true),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.WithdrawItems, requiresCompletedBuilding: true)
+                    new BuildingInteractionDefinition(
+                        BuildingInteractionKind.OpenDetails,
+                        displayName: "Open",
+                        requiresCompletedBuilding: false,
+                        OPEN_DETAILS_PRIORITY),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, displayName: "Deposit", requiresCompletedBuilding: false),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, displayName: "Build", requiresCompletedBuilding: false),
+                    new BuildingInteractionDefinition(
+                        BuildingInteractionKind.StoreItems,
+                        displayName: "Open Storage",
+                        requiresCompletedBuilding: true,
+                        STORE_ITEMS_PRIORITY),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.WithdrawItems, displayName: "Withdraw", requiresCompletedBuilding: true)
                 },
                 new BuildingNpcProfileDefinition(supportsWorkers: true, workerSlots: 1),
                 new BuildingOperationDefinition(
@@ -70,6 +88,7 @@ namespace StaticMlp.Features.BuildingCatalog
                 code: "bedroll_shelter",
                 displayName: "Bedroll Shelter",
                 BuildingCategory.Housing,
+                categoryDisplayName: "Housing",
                 BuildingCapabilityFlags.ProvidesHousing
                     | BuildingCapabilityFlags.ProvidesRest
                     | BuildingCapabilityFlags.SupportsNpcInteraction
@@ -84,11 +103,23 @@ namespace StaticMlp.Features.BuildingCatalog
                 buildWorkRequired: 70f,
                 new[]
                 {
-                    new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, requiresCompletedBuilding: false),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, requiresCompletedBuilding: false),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, requiresCompletedBuilding: false),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.AssignBed, requiresCompletedBuilding: true),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.Rest, requiresCompletedBuilding: true)
+                    new BuildingInteractionDefinition(
+                        BuildingInteractionKind.OpenDetails,
+                        displayName: "Open",
+                        requiresCompletedBuilding: false,
+                        OPEN_DETAILS_PRIORITY),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, displayName: "Deposit", requiresCompletedBuilding: false),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, displayName: "Build", requiresCompletedBuilding: false),
+                    new BuildingInteractionDefinition(
+                        BuildingInteractionKind.AssignBed,
+                        displayName: "Assign Bed",
+                        requiresCompletedBuilding: true,
+                        ASSIGN_BED_PRIORITY),
+                    new BuildingInteractionDefinition(
+                        BuildingInteractionKind.Rest,
+                        displayName: "Rest",
+                        requiresCompletedBuilding: true,
+                        REST_PRIORITY)
                 },
                 new BuildingNpcProfileDefinition(supportsWorkers: true, workerSlots: 2),
                 new BuildingOperationDefinition(
@@ -100,6 +131,7 @@ namespace StaticMlp.Features.BuildingCatalog
                 code: "lumber_camp",
                 displayName: "Lumber Camp",
                 BuildingCategory.Extraction,
+                categoryDisplayName: "Extraction",
                 BuildingCapabilityFlags.ProvidesWorkplace
                     | BuildingCapabilityFlags.ProducesResources
                     | BuildingCapabilityFlags.ExtractsFromNode
@@ -127,6 +159,7 @@ namespace StaticMlp.Features.BuildingCatalog
                 code: "stone_mine",
                 displayName: "Stone Mine",
                 BuildingCategory.Extraction,
+                categoryDisplayName: "Extraction",
                 BuildingCapabilityFlags.ProvidesWorkplace
                     | BuildingCapabilityFlags.ProducesResources
                     | BuildingCapabilityFlags.ExtractsFromNode
@@ -154,6 +187,7 @@ namespace StaticMlp.Features.BuildingCatalog
                 code: "workbench",
                 displayName: "Workbench",
                 BuildingCategory.Production,
+                categoryDisplayName: "Production",
                 BuildingCapabilityFlags.ProvidesWorkplace
                     | BuildingCapabilityFlags.ProducesResources
                     | BuildingCapabilityFlags.ConsumesResources
@@ -170,13 +204,25 @@ namespace StaticMlp.Features.BuildingCatalog
                 buildWorkRequired: 120f,
                 new[]
                 {
-                    new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, requiresCompletedBuilding: false),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, requiresCompletedBuilding: false),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, requiresCompletedBuilding: false),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.AssignWorker, requiresCompletedBuilding: true),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.OpenProductionQueue, requiresCompletedBuilding: true),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.SetRecipe, requiresCompletedBuilding: true),
-                    new BuildingInteractionDefinition(BuildingInteractionKind.ClaimOutput, requiresCompletedBuilding: true)
+                    new BuildingInteractionDefinition(
+                        BuildingInteractionKind.OpenDetails,
+                        displayName: "Open",
+                        requiresCompletedBuilding: false,
+                        OPEN_DETAILS_PRIORITY),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, displayName: "Deposit", requiresCompletedBuilding: false),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, displayName: "Build", requiresCompletedBuilding: false),
+                    new BuildingInteractionDefinition(
+                        BuildingInteractionKind.AssignWorker,
+                        displayName: "Assign Worker",
+                        requiresCompletedBuilding: true,
+                        ASSIGN_WORKER_PRIORITY),
+                    new BuildingInteractionDefinition(
+                        BuildingInteractionKind.OpenProductionQueue,
+                        displayName: "Open Queue",
+                        requiresCompletedBuilding: true,
+                        OPEN_PRODUCTION_QUEUE_PRIORITY),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.SetRecipe, displayName: "Set Recipe", requiresCompletedBuilding: true),
+                    new BuildingInteractionDefinition(BuildingInteractionKind.ClaimOutput, displayName: "Claim Output", requiresCompletedBuilding: true)
                 },
                 new BuildingNpcProfileDefinition(supportsWorkers: true, workerSlots: 2),
                 new BuildingOperationDefinition(
@@ -222,9 +268,13 @@ namespace StaticMlp.Features.BuildingCatalog
         {
             return new[]
             {
-                new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, requiresCompletedBuilding: false),
-                new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, requiresCompletedBuilding: false),
-                new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, requiresCompletedBuilding: false)
+                new BuildingInteractionDefinition(
+                    BuildingInteractionKind.OpenDetails,
+                    displayName: "Open",
+                    requiresCompletedBuilding: false,
+                    OPEN_DETAILS_PRIORITY),
+                new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, displayName: "Deposit", requiresCompletedBuilding: false),
+                new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, displayName: "Build", requiresCompletedBuilding: false)
             };
         }
 
@@ -232,11 +282,23 @@ namespace StaticMlp.Features.BuildingCatalog
         {
             return new[]
             {
-                new BuildingInteractionDefinition(BuildingInteractionKind.OpenDetails, requiresCompletedBuilding: false),
-                new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, requiresCompletedBuilding: false),
-                new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, requiresCompletedBuilding: false),
-                new BuildingInteractionDefinition(BuildingInteractionKind.AssignWorker, requiresCompletedBuilding: true),
-                new BuildingInteractionDefinition(BuildingInteractionKind.Extract, requiresCompletedBuilding: true)
+                new BuildingInteractionDefinition(
+                    BuildingInteractionKind.OpenDetails,
+                    displayName: "Open",
+                    requiresCompletedBuilding: false,
+                    OPEN_DETAILS_PRIORITY),
+                new BuildingInteractionDefinition(BuildingInteractionKind.DepositConstructionResources, displayName: "Deposit", requiresCompletedBuilding: false),
+                new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, displayName: "Build", requiresCompletedBuilding: false),
+                new BuildingInteractionDefinition(
+                    BuildingInteractionKind.AssignWorker,
+                    displayName: "Assign Worker",
+                    requiresCompletedBuilding: true,
+                    ASSIGN_WORKER_PRIORITY),
+                new BuildingInteractionDefinition(
+                    BuildingInteractionKind.Extract,
+                    displayName: "Extract",
+                    requiresCompletedBuilding: true,
+                    EXTRACT_PRIORITY)
             };
         }
     }

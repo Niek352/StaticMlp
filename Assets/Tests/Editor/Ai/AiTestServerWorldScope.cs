@@ -34,8 +34,8 @@ namespace StaticMlp.Tests.Ai
                 typeof(ConstructionRules).Assembly,
                 typeof(SettlementAnchorRef).Assembly,
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
-                typeof(Stage1SettlementProgression).Assembly,
-                typeof(Stage1WorkerAssignmentAcceptedEvent).Assembly,
+                typeof(CampFlowProgression).Assembly,
+                typeof(CampFlowWorkerAssignmentAcceptedEvent).Assembly,
                 typeof(SettlementWorkersGameplayFeature).Assembly,
                 typeof(Health).Assembly,
                 typeof(CharacterNetState).Assembly,
@@ -116,10 +116,10 @@ namespace StaticMlp.Tests.Ai
 
         public SW.Entity CreateSettlementAnchor(
             SettlementAnchorId anchorId,
-            Stage1SettlementProgressStage stage = Stage1SettlementProgressStage.CampRepaired)
+            CampFlowStage stage = CampFlowStage.CampRepaired)
         {
             var entity = SW.NewEntity<Default>();
-            entity.Set(new Stage1SettlementProgression
+            entity.Set(new CampFlowProgression
             {
                 AnchorId = anchorId.Value,
                 Stage = stage

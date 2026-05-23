@@ -13,7 +13,7 @@
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Features.Progression.Logic",
         "StaticMlp.Features.Settlement.Logic",
-        "StaticMlp.Features.Stage1.Logic",
+        "StaticMlp.Features.CampFlow.Logic",
         "StaticMlp.Features.Frontier.Logic",
         "Unity.InputSystem",
         "Unity.TextMeshPro",

@@ -10,13 +10,13 @@ namespace StaticMlp.Features.Frontier
     {
         public void Update()
         {
-            foreach (var anchor in SW.Query<All<Stage1SettlementProgression, ActiveExpeditionState>>().Entities())
+            foreach (var anchor in SW.Query<All<CampFlowProgression, ActiveExpeditionState>>().Entities())
             {
                 ref readonly var activeExpedition = ref anchor.Read<ActiveExpeditionState>();
                 if (activeExpedition.Status != ExpeditionActivityStatus.Active)
                     continue;
 
-                var anchorId = anchor.Read<Stage1SettlementProgression>().Anchor;
+                var anchorId = anchor.Read<CampFlowProgression>().Anchor;
                 if (FrontierEncounterParticipantQuery.HasAnyLivingParticipant(
                         anchorId,
                         FrontierEncounterKind.Expedition,

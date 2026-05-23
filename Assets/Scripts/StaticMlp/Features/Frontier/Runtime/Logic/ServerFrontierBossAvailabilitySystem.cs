@@ -9,9 +9,9 @@ namespace StaticMlp.Features.Frontier
     {
         public void Update()
         {
-            foreach (var anchor in SW.Query<All<Stage1ProgressionState, BossEncounterState>>().Entities())
+            foreach (var anchor in SW.Query<All<ProgressionState, BossEncounterState>>().Entities())
             {
-                ref readonly var progression = ref anchor.Read<Stage1ProgressionState>();
+                ref readonly var progression = ref anchor.Read<ProgressionState>();
                 ref readonly var bossState = ref anchor.Read<BossEncounterState>();
                 if (bossState.Status is BossEncounterStatus.Active or BossEncounterStatus.Defeated)
                     continue;

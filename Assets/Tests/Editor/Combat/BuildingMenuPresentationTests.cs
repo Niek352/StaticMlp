@@ -28,7 +28,7 @@ namespace StaticMlp.Tests.Combat
                 Assert.That(card.BuildingId, Is.EqualTo(definition.Id));
                 Assert.That(card.DisplayName, Is.EqualTo(BuildingPresentationCatalog.Get(definition.Id).DisplayName));
                 Assert.That(card.Category, Is.EqualTo(definition.Category));
-                Assert.That(card.CategoryLabel, Is.Not.Empty);
+                Assert.That(card.CategoryLabel, Is.EqualTo(definition.CategoryDisplayName));
                 Assert.That(card.CostLabel, Does.Contain("Wood"));
                 Assert.That(card.IsSelected, Is.False);
             }

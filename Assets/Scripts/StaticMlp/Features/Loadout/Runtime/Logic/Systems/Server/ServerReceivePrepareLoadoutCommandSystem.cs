@@ -34,7 +34,7 @@ namespace StaticMlp.Features.Loadout
                 {
                     PrimaryModuleId = evt.Value.Value.PrimaryModuleId
                 });
-                SW.SendEvent(new Stage1LoadoutPreparedEvent(evt.Value.Value.AnchorId));
+                SW.SendEvent(new CampFlowLoadoutPreparedEvent(evt.Value.Value.AnchorId));
             }
         }
 

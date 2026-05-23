@@ -13,7 +13,7 @@
         "StaticMlp.Features.Loadout.Logic",
         "StaticMlp.Features.Progression.Contracts",
         "StaticMlp.Features.Settlement.Contracts",
-        "StaticMlp.Features.Stage1.Contracts",
+        "StaticMlp.Features.CampFlow.Contracts",
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.Frontier.Logic",
         "StaticMlp.Features.Player",

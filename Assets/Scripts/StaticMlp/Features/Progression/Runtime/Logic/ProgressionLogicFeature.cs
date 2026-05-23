@@ -7,14 +7,14 @@ namespace StaticMlp.Features.Progression
     {
         public override void RegisterNetworkEvents()
         {
-            ProjectionRegistry.Register<Stage1ProgressionState>();
+            ProjectionRegistry.Register<ProgressionState>();
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
-            systems.Add(new ServerStage1RewardApplicationSystem(), GameplaySystemOrder.Gameplay - 93);
-            systems.Add(new ServerStage1RaidDefenseProgressionSystem(), GameplaySystemOrder.Gameplay - 90);
-            systems.Add(new ServerStage1BossPreparationProgressionSystem(), GameplaySystemOrder.Gameplay - 89);
+            systems.Add(new ServerRewardApplicationSystem(), GameplaySystemOrder.Gameplay - 93);
+            systems.Add(new ServerRaidDefenseProgressionSystem(), GameplaySystemOrder.Gameplay - 90);
+            systems.Add(new ServerBossPreparationProgressionSystem(), GameplaySystemOrder.Gameplay - 89);
         }
     }
 }

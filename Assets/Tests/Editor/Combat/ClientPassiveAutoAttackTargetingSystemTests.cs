@@ -80,7 +80,7 @@ namespace StaticMlp.Tests.Combat
             {
                 PrimaryModuleId = LoadoutModuleCatalog.FireFlaskModuleId
             });
-            player.Set(Stage1LoadoutRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
+            player.Set(LoadoutPreparationRules.CreatePreparedSnapshot(player.Read<OwnerLoadoutSelection>()));
             scope.CreateMonster(new Vector3(9.5f, 0f, 0f));
             scope.SetGameTime(4.5f);
             var system = new ClientPassiveAutoAttackTargetingSystem();

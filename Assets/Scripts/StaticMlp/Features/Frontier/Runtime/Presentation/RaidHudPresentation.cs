@@ -9,7 +9,7 @@ namespace StaticMlp.Features.Frontier
     {
         public static RaidHudState Build()
         {
-            if (!Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
+            if (!CampFlowProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor))
                 return default;
 
             var state = new RaidHudState();

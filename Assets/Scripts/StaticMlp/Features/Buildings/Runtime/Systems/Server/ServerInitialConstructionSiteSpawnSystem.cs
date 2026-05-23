@@ -19,7 +19,7 @@ namespace StaticMlp.Features.Buildings
                 return;
             }
 
-            var resource = SW.GetResource<Stage1SettlementSeed>();
+            var resource = SW.GetResource<SettlementSeed>();
             var heightSampler = SW.GetResource<IHeightSampler>();
             var sites = resource.InitialConstructionSites;
             for (var i = 0; i < sites.Length; i++)
@@ -28,7 +28,7 @@ namespace StaticMlp.Features.Buildings
             _spawned = true;
         }
 
-        private static void SpawnInitialSite(Stage1ConstructionSiteSeed definition, IHeightSampler heightSampler)
+        private static void SpawnInitialSite(SettlementConstructionSiteSeed definition, IHeightSampler heightSampler)
         {
             var position = definition.Position;
             position.y = heightSampler.SampleHeight(position.x, position.z);

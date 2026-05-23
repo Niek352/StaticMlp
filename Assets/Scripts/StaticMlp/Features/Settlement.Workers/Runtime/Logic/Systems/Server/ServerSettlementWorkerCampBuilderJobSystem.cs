@@ -10,9 +10,9 @@ namespace StaticMlp.Features.Settlement.Workers
     {
         public void Update()
         {
-            foreach (var anchor in SW.Query<All<Stage1SettlementProgression>>().Entities())
+            foreach (var anchor in SW.Query<All<CampFlowProgression>>().Entities())
             {
-                ref readonly var progression = ref anchor.Read<Stage1SettlementProgression>();
+                ref readonly var progression = ref anchor.Read<CampFlowProgression>();
 
                 var jobState = CreateJobState(progression.Anchor, in progression);
                 var summary = CreateSummary(progression.Anchor, jobState);
@@ -27,7 +27,7 @@ namespace StaticMlp.Features.Settlement.Workers
 
         private static SettlementCampBuilderJobState CreateJobState(
             SettlementAnchorId anchorId,
-            in Stage1SettlementProgression progression)
+            in CampFlowProgression progression)
         {
             var state = new SettlementCampBuilderJobState
             {
@@ -38,7 +38,7 @@ namespace StaticMlp.Features.Settlement.Workers
                 BlockingReason = SettlementWorkerBlockingReason.None
             };
 
-            if ((byte)progression.Stage < (byte)Stage1SettlementProgressStage.CampRepaired)
+            if ((byte)progression.Stage < (byte)CampFlowStage.CampRepaired)
             {
                 state.AssignedWorker = FindFirstAssignedWorker(anchorId, out _);
                 state.BlockingReason = SettlementWorkerBlockingReason.AwaitingCampRepair;

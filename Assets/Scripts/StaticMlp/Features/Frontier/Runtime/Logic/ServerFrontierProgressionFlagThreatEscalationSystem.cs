@@ -35,7 +35,7 @@ namespace StaticMlp.Features.Frontier
             if (evt.FlagId != ProgressFlagCatalog.RecoveredWarCacheAppliedId)
                 return;
 
-            var anchor = Stage1SettlementProgressionQuery.GetServerAnchor(evt.AnchorId);
+            var anchor = CampFlowProgressionQuery.GetServerAnchor(evt.AnchorId);
             var raidId = RaidCatalog.RaiderCounterattackId;
             var raid = RaidCatalog.Get(raidId);
 

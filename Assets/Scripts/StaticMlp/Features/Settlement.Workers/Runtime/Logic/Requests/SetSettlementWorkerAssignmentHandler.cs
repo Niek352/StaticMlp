@@ -34,12 +34,12 @@ namespace StaticMlp.Features.Settlement.Workers
             if (identity.HomeAnchorId != request.AnchorId)
                 return rejected;
 
-            if (!Stage1SettlementProgressionQuery.TryGetServerAnchor(new SettlementAnchorId(request.AnchorId), out var anchor))
+            if (!CampFlowProgressionQuery.TryGetServerAnchor(new SettlementAnchorId(request.AnchorId), out var anchor))
                 return rejected;
 
-            ref readonly var progression = ref anchor.Read<Stage1SettlementProgression>();
+            ref readonly var progression = ref anchor.Read<CampFlowProgression>();
             if (request.Assigned
-                && (byte)progression.Stage < (byte)Stage1SettlementProgressStage.CampRepaired)
+                && (byte)progression.Stage < (byte)CampFlowStage.CampRepaired)
                 return rejected;
 
             if (request.Assigned && HasOtherAssignedWorker(new SettlementAnchorId(request.AnchorId), worker.GID))
@@ -58,7 +58,7 @@ namespace StaticMlp.Features.Settlement.Workers
             buildingAssignment.SlotIndex = 0;
 
             if (request.Assigned && identity.Role == WorkerRoleCatalog.CampBuilderId)
-                SW.SendEvent(new Stage1WorkerAssignmentAcceptedEvent(new SettlementAnchorId(request.AnchorId)));
+                SW.SendEvent(new CampFlowWorkerAssignmentAcceptedEvent(new SettlementAnchorId(request.AnchorId)));
 
             return new SetSettlementWorkerAssignmentResultEvent
             {

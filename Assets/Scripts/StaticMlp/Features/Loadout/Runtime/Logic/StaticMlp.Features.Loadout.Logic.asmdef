@@ -8,7 +8,7 @@
         "Game.Core",
         "StaticMlp.Features.Loadout.Contracts",
         "StaticMlp.Features.Settlement.Contracts",
-        "StaticMlp.Features.Stage1.Contracts"
+        "StaticMlp.Features.CampFlow.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

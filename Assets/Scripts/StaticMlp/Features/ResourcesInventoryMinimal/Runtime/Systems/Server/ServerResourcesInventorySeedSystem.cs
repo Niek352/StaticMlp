@@ -10,7 +10,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
     {
         public void Update()
         {
-            var settlementSeed = SW.GetResource<Stage1SettlementSeed>();
+            var settlementSeed = SW.GetResource<SettlementSeed>();
             var startingWood = settlementSeed.GetStartingResourceAmount(ResourceCatalog.WoodId);
             var startingStone = settlementSeed.GetStartingResourceAmount(ResourceCatalog.StoneId);
 

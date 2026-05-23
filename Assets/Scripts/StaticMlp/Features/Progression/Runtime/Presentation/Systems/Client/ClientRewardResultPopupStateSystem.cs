@@ -10,13 +10,13 @@ namespace StaticMlp.Features.Progression
         public void Update()
         {
             ref var session = ref CW.GetResource<RewardResultPopupSession>();
-            if (!Stage1SettlementProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor)
-                || !anchor.Has<Projected<Stage1ProgressionState>>())
+            if (!CampFlowProgressionQuery.TryGetClientAnchor(SettlementAnchorCatalog.HomeCampId, out var anchor)
+                || !anchor.Has<Projected<ProgressionState>>())
             {
                 return;
             }
 
-            ref readonly var progression = ref ClientProjection.Read<Stage1ProgressionState>(anchor);
+            ref readonly var progression = ref ClientProjection.Read<ProgressionState>(anchor);
             session.CurrentAppliedRewardsMask = progression.AppliedRewardsMask;
 
             if (session.IsVisible)

@@ -37,14 +37,14 @@ namespace StaticMlp.Features.Frontier
 
             var anchorId = new SettlementAnchorId(request.Value.AnchorId);
             var expeditionId = new ExpeditionId(request.Value.ExpeditionId);
-            var anchor = Stage1SettlementProgressionQuery.GetServerAnchor(anchorId);
-            ref readonly var progression = ref anchor.Read<Stage1SettlementProgression>();
+            var anchor = CampFlowProgressionQuery.GetServerAnchor(anchorId);
+            ref readonly var progression = ref anchor.Read<CampFlowProgression>();
             ref readonly var availability = ref anchor.Read<ExpeditionAvailabilityState>();
             ref readonly var activeExpedition = ref anchor.Read<ActiveExpeditionState>();
             ref readonly var threat = ref anchor.Read<ThreatState>();
             ref readonly var raidSchedule = ref anchor.Read<RaidScheduleState>();
 
-            if (progression.Stage != Stage1SettlementProgressStage.LoadoutPrepared
+            if (progression.Stage != CampFlowStage.LoadoutPrepared
                 || availability.Status != ExpeditionAvailabilityStatus.Available
                 || availability.ExpeditionIdValue != expeditionId.Value
                 || activeExpedition.Status == ExpeditionActivityStatus.Active

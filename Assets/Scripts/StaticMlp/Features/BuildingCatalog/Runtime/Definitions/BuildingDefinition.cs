@@ -9,6 +9,7 @@ namespace StaticMlp.Features.BuildingCatalog
         public readonly string Code;
         public readonly string DisplayName;
         public readonly BuildingCategory Category;
+        public readonly string CategoryDisplayName;
         public readonly BuildingCapabilityFlags Capabilities;
         public readonly ResourceAmount[] ConstructionCost;
         public readonly int2 Footprint;
@@ -22,6 +23,7 @@ namespace StaticMlp.Features.BuildingCatalog
             string code,
             string displayName,
             BuildingCategory category,
+            string categoryDisplayName,
             BuildingCapabilityFlags capabilities,
             ResourceAmount[] constructionCost,
             int2 footprint,
@@ -34,6 +36,7 @@ namespace StaticMlp.Features.BuildingCatalog
             Code = code;
             DisplayName = displayName;
             Category = category;
+            CategoryDisplayName = categoryDisplayName;
             Capabilities = capabilities;
             ConstructionCost = constructionCost;
             Footprint = footprint;

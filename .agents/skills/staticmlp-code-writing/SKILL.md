@@ -106,6 +106,7 @@ Rules:
 - Do not place Unity presentation code, view components, or client-only visuals in `Runtime/Logic`.
 - Do not place gameplay rules, replicated mutation, server authority, or validation logic in `Runtime/Presentation`.
 - Keep domain definitions free from network ids, prefab/view paths, transport state, and concrete UI concerns.
+- Do not add `if/else` chains for mapping ids/enums/types/states to data, labels, behavior, or handlers. Use explicit catalog/definition data, cohesive domain rules, polymorphic handlers, or a small local `switch` expression only when the branching is closed, stable, and not config/static data.
 
 ## System Design
 

@@ -18,7 +18,7 @@ namespace StaticMlp.Tests.Ai
         {
             using var scope = new AiTestServerWorldScope();
             var anchorId = SettlementAnchorCatalog.HomeCampId;
-            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.RepairResourcesReady);
+            var anchor = scope.CreateSettlementAnchor(anchorId, CampFlowStage.RepairResourcesReady);
             var worker = scope.CreateWorker(anchorId, new Vector3(1f, 0f, 1f));
             var handler = new SetSettlementWorkerAssignmentHandler();
             var request = new SetSettlementWorkerAssignmentRequestEvent(worker.GID, anchorId, assigned: true);
@@ -28,10 +28,10 @@ namespace StaticMlp.Tests.Ai
             Assert.That(rejected.Status, Is.EqualTo(RequestStatus.Rejected));
             Assert.That(worker.Read<SettlementWorkerAssignment>().Status, Is.EqualTo(SettlementWorkerAssignmentStatus.Unassigned));
 
-            anchor.Set(new Stage1SettlementProgression
+            anchor.Set(new CampFlowProgression
             {
                 AnchorId = anchorId.Value,
-                Stage = Stage1SettlementProgressStage.CampRepaired
+                Stage = CampFlowStage.CampRepaired
             });
 
             var accepted = handler.Handle(default, in request);
@@ -46,13 +46,13 @@ namespace StaticMlp.Tests.Ai
         {
             using var scope = new AiTestServerWorldScope();
             var anchorId = SettlementAnchorCatalog.HomeCampId;
-            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var anchor = scope.CreateSettlementAnchor(anchorId, CampFlowStage.CampRepaired);
             var worker = scope.CreateWorker(anchorId, Vector3.zero, SettlementWorkerAssignmentStatus.Assigned);
             var site = scope.CreateConstructionSite(new Vector3(2f, 0f, 0f), ConstructionPhase.WaitingForResources, resourcesComplete: false);
 
             new ServerSettlementWorkerCampBuilderJobSystem().Update();
 
-            Assert.That(anchor.Read<Stage1SettlementProgression>().Stage, Is.EqualTo(Stage1SettlementProgressStage.CampRepaired));
+            Assert.That(anchor.Read<CampFlowProgression>().Stage, Is.EqualTo(CampFlowStage.CampRepaired));
 
             ref readonly var job = ref anchor.Read<SettlementCampBuilderJobState>();
             Assert.That(job.AssignedWorker, Is.EqualTo(worker.GID));
@@ -74,7 +74,7 @@ namespace StaticMlp.Tests.Ai
         {
             using var scope = new AiTestServerWorldScope();
             var anchorId = SettlementAnchorCatalog.HomeCampId;
-            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var anchor = scope.CreateSettlementAnchor(anchorId, CampFlowStage.CampRepaired);
             var worker = scope.CreateWorker(anchorId, Vector3.zero, SettlementWorkerAssignmentStatus.Assigned, WorkerRoleCatalog.BuilderId);
             var site = scope.CreateConstructionSite(new Vector3(2f, 0f, 0f), ConstructionPhase.WaitingForResources, resourcesComplete: false);
             CreateWorkbench(outputPlanks: 5);
@@ -142,7 +142,7 @@ namespace StaticMlp.Tests.Ai
         {
             using var scope = new AiTestServerWorldScope();
             var anchorId = SettlementAnchorCatalog.HomeCampId;
-            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var anchor = scope.CreateSettlementAnchor(anchorId, CampFlowStage.CampRepaired);
             var worker = scope.CreateWorker(
                 anchorId,
                 Vector3.zero,
@@ -165,7 +165,7 @@ namespace StaticMlp.Tests.Ai
         {
             using var scope = new AiTestServerWorldScope();
             var anchorId = SettlementAnchorCatalog.HomeCampId;
-            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var anchor = scope.CreateSettlementAnchor(anchorId, CampFlowStage.CampRepaired);
             var worker = scope.CreateWorker(
                 anchorId,
                 Vector3.zero,
@@ -189,7 +189,7 @@ namespace StaticMlp.Tests.Ai
         {
             using var scope = new AiTestServerWorldScope();
             var anchorId = SettlementAnchorCatalog.HomeCampId;
-            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var anchor = scope.CreateSettlementAnchor(anchorId, CampFlowStage.CampRepaired);
             var worker = scope.CreateWorker(
                 anchorId,
                 Vector3.zero,
@@ -211,7 +211,7 @@ namespace StaticMlp.Tests.Ai
         {
             using var scope = new AiTestServerWorldScope();
             var anchorId = SettlementAnchorCatalog.HomeCampId;
-            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.CampRepaired);
+            var anchor = scope.CreateSettlementAnchor(anchorId, CampFlowStage.CampRepaired);
             var worker = scope.CreateWorker(
                 anchorId,
                 Vector3.zero,
@@ -235,7 +235,7 @@ namespace StaticMlp.Tests.Ai
         {
             using var scope = new AiTestServerWorldScope();
             var anchorId = SettlementAnchorCatalog.HomeCampId;
-            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.WorkerAssigned);
+            var anchor = scope.CreateSettlementAnchor(anchorId, CampFlowStage.WorkerAssigned);
             var worker = scope.CreateWorker(anchorId, Vector3.zero, SettlementWorkerAssignmentStatus.Assigned);
             var site = scope.CreateConstructionSite(new Vector3(3f, 0f, 0f), ConstructionPhase.ReadyToBuild, resourcesComplete: true);
 
@@ -261,7 +261,7 @@ namespace StaticMlp.Tests.Ai
         {
             using var scope = new AiTestServerWorldScope();
             var anchorId = SettlementAnchorCatalog.HomeCampId;
-            var anchor = scope.CreateSettlementAnchor(anchorId, Stage1SettlementProgressStage.WorkerAssigned);
+            var anchor = scope.CreateSettlementAnchor(anchorId, CampFlowStage.WorkerAssigned);
             var worker = scope.CreateWorker(
                 anchorId,
                 Vector3.zero,

@@ -7,7 +7,7 @@ namespace StaticMlp.Features.Settlement
 {
     public sealed class SettlementSharedResourcesFactory : NetEntityFactory<SettlementSharedResourcesNetworkEntity>, IResource
     {
-        public EntityGID Spawn(Stage1SettlementSeed seed)
+        public EntityGID Spawn(SettlementSeed seed)
         {
             var entity = CreateEntity(
                 new NetworkPeerId(0),
@@ -18,7 +18,7 @@ namespace StaticMlp.Features.Settlement
             return entity;
         }
 
-        private static void Configure(SW.Entity entity, in Stage1SettlementSeed seed)
+        private static void Configure(SW.Entity entity, in SettlementSeed seed)
         {
             entity.Set<SettlementResourceStorageTag>();
             entity.Set(new SettlementSharedResources());

@@ -69,7 +69,7 @@ namespace StaticMlp.Features.Loadout
             {
                 ref var selection = ref player.Mut<OwnerLoadoutSelection>();
                 selection.PrimaryModuleId = moduleId;
-                player.Set(Stage1LoadoutRules.CreatePreparedSnapshot(selection));
+                player.Set(LoadoutPreparationRules.CreatePreparedSnapshot(selection));
                 return;
             }
 
