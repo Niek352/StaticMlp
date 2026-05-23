@@ -1,3 +1,4 @@
+using StaticMlp.Features.CampFlow;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
@@ -239,7 +240,7 @@ namespace StaticMlp.Tests.Combat
             var owner = new NetworkPeerId(1);
             var player = scope.CreatePlayer(owner, Vector3.zero);
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
-            InitializeStage1BossPath(scope);
+            InitializeBossPath(scope);
 
             ref var progression = ref anchor.Mut<ProgressionState>();
             progression.GrantBossPreparationTokens(1);
@@ -271,7 +272,7 @@ namespace StaticMlp.Tests.Combat
             var owner = new NetworkPeerId(1);
             var player = scope.CreatePlayer(owner, Vector3.zero);
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
-            InitializeStage1BossPath(scope);
+            InitializeBossPath(scope);
 
             ref var progression = ref anchor.Mut<ProgressionState>();
             progression.ApplyFlag(ProgressFlagCatalog.CounterattackDefendedId);
@@ -320,7 +321,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var scope = new CombatTestServerWorldScope();
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
-            InitializeStage1BossPath(scope);
+            InitializeBossPath(scope);
 
             new ServerFrontierExpeditionAvailabilitySystem().Update();
             new ServerFrontierBossAvailabilitySystem().Update();
@@ -345,7 +346,7 @@ namespace StaticMlp.Tests.Combat
             var owner = new NetworkPeerId(1);
             var player = scope.CreatePlayer(owner, Vector3.zero);
             var anchor = scope.CreateSettlementAnchor(SettlementAnchorCatalog.HomeCampId, Vector3.zero, CampFlowStage.LoadoutPrepared);
-            InitializeStage1BossPath(scope);
+            InitializeBossPath(scope);
 
             ref var progression = ref anchor.Mut<ProgressionState>();
             progression.ApplyFlag(ProgressFlagCatalog.CounterattackDefendedId);
@@ -424,7 +425,7 @@ namespace StaticMlp.Tests.Combat
             startSystem.Destroy();
         }
 
-        private static void InitializeStage1BossPath(CombatTestServerWorldScope scope)
+        private static void InitializeBossPath(CombatTestServerWorldScope scope)
         {
             scope.CreateSettlementSharedResources();
         }

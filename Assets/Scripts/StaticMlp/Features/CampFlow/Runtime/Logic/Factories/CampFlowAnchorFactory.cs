@@ -16,7 +16,7 @@ namespace StaticMlp.Features.CampFlow
         public EntityGID Spawn(in CampFlowAnchorSpawnSpec spec)
         {
             if (spec.AnchorId.Value == 0)
-                throw new InvalidOperationException("Stage1 camp anchor spawn requires a non-zero settlement anchor id.");
+                throw new InvalidOperationException("Camp flow anchor spawn requires a non-zero settlement anchor id.");
 
             var entity = CreateEntity(
                 new NetworkPeerId(0),
@@ -38,8 +38,8 @@ namespace StaticMlp.Features.CampFlow
             {
                 AnchorId = spec.AnchorId.Value,
                 Stage = CampFlowStage.DamagedCampStart,
-                Objective = Stage1FlowObjective.RepairCamp,
-                Hint = Stage1FlowHint.GatherRepairResources
+                ObjectiveDisplayName = CampFlowCatalog.REPAIR_CAMP_OBJECTIVE,
+                HintDisplayName = CampFlowCatalog.GATHER_REPAIR_RESOURCES_HINT
             });
             entity.Set(new ProgressionState(spec.AnchorId, spec.StartingFlagsMask));
             entity.Set(new SettlementAnchorLocation(spec.Position, spec.Rotation));

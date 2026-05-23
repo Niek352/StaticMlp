@@ -39,7 +39,7 @@ namespace StaticMlp.Features.Settlement
             {
                 var definition = resources[i];
                 if (!definition.IsSettlementStored)
-                    throw new InvalidOperationException($"Stage1 seed cannot initialize non-stored settlement resource id {definition.Id.Value}.");
+                    throw new InvalidOperationException($"Settlement seed cannot initialize non-stored settlement resource id {definition.Id.Value}.");
 
                 startingResources[i] = new ResourceAmount(definition.Id, definition.StartingSettlementAmount);
             }

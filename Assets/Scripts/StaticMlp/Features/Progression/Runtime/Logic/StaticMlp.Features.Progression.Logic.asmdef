@@ -6,6 +6,7 @@
         "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core",
+        "StaticMlp.Features.CampFlow.Contracts",
         "StaticMlp.Features.Loadout.Contracts",
         "StaticMlp.Features.Progression.Contracts",
         "StaticMlp.Features.Settlement.Contracts",

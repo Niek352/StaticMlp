@@ -209,13 +209,16 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Settlement.Logic
     - guid: 8d47b71d-f6a0-4ecf-9b4e-b9a3d8fae6c1
       current:
-        className: Stage1SettlementProgression
-        namespaceName: StaticMlp.Features.Settlement
-        assembly: StaticMlp.Features.Settlement.Logic
+        className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
       history:
       - className: Stage1SettlementProgression
         namespaceName: StaticMlp.Features.Settlement
         assembly: StaticMlp.Features.Settlement.Logic
+      - className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
     - guid: 4b90f4d5-861f-4105-a2a5-48d8dbb5f9c8
       current:
         className: SettlementCampBuilderJobState
@@ -323,11 +326,14 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Frontier.Logic
     - guid: c6f1d334-a1e4-4472-a7a0-311c3e84fd54
       current:
-        className: Stage1ProgressionState
+        className: ProgressionState
         namespaceName: StaticMlp.Features.Progression
         assembly: StaticMlp.Features.Progression.Logic
       history:
       - className: Stage1ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+      - className: ProgressionState
         namespaceName: StaticMlp.Features.Progression
         assembly: StaticMlp.Features.Progression.Logic
     - guid: e271ae45-3257-4897-955f-d411a1dac94f
@@ -344,13 +350,16 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Settlement.Contracts
     - guid: ce5bcff2-7cdb-4b27-8c53-66c6639e28fa
       current:
-        className: Stage1FlowViewState
-        namespaceName: StaticMlp.Features.Settlement
-        assembly: StaticMlp.Features.Stage1.Contracts
+        className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
       history:
       - className: Stage1FlowViewState
         namespaceName: StaticMlp.Features.Settlement
         assembly: StaticMlp.Features.Stage1.Contracts
+      - className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
     - guid: 6abb3da8-3525-48cb-8265-f041b1cf0ba3
       current:
         className: OpenWorldChunkRef
@@ -927,13 +936,16 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Settlement.Logic
     - guid: 8d47b71d-f6a0-4ecf-9b4e-b9a3d8fae6c1
       current:
-        className: Stage1SettlementProgression
-        namespaceName: StaticMlp.Features.Settlement
-        assembly: StaticMlp.Features.Settlement.Logic
+        className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
       history:
       - className: Stage1SettlementProgression
         namespaceName: StaticMlp.Features.Settlement
         assembly: StaticMlp.Features.Settlement.Logic
+      - className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
     - guid: 4b90f4d5-861f-4105-a2a5-48d8dbb5f9c8
       current:
         className: SettlementCampBuilderJobState
@@ -1041,11 +1053,14 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Frontier.Logic
     - guid: c6f1d334-a1e4-4472-a7a0-311c3e84fd54
       current:
-        className: Stage1ProgressionState
+        className: ProgressionState
         namespaceName: StaticMlp.Features.Progression
         assembly: StaticMlp.Features.Progression.Logic
       history:
       - className: Stage1ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+      - className: ProgressionState
         namespaceName: StaticMlp.Features.Progression
         assembly: StaticMlp.Features.Progression.Logic
     - guid: e271ae45-3257-4897-955f-d411a1dac94f
@@ -1062,13 +1077,16 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Settlement.Contracts
     - guid: ce5bcff2-7cdb-4b27-8c53-66c6639e28fa
       current:
-        className: Stage1FlowViewState
-        namespaceName: StaticMlp.Features.Settlement
-        assembly: StaticMlp.Features.Stage1.Contracts
+        className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
       history:
       - className: Stage1FlowViewState
         namespaceName: StaticMlp.Features.Settlement
         assembly: StaticMlp.Features.Stage1.Contracts
+      - className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
     - guid: 6abb3da8-3525-48cb-8265-f041b1cf0ba3
       current:
         className: OpenWorldChunkRef

@@ -1,3 +1,4 @@
+using StaticMlp.Features.CampFlow;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;

@@ -5,7 +5,7 @@ namespace StaticMlp.Features.Settlement.Workers
 {
     public static class SettlementWorkerRuntimeProfileCatalog
     {
-        // Stage1 balancing: health values reflect role fragility (guard/builder tankier; processor most fragile).
+        // Camp flow balancing: health values reflect role fragility (guard/builder tankier; processor most fragile).
         private const float BUILDER_MAX_HEALTH = 100f;
         private const float GATHERER_MAX_HEALTH = 90f;
         private const float HAULER_MAX_HEALTH = 95f;

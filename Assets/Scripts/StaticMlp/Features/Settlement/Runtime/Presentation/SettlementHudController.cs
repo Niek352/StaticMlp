@@ -26,28 +26,6 @@ namespace StaticMlp.Features.Settlement
         public override ViewLayer Layer => ViewLayer.Persistent;
         public override int? PersistentSortOrder => 0;
 
-        public static string DescribeObjective(Stage1ObjectiveKind objective)
-        {
-            return objective switch
-            {
-                Stage1ObjectiveKind.RepairCamp => "Repair the camp core",
-                Stage1ObjectiveKind.AssignWorker => "Assign the camp builder",
-                Stage1ObjectiveKind.PlaceStockpile => "Place a stockpile",
-                Stage1ObjectiveKind.PlaceShelter => "Place worker shelter",
-                Stage1ObjectiveKind.BringExtractionOnline => "Bring extraction online",
-                Stage1ObjectiveKind.BringWorkbenchOnline => "Bring the workbench online",
-                Stage1ObjectiveKind.PrepareBuild => "Choose the next combat build",
-                Stage1ObjectiveKind.StartExpedition => "Start the nearby expedition",
-                Stage1ObjectiveKind.ClearExpedition => "Clear the hostile expedition",
-                Stage1ObjectiveKind.DefendCamp => "Defend the camp from the raid",
-                Stage1ObjectiveKind.PrepareBoss => "Spend the reward on boss preparation",
-                Stage1ObjectiveKind.StartBossEncounter => "Begin the boss encounter",
-                Stage1ObjectiveKind.DefeatBoss => "Defeat the boss",
-                Stage1ObjectiveKind.VerticalSliceComplete => "Vertical slice complete",
-                _ => "Stabilize the camp",
-            };
-        }
-
         public static string DescribeBuild(LoadoutModuleId moduleId)
         {
             if (moduleId == LoadoutModuleCatalog.PoisonArrowModuleId)

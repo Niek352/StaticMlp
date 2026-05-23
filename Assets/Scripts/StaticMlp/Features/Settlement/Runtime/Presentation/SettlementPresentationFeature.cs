@@ -6,7 +6,7 @@ namespace StaticMlp.Features.Settlement
 {
     public sealed class SettlementPresentationFeature : GameplayFeature
     {
-        private const string HUD_VIEW_RESOURCE_PATH = "Views/Stage1/SettlementHudView";
+        private const string HUD_VIEW_RESOURCE_PATH = "Views/Stage1/Stage1HudView";
         private const string INTERACTION_PROMPT_VIEW_RESOURCE_PATH = "Views/Settlement/InteractionPromptView";
         private const string BUILDING_MANAGEMENT_PANEL_VIEW_RESOURCE_PATH = "Views/Settlement/BuildingManagementPanelView";
 

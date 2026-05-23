@@ -4,7 +4,7 @@ using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticPack;
 
 namespace StaticMlp.Features.Progression {
-    public partial struct Stage1ProgressionState {
+    public partial struct ProgressionState {
         public void Write<TWorld>(ref BinaryPackWriter writer, World<TWorld>.Entity self)
             where TWorld : struct, IWorldType {
             writer.WriteUshort(AnchorId);

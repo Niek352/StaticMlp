@@ -9,6 +9,14 @@ namespace StaticMlp.Features.CampFlow
 {
     public sealed class ServerCampFlowViewStateSystem : ISystem
     {
+        private static readonly IFlowObjectiveOverride[] OBJECTIVE_OVERRIDES =
+        {
+            new BossFlowObjectiveOverride(),
+            new ThreatFlowObjectiveOverride(),
+            new ExpeditionFlowObjectiveOverride(),
+            new ProgressionFlowObjectiveOverride(),
+        };
+
         public void Update()
         {
             foreach (var anchor in SW.Query<All<CampFlowProgression, ProgressionState, ExpeditionAvailabilityState, ActiveExpeditionState, ThreatState, RaidScheduleState, BossEncounterState, CampFlowViewState>>().Entities())
@@ -31,13 +39,21 @@ namespace StaticMlp.Features.CampFlow
             ref readonly var threat = ref anchor.Read<ThreatState>();
             ref readonly var raid = ref anchor.Read<RaidScheduleState>();
             ref readonly var boss = ref anchor.Read<BossEncounterState>();
+            var context = new CampFlowContext(
+                progression.Stage,
+                in progressionState,
+                in availability,
+                in expedition,
+                in threat,
+                in boss);
+            var definition = ResolveDefinition(in context);
 
             return new CampFlowViewState
             {
                 AnchorId = progression.AnchorId,
                 Stage = progression.Stage,
-                Objective = ResolveObjective(progression.Stage, in progressionState, in availability, in expedition, in threat, in boss),
-                Hint = ResolveHint(progression.Stage),
+                ObjectiveDisplayName = definition.ObjectiveDisplayName,
+                HintDisplayName = definition.HintDisplayName,
                 CanToggleWorkerAssignment = progression.Stage >= CampFlowStage.CampRepaired,
                 CanOpenLoadoutPreparation =
                     progression.Stage >= CampFlowStage.WorkbenchOnline
@@ -53,89 +69,24 @@ namespace StaticMlp.Features.CampFlow
             };
         }
 
-        private static Stage1FlowObjective ResolveObjective(
-            CampFlowStage stage,
-            in ProgressionState progression,
-            in ExpeditionAvailabilityState availability,
-            in ActiveExpeditionState expedition,
-            in ThreatState threat,
-            in BossEncounterState boss)
+        private static CampFlowStageDefinition ResolveDefinition(in CampFlowContext context)
         {
-            if (boss.Status == BossEncounterStatus.Defeated)
-                return Stage1FlowObjective.VerticalSliceComplete;
-
-            if (boss.Status == BossEncounterStatus.Active)
-                return Stage1FlowObjective.DefeatBoss;
-
-            if (boss.Status == BossEncounterStatus.Available)
-                return Stage1FlowObjective.StartBossEncounter;
-
-            if (threat.Phase is ThreatPhase.RaidPending or ThreatPhase.RaidActive)
-                return Stage1FlowObjective.DefendCamp;
-
-            if (expedition.Status == ExpeditionActivityStatus.Active)
-                return Stage1FlowObjective.ClearExpedition;
-
-            if (stage < CampFlowStage.CampRepaired)
-                return Stage1FlowObjective.RepairCamp;
-
-            if (stage < CampFlowStage.WorkerAssigned)
-                return Stage1FlowObjective.AssignWorker;
-
-            if (stage < CampFlowStage.StockpilePlaced)
-                return Stage1FlowObjective.PlaceStockpile;
-
-            if (stage < CampFlowStage.ShelterPlaced)
-                return Stage1FlowObjective.PlaceShelter;
-
-            if (stage < CampFlowStage.ExtractionOnline)
-                return Stage1FlowObjective.BringExtractionOnline;
-
-            if (stage < CampFlowStage.WorkbenchOnline)
-                return Stage1FlowObjective.BringWorkbenchOnline;
-
-            if (stage < CampFlowStage.LoadoutPrepared)
-                return Stage1FlowObjective.PrepareBuild;
-
-            if (availability.Status == ExpeditionAvailabilityStatus.Available)
-                return Stage1FlowObjective.StartExpedition;
-
-            if (progression.HasFlag(ProgressFlagCatalog.CounterattackDefendedId)
-                && !progression.HasFlag(ProgressFlagCatalog.BossUnlockedId))
+            for (var i = 0; i < OBJECTIVE_OVERRIDES.Length; i++)
             {
-                return Stage1FlowObjective.PrepareBoss;
+                if (OBJECTIVE_OVERRIDES[i].TryOverride(
+                        in context,
+                        out var objectiveDisplayName,
+                        out var hintDisplayName))
+                {
+                    return new CampFlowStageDefinition(
+                        context.Stage,
+                        objectiveDisplayName,
+                        hintDisplayName,
+                        autoAdvance: false);
+                }
             }
 
-            if (progression.HasFlag(ProgressFlagCatalog.BossUnlockedId))
-                return Stage1FlowObjective.StartBossEncounter;
-
-            return Stage1FlowObjective.PrepareBuild;
-        }
-
-        private static Stage1FlowHint ResolveHint(CampFlowStage stage)
-        {
-            if (stage == CampFlowStage.RepairResourcesReady)
-                return Stage1FlowHint.ContinueRepairBuild;
-
-            if (stage < CampFlowStage.RepairResourcesReady)
-                return Stage1FlowHint.GatherRepairResources;
-
-            if (stage == CampFlowStage.CampRepaired)
-                return Stage1FlowHint.AssignWorker;
-
-            if (stage == CampFlowStage.WorkerAssigned)
-                return Stage1FlowHint.PlaceStockpile;
-
-            if (stage == CampFlowStage.StockpilePlaced)
-                return Stage1FlowHint.PlaceShelter;
-
-            if (stage == CampFlowStage.ShelterPlaced)
-                return Stage1FlowHint.BringExtractionOnline;
-
-            if (stage == CampFlowStage.ExtractionOnline)
-                return Stage1FlowHint.BringWorkbenchOnline;
-
-            return Stage1FlowHint.None;
+            return CampFlowCatalog.Get(context.Stage);
         }
     }
 }

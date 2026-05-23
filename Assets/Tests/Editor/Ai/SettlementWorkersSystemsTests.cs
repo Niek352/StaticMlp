@@ -1,3 +1,4 @@
+using StaticMlp.Features.CampFlow;
 using System;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;

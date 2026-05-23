@@ -9,6 +9,7 @@
         "UniTask",
         "Unity.TextMeshPro",
         "UnityEngine.UI",
+        "StaticMlp.Features.CampFlow.Contracts",
         "StaticMlp.Features.Loadout.Logic",
         "StaticMlp.Features.Frontier.Contracts",
         "StaticMlp.Features.Progression.Contracts",

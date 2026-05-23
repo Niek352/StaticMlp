@@ -11,6 +11,7 @@ namespace StaticMlp.Features.CampFlow
     {
         public override void RegisterNetworkEvents()
         {
+            ProjectionRegistry.Register<CampFlowProgression>();
             ProjectionRegistry.Register<CampFlowViewState>();
         }
 

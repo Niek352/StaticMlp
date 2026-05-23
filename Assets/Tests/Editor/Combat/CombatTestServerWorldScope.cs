@@ -60,6 +60,7 @@ namespace StaticMlp.Tests.Combat
                 typeof(ProgressionLogicFeature).Assembly,
                 typeof(SettlementAnchorRef).Assembly,
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
+                typeof(BuildingWorkerAssignmentState).Assembly,
                 typeof(SettlementWorkersGameplayFeature).Assembly,
                 typeof(CampFlowViewState).Assembly,
                 typeof(CampFlowGameplayFeature).Assembly,
@@ -197,6 +198,7 @@ namespace StaticMlp.Tests.Combat
             Vector3 position,
             CampFlowStage stage = CampFlowStage.LoadoutPrepared)
         {
+            var definition = CampFlowCatalog.Get(stage);
             var entity = SW.NewEntity<Default>();
             entity.Set(new CampFlowProgression
             {
@@ -207,34 +209,8 @@ namespace StaticMlp.Tests.Combat
             {
                 AnchorId = anchorId.Value,
                 Stage = stage,
-                Objective = stage < CampFlowStage.CampRepaired
-                    ? Stage1FlowObjective.RepairCamp
-                    : stage < CampFlowStage.WorkerAssigned
-                        ? Stage1FlowObjective.AssignWorker
-                        : stage < CampFlowStage.StockpilePlaced
-                            ? Stage1FlowObjective.PlaceStockpile
-                            : stage < CampFlowStage.ShelterPlaced
-                                ? Stage1FlowObjective.PlaceShelter
-                                : stage < CampFlowStage.ExtractionOnline
-                                    ? Stage1FlowObjective.BringExtractionOnline
-                                    : stage < CampFlowStage.WorkbenchOnline
-                                        ? Stage1FlowObjective.BringWorkbenchOnline
-                                        : Stage1FlowObjective.PrepareBuild,
-                Hint = stage == CampFlowStage.RepairResourcesReady
-                    ? Stage1FlowHint.ContinueRepairBuild
-                    : stage < CampFlowStage.RepairResourcesReady
-                        ? Stage1FlowHint.GatherRepairResources
-                        : stage == CampFlowStage.CampRepaired
-                            ? Stage1FlowHint.AssignWorker
-                            : stage == CampFlowStage.WorkerAssigned
-                                ? Stage1FlowHint.PlaceStockpile
-                                : stage == CampFlowStage.StockpilePlaced
-                                    ? Stage1FlowHint.PlaceShelter
-                                    : stage == CampFlowStage.ShelterPlaced
-                                        ? Stage1FlowHint.BringExtractionOnline
-                                        : stage == CampFlowStage.ExtractionOnline
-                                            ? Stage1FlowHint.BringWorkbenchOnline
-                                            : Stage1FlowHint.None,
+                ObjectiveDisplayName = definition.ObjectiveDisplayName,
+                HintDisplayName = definition.HintDisplayName,
                 CanToggleWorkerAssignment = stage >= CampFlowStage.CampRepaired,
                 CanOpenLoadoutPreparation = stage >= CampFlowStage.WorkbenchOnline
             });

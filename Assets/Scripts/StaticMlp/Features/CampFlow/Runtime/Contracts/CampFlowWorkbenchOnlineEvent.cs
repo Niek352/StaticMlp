@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
+using StaticMlp.Features.Settlement;
 
 namespace StaticMlp.Features.CampFlow
 {

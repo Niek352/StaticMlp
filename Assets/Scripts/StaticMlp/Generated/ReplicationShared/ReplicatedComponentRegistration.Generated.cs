@@ -5,6 +5,7 @@ using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.CampFlow;
 using StaticMlp.Features.CombatDirector;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Loadout;
@@ -29,6 +30,20 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ReplicationAudience.All,
                 NetDelivery.UnreliableSequenced,
                 sendRate: AiNetStateReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<CampFlowProgression>(
+                ReplicatedComponentIds.CampFlowProgression,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: CampFlowProgressionReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<CampFlowViewState>(
+                ReplicatedComponentIds.CampFlowViewState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: CampFlowViewStateReplication.SendRate);
 
             ReplicationRegistry.RegisterComponent<DirectorState>(
                 ReplicatedComponentIds.DirectorState,
@@ -128,12 +143,12 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 sendRate: OpenWorldResourceNodeTransformReplication.SendRate);
 
-            ReplicationRegistry.RegisterComponent<Stage1ProgressionState>(
-                ReplicatedComponentIds.Stage1ProgressionState,
+            ReplicationRegistry.RegisterComponent<ProgressionState>(
+                ReplicatedComponentIds.ProgressionState,
                 ReplicationAuthority.Server,
                 ReplicationAudience.All,
                 NetDelivery.ReliableSequenced,
-                sendRate: Stage1ProgressionStateReplication.SendRate);
+                sendRate: ProgressionStateReplication.SendRate);
 
             ReplicationRegistry.RegisterComponent<ResourcesInventory>(
                 ReplicatedComponentIds.ResourcesInventory,
@@ -197,20 +212,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ReplicationAudience.All,
                 NetDelivery.ReliableSequenced,
                 sendRate: SettlementSharedResourcesReplication.SendRate);
-
-            ReplicationRegistry.RegisterComponent<Stage1FlowViewState>(
-                ReplicatedComponentIds.Stage1FlowViewState,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                sendRate: Stage1FlowViewStateReplication.SendRate);
-
-            ReplicationRegistry.RegisterComponent<Stage1SettlementProgression>(
-                ReplicatedComponentIds.Stage1SettlementProgression,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                sendRate: Stage1SettlementProgressionReplication.SendRate);
 
             ReplicationRegistry.RegisterComponent<StockpileOperationState>(
                 ReplicatedComponentIds.StockpileOperationState,
@@ -312,11 +313,11 @@ namespace StaticMlp.Networking.Replication.Generated {
             ReplicationRegistry.RegisterNetworkEntity(5, 1, 200);
             ReplicationRegistry.RegisterNetworkEntity(3, 1, 100);
             ReplicationRegistry.RegisterNetworkEntity(4, 1, 101);
+            ReplicationRegistry.RegisterNetworkEntity(8, 1, 320);
             ReplicationRegistry.RegisterNetworkEntity(10, 1, 500);
             ReplicationRegistry.RegisterNetworkEntity(9, 1, 400);
             ReplicationRegistry.RegisterNetworkEntity(1, 1, 1);
             ReplicationRegistry.RegisterNetworkEntity(7, 1, 300);
-            ReplicationRegistry.RegisterNetworkEntity(8, 1, 320);
             ReplicationRegistry.RegisterNetworkEntity(6, 1, 0);
             ReplicationRegistry.RegisterNetworkEntity(2, 1, 2);
         }

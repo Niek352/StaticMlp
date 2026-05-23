@@ -1,4 +1,5 @@
 using StaticMlp.Features.Settlement.Workers;
+using StaticMlp.Features.CampFlow;
 using Unity.Collections;
 
 namespace StaticMlp.Features.Settlement
@@ -6,8 +7,8 @@ namespace StaticMlp.Features.Settlement
     public struct SettlementHudState
     {
         public SettlementAnchorId AnchorId;
-        public Stage1ObjectiveKind Objective;
-        public string ObjectiveHint;
+        public string ObjectiveDisplayName;
+        public string HintDisplayName;
         public CampFlowStage SettlementStage;
         public FixedList512Bytes<SettlementResourceViewEntry> Resources;
         public ushort TotalWorkers;

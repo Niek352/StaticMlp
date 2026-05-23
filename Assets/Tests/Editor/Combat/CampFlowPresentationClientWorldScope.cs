@@ -284,12 +284,13 @@ namespace StaticMlp.Tests.Combat
             RaidScheduleStatus raidStatus,
             BossEncounterStatus bossStatus)
         {
+            var definition = ResolveDefinition(stage, expeditionAvailability, expeditionActivity, threatPhase, bossStatus);
             return new CampFlowViewState
             {
                 AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
                 Stage = stage,
-                Objective = ResolveObjective(stage, expeditionAvailability, expeditionActivity, threatPhase, bossStatus),
-                Hint = ResolveHint(stage),
+                ObjectiveDisplayName = definition.ObjectiveDisplayName,
+                HintDisplayName = definition.HintDisplayName,
                 CanToggleWorkerAssignment = stage >= CampFlowStage.CampRepaired,
                 CanOpenLoadoutPreparation = stage >= CampFlowStage.WorkbenchOnline
                                          && bossStatus != BossEncounterStatus.Active
@@ -303,7 +304,7 @@ namespace StaticMlp.Tests.Combat
             };
         }
 
-        private static Stage1FlowObjective ResolveObjective(
+        private static CampFlowStageDefinition ResolveDefinition(
             CampFlowStage stage,
             ExpeditionAvailabilityStatus expeditionAvailability,
             ExpeditionActivityStatus expeditionActivity,
@@ -311,71 +312,29 @@ namespace StaticMlp.Tests.Combat
             BossEncounterStatus bossStatus)
         {
             if (bossStatus == BossEncounterStatus.Defeated)
-                return Stage1FlowObjective.VerticalSliceComplete;
+                return OverrideDefinition(stage, CampFlowCatalog.COMPLETE_OBJECTIVE);
 
             if (bossStatus == BossEncounterStatus.Active)
-                return Stage1FlowObjective.DefeatBoss;
+                return OverrideDefinition(stage, CampFlowCatalog.DEFEAT_BOSS_OBJECTIVE);
 
             if (bossStatus == BossEncounterStatus.Available)
-                return Stage1FlowObjective.StartBossEncounter;
+                return OverrideDefinition(stage, CampFlowCatalog.START_BOSS_OBJECTIVE);
 
             if (threatPhase == ThreatPhase.RaidPending || threatPhase == ThreatPhase.RaidActive)
-                return Stage1FlowObjective.DefendCamp;
+                return OverrideDefinition(stage, CampFlowCatalog.DEFEND_CAMP_OBJECTIVE);
 
             if (expeditionActivity == ExpeditionActivityStatus.Active)
-                return Stage1FlowObjective.ClearExpedition;
-
-            if (stage < CampFlowStage.CampRepaired)
-                return Stage1FlowObjective.RepairCamp;
-
-            if (stage < CampFlowStage.WorkerAssigned)
-                return Stage1FlowObjective.AssignWorker;
-
-            if (stage < CampFlowStage.StockpilePlaced)
-                return Stage1FlowObjective.PlaceStockpile;
-
-            if (stage < CampFlowStage.ShelterPlaced)
-                return Stage1FlowObjective.PlaceShelter;
-
-            if (stage < CampFlowStage.ExtractionOnline)
-                return Stage1FlowObjective.BringExtractionOnline;
-
-            if (stage < CampFlowStage.WorkbenchOnline)
-                return Stage1FlowObjective.BringWorkbenchOnline;
-
-            if (stage < CampFlowStage.LoadoutPrepared)
-                return Stage1FlowObjective.PrepareBuild;
+                return OverrideDefinition(stage, CampFlowCatalog.CLEAR_EXPEDITION_OBJECTIVE);
 
             if (expeditionAvailability == ExpeditionAvailabilityStatus.Available)
-                return Stage1FlowObjective.StartExpedition;
+                return OverrideDefinition(stage, CampFlowCatalog.START_EXPEDITION_OBJECTIVE);
 
-            return Stage1FlowObjective.PrepareBuild;
+            return CampFlowCatalog.Get(stage);
         }
 
-        private static Stage1FlowHint ResolveHint(CampFlowStage stage)
+        private static CampFlowStageDefinition OverrideDefinition(CampFlowStage stage, string objectiveDisplayName)
         {
-            if (stage == CampFlowStage.RepairResourcesReady)
-                return Stage1FlowHint.ContinueRepairBuild;
-
-            if (stage < CampFlowStage.RepairResourcesReady)
-                return Stage1FlowHint.GatherRepairResources;
-
-            if (stage == CampFlowStage.CampRepaired)
-                return Stage1FlowHint.AssignWorker;
-
-            if (stage == CampFlowStage.WorkerAssigned)
-                return Stage1FlowHint.PlaceStockpile;
-
-            if (stage == CampFlowStage.StockpilePlaced)
-                return Stage1FlowHint.PlaceShelter;
-
-            if (stage == CampFlowStage.ShelterPlaced)
-                return Stage1FlowHint.BringExtractionOnline;
-
-            if (stage == CampFlowStage.ExtractionOnline)
-                return Stage1FlowHint.BringWorkbenchOnline;
-
-            return Stage1FlowHint.None;
+            return new CampFlowStageDefinition(stage, objectiveDisplayName, string.Empty, autoAdvance: false);
         }
 
         public void Dispose()

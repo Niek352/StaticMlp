@@ -36,7 +36,7 @@ namespace StaticMlp.Features.CampFlow
 
                 if (!spawnedAnchorIds.Add(sites[i].AnchorId))
                     throw new InvalidOperationException(
-                        $"Stage 1 seed defines duplicate camp anchor {sites[i].AnchorId}.");
+                        $"Settlement seed defines duplicate camp anchor {sites[i].AnchorId}.");
 
                 SpawnAnchor(sites[i], progressionSeed, heightSampler);
             }

@@ -15,7 +15,7 @@
         "StaticMlp.Features.Progression.Contracts",
         "StaticMlp.Features.Settlement.Logic",
         "StaticMlp.Features.Settlement.Contracts",
-        "StaticMlp.Features.Stage1.Contracts",
+        "StaticMlp.Features.CampFlow.Contracts",
         "StaticMlp.Features.ResourcesInventoryMinimal",
         "StaticMlp.Features.AiBots",
         "StaticMlp.Features.Shared.Logic",

@@ -6,7 +6,7 @@ namespace StaticMlp.Features.Settlement
     public struct SettlementContextFocusTarget : IResource
     {
         /// <summary>
-        /// Written each frame by the client raycast/crosshair producer before Stage1 context session sync.
+        /// Written each frame by the client raycast/crosshair producer before settlement context session sync.
         /// Leave default when no valid construction-site target is under the pointer.
         /// </summary>
         public EntityGID Target;

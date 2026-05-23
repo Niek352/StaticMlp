@@ -1,3 +1,4 @@
+using StaticMlp.Features.CampFlow;
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Buildings;
@@ -46,7 +47,7 @@ namespace StaticMlp.Features.Settlement
                     }
 
                     throw new InvalidOperationException(
-                        $"Stage 1 repair flow requires a construction-site repair target for anchor {SettlementAnchorCatalog.HomeCampId.Value}.");
+                        $"Camp flow repair requires a construction-site repair target for anchor {SettlementAnchorCatalog.HomeCampId.Value}.");
                 }
 
                 session.Mode = SettlementContextPanelMode.Building;
@@ -86,11 +87,11 @@ namespace StaticMlp.Features.Settlement
 
             if (!focus.Target.TryUnpack<ClientCoreWT>(out site))
                 throw new InvalidOperationException(
-                    $"Stage 1 context focus target {focus.Target.Raw} does not exist in the client world.");
+                    $"Settlement context focus target {focus.Target.Raw} does not exist in the client world.");
 
             if (!site.Has<ConstructionSiteState>())
                 throw new InvalidOperationException(
-                    $"Stage 1 context focus target {focus.Target.Raw} is not a construction-site entity.");
+                    $"Settlement context focus target {focus.Target.Raw} is not a construction-site entity.");
 
             return true;
         }

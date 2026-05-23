@@ -1,3 +1,4 @@
+using StaticMlp.Features.CampFlow;
 using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Loadout;

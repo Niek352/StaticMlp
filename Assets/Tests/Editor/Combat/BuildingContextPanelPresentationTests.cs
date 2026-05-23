@@ -1,3 +1,4 @@
+using StaticMlp.Features.CampFlow;
 using NUnit.Framework;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;

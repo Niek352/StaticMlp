@@ -22,7 +22,7 @@ namespace StaticMlp.Tests.Combat
     public sealed class CampFlowRepairFlowTests
     {
         [Test]
-        public void ServerCompleteConstructionSystem_WhenRepairSiteFinishes_EmitsFlowFactHandledByStage1FlowOwner()
+        public void ServerCompleteConstructionSystem_WhenRepairSiteFinishes_EmitsFlowFactHandledByCampFlowOwner()
         {
             using var scope = new CombatTestServerWorldScope();
             var anchor = scope.CreateSettlementAnchor(
@@ -164,7 +164,7 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
-        public void ServerStage1SeedSpawnSystems_ProjectInitialCampAndWorkerToTerrainHeight()
+        public void ServerSettlementSeedSpawnSystems_ProjectInitialCampAndWorkerToTerrainHeight()
         {
             using var scope = new CombatTestServerWorldScope();
             SW.SetResource<IHeightSampler>(new ConstantHeightSampler(7.25f));
@@ -236,7 +236,7 @@ namespace StaticMlp.Tests.Combat
         }
 
         [Test]
-        public void SetSettlementWorkerAssignmentHandler_WhenAssignmentAccepted_Stage1FlowOwnerAdvancesToWorkerAssigned()
+        public void SetSettlementWorkerAssignmentHandler_WhenAssignmentAccepted_CampFlowOwnerAdvancesToWorkerAssigned()
         {
             using var scope = new CombatTestServerWorldScope();
             var anchor = scope.CreateSettlementAnchor(
@@ -251,6 +251,10 @@ namespace StaticMlp.Tests.Combat
                 RoleId = WorkerRoleCatalog.CampBuilderId.Value
             });
             worker.Set(new SettlementWorkerAssignment
+            {
+                Status = SettlementWorkerAssignmentStatus.Unassigned
+            });
+            worker.Set(new BuildingWorkerAssignmentState
             {
                 Status = SettlementWorkerAssignmentStatus.Unassigned
             });
@@ -283,6 +287,10 @@ namespace StaticMlp.Tests.Combat
                 RoleId = WorkerRoleCatalog.CampBuilderId.Value
             });
             worker.Set(new SettlementWorkerAssignment
+            {
+                Status = SettlementWorkerAssignmentStatus.Unassigned
+            });
+            worker.Set(new BuildingWorkerAssignmentState
             {
                 Status = SettlementWorkerAssignmentStatus.Unassigned
             });
@@ -342,14 +350,14 @@ namespace StaticMlp.Tests.Combat
             scope.RefreshProjections();
 
             var hud = SettlementHudPresentation.Build();
-            Assert.That(hud.Objective, Is.Not.EqualTo(Stage1ObjectiveKind.RepairCamp));
-            Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.AssignWorker));
+            Assert.That(hud.ObjectiveDisplayName, Is.Not.EqualTo(CampFlowCatalog.REPAIR_CAMP_OBJECTIVE));
+            Assert.That(hud.ObjectiveDisplayName, Is.EqualTo(CampFlowCatalog.ASSIGN_WORKER_OBJECTIVE));
             Assert.That(hud.CanOpenLoadoutPreparation, Is.False);
             Assert.That(hud.CanOpenExpeditionSelection, Is.False);
         }
 
         [Test]
-        public void Stage1RepairFlow_OneBuildActionDoesNotCompleteInitialCampRepair()
+        public void CampFlowRepairFlow_OneBuildActionDoesNotCompleteInitialCampRepair()
         {
             using var scope = new CombatTestServerWorldScope();
             var site = scope.CreateNetworkedConstructionSite(phase: ConstructionPhase.ReadyToBuild);
@@ -632,8 +640,8 @@ namespace StaticMlp.Tests.Combat
             scope.RefreshProjections();
 
             var hud = SettlementHudPresentation.Build();
-            Assert.That(hud.Objective, Is.EqualTo(Stage1ObjectiveKind.RepairCamp));
-            Assert.That(hud.ObjectiveHint, Is.EqualTo("Resources delivered. Keep building the camp core to finish repairs."));
+            Assert.That(hud.ObjectiveDisplayName, Is.EqualTo(CampFlowCatalog.REPAIR_CAMP_OBJECTIVE));
+            Assert.That(hud.HintDisplayName, Is.EqualTo(CampFlowCatalog.CONTINUE_REPAIR_BUILD_HINT));
         }
 
         private sealed class ConstantHeightSampler : IHeightSampler

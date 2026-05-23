@@ -76,11 +76,11 @@ namespace StaticMlp.Features.Settlement
             in ProgressionHudState progression)
         {
             panelRoot.SetActive(true);
-            var hintLine = string.IsNullOrEmpty(settlement.ObjectiveHint)
+            var hintLine = string.IsNullOrEmpty(settlement.HintDisplayName)
                 ? string.Empty
-                : $"\nHint: {settlement.ObjectiveHint}";
+                : $"\nHint: {settlement.HintDisplayName}";
             summaryLabel.text =
-                $"Objective: {SettlementHudController.DescribeObjective(settlement.Objective)}\n" +
+                $"Objective: {settlement.ObjectiveDisplayName}\n" +
                 $"Actions: {FormatActionStatus(in settlement.LoadoutPreparationAction)} / {FormatActionStatus(in settlement.ExpeditionSelectionAction)}\n" +
                 $"Camp stage: {settlement.SettlementStage}\n" +
                 $"Resources: {FormatResources(in settlement)}\n" +

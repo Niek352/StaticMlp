@@ -2,6 +2,8 @@
 namespace StaticMlp.Networking.Replication {
     public static class ReplicatedComponentIds {
         public const ushort AiNetState = 19454;
+        public const ushort CampFlowProgression = 56454;
+        public const ushort CampFlowViewState = 42436;
         public const ushort DirectorState = 52302;
         public const ushort EnemyArchetype = 42419;
         public const ushort EnemySpawnSource = 40725;
@@ -16,7 +18,7 @@ namespace StaticMlp.Networking.Replication {
         public const ushort NpcRosterRecord = 7991;
         public const ushort OpenWorldResourceNodeState = 28580;
         public const ushort OpenWorldResourceNodeTransform = 55422;
-        public const ushort Stage1ProgressionState = 58031;
+        public const ushort ProgressionState = 58031;
         public const ushort ResourcesInventory = 44055;
         public const ushort BedrollShelterState = 10029;
         public const ushort ConstructionProgress = 15866;
@@ -26,8 +28,6 @@ namespace StaticMlp.Networking.Replication {
         public const ushort ExtractionOperationState = 51973;
         public const ushort SettlementAnchorRef = 55002;
         public const ushort SettlementSharedResources = 16446;
-        public const ushort Stage1FlowViewState = 42436;
-        public const ushort Stage1SettlementProgression = 56454;
         public const ushort StockpileOperationState = 13660;
         public const ushort WorkbenchOperationState = 49713;
         public const ushort BuildingWorkerAssignmentState = 2454;

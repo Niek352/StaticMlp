@@ -129,7 +129,7 @@ namespace StaticMlp.Features.CampFlow
             }
 
             throw new System.InvalidOperationException(
-                $"Stage 1 repair site is missing for settlement anchor {anchorId.Value}.");
+                $"Camp flow repair site is missing for settlement anchor {anchorId.Value}.");
         }
     }
 }

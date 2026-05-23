@@ -1,3 +1,4 @@
+using StaticMlp.Features.CampFlow;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Progression;
 using StaticMlp.Features.Settlement;

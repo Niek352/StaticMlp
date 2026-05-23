@@ -1,5 +1,6 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.CampFlow
@@ -12,7 +13,7 @@ namespace StaticMlp.Features.CampFlow
                 return anchor;
 
             throw new InvalidOperationException(
-                $"Stage 1 settlement anchor {anchorId.Value} is missing in the server world.");
+                $"Camp flow anchor {anchorId.Value} is missing in the server world.");
         }
 
         public static bool TryGetServerAnchor(SettlementAnchorId anchorId, out SW.Entity anchor)
@@ -37,7 +38,7 @@ namespace StaticMlp.Features.CampFlow
                 return anchor;
 
             throw new InvalidOperationException(
-                $"Stage 1 settlement anchor {anchorId.Value} is missing in the client world.");
+                $"Camp flow anchor {anchorId.Value} is missing in the client world.");
         }
 
         public static bool TryGetClientAnchor(SettlementAnchorId anchorId, out CW.Entity anchor)

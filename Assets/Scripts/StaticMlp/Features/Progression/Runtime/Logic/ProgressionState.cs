@@ -82,7 +82,7 @@ namespace StaticMlp.Features.Progression
             if (flagId.Value is 0 or > 32)
             {
                 throw new InvalidOperationException(
-                    $"Progress flag id {flagId.Value} is outside supported Stage 1 mask range.");
+                    $"Progress flag id {flagId.Value} is outside supported progression mask range.");
             }
 
             return 1u << (flagId.Value - 1);
@@ -93,7 +93,7 @@ namespace StaticMlp.Features.Progression
             if (rewardPackageId.Value == 0 || rewardPackageId.Value > 32)
             {
                 throw new InvalidOperationException(
-                    $"Reward package id {rewardPackageId.Value} is outside supported Stage 1 mask range.");
+                    $"Reward package id {rewardPackageId.Value} is outside supported progression mask range.");
             }
 
             return 1u << (rewardPackageId.Value - 1);

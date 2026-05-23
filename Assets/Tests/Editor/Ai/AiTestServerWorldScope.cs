@@ -1,3 +1,4 @@
+using StaticMlp.Features.CampFlow;
 using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiActions;
@@ -34,6 +35,7 @@ namespace StaticMlp.Tests.Ai
                 typeof(ConstructionRules).Assembly,
                 typeof(SettlementAnchorRef).Assembly,
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
+                typeof(BuildingWorkerAssignmentState).Assembly,
                 typeof(CampFlowProgression).Assembly,
                 typeof(CampFlowWorkerAssignmentAcceptedEvent).Assembly,
                 typeof(SettlementWorkersGameplayFeature).Assembly,
@@ -168,6 +170,13 @@ namespace StaticMlp.Tests.Ai
             {
                 Status = status,
                 AnchorId = status == SettlementWorkerAssignmentStatus.Assigned ? anchorId.Value : (ushort)0
+            });
+            entity.Set(new BuildingWorkerAssignmentState
+            {
+                Status = SettlementWorkerAssignmentStatus.Unassigned,
+                AnchorId = 0,
+                Building = default,
+                SlotIndex = 0
             });
             return entity;
         }
