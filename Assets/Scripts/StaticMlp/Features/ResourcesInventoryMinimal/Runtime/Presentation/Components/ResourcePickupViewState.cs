@@ -7,5 +7,6 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         public ushort ResourceId;
         public int Amount;
         public bool IsMagnetized;
+        public bool IsConsumed;
     }
 }

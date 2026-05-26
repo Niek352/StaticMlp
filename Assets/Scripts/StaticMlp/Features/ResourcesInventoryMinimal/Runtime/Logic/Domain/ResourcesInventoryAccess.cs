@@ -36,8 +36,14 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             ref readonly var rows = ref entity.Ref<World<TWorld>.Multi<CarriedResourceEntry>>();
             ValidateRows(in rows, inventory.Capacity);
 
-            var index = FindIndex(in rows, id);
-            return index >= 0 ? rows[index].Amount : 0;
+            var amount = 0;
+            for (var i = 0; i < rows.Length; i++)
+            {
+                if (rows[i].Id == id)
+                    amount += rows[i].Amount;
+            }
+
+            return amount;
         }
 
         public static int Add(SW.Entity entity, ResourceAmount resource)
@@ -51,24 +57,27 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             if (resource.Amount == 0)
                 return 0;
 
-            var available = inventory.Capacity - TotalUsed(in rows);
-            var accepted = Math.Min(resource.Amount, available);
-            if (accepted <= 0)
-                return resource.Amount;
+            var remaining = resource.Amount;
+            for (var i = 0; i < rows.Length && remaining > 0; i++)
+            {
+                ref var row = ref rows[i];
+                if (row.Id != resource.Id || row.Amount >= ResourcesInventory.MAX_STACK_AMOUNT)
+                    continue;
 
-            var index = FindIndex(in rows, resource.Id);
-            if (index >= 0)
-            {
-                ref var row = ref rows[index];
+                var accepted = Math.Min(remaining, ResourcesInventory.MAX_STACK_AMOUNT - row.Amount);
                 row.Amount += accepted;
+                remaining -= accepted;
             }
-            else
+
+            while (remaining > 0 && rows.Length < inventory.Capacity)
             {
+                var accepted = Math.Min(remaining, ResourcesInventory.MAX_STACK_AMOUNT);
                 rows.Add(new CarriedResourceEntry(resource.Id, accepted));
+                remaining -= accepted;
             }
 
             ValidateRows(in rows, inventory.Capacity);
-            return resource.Amount - accepted;
+            return remaining;
         }
 
         public static int Spend(SW.Entity entity, ResourceId id, int requested)
@@ -83,21 +92,26 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             ref var rows = ref entity.Ref<SW.Multi<CarriedResourceEntry>>();
             ValidateRows(in rows, inventory.Capacity);
 
-            var index = FindIndex(in rows, id);
-            if (index < 0)
-                return 0;
+            var remaining = requested;
+            var spent = 0;
+            for (var i = 0; i < rows.Length && remaining > 0;)
+            {
+                ref var row = ref rows[i];
+                if (row.Id != id)
+                {
+                    i++;
+                    continue;
+                }
 
-            ref var row = ref rows[index];
-            var spent = Math.Min(requested, row.Amount);
-            row.Amount -= spent;
-            if (row.Amount > 0)
-            {
-                ValidateRows(in rows, inventory.Capacity);
-                return spent;
-            }
-            else
-            {
-                rows.RemoveAt(index);
+                var accepted = Math.Min(remaining, row.Amount);
+                row.Amount -= accepted;
+                remaining -= accepted;
+                spent += accepted;
+
+                if (row.Amount == 0)
+                    rows.RemoveAt(i);
+                else
+                    i++;
             }
 
             ValidateRows(in rows, inventory.Capacity);
@@ -108,22 +122,12 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             where TWorld : struct, IWorldType
         {
             ResourcesInventory.ValidateCapacity(capacity);
-            if (rows.Length > ResourceCatalog.All.Count || rows.Length > capacity)
+            if (rows.Length > capacity)
                 throw new InvalidOperationException($"Invalid carried resource row count {rows.Length}.");
 
-            var total = 0;
             for (var i = 0; i < rows.Length; i++)
             {
                 ValidateRow(rows[i].Id, rows[i].Amount);
-                total += rows[i].Amount;
-                if (total > capacity)
-                    throw new InvalidOperationException($"Carried resource total {total} exceeds capacity {capacity}.");
-
-                for (var j = i + 1; j < rows.Length; j++)
-                {
-                    if (rows[i].Id == rows[j].Id)
-                        throw new InvalidOperationException($"Duplicate carried resource id {rows[i].Id.Value}.");
-                }
             }
         }
 
@@ -132,6 +136,9 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             ValidateRawResourceId(id);
             if (amount <= 0)
                 throw new InvalidOperationException($"Carried resource id {id.Value} has invalid amount {amount}.");
+            if (amount > ResourcesInventory.MAX_STACK_AMOUNT)
+                throw new InvalidOperationException(
+                    $"Carried resource id {id.Value} stack amount {amount} exceeds {ResourcesInventory.MAX_STACK_AMOUNT}.");
         }
 
         public static int FindIndex<TWorld>(in World<TWorld>.Multi<CarriedResourceEntry> rows, ResourceId id)

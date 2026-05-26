@@ -1,0 +1,407 @@
+<UnityPrefab>
+    <GameObject name="ResourcesInventoryHudView" id="Root">
+        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="0, 0" m_Pivot="0, 0" m_SizeDelta="0, 0" />
+        <Canvas m_RenderMode="0" m_SortingOrder="20" />
+        <CanvasScaler m_UiScaleMode="1" m_ReferenceResolution="1920, 1080" m_ScreenMatchMode="0" m_MatchWidthOrHeight="0.5" />
+        <GraphicRaycaster />
+        <ResourcesInventoryHudView
+            canvas="#Root"
+            graphicRaycaster="#Root"
+            _panelRoot="#Panel"
+            _summaryLabel="#SummaryLabel">
+            <Field name="_slotRoots">
+                <Item v="#Slot00" />
+                <Item v="#Slot01" />
+                <Item v="#Slot02" />
+                <Item v="#Slot03" />
+                <Item v="#Slot04" />
+                <Item v="#Slot05" />
+                <Item v="#Slot06" />
+                <Item v="#Slot07" />
+                <Item v="#Slot08" />
+                <Item v="#Slot09" />
+                <Item v="#Slot10" />
+                <Item v="#Slot11" />
+                <Item v="#Slot12" />
+                <Item v="#Slot13" />
+                <Item v="#Slot14" />
+                <Item v="#Slot15" />
+                <Item v="#Slot16" />
+                <Item v="#Slot17" />
+                <Item v="#Slot18" />
+                <Item v="#Slot19" />
+            </Field>
+            <Field name="_slotBackgrounds">
+                <Item v="#Slot00" />
+                <Item v="#Slot01" />
+                <Item v="#Slot02" />
+                <Item v="#Slot03" />
+                <Item v="#Slot04" />
+                <Item v="#Slot05" />
+                <Item v="#Slot06" />
+                <Item v="#Slot07" />
+                <Item v="#Slot08" />
+                <Item v="#Slot09" />
+                <Item v="#Slot10" />
+                <Item v="#Slot11" />
+                <Item v="#Slot12" />
+                <Item v="#Slot13" />
+                <Item v="#Slot14" />
+                <Item v="#Slot15" />
+                <Item v="#Slot16" />
+                <Item v="#Slot17" />
+                <Item v="#Slot18" />
+                <Item v="#Slot19" />
+            </Field>
+            <Field name="_slotNameLabels">
+                <Item v="#Slot00Name" />
+                <Item v="#Slot01Name" />
+                <Item v="#Slot02Name" />
+                <Item v="#Slot03Name" />
+                <Item v="#Slot04Name" />
+                <Item v="#Slot05Name" />
+                <Item v="#Slot06Name" />
+                <Item v="#Slot07Name" />
+                <Item v="#Slot08Name" />
+                <Item v="#Slot09Name" />
+                <Item v="#Slot10Name" />
+                <Item v="#Slot11Name" />
+                <Item v="#Slot12Name" />
+                <Item v="#Slot13Name" />
+                <Item v="#Slot14Name" />
+                <Item v="#Slot15Name" />
+                <Item v="#Slot16Name" />
+                <Item v="#Slot17Name" />
+                <Item v="#Slot18Name" />
+                <Item v="#Slot19Name" />
+            </Field>
+            <Field name="_slotAmountLabels">
+                <Item v="#Slot00Amount" />
+                <Item v="#Slot01Amount" />
+                <Item v="#Slot02Amount" />
+                <Item v="#Slot03Amount" />
+                <Item v="#Slot04Amount" />
+                <Item v="#Slot05Amount" />
+                <Item v="#Slot06Amount" />
+                <Item v="#Slot07Amount" />
+                <Item v="#Slot08Amount" />
+                <Item v="#Slot09Amount" />
+                <Item v="#Slot10Amount" />
+                <Item v="#Slot11Amount" />
+                <Item v="#Slot12Amount" />
+                <Item v="#Slot13Amount" />
+                <Item v="#Slot14Amount" />
+                <Item v="#Slot15Amount" />
+                <Item v="#Slot16Amount" />
+                <Item v="#Slot17Amount" />
+                <Item v="#Slot18Amount" />
+                <Item v="#Slot19Amount" />
+            </Field>
+        </ResourcesInventoryHudView>
+
+        <GameObject name="Panel" id="Panel" active="false">
+            <RectTransform m_AnchorMin="1, 1" m_AnchorMax="1, 1" m_Pivot="1, 1" m_SizeDelta="384, 300" m_AnchoredPosition="-18, -18" />
+            <Image m_Color="#162329E8" m_RaycastTarget="false" />
+            <VerticalLayoutGroup
+                m_Padding.m_Left="14"
+                m_Padding.m_Right="14"
+                m_Padding.m_Top="12"
+                m_Padding.m_Bottom="12"
+                m_Spacing="8"
+                m_ChildControlWidth="true"
+                m_ChildControlHeight="true"
+                m_ChildForceExpandWidth="true"
+                m_ChildForceExpandHeight="false" />
+
+            <GameObject name="TitleRow">
+                <RectTransform m_SizeDelta="0, 26" />
+                <HorizontalLayoutGroup
+                    m_Spacing="8"
+                    m_ChildAlignment="4"
+                    m_ChildControlWidth="true"
+                    m_ChildControlHeight="true"
+                    m_ChildForceExpandWidth="true"
+                    m_ChildForceExpandHeight="false" />
+                <LayoutElement m_PreferredHeight="26" />
+
+                <GameObject name="Title">
+                    <RectTransform m_SizeDelta="0, 26" />
+                    <TextMeshProUGUI
+                        m_text="Inventory"
+                        m_fontSize="18"
+                        m_fontStyle="1"
+                        m_fontColor="#F4F8F4"
+                        m_HorizontalAlignment="1"
+                        m_VerticalAlignment="512"
+                        m_RaycastTarget="false" />
+                </GameObject>
+
+                <GameObject name="SummaryLabel" id="SummaryLabel">
+                    <RectTransform m_SizeDelta="110, 26" />
+                    <TextMeshProUGUI
+                        m_text="Slots 0/20"
+                        m_fontSize="13"
+                        m_fontColor="#C8D9D2"
+                        m_HorizontalAlignment="4"
+                        m_VerticalAlignment="512"
+                        m_RaycastTarget="false" />
+                    <LayoutElement m_PreferredWidth="110" m_PreferredHeight="26" />
+                </GameObject>
+            </GameObject>
+
+            <GameObject name="SlotsGrid">
+                <RectTransform m_SizeDelta="0, 234" />
+                <GridLayoutGroup
+                    m_CellSize="64, 54"
+                    m_Spacing="6, 6"
+                    m_StartCorner="0"
+                    m_StartAxis="0"
+                    m_ChildAlignment="4"
+                    m_Constraint="1"
+                    m_ConstraintCount="5" />
+                <LayoutElement m_PreferredHeight="234" />
+
+                <GameObject name="Slot00" id="Slot00">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot00Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot00Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot01" id="Slot01">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot01Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot01Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot02" id="Slot02">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot02Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot02Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot03" id="Slot03">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot03Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot03Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot04" id="Slot04">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot04Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot04Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot05" id="Slot05">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot05Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot05Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot06" id="Slot06">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot06Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot06Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot07" id="Slot07">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot07Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot07Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot08" id="Slot08">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot08Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot08Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot09" id="Slot09">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot09Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot09Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot10" id="Slot10">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot10Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot10Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot11" id="Slot11">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot11Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot11Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot12" id="Slot12">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot12Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot12Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot13" id="Slot13">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot13Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot13Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot14" id="Slot14">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot14Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot14Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot15" id="Slot15">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot15Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot15Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot16" id="Slot16">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot16Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot16Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot17" id="Slot17">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot17Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot17Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot18" id="Slot18">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot18Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot18Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+                <GameObject name="Slot19" id="Slot19">
+                    <RectTransform m_SizeDelta="64, 54" />
+                    <Image m_Color="#1C292EE0" m_RaycastTarget="false" />
+                    <GameObject name="Name" id="Slot19Name">
+                        <RectTransform m_AnchorMin="0, 0.5" m_AnchorMax="1, 1" m_SizeDelta="-8, -6" m_AnchoredPosition="0, -4" />
+                        <TextMeshProUGUI m_text="Empty" m_fontSize="11" m_fontColor="#B7C8C1" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_overflowMode="3" m_RaycastTarget="false" />
+                    </GameObject>
+                    <GameObject name="Amount" id="Slot19Amount">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 0.5" m_SizeDelta="-8, -4" m_AnchoredPosition="0, 3" />
+                        <TextMeshProUGUI m_text="" m_fontSize="16" m_fontStyle="1" m_fontColor="#FFFFFF" m_HorizontalAlignment="2" m_VerticalAlignment="512" m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+            </GameObject>
+        </GameObject>
+    </GameObject>
+</UnityPrefab>

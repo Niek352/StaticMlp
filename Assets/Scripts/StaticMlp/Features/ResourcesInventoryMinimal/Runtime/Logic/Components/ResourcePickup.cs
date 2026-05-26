@@ -26,10 +26,16 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         [ReplicatedField(Quantize = 0.01f)]
         public Vector3 Position;
 
+        [ReplicatedField]
+        public bool IsPickedUp;
+
         public ResourceAmount Resource => new(new ResourceId(ResourceId), Amount);
 
         public void Validate()
         {
+            if (IsPickedUp)
+                return;
+
             if (ResourceId == 0)
                 throw new InvalidOperationException($"{nameof(ResourcePickup)} has no resource id.");
             if (Amount <= 0)
@@ -52,6 +58,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             writer.WriteUshort(ResourceId);
             writer.WriteInt(Amount);
             writer.WriteFloat(Position.x, Position.y, Position.z);
+            writer.WriteBool(IsPickedUp);
         }
 
         public void Read<TWorld>(ref BinaryPackReader reader, World<TWorld>.Entity self, byte version, bool disabled)
@@ -60,6 +67,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             ResourceId = reader.ReadUshort();
             Amount = reader.ReadInt();
             Position = new Vector3(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());
+            IsPickedUp = reader.ReadBool();
             Validate();
         }
 

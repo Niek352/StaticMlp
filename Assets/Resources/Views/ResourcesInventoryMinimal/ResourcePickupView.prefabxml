@@ -1,0 +1,7 @@
+<UnityPrefab>
+    <GameObject name="ResourcePickupView">
+        <EntityView />
+        <TransformViewComponent />
+        <ResourcePickupViewPart />
+    </GameObject>
+</UnityPrefab>

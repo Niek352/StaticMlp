@@ -18,6 +18,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         ITrackableAdded, ITrackableChanged, ITrackableDeleted
     {
         public const int MAX_SLOTS = 20;
+        public const int MAX_STACK_AMOUNT = 20;
 
         [ReplicatedField]
         public int Capacity;
@@ -61,9 +62,6 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
                 var id = new ResourceId(reader.ReadUshort());
                 var amount = reader.ReadInt();
                 ResourcesInventoryAccess.ValidateRow(id, amount);
-                if (ResourcesInventoryAccess.FindIndex(in rows, id) >= 0)
-                    throw new InvalidOperationException($"Duplicate carried resource id {id.Value}.");
-
                 rows.Add(new CarriedResourceEntry(id, amount));
             }
 

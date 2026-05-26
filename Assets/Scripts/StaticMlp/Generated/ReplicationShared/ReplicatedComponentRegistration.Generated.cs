@@ -4,6 +4,7 @@ using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
 using UnityEngine;
+using StaticMlp.Features.AiBots;
 using StaticMlp.Features.CampFlow;
 using StaticMlp.Features.CombatDirector;
 using StaticMlp.Features.Frontier;
@@ -22,6 +23,13 @@ namespace StaticMlp.Networking.Replication.Generated {
     public static class ReplicatedComponentRegistration {
         public static void RegisterReplicationComponents() {
             ReplicationRegistry.Clear();
+
+            ReplicationRegistry.RegisterComponent<AiNetState>(
+                ReplicatedComponentIds.AiNetState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.UnreliableSequenced,
+                sendRate: AiNetStateReplication.SendRate);
 
             ReplicationRegistry.RegisterComponent<CampFlowProgression>(
                 ReplicatedComponentIds.CampFlowProgression,
@@ -233,6 +241,34 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 sendRate: BuildingWorkerAssignmentStateReplication.SendRate);
 
+            ReplicationRegistry.RegisterComponent<SettlementCampBuilderJobState>(
+                ReplicatedComponentIds.SettlementCampBuilderJobState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: SettlementCampBuilderJobStateReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<SettlementWorkerAssignment>(
+                ReplicatedComponentIds.SettlementWorkerAssignment,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: SettlementWorkerAssignmentReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<SettlementWorkerIdentity>(
+                ReplicatedComponentIds.SettlementWorkerIdentity,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: SettlementWorkerIdentityReplication.SendRate);
+
+            ReplicationRegistry.RegisterComponent<SettlementWorkerSummary>(
+                ReplicatedComponentIds.SettlementWorkerSummary,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: SettlementWorkerSummaryReplication.SendRate);
+
             ReplicationRegistry.RegisterComponent<Health>(
                 ReplicatedComponentIds.Health,
                 ReplicationAuthority.Server,
@@ -281,8 +317,10 @@ namespace StaticMlp.Networking.Replication.Generated {
                 registerClientSystems: RegisterPhysicsCubeNetStateClientSystems,
                 initializeClientState: InitializePhysicsCubeNetStateClientState);
 
+            ReplicationRegistry.RegisterNetworkEntity(5, 1, 200);
             ReplicationRegistry.RegisterNetworkEntity(3, 1, 100);
             ReplicationRegistry.RegisterNetworkEntity(4, 1, 101);
+            ReplicationRegistry.RegisterNetworkEntity(8, 1, 320);
             ReplicationRegistry.RegisterNetworkEntity(10, 1, 500);
             ReplicationRegistry.RegisterNetworkEntity(9, 1, 400);
             ReplicationRegistry.RegisterNetworkEntity(1, 1, 1);

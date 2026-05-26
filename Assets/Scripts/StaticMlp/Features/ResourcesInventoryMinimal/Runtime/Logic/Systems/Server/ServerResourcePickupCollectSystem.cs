@@ -10,12 +10,14 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
 {
     public sealed class ServerResourcePickupCollectSystem : ISystem
     {
+        private const float DESPAWN_DELAY_SECONDS = 2f;
+
         public void Update()
         {
             var config = SW.GetResource<ResourcesInventoryConfig>();
             var radiusSq = config.PickupCollectionRadius * config.PickupCollectionRadius;
 
-            foreach (var pickup in SW.Query<All<ServerOwned, ResourcePickupTag, ResourcePickup, ResourcePickupSource>>().Entities())
+            foreach (var pickup in SW.Query<All<ServerOwned, ResourcePickupTag, ResourcePickup, ResourcePickupSource>, None<ResourcePickupDespawnTimer>>().Entities())
             {
                 ref readonly var pickupState = ref pickup.Read<ResourcePickup>();
                 pickupState.Validate();
@@ -38,7 +40,11 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
                     continue;
                 }
 
-                NetworkEntityDespawner.DespawnAndDestroy(pickup);
+                // Fully collected: mark as picked up and schedule delayed despawn.
+                // Do NOT despawn immediately — the client needs time to play the magnet animation.
+                ref var collectedPickup = ref ReplicationMut.Mut<ResourcePickup>(pickup);
+                collectedPickup.IsPickedUp = true;
+                pickup.Set(new ResourcePickupDespawnTimer { RemainingSeconds = DESPAWN_DELAY_SECONDS });
             }
         }
 

@@ -32,6 +32,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             systems.Add(new ServerResourcesInventorySeedSystem(), GameplaySystemOrder.ServerConnectionGameplay + 20);
             systems.Add(new ServerResourcePickupSpawnSystem(), GameplaySystemOrder.Gameplay - 32);
             systems.Add(new ServerResourcePickupCollectSystem(), GameplaySystemOrder.Gameplay - 30);
+            systems.Add(new ServerResourcePickupCleanupSystem(), GameplaySystemOrder.Gameplay - 29);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
     public struct ResourcePickupNetworkEntity : INetworkEntityType
     {
         public byte Id() => 11;
-        public ushort NetworkSchemaVersion() => 1;
+        public ushort NetworkSchemaVersion() => 2;
         public ushort DefaultNetworkArchetypeId() => ResourcesInventoryMinimalGameplayFeature.RESOURCE_PICKUP;
     }
 }
