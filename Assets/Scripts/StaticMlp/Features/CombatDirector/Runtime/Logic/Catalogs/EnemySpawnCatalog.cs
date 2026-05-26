@@ -52,9 +52,24 @@ namespace StaticMlp.Features.CombatDirector
         {
             return new EnemySpawnCatalog(new[]
             {
-                new EnemySpawnDefinition(EnemyRole.Swarmer, budgetCost: 1f, minCountPerWave: 6, maxCountPerWave: 18),
-                new EnemySpawnDefinition(EnemyRole.Marker, budgetCost: 4f, minCountPerWave: 1, maxCountPerWave: 1),
-                new EnemySpawnDefinition(EnemyRole.AnchorElite, budgetCost: 10f, minCountPerWave: 1, maxCountPerWave: 1)
+                new EnemySpawnDefinition(
+                    EnemyRole.Swarmer,
+                    budgetCost: 1f,
+                    maxHealth: 6f,
+                    minCountPerWave: 6,
+                    maxCountPerWave: 18),
+                new EnemySpawnDefinition(
+                    EnemyRole.Marker,
+                    budgetCost: 4f,
+                    maxHealth: 14f,
+                    minCountPerWave: 1,
+                    maxCountPerWave: 1),
+                new EnemySpawnDefinition(
+                    EnemyRole.AnchorElite,
+                    budgetCost: 10f,
+                    maxHealth: 35f,
+                    minCountPerWave: 1,
+                    maxCountPerWave: 1)
             });
         }
     }

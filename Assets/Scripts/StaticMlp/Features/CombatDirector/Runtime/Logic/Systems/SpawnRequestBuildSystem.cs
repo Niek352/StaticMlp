@@ -72,6 +72,11 @@ namespace StaticMlp.Features.CombatDirector
             if (remainingSlots <= 0)
                 return;
 
+            minCount = math.max(minCount, definition.MinCountPerWave);
+            maxCount = math.min(maxCount, definition.MaxCountPerWave);
+            if (maxCount < minCount)
+                return;
+
             var affordableCount = (int)math.floor(remainingBudget / definition.BudgetCost);
             var count = math.min(math.min(maxCount, affordableCount), remainingSlots);
             if (count < minCount)

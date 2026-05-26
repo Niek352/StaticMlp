@@ -1,10 +1,10 @@
 <UnityPrefab>
-    <GameObject name="Stage1HudView" id="Root">
+    <GameObject name="SettlementHudView" id="Root">
         <RectTransform m_AnchorMin="0, 0" m_AnchorMax="0, 0" m_Pivot="0, 0" m_SizeDelta="0, 0" />
         <Canvas m_RenderMode="ScreenSpaceOverlay" m_SortingOrder="0" />
         <CanvasScaler m_UiScaleMode="ScaleWithScreenSize" m_ReferenceResolution="1920, 1080" m_ScreenMatchMode="MatchWidthOrHeight" m_MatchWidthOrHeight="0.5" />
         <GraphicRaycaster />
-        <Stage1HudView
+        <SettlementHudView
             canvas="#Root"
             graphicRaycaster="#Root"
             panelRoot="#Panel"

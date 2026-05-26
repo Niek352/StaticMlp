@@ -6,7 +6,7 @@ This planning roadmap mirrors the source roadmap only for executable planning. I
 
 ## Phase 1 - Core Combat and Gathering
 
-Status: in progress, 5/6 plans complete.
+Status: Completed (Unity verification pending), 6/6 plans source-complete.
 
 Phase 1 must turn the existing movement, combat, open-world resource overlay, inventory seed, and AI foundations into a playable attack-to-gather vertical slice.
 

@@ -28,6 +28,12 @@ namespace StaticMlp.Features.CombatDirector
                         $"Enemy spawn definition for role {definition.Role} has non-positive budget cost.");
                 }
 
+                if (definition.MaxHealth <= 0f)
+                {
+                    throw new InvalidOperationException(
+                        $"Enemy spawn definition for role {definition.Role} has non-positive max health.");
+                }
+
                 if (definition.MinCountPerWave > definition.MaxCountPerWave)
                 {
                     throw new InvalidOperationException(

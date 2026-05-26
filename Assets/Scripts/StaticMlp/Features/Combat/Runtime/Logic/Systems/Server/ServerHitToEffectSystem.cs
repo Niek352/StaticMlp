@@ -38,13 +38,7 @@ namespace StaticMlp.Features.Combat
                 ClientCommandId = data.ClientCommandId
             });
 
-            if (data.Target.Kind != CombatTargetKind.ActorEntity)
-            {
-                hit.Destroy();
-                return;
-            }
-
-            var actorTarget = data.Target.Entity;
+            var actorTarget = data.Target;
 
             switch (data.AbilityId)
             {

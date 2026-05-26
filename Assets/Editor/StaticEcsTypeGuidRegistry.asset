@@ -477,6 +477,15 @@ MonoBehaviour:
       - className: BuildingWorkerAssignmentState
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 70eaf461-6ab4-46d7-b4b7-49179f7ad6bf
+      current:
+        className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -1204,6 +1213,15 @@ MonoBehaviour:
       - className: BuildingWorkerAssignmentState
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 70eaf461-6ab4-46d7-b4b7-49179f7ad6bf
+      current:
+        className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47

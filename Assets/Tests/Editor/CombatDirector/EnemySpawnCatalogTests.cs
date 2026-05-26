@@ -22,8 +22,8 @@ namespace StaticMlp.Tests.CombatDirector
         {
             var definitions = new[]
             {
-                new EnemySpawnDefinition(EnemyRole.Swarmer, budgetCost: 1f, minCountPerWave: 6, maxCountPerWave: 18),
-                new EnemySpawnDefinition(EnemyRole.Swarmer, budgetCost: 2f, minCountPerWave: 1, maxCountPerWave: 2)
+                new EnemySpawnDefinition(EnemyRole.Swarmer, budgetCost: 1f,10, minCountPerWave: 6, maxCountPerWave: 18),
+                new EnemySpawnDefinition(EnemyRole.Swarmer, budgetCost: 2f,10, minCountPerWave: 1, maxCountPerWave: 2)
             };
 
             var exception = Assert.Throws<InvalidOperationException>(() => new EnemySpawnCatalog(definitions));
@@ -36,7 +36,7 @@ namespace StaticMlp.Tests.CombatDirector
         {
             var definitions = new[]
             {
-                new EnemySpawnDefinition(EnemyRole.Marker, budgetCost: 0f, minCountPerWave: 1, maxCountPerWave: 1)
+                new EnemySpawnDefinition(EnemyRole.Marker, budgetCost: 0f,10, minCountPerWave: 1, maxCountPerWave: 1)
             };
 
             var exception = Assert.Throws<InvalidOperationException>(() => new EnemySpawnCatalog(definitions));
@@ -49,7 +49,7 @@ namespace StaticMlp.Tests.CombatDirector
         {
             var definitions = new[]
             {
-                new EnemySpawnDefinition(EnemyRole.AnchorElite, budgetCost: 10f, minCountPerWave: 2, maxCountPerWave: 1)
+                new EnemySpawnDefinition(EnemyRole.AnchorElite, budgetCost: 10f,10, minCountPerWave: 2, maxCountPerWave: 1)
             };
 
             var exception = Assert.Throws<InvalidOperationException>(() => new EnemySpawnCatalog(definitions));

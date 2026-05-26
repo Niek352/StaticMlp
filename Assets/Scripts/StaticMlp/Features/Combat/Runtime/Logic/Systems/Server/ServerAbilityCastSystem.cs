@@ -26,27 +26,14 @@ namespace StaticMlp.Features.Combat
         private static void Cast(SW.Entity request)
         {
             ref readonly var data = ref request.Read<CombatAbilityRequest>();
-            if (data.Target.Kind == CombatTargetKind.StaticPlacement)
+            var hit = SW.NewEntity<Default>();
+            hit.Set(new CombatHit
             {
-                SW.SendEvent(new CombatTargetHitEvent
-                {
-                    Source = data.Source,
-                    Target = data.Target,
-                    AbilityId = data.AbilityId,
-                    ClientCommandId = data.ClientCommandId
-                });
-            }
-            else
-            {
-                var hit = SW.NewEntity<Default>();
-                hit.Set(new CombatHit
-                {
-                    AbilityId = data.AbilityId,
-                    Source = data.Source,
-                    Target = data.Target,
-                    ClientCommandId = data.ClientCommandId,
-                });
-            }
+                AbilityId = data.AbilityId,
+                Source = data.Source,
+                Target = data.Target,
+                ClientCommandId = data.ClientCommandId,
+            });
 
             request.Destroy();
         }

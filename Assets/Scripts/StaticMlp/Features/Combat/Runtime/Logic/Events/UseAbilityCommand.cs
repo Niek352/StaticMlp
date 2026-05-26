@@ -8,10 +8,10 @@ namespace StaticMlp.Features.Combat {
         public const ushort NETWORK_EVENT_ID = 57022;
 
         public CombatAbilityId AbilityId;
-        public CombatTargetRef Target;
+        public EntityGID Target;
         public uint ClientCommandId;
 
-        public UseAbilityCommand(CombatAbilityId abilityId, CombatTargetRef target, uint clientCommandId) {
+        public UseAbilityCommand(CombatAbilityId abilityId, EntityGID target, uint clientCommandId) {
             AbilityId = abilityId;
             Target = target;
             ClientCommandId = clientCommandId;

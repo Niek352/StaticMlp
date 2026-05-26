@@ -14,7 +14,8 @@
         "StaticMlp.Features.Shared.Logic",
         "StaticMlp.Features.Frontier.Logic",
         "StaticMlp.Features.AiNavigation.Contracts",
-        "StaticMlp.Features.OpenWorldGeneration.Contracts"
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
+        "StaticMlp.Features.Combat.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

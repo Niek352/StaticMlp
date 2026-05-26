@@ -8,6 +8,7 @@
         "Game.Core",
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
         "StaticMlp.Features.OpenWorldGeneration.Logic",
+        "StaticMlp.Features.OpenWorldResources.Contracts",
         "StaticMlp.Features.OpenWorldResources",
         "StaticMlp.Features.OpenWorldResources.Presentation",
         "StaticMlp.Features.EcsViews",

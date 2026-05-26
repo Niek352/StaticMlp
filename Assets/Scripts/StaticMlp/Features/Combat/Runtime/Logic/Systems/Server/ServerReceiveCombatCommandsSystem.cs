@@ -33,7 +33,7 @@ namespace StaticMlp.Features.Combat
         public static SW.Entity CreateRequest(
             EntityGID source,
             CombatAbilityId abilityId,
-            CombatTargetRef target,
+            EntityGID target,
             uint clientCommandId)
         {
             var request = SW.NewEntity<Default>();

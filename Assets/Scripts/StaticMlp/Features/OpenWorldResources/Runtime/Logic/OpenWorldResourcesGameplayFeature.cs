@@ -54,12 +54,17 @@ namespace StaticMlp.Features.OpenWorldResources
         {
             systems.Add(new ServerOpenWorldResourcePlacementIndexSystem(), GameplaySystemOrder.ServerConnectionGameplay + 35);
             systems.Add(new ServerOpenWorldChunkOverlayRequestSystem(), GameplaySystemOrder.Gameplay - 50);
-            systems.Add(new ServerOpenWorldResourceHitSystem(), GameplaySystemOrder.Gameplay - 33);
+            systems.Add(new ServerOpenWorldResourceHarvestCommandSystem(), GameplaySystemOrder.Gameplay - 33);
             systems.Add(new ServerOpenWorldResourceHazardSystem(), GameplaySystemOrder.Gameplay - 32);
             systems.Add(new ServerOpenWorldChunkOverlaySendSystem(), GameplaySystemOrder.Gameplay - 31);
 
             if (OpenWorldResourcesCompatibility.UseLegacyReplicatedResourceNodes)
                 systems.Add(new ServerOpenWorldResourceNodeDeltaCaptureSystem(), GameplaySystemOrder.CollectReplication - 30);
+        }
+
+        public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
+        {
+            systems.Add(new ClientOpenWorldResourceHarvestInputSystem(), GameplaySystemOrder.Gameplay - 45);
         }
     }
 }

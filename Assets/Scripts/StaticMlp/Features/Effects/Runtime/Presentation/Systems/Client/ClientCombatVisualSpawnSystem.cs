@@ -33,21 +33,33 @@ namespace StaticMlp.Features.Effects
                 return;
 
             prediction.LastVisualizedCommandId = intent.ShotSequence;
-            if (!intent.Target.TryUnpack<ClientCoreWT>(out var target) || !target.Has<CharacterNetState>())
+            if (!TryGetTargetPosition(intent.Target, out var targetPosition))
                 return;
 
             var start = player.Read<CharacterNetState>().Position + Vector3.up * 1.1f;
-            var end = target.Read<CharacterNetState>().Position + Vector3.up * 1.1f;
+            var end = targetPosition + Vector3.up * 1.1f;
 
             switch (intent.AbilityId)
             {
                 case CombatAbilityId.PoisonArrow:
-                    SpawnProjectile(start, end, intent.AbilityId, 0.22f, CombatEffectVisualType.PoisonBurst, target.Read<CharacterNetState>().Position, 0.8f, 0.35f);
+                    SpawnProjectile(start, end, intent.AbilityId, 0.22f, CombatEffectVisualType.PoisonBurst, targetPosition, 0.8f, 0.35f);
                     break;
                 case CombatAbilityId.FireFlask:
-                    SpawnProjectile(start, end, intent.AbilityId, 0.35f, CombatEffectVisualType.BurningPool, target.Read<CharacterNetState>().Position, config.BurningPoolRadius, config.BurningPoolDuration);
+                    SpawnProjectile(start, end, intent.AbilityId, 0.35f, CombatEffectVisualType.BurningPool, targetPosition, config.BurningPoolRadius, config.BurningPoolDuration);
                     break;
             }
+        }
+
+        private static bool TryGetTargetPosition(EntityGID targetRef, out Vector3 position)
+        {
+            if (targetRef.TryUnpack<ClientCoreWT>(out var target) && target.Has<CharacterNetState>())
+            {
+                position = target.Read<CharacterNetState>().Position;
+                return true;
+            }
+
+            position = default;
+            return false;
         }
 
         private static void SpawnProjectile(

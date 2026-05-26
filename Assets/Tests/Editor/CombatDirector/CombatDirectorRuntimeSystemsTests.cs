@@ -86,11 +86,6 @@ namespace StaticMlp.Tests.CombatDirector
         {
             using var scope = new CombatDirectorTestServerWorldScope();
             var player = scope.CreatePlayer(new NetworkPeerId(11), Vector3.zero);
-            player.Set(new ResourcesInventory
-            {
-                Wood = 7,
-                Stone = 5
-            });
 
             var cellTrackingSystem = new CombatCellTrackingSystem();
             var threatInputSystem = new PlayerThreatInputSystem();

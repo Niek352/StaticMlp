@@ -1,111 +1,77 @@
-using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Input;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
-using StaticMlp.Features.Loadout;
-using StaticMlp.Features.Shared;
 using UnityEngine;
 
-namespace StaticMlp.Features.Combat
+namespace StaticMlp.Features.OpenWorldResources
 {
-    public sealed class ClientPassiveAutoAttackTargetingSystem : ISystem
+    public sealed class ClientOpenWorldResourceHarvestInputSystem : ISystem
     {
         private const float AIM_CONE_DEGREES = 12f;
-
-        private readonly List<EntityGID> _players = new();
+        private const float HIT_POINT_QUANTIZATION = 0.01f;
+        private const float HARVEST_INTERACTION_RANGE = 4f;
+        private const ushort DEFAULT_TOOL_ID = 0;
 
         public void Update()
         {
-            var config = CW.GetResource<CombatConfig>();
             var inputState = CW.GetResource<ClientInputState>();
-            var now = CW.GetResource<GameTime>().Time;
-            _players.Clear();
+            if (!inputState.WasPressed(CoreInputActions.Primary))
+                return;
 
             foreach (var player in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities())
-                _players.Add(player.GID);
-
-            for (var i = 0; i < _players.Count; i++)
             {
-                if (_players[i].TryUnpack<ClientCoreWT>(out var player))
-                    UpdatePlayer(player, config, inputState, now);
+                if (!TryCreateCommand(player, inputState, out var command))
+                    continue;
+
+                CW.SendToServer(in command);
             }
         }
 
-        private static void UpdatePlayer(CW.Entity player, CombatConfig config, ClientInputState inputState, float now)
+        private static bool TryCreateCommand(CW.Entity player, ClientInputState inputState, out TryHarvestOpenWorldResourceCommand command)
         {
-            if (!player.Has<PassiveAutoAttackState>())
+            if (inputState.TryGetAimRay(out var aimRay))
             {
-                player.Set(new PassiveAutoAttackState
-                {
-                    NextFireAt = now
-                });
+                if (TryFindAimTarget(player, aimRay, out command))
+                    return true;
+
+                return TryFindNearestTarget(player, out command);
             }
 
-            ref var state = ref player.Mut<PassiveAutoAttackState>();
-            var previousTarget = state.CurrentTarget;
-            var abilityId = player.Read<PreparedLoadoutSnapshot>().PreparedAbilityId;
-            var range = GetRange(abilityId, config);
-            state.CurrentTarget = inputState.TryGetAimRay(out var aimRay)
-                ? FindAimTargetOrNearest(player, range, aimRay)
-                : FindNearestTarget(player, range);
-
-            if (previousTarget.Raw != 0ul && state.CurrentTarget.Raw == 0ul)
-                state.NextFireAt = now;
+            return TryFindNearestTarget(player, out command);
         }
 
-        private static float GetRange(CombatAbilityId abilityId, CombatConfig config)
-        {
-            switch (abilityId)
-            {
-                case CombatAbilityId.PoisonArrow:
-                    return config.PoisonArrowRange;
-                case CombatAbilityId.FireFlask:
-                    return config.FireFlaskRange;
-                default:
-                    return config.Radius;
-            }
-        }
-
-        private static EntityGID FindAimTargetOrNearest(CW.Entity player, float radius, Ray aimRay)
+        private static bool TryFindAimTarget(CW.Entity player, Ray aimRay, out TryHarvestOpenWorldResourceCommand command)
         {
             var direction = aimRay.direction;
             if (!IsFinite(aimRay.origin)
                 || !IsFinite(direction)
                 || direction.sqrMagnitude <= 0.0001f)
             {
-                return FindNearestTarget(player, radius);
+                command = default;
+                return false;
             }
 
             direction.Normalize();
             var aim = new AimSelection(aimRay.origin, direction, Mathf.Cos(AIM_CONE_DEGREES * Mathf.Deg2Rad));
-            if (TryFindAimTarget(player, radius, aim, out var target))
-                return target;
-
-            return FindNearestTarget(player, radius);
-        }
-
-        private static bool TryFindAimTarget(CW.Entity player, float radius, AimSelection aim, out EntityGID target)
-        {
             var playerPosition = player.Read<CharacterNetState>().Position;
-            var radiusSq = radius * radius;
+            var radiusSq = HARVEST_INTERACTION_RANGE * HARVEST_INTERACTION_RANGE;
             var hasBest = false;
             var bestAimDistanceSq = 0f;
             var bestSourceDistanceSq = 0f;
             var bestTieBreaker = ulong.MaxValue;
-            var bestTarget = default(EntityGID);
+            var bestCommand = default(TryHarvestOpenWorldResourceCommand);
 
-            foreach (var candidate in CW.Query<All<MonsterTag, CharacterNetState>>().Entities())
+            foreach (var candidate in CW.Query<All<OpenWorldResourceTargetable, OpenWorldResourceTargetState>>().Entities())
             {
-                if (!candidate.Has<Health>() || candidate.Read<Health>().Current <= 0f)
+                ref readonly var resource = ref candidate.Read<OpenWorldResourceTargetState>();
+                if (!IsTargetableResource(resource))
                     continue;
 
-                var targetPosition = candidate.Read<CharacterNetState>().Position;
                 if (!TryGetCandidateScore(
                         playerPosition,
-                        targetPosition,
+                        resource.WorldPosition,
                         radiusSq,
                         aim,
                         out var aimDistanceSq,
@@ -114,7 +80,7 @@ namespace StaticMlp.Features.Combat
                     continue;
                 }
 
-                var tieBreaker = candidate.GID.Raw;
+                var tieBreaker = DeterministicPlacementTieBreaker(resource.PlacementId);
                 if (IsBetterAimCandidate(
                         hasBest,
                         aimDistanceSq,
@@ -128,34 +94,35 @@ namespace StaticMlp.Features.Combat
                     bestAimDistanceSq = aimDistanceSq;
                     bestSourceDistanceSq = sourceDistanceSq;
                     bestTieBreaker = tieBreaker;
-                    bestTarget = candidate.GID;
+                    bestCommand = CreateCommand(resource);
                 }
             }
 
-            target = bestTarget;
+            command = bestCommand;
             return hasBest;
         }
 
-        private static EntityGID FindNearestTarget(CW.Entity player, float radius)
+        private static bool TryFindNearestTarget(CW.Entity player, out TryHarvestOpenWorldResourceCommand command)
         {
             var playerPosition = player.Read<CharacterNetState>().Position;
-            var radiusSq = radius * radius;
+            var radiusSq = HARVEST_INTERACTION_RANGE * HARVEST_INTERACTION_RANGE;
             var hasBest = false;
             var bestDistanceSq = 0f;
             var bestTieBreaker = ulong.MaxValue;
-            var bestTarget = default(EntityGID);
+            var bestCommand = default(TryHarvestOpenWorldResourceCommand);
 
-            foreach (var candidate in CW.Query<All<MonsterTag, CharacterNetState>>().Entities())
+            foreach (var candidate in CW.Query<All<OpenWorldResourceTargetable, OpenWorldResourceTargetState>>().Entities())
             {
-                if (!candidate.Has<Health>() || candidate.Read<Health>().Current <= 0f)
+                ref readonly var resource = ref candidate.Read<OpenWorldResourceTargetState>();
+                if (!IsTargetableResource(resource))
                     continue;
 
-                var delta = candidate.Read<CharacterNetState>().Position - playerPosition;
+                var delta = resource.WorldPosition - playerPosition;
                 var distanceSq = delta.sqrMagnitude;
                 if (distanceSq > radiusSq)
                     continue;
 
-                var tieBreaker = candidate.GID.Raw;
+                var tieBreaker = DeterministicPlacementTieBreaker(resource.PlacementId);
                 if (!hasBest
                     || distanceSq < bestDistanceSq
                     || (Mathf.Approximately(distanceSq, bestDistanceSq) && tieBreaker < bestTieBreaker))
@@ -163,11 +130,12 @@ namespace StaticMlp.Features.Combat
                     hasBest = true;
                     bestDistanceSq = distanceSq;
                     bestTieBreaker = tieBreaker;
-                    bestTarget = candidate.GID;
+                    bestCommand = CreateCommand(resource);
                 }
             }
 
-            return hasBest ? bestTarget : default;
+            command = bestCommand;
+            return hasBest;
         }
 
         private static bool TryGetCandidateScore(
@@ -220,6 +188,41 @@ namespace StaticMlp.Features.Combat
                        && (sourceDistanceSq < bestSourceDistanceSq
                            || (Mathf.Approximately(sourceDistanceSq, bestSourceDistanceSq)
                                && tieBreaker < bestTieBreaker)));
+        }
+
+        private static TryHarvestOpenWorldResourceCommand CreateCommand(in OpenWorldResourceTargetState resource)
+        {
+            return new TryHarvestOpenWorldResourceCommand
+            {
+                PlacementId = resource.PlacementId,
+                ToolId = DEFAULT_TOOL_ID,
+                HitPointXQ = QuantizeHitPoint(resource.WorldPosition.x),
+                HitPointYQ = QuantizeHitPoint(resource.WorldPosition.y),
+                HitPointZQ = QuantizeHitPoint(resource.WorldPosition.z)
+            };
+        }
+
+        private static int QuantizeHitPoint(float value)
+        {
+            return Mathf.RoundToInt(value / HIT_POINT_QUANTIZATION);
+        }
+
+        private static bool IsTargetableResource(in OpenWorldResourceTargetState resource)
+        {
+            const OpenWorldResourceOverlayFlags inactive =
+                OpenWorldResourceOverlayFlags.Depleted
+                | OpenWorldResourceOverlayFlags.Hidden
+                | OpenWorldResourceOverlayFlags.Replaced;
+
+            return resource.PlacementId != 0L
+                   && resource.RemainingAmount > 0
+                   && (resource.Flags & inactive) == 0
+                   && IsFinite(resource.WorldPosition);
+        }
+
+        private static ulong DeterministicPlacementTieBreaker(long placementId)
+        {
+            return unchecked((ulong)placementId);
         }
 
         private static bool IsFinite(Vector3 value)

@@ -12,7 +12,6 @@ namespace StaticMlp.Features.CombatDirector
 {
     public sealed class EnemySpawnApplySystem : ISystem
     {
-        private const float DEFAULT_ENEMY_MAX_HEALTH = 10f;
         private readonly List<EntityGID> _requests = new();
 
         public void Update()
@@ -58,7 +57,7 @@ namespace StaticMlp.Features.CombatDirector
                     ToVector3(spawnRequest.SpawnPosition),
                     Quaternion.identity,
                     CombatEnemyBehaviorIds.Default,
-                    DEFAULT_ENEMY_MAX_HEALTH,
+                    definition.MaxHealth,
                     health01: 1f,
                     hunger: 0f,
                     fear: 0f,

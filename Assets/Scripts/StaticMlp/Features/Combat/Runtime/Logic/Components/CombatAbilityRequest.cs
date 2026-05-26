@@ -1,5 +1,4 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Combat
 {
@@ -7,7 +6,7 @@ namespace StaticMlp.Features.Combat
     {
         public CombatAbilityId AbilityId;
         public EntityGID Source;
-        public CombatTargetRef Target;
+        public EntityGID Target;
         public uint ClientCommandId;
     }
 }

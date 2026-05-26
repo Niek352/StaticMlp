@@ -105,26 +105,15 @@ namespace StaticMlp.Features.Combat
             }
         }
 
-        private static bool ValidateTarget(CombatTargetRef targetRef, Vector3 sourcePosition, CombatAbilityId abilityId, CombatConfig config)
+        private static bool ValidateTarget(EntityGID targetGid, Vector3 sourcePosition, CombatAbilityId abilityId, CombatConfig config)
         {
-            switch (targetRef.Kind)
-            {
-                case CombatTargetKind.ActorEntity:
-                    if (!targetRef.Entity.TryUnpack<ServerWT>(out var target)
-                        || !target.Has<CharacterNetState>()
-                        || !target.Has<Health>()
-                        || target.Read<Health>().Current <= 0f)
-                        return false;
+            if (!targetGid.TryUnpack<ServerWT>(out var target)
+                || !target.Has<CharacterNetState>()
+                || !target.Has<Health>()
+                || target.Read<Health>().Current <= 0f)
+                return false;
 
-                    return IsInRange(sourcePosition, target.Read<CharacterNetState>().Position, abilityId, config);
-
-                case CombatTargetKind.StaticPlacement:
-                    return targetRef.PlacementId != 0L
-                           && HasFiniteQuantizedHitPoint(targetRef);
-
-                default:
-                    return false;
-            }
+            return IsInRange(sourcePosition, target.Read<CharacterNetState>().Position, abilityId, config);
         }
 
         private static bool IsInRange(Vector3 sourcePosition, Vector3 targetPosition, CombatAbilityId abilityId, CombatConfig config)
@@ -133,19 +122,5 @@ namespace StaticMlp.Features.Combat
             return (sourcePosition - targetPosition).sqrMagnitude <= range * range;
         }
 
-        private static bool HasFiniteQuantizedHitPoint(CombatTargetRef targetRef)
-        {
-            const float quantization = 0.01f;
-            var hitPoint = new Vector3(
-                targetRef.HitPointXQ * quantization,
-                targetRef.HitPointYQ * quantization,
-                targetRef.HitPointZQ * quantization);
-            return IsFinite(hitPoint.x) && IsFinite(hitPoint.y) && IsFinite(hitPoint.z);
-        }
-
-        private static bool IsFinite(float value)
-        {
-            return !float.IsNaN(value) && !float.IsInfinity(value);
-        }
     }
 }

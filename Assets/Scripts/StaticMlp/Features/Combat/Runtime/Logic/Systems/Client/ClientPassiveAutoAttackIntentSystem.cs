@@ -74,32 +74,9 @@ namespace StaticMlp.Features.Combat
             }
         }
 
-        private static bool IsValidTarget(CombatTargetRef target)
+        private static bool IsValidTarget(EntityGID target)
         {
-            switch (target.Kind)
-            {
-                case CombatTargetKind.ActorEntity:
-                    return target.Entity.Raw != 0ul && target.Entity.TryUnpack<ClientCoreWT>(out _);
-                case CombatTargetKind.StaticPlacement:
-                    return target.PlacementId != 0L && HasFiniteQuantizedHitPoint(target);
-                default:
-                    return false;
-            }
-        }
-
-        private static bool HasFiniteQuantizedHitPoint(CombatTargetRef target)
-        {
-            const float quantization = 0.01f;
-            var hitPoint = new Vector3(
-                target.HitPointXQ * quantization,
-                target.HitPointYQ * quantization,
-                target.HitPointZQ * quantization);
-            return !float.IsNaN(hitPoint.x)
-                   && !float.IsInfinity(hitPoint.x)
-                   && !float.IsNaN(hitPoint.y)
-                   && !float.IsInfinity(hitPoint.y)
-                   && !float.IsNaN(hitPoint.z)
-                   && !float.IsInfinity(hitPoint.z);
+            return target.Raw != 0ul && target.TryUnpack<ClientCoreWT>(out _);
         }
     }
 }
