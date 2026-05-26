@@ -206,6 +206,16 @@ namespace StaticMlp.Features.Settlement
             builder.Append(state.AssignedWorkerCount);
             builder.Append(" / ");
             builder.Append(state.WorkerSlotCount);
+
+            for (var i = 0; i < state.WorkerSlots.Length; i++)
+            {
+                var slot = state.WorkerSlots[i];
+                builder.Append("\nSlot ");
+                builder.Append(slot.SlotIndex + 1);
+                builder.Append(": ");
+                builder.Append(slot.Assigned ? $"Worker {slot.Worker.Raw}" : "Empty");
+            }
+
             AppendAmounts(builder, "Inputs", in state.Inputs);
             AppendAmounts(builder, "Outputs", in state.Outputs);
             builder.Append("\nRecipe and claim actions are unavailable until server requests exist.");

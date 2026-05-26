@@ -46,6 +46,7 @@ namespace StaticMlp.Features.Settlement
                     return next;
                 case BuildingPanelKind.WorkbenchPanel:
                     next.Workbench = BuildWorkbench(target, in definition);
+                    next.PrimaryAction = CreateWorkerAction(in next.Workbench);
                     return next;
                 case BuildingPanelKind.ShelterPanel:
                     next.Shelter = BuildShelter(target, in definition);
@@ -123,11 +124,11 @@ namespace StaticMlp.Features.Settlement
                 RecipeName = recipe.Code,
                 WorkDone = workbench.WorkDone,
                 WorkRequired = recipe.WorkRequired,
-                WorkerSlotCount = workbench.WorkerSlotCount,
-                AssignedWorkerCount = CountAssignedWorkers(target.GID)
+                WorkerSlotCount = workbench.WorkerSlotCount
             };
             CopyAmounts(recipe.Inputs, ref state.Inputs);
             CopyAmounts(recipe.Outputs, ref state.Outputs);
+            PopulateWorkerSlots(ref state);
             return state;
         }
 
@@ -209,6 +210,33 @@ namespace StaticMlp.Features.Settlement
                 freeSlot);
         }
 
+        private static BuildingPanelAction CreateWorkerAction(in WorkbenchPanelState state)
+        {
+            if (TryFindAssignedSlot(in state, out var assignedSlot))
+            {
+                return new BuildingPanelAction(
+                    BuildingPanelActionKind.UnassignWorker,
+                    "Unassign Worker",
+                    enabled: true,
+                    disabledReason: string.Empty,
+                    state.Target,
+                    assignedSlot.Worker,
+                    assignedSlot.SlotIndex);
+            }
+
+            var hasFreeSlot = TryFindFreeSlot(in state, out var freeSlot);
+            var hasWorker = TryFindAssignableWorker(state.AnchorId, out var worker);
+            var enabled = hasFreeSlot && hasWorker;
+            return new BuildingPanelAction(
+                BuildingPanelActionKind.AssignWorker,
+                "Assign Worker",
+                enabled,
+                enabled ? string.Empty : ResolveAssignDisabledReason(hasFreeSlot, hasWorker),
+                state.Target,
+                worker,
+                freeSlot);
+        }
+
         private static BuildingPanelAction CreateCollectExtractionAction(in ExtractionPanelState state)
         {
             var enabled = state.BufferAmount > 0;
@@ -262,6 +290,35 @@ namespace StaticMlp.Features.Settlement
             }
         }
 
+        private static void PopulateWorkerSlots(ref WorkbenchPanelState state)
+        {
+            for (byte i = 0; i < state.WorkerSlotCount; i++)
+            {
+                if (state.WorkerSlots.Length == state.WorkerSlots.Capacity)
+                    throw new InvalidOperationException(
+                        $"{nameof(WorkbenchPanelState)} cannot hold more than {state.WorkerSlots.Capacity} worker slots.");
+
+                state.WorkerSlots.Add(new BuildingWorkerSlot(i, default, assigned: false));
+            }
+
+            foreach (var worker in CW.Query<All<SettlementWorkerTag, BuildingWorkerAssignmentState>>().Entities())
+            {
+                ref readonly var assignment = ref ClientProjection.Read<BuildingWorkerAssignmentState>(worker);
+                if (!assignment.IsAssigned || assignment.Building != state.Target)
+                    continue;
+
+                if (assignment.SlotIndex >= state.WorkerSlots.Length)
+                    throw new InvalidOperationException(
+                        $"Worker {worker.GID.Raw} is assigned to slot {assignment.SlotIndex}, but building {state.Target.Raw} exposes {state.WorkerSlots.Length} slots.");
+
+                state.WorkerSlots[assignment.SlotIndex] = new BuildingWorkerSlot(
+                    assignment.SlotIndex,
+                    worker.GID,
+                    assigned: true);
+                state.AssignedWorkerCount++;
+            }
+        }
+
         private static bool TryFindAssignedSlot(in ExtractionPanelState state, out BuildingWorkerSlot slot)
         {
             for (var i = 0; i < state.WorkerSlots.Length; i++)
@@ -279,6 +336,38 @@ namespace StaticMlp.Features.Settlement
         }
 
         private static bool TryFindFreeSlot(in ExtractionPanelState state, out byte slotIndex)
+        {
+            for (var i = 0; i < state.WorkerSlots.Length; i++)
+            {
+                var slot = state.WorkerSlots[i];
+                if (slot.Assigned)
+                    continue;
+
+                slotIndex = slot.SlotIndex;
+                return true;
+            }
+
+            slotIndex = 0;
+            return false;
+        }
+
+        private static bool TryFindAssignedSlot(in WorkbenchPanelState state, out BuildingWorkerSlot slot)
+        {
+            for (var i = 0; i < state.WorkerSlots.Length; i++)
+            {
+                var candidate = state.WorkerSlots[i];
+                if (!candidate.Assigned)
+                    continue;
+
+                slot = candidate;
+                return true;
+            }
+
+            slot = default;
+            return false;
+        }
+
+        private static bool TryFindFreeSlot(in WorkbenchPanelState state, out byte slotIndex)
         {
             for (var i = 0; i < state.WorkerSlots.Length; i++)
             {

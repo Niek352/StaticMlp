@@ -22,7 +22,7 @@ namespace StaticMlp.Features.Settlement
         }
 
         public override ViewLayer Layer => ViewLayer.Persistent;
-        public override int? PersistentSortOrder => 100;
+        public override int? PersistentSortOrder => 110;
 
         public void Apply(in BuildingPanelState state)
         {

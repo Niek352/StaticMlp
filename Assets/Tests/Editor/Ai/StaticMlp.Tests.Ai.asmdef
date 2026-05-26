@@ -10,6 +10,7 @@
         "StaticMlp.Features.AiActions",
         "StaticMlp.Features.AiNavigation.Contracts",
         "StaticMlp.Features.AiNavigation.Logic",
+        "StaticMlp.Features.BuildingCatalog",
         "StaticMlp.Features.Buildings.Contracts",
         "StaticMlp.Features.Buildings",
         "StaticMlp.Features.Combat.Logic",

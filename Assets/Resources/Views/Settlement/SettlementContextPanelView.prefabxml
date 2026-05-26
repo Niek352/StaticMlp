@@ -1,0 +1,116 @@
+<UnityPrefab>
+    <GameObject name="SettlementContextPanelView" id="Root">
+        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="0, 0" m_Pivot="0, 0" m_SizeDelta="0, 0" />
+        <Canvas m_RenderMode="0" m_SortingOrder="0" />
+        <CanvasScaler m_UiScaleMode="1" m_ReferenceResolution="1920, 1080" m_ScreenMatchMode="0" m_MatchWidthOrHeight="0.5" />
+        <GraphicRaycaster />
+        <SettlementContextPanelView
+            canvas="#Root"
+            graphicRaycaster="#Root"
+            panelRoot="#Panel"
+            primaryButton="#PrimaryButton"
+            secondaryButton="#SecondaryButton"
+            primaryButtonLabel="#PrimaryButtonLabel"
+            secondaryButtonLabel="#SecondaryButtonLabel"
+            summaryLabel="#SummaryLabel" />
+
+        <GameObject name="Panel" id="Panel" active="false">
+            <RectTransform m_AnchorMin="1, 1" m_AnchorMax="1, 1" m_Pivot="1, 1" m_SizeDelta="420, 244" m_AnchoredPosition="-18, -18" />
+            <Image m_Color="#18232CEE" m_RaycastTarget="true" />
+            <VerticalLayoutGroup
+                m_Padding.m_Left="14"
+                m_Padding.m_Right="14"
+                m_Padding.m_Top="12"
+                m_Padding.m_Bottom="12"
+                m_Spacing="10"
+                m_ChildControlWidth="true"
+                m_ChildForceExpandWidth="true"
+                m_ChildForceExpandHeight="false" />
+
+            <GameObject name="Title">
+                <RectTransform m_SizeDelta="0, 30" />
+                <TextMeshProUGUI
+                    m_text="Context Focus"
+                    m_fontSize="22"
+                    m_fontStyle="1"
+                    m_fontColor="#F4F8F4"
+                    m_HorizontalAlignment="2"
+                    m_VerticalAlignment="512"
+                    m_RaycastTarget="false" />
+                <LayoutElement m_PreferredHeight="30" />
+            </GameObject>
+
+            <GameObject name="SummaryLabel" id="SummaryLabel">
+                <RectTransform m_SizeDelta="0, 150" />
+                <TextMeshProUGUI
+                    m_text="Worker focus&#10;Assigned: False&#10;Task: Idle&#10;Blocked: None"
+                    m_fontSize="16"
+                    m_fontColor="#D7E3D6"
+                    m_HorizontalAlignment="0"
+                    m_VerticalAlignment="256"
+                    m_TextWrappingMode="0"
+                    m_overflowMode="1"
+                    m_RaycastTarget="false" />
+                <LayoutElement m_PreferredHeight="150" />
+            </GameObject>
+
+            <GameObject name="ActionRow">
+                <RectTransform m_SizeDelta="0, 42" />
+                <HorizontalLayoutGroup
+                    m_Spacing="10"
+                    m_ChildControlWidth="true"
+                    m_ChildForceExpandWidth="true"
+                    m_ChildForceExpandHeight="false" />
+                <LayoutElement m_PreferredHeight="42" />
+
+                <GameObject name="PrimaryButton" id="PrimaryButton">
+                    <RectTransform m_SizeDelta="0, 42" />
+                    <Image m_Color="#4C7A52" m_RaycastTarget="true" />
+                    <Button
+                        m_Transition="1"
+                        m_Colors.m_NormalColor="#FFFFFF"
+                        m_Colors.m_HighlightedColor="#E8F2E4"
+                        m_Colors.m_PressedColor="#C4D8BD"
+                        m_Colors.m_DisabledColor="#6A7585AA"
+                        m_Colors.m_FadeDuration="0.08" />
+
+                    <GameObject name="Label" id="PrimaryButtonLabel">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+                        <TextMeshProUGUI
+                            m_text="Assign Worker"
+                            m_fontSize="16"
+                            m_fontStyle="1"
+                            m_fontColor="#FFFFFF"
+                            m_HorizontalAlignment="2"
+                            m_VerticalAlignment="512"
+                            m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+
+                <GameObject name="SecondaryButton" id="SecondaryButton">
+                    <RectTransform m_SizeDelta="0, 42" />
+                    <Image m_Color="#33505F" m_RaycastTarget="true" />
+                    <Button
+                        m_Transition="1"
+                        m_Colors.m_NormalColor="#FFFFFF"
+                        m_Colors.m_HighlightedColor="#E5F4FA"
+                        m_Colors.m_PressedColor="#C8DCE4"
+                        m_Colors.m_DisabledColor="#6A7585AA"
+                        m_Colors.m_FadeDuration="0.08" />
+
+                    <GameObject name="Label" id="SecondaryButtonLabel">
+                        <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
+                        <TextMeshProUGUI
+                            m_text="Refresh"
+                            m_fontSize="16"
+                            m_fontStyle="1"
+                            m_fontColor="#FFFFFF"
+                            m_HorizontalAlignment="2"
+                            m_VerticalAlignment="512"
+                            m_RaycastTarget="false" />
+                    </GameObject>
+                </GameObject>
+            </GameObject>
+        </GameObject>
+    </GameObject>
+</UnityPrefab>

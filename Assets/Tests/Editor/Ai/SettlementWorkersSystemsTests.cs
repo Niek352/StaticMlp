@@ -3,9 +3,11 @@ using System;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Npc;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
+using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
 using UnityEngine;
@@ -40,6 +42,35 @@ namespace StaticMlp.Tests.Ai
             Assert.That(accepted.Status, Is.EqualTo(RequestStatus.Accepted));
             Assert.That(worker.Read<SettlementWorkerAssignment>().Status, Is.EqualTo(SettlementWorkerAssignmentStatus.Assigned));
             Assert.That(worker.Read<SettlementWorkerAssignment>().AnchorId, Is.EqualTo(anchorId.Value));
+        }
+
+        [Test]
+        public void BuildingAssignmentHandler_WhenUnassignAccepted_ReturnsSerializableBuildingTarget()
+        {
+            using var scope = new AiTestServerWorldScope();
+            var peer = new NetworkPeerId(1);
+            var anchorId = SettlementAnchorCatalog.HomeCampId;
+            scope.CreateSettlementAnchor(anchorId);
+            CreatePlayer(peer, Vector3.zero);
+            var worker = scope.CreateWorker(anchorId, Vector3.zero);
+            var building = CreateFinishedWorkerBuilding(anchorId, Vector3.zero);
+            worker.Set(new BuildingWorkerAssignmentState
+            {
+                Status = SettlementWorkerAssignmentStatus.Assigned,
+                AnchorId = anchorId.Value,
+                Building = building.GID,
+                SlotIndex = 0
+            });
+            var request = new SetBuildingWorkerAssignmentRequestEvent(worker.GID, building.GID, 0, assigned: false);
+
+            var result = new SetBuildingWorkerAssignmentHandler().Handle(peer, in request);
+
+            Assert.That(result.Status, Is.EqualTo(RequestStatus.Accepted));
+            Assert.That(result.Worker, Is.EqualTo(worker.GID));
+            Assert.That(result.Building, Is.EqualTo(building.GID));
+            Assert.That(result.AnchorId, Is.EqualTo(0));
+            Assert.That(result.AssignmentStatus, Is.EqualTo(SettlementWorkerAssignmentStatus.Unassigned));
+            Assert.That(worker.Read<BuildingWorkerAssignmentState>().Building, Is.EqualTo(default(EntityGID)));
         }
 
         [Test]
@@ -538,6 +569,42 @@ namespace StaticMlp.Tests.Ai
                 OutputBufferCapacity = 40,
                 Enabled = enabled,
                 WorkerSlotCount = 2
+            });
+            return entity;
+        }
+
+        private static SW.Entity CreateFinishedWorkerBuilding(SettlementAnchorId anchorId, Vector3 position)
+        {
+            var entity = SW.NewEntity<Default>();
+            entity.Set<FinishedBuildingTag>();
+            entity.Set(new SettlementAnchorRef(anchorId));
+            entity.Set(new ConstructionSiteState
+            {
+                BuildingId = BuildingCatalogData.WorkbenchId.Value,
+                Phase = ConstructionPhase.Completed
+            });
+            entity.Set(new ConstructionTransform
+            {
+                Position = position,
+                Rotation = Quaternion.identity
+            });
+            return entity;
+        }
+
+        private static SW.Entity CreatePlayer(NetworkPeerId owner, Vector3 position)
+        {
+            var entity = SW.NewEntity<Default>();
+            entity.Set<PlayerTag>();
+            entity.Set(new NetworkIdentity
+            {
+                Owner = owner,
+                Authority = NetworkAuthority.Owner,
+                NetworkArchetypeId = 0
+            });
+            entity.Set(new CharacterNetState
+            {
+                Position = position,
+                Rotation = Quaternion.identity
             });
             return entity;
         }

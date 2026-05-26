@@ -9,6 +9,7 @@ namespace StaticMlp.Features.Settlement
         private const string HUD_VIEW_RESOURCE_PATH = "Views/Stage1/Stage1HudView";
         private const string INTERACTION_PROMPT_VIEW_RESOURCE_PATH = "Views/Settlement/InteractionPromptView";
         private const string BUILDING_MANAGEMENT_PANEL_VIEW_RESOURCE_PATH = "Views/Settlement/BuildingManagementPanelView";
+        private const string CONTEXT_PANEL_VIEW_RESOURCE_PATH = "Views/Settlement/SettlementContextPanelView";
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
@@ -37,6 +38,15 @@ namespace StaticMlp.Features.Settlement
                     buildingPanelBridge),
                 state => state.IsOpen), GameplaySystemOrder.ClientPresentation + 12);
             systems.Add(buildingPanelBridge, GameplaySystemOrder.ClientPresentation + 13);
+
+            var contextPanelBridge = new SettlementContextPanelCompositeBridgeSystem();
+            systems.Add(new ClientSettlementContextPanelSessionSystem(), GameplaySystemOrder.ClientPresentation + 14);
+            systems.Add(new StateDrivenPersistentControllerHostSystem<SettlementContextPanelView, SettlementContextPanelController, SettlementContextPanelSession>(
+                _ => new SettlementContextPanelController(
+                    ResourcesViewFactory.CreateLazy<SettlementContextPanelView>(CONTEXT_PANEL_VIEW_RESOURCE_PATH),
+                    contextPanelBridge),
+                state => state.Mode != SettlementContextPanelMode.None), GameplaySystemOrder.ClientPresentation + 15);
+            systems.Add(contextPanelBridge, GameplaySystemOrder.ClientPresentation + 16);
         }
     }
 }

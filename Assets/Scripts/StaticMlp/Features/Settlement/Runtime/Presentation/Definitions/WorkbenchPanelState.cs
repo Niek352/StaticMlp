@@ -13,6 +13,7 @@ namespace StaticMlp.Features.Settlement
         public float WorkRequired;
         public byte WorkerSlotCount;
         public byte AssignedWorkerCount;
+        public FixedList128Bytes<BuildingWorkerSlot> WorkerSlots;
         public FixedList128Bytes<ResourceAmount> Inputs;
         public FixedList128Bytes<ResourceAmount> Outputs;
     }

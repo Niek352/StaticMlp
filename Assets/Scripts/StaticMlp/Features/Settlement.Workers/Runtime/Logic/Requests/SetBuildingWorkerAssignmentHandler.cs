@@ -102,7 +102,7 @@ namespace StaticMlp.Features.Settlement.Workers
                 RequestId = request.RequestId,
                 Status = RequestStatus.Accepted,
                 Worker = request.Worker,
-                Building = request.Assigned ? request.Building : default,
+                Building = request.Building,
                 AnchorId = request.Assigned ? anchorRef.AnchorId : (ushort)0,
                 SlotIndex = request.Assigned ? request.SlotIndex : (byte)0,
                 AssignmentStatus = buildingAssignment.Status

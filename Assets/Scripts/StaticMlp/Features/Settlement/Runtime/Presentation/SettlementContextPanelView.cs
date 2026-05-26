@@ -1,9 +1,12 @@
 using System;
 using System.Text;
 using Code.EcsUi.Mvc;
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
+using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Settlement.Workers;
+using StaticMlp.Networking;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -134,15 +137,56 @@ namespace StaticMlp.Features.Settlement
             primaryButtonLabel.text = state.WorkerAssigned ? "Unassign" : "Assign";
 
             var summaryBuilder = new StringBuilder();
-            summaryBuilder.Append("Worker\n");
-            summaryBuilder.Append("Status: ");
-            summaryBuilder.Append(state.WorkerAssigned ? "Assigned" : "Unassigned");
-            summaryBuilder.Append("\nTask: ");
-            summaryBuilder.Append(state.WorkerActiveTask);
+            var assignedCount = 0;
+            for (var i = 0; i < state.Workers.Length; i++)
+            {
+                if (state.Workers[i].IsAssigned)
+                    assignedCount++;
+            }
+
+            summaryBuilder.Append("Workers: ");
+            summaryBuilder.Append(assignedCount);
+            summaryBuilder.Append(" / ");
+            summaryBuilder.Append(state.Workers.Length);
+            summaryBuilder.Append(" assigned\n");
+
+            for (var i = 0; i < state.Workers.Length; i++)
+            {
+                var worker = state.Workers[i];
+                var roleName = WorkerRoleCatalog.TryGet(worker.Role, out var roleDef)
+                    ? roleDef.AllowedJobs.ToString()
+                    : $"Role {worker.Role.Value}";
+                summaryBuilder.Append(roleName);
+                summaryBuilder.Append(": ");
+
+                if (worker.IsBuildingAssignment && worker.Building.Raw != 0)
+                {
+                    var buildingName = ResolveBuildingDisplayName(worker.Building);
+                    summaryBuilder.Append(buildingName);
+                    summaryBuilder.Append(" #");
+                    summaryBuilder.Append(worker.SlotIndex + 1);
+                }
+                else if (worker.IsAssigned)
+                {
+                    summaryBuilder.Append("Camp Builder");
+                }
+                else
+                {
+                    summaryBuilder.Append("Unassigned");
+                }
+
+                if (worker.BlockingReason != SettlementWorkerBlockingReason.None)
+                {
+                    summaryBuilder.Append(" [");
+                    summaryBuilder.Append(worker.BlockingReason);
+                    summaryBuilder.Append("]");
+                }
+                summaryBuilder.Append("\n");
+            }
+
             summaryBuilder.Append("\nPrimary: ");
             summaryBuilder.Append(state.WorkerAssigned ? "Unassign" : "Assign");
             summaryBuilder.Append(state.CanToggleWorkerAssignment ? " (ready)" : " (locked)");
-            summaryBuilder.Append("\nEffect: Sends worker assignment request.");
 
             if (state.WorkerBlockingReason != SettlementWorkerBlockingReason.None)
             {
@@ -218,6 +262,19 @@ namespace StaticMlp.Features.Settlement
         private static string FormatWorkerBlockingReason(SettlementWorkerBlockingReason reason)
         {
             return reason.ToString();
+        }
+
+        private static string ResolveBuildingDisplayName(EntityGID buildingGid)
+        {
+            if (!buildingGid.TryUnpack<ClientCoreWT>(out var building))
+                return "Building";
+
+            if (!building.Has<ConstructionSiteState>())
+                return "Building";
+
+            ref readonly var site = ref building.Read<ConstructionSiteState>();
+            var definition = BuildingCatalogData.Get(new BuildingId(site.BuildingId));
+            return definition.DisplayName;
         }
     }
 }

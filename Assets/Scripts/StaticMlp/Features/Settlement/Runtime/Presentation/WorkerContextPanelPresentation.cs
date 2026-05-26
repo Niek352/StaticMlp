@@ -1,5 +1,8 @@
+using System;
 using StaticMlp.Features.CampFlow;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
@@ -19,6 +22,7 @@ namespace StaticMlp.Features.Settlement
             };
 
             PopulateWorkerState(ref state);
+            PopulateWorkerList(ref state);
 
             return state;
         }
@@ -64,5 +68,53 @@ namespace StaticMlp.Features.Settlement
                 return;
             }
         }
+
+        private static void PopulateWorkerList(ref WorkerContextPanelState state)
+        {
+            foreach (var worker in CW.Query<All<SettlementWorkerTag, SettlementWorkerIdentity, SettlementWorkerAssignment>>().Entities())
+            {
+                ref readonly var identity = ref worker.Read<SettlementWorkerIdentity>();
+                if (identity.HomeAnchorId != state.AnchorId.Value)
+                    continue;
+
+                if (state.Workers.Length == state.Workers.Capacity)
+                    throw new InvalidOperationException(
+                        $"{nameof(WorkerContextPanelState)} cannot hold more than {state.Workers.Capacity} worker entries.");
+
+                ref readonly var assignment = ref worker.Read<SettlementWorkerAssignment>();
+                var entry = new WorkerListEntryState
+                {
+                    WorkerId = worker.GID,
+                    Role = identity.Role,
+                    IsAssigned = assignment.IsAssigned,
+                    BlockingReason = SettlementWorkerBlockingReason.None,
+                };
+
+                if (worker.Has<BuildingWorkerAssignmentState>())
+                {
+                    ref readonly var buildingAssignment = ref ClientProjection.Read<BuildingWorkerAssignmentState>(worker);
+                    if (buildingAssignment.IsAssigned && buildingAssignment.Building.Raw != 0)
+                    {
+                        entry.IsAssigned = true;
+                        entry.IsBuildingAssignment = true;
+                        entry.Building = buildingAssignment.Building;
+                        entry.SlotIndex = buildingAssignment.SlotIndex;
+                    }
+                }
+
+                if (assignment.IsAssigned && identity.Role == WorkerRoleCatalog.CampBuilderId)
+                {
+                    if (CampFlowProgressionQuery.TryGetClientAnchor(state.AnchorId, out var anchor)
+                        && anchor.Has<Projected<SettlementCampBuilderJobState>>())
+                    {
+                        ref readonly var job = ref ClientProjection.Read<SettlementCampBuilderJobState>(anchor);
+                        entry.BlockingReason = job.BlockingReason;
+                    }
+                }
+
+                state.Workers.Add(entry);
+            }
+        }
+
     }
 }
