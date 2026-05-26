@@ -119,10 +119,8 @@ namespace StaticMlp.Features.Combat
                     return IsInRange(sourcePosition, target.Read<CharacterNetState>().Position, abilityId, config);
 
                 case CombatTargetKind.StaticPlacement:
-                    if (targetRef.PlacementId <= 0L)
-                        return false;
-
-                    return IsInRange(sourcePosition, QuantizedHitPointToWorld(targetRef), abilityId, config);
+                    return targetRef.PlacementId != 0L
+                           && HasFiniteQuantizedHitPoint(targetRef);
 
                 default:
                     return false;
@@ -135,13 +133,19 @@ namespace StaticMlp.Features.Combat
             return (sourcePosition - targetPosition).sqrMagnitude <= range * range;
         }
 
-        private static Vector3 QuantizedHitPointToWorld(CombatTargetRef targetRef)
+        private static bool HasFiniteQuantizedHitPoint(CombatTargetRef targetRef)
         {
             const float quantization = 0.01f;
-            return new Vector3(
+            var hitPoint = new Vector3(
                 targetRef.HitPointXQ * quantization,
                 targetRef.HitPointYQ * quantization,
                 targetRef.HitPointZQ * quantization);
+            return IsFinite(hitPoint.x) && IsFinite(hitPoint.y) && IsFinite(hitPoint.z);
+        }
+
+        private static bool IsFinite(float value)
+        {
+            return !float.IsNaN(value) && !float.IsInfinity(value);
         }
     }
 }

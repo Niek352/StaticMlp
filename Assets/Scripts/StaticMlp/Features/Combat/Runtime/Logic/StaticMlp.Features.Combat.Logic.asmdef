@@ -8,6 +8,7 @@
         "Game.Core",
         "StaticMlp.Features.Loadout.Logic",
         "StaticMlp.Features.Combat.Contracts",
+        "StaticMlp.Features.OpenWorldResources.Contracts",
         "StaticMlp.Features.Shared.Logic",
         "StaticMlp.Features.Effects.Contracts",
         "StaticMlp.Features.Effects.Logic",

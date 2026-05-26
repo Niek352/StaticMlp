@@ -1,6 +1,6 @@
 # Phase 1: Core Combat and Gathering Summary
 
-**Combat can now describe actor and static-placement targets while OpenWorldResources publishes targetable proxy read models.**
+**Combat can now select actor or static-placement targets from active aim and emit validated hit facts without mutating resource overlays.**
 
 ## Current State
 
@@ -17,13 +17,14 @@
 - Phase 1 split into six atomic execution plans.
 - Architecture decision recorded: resources are attacked through combat target facts, but OpenWorldResources remains the only owner of resource overlay mutation.
 - `01-01-PLAN.md` completed: combat target refs, combat hit facts, and OpenWorldResources target read models are in source.
+- `01-02-PLAN.md` completed: active aim targeting chooses actor or resource targets, server validation accepts both through Combat-owned checks, and static placement hits emit `CombatTargetHitEvent`.
 
 ## Implementation Progress
 
 | Plan | Status | Summary |
 | --- | --- | --- |
 | `01-01-PLAN.md` | Done | `01-01-SUMMARY.md` |
-| `01-02-PLAN.md` | Not started | Pending |
+| `01-02-PLAN.md` | Done | `01-02-SUMMARY.md` |
 | `01-03-PLAN.md` | Not started | Pending |
 | `01-04-PLAN.md` | Not started | Pending |
 | `01-05-PLAN.md` | Not started | Pending |
