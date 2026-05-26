@@ -94,6 +94,12 @@ namespace StaticMlp.Features.OpenWorldResources
             proxyState.RemainingAmount = state.RemainingAmount;
             proxyState.Flags = state.Flags;
 
+            ref var targetState = ref entity.Mut<OpenWorldResourceTargetState>();
+            targetState.KindIdValue = state.KindIdValue;
+            targetState.RemainingAmount = state.RemainingAmount;
+            targetState.Flags = state.Flags;
+            ApplyTargetableTag(entity, state.Flags);
+
             ref var viewState = ref entity.Mut<OpenWorldResourceNodeViewState>();
             viewState.KindIdValue = state.KindIdValue;
             viewState.RemainingAmount = state.RemainingAmount;
@@ -117,10 +123,38 @@ namespace StaticMlp.Features.OpenWorldResources
             proxyState.RemainingAmount = delta.RemainingAmount;
             proxyState.Flags = delta.Flags;
 
+            ref var targetState = ref entity.Mut<OpenWorldResourceTargetState>();
+            targetState.RemainingAmount = delta.RemainingAmount;
+            targetState.Flags = delta.Flags;
+            ApplyTargetableTag(entity, delta.Flags);
+
             ref var viewState = ref entity.Mut<OpenWorldResourceNodeViewState>();
             viewState.RemainingAmount = delta.RemainingAmount;
             viewState.MaxAmount = OpenWorldResourceNodeRules.StartingAmount(new ResourcePlacementKindId(proxyState.KindIdValue));
             viewState.Flags = delta.Flags;
+        }
+
+        private static void ApplyTargetableTag(CW.Entity entity, OpenWorldResourceOverlayFlags flags)
+        {
+            if (IsInactive(flags))
+            {
+                if (entity.Has<OpenWorldResourceTargetable>())
+                    entity.Delete<OpenWorldResourceTargetable>();
+
+                return;
+            }
+
+            if (!entity.Has<OpenWorldResourceTargetable>())
+                entity.Set<OpenWorldResourceTargetable>();
+        }
+
+        private static bool IsInactive(OpenWorldResourceOverlayFlags flags)
+        {
+            const OpenWorldResourceOverlayFlags inactive =
+                OpenWorldResourceOverlayFlags.Depleted
+                | OpenWorldResourceOverlayFlags.Hidden
+                | OpenWorldResourceOverlayFlags.Replaced;
+            return (flags & inactive) != 0;
         }
     }
 }

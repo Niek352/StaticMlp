@@ -1,13 +1,12 @@
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Combat
 {
-    public struct CombatAbilityRequest : IComponent
+    public struct CombatTargetHitEvent : IEvent
     {
-        public CombatAbilityId AbilityId;
         public EntityGID Source;
         public CombatTargetRef Target;
+        public CombatAbilityId AbilityId;
         public uint ClientCommandId;
     }
 }

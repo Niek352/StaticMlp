@@ -7,7 +7,7 @@ namespace StaticMlp.Features.Combat
     {
         public CombatAbilityId AbilityId;
         public EntityGID Source;
-        public EntityGID Target;
+        public CombatTargetRef Target;
         public uint ClientCommandId;
     }
 }

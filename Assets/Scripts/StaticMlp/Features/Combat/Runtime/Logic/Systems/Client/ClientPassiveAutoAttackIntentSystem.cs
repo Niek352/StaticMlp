@@ -33,7 +33,7 @@ namespace StaticMlp.Features.Combat
         {
             ref var state = ref player.Mut<PassiveAutoAttackState>();
             var abilityId = player.Read<PreparedLoadoutSnapshot>().PreparedAbilityId;
-            if (state.CurrentTarget.Raw == 0ul || !state.CurrentTarget.TryUnpack<ClientCoreWT>(out _))
+            if (!IsValidTarget(state.CurrentTarget))
             {
                 if (player.Has<PassiveAutoAttackIntent>())
                     player.Delete<PassiveAutoAttackIntent>();
@@ -71,6 +71,19 @@ namespace StaticMlp.Features.Combat
                     return config.FireFlaskCooldown;
                 default:
                     return config.FireInterval;
+            }
+        }
+
+        private static bool IsValidTarget(CombatTargetRef target)
+        {
+            switch (target.Kind)
+            {
+                case CombatTargetKind.ActorEntity:
+                    return target.Entity.Raw != 0ul && target.Entity.TryUnpack<ClientCoreWT>(out _);
+                case CombatTargetKind.StaticPlacement:
+                    return target.PlacementId > 0L;
+                default:
+                    return false;
             }
         }
     }

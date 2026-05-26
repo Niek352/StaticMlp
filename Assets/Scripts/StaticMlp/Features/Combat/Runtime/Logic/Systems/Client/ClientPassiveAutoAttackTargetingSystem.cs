@@ -44,7 +44,7 @@ namespace StaticMlp.Features.Combat
             var previousTarget = state.CurrentTarget;
             var abilityId = player.Read<PreparedLoadoutSnapshot>().PreparedAbilityId;
             state.CurrentTarget = FindNearestTarget(player, GetRange(abilityId, config));
-            if (previousTarget.Raw != 0ul && state.CurrentTarget.Raw == 0ul)
+            if (previousTarget.Kind != CombatTargetKind.None && state.CurrentTarget.Kind == CombatTargetKind.None)
                 state.NextFireAt = now;
         }
 
@@ -61,7 +61,7 @@ namespace StaticMlp.Features.Combat
             }
         }
 
-        private static EntityGID FindNearestTarget(CW.Entity player, float radius)
+        private static CombatTargetRef FindNearestTarget(CW.Entity player, float radius)
         {
             var playerPosition = player.Read<CharacterNetState>().Position;
             var radiusSq = radius * radius;
@@ -89,7 +89,13 @@ namespace StaticMlp.Features.Combat
                 }
             }
 
-            return bestTarget;
+            return hasBest
+                ? new CombatTargetRef
+                {
+                    Kind = CombatTargetKind.ActorEntity,
+                    Entity = bestTarget
+                }
+                : default;
         }
     }
 }

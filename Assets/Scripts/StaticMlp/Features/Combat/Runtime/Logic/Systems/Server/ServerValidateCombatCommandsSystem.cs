@@ -52,23 +52,8 @@ namespace StaticMlp.Features.Combat
                 }
             }
 
-            if (!data.Target.TryUnpack<ServerWT>(out var target)
-                || !target.Has<CharacterNetState>()
-                || !target.Has<Health>())
-            {
-                request.Destroy();
-                return;
-            }
-
-            if (target.Read<Health>().Current <= 0f)
-            {
-                request.Destroy();
-                return;
-            }
-
             var sourcePosition = source.Read<CharacterNetState>().Position;
-            var targetPosition = target.Read<CharacterNetState>().Position;
-            if ((sourcePosition - targetPosition).sqrMagnitude > GetRange(data.AbilityId, config) * GetRange(data.AbilityId, config))
+            if (!ValidateTarget(data.Target, sourcePosition, data.AbilityId, config))
             {
                 request.Destroy();
                 return;
@@ -118,6 +103,45 @@ namespace StaticMlp.Features.Combat
                 default:
                     return config.FireInterval;
             }
+        }
+
+        private static bool ValidateTarget(CombatTargetRef targetRef, Vector3 sourcePosition, CombatAbilityId abilityId, CombatConfig config)
+        {
+            switch (targetRef.Kind)
+            {
+                case CombatTargetKind.ActorEntity:
+                    if (!targetRef.Entity.TryUnpack<ServerWT>(out var target)
+                        || !target.Has<CharacterNetState>()
+                        || !target.Has<Health>()
+                        || target.Read<Health>().Current <= 0f)
+                        return false;
+
+                    return IsInRange(sourcePosition, target.Read<CharacterNetState>().Position, abilityId, config);
+
+                case CombatTargetKind.StaticPlacement:
+                    if (targetRef.PlacementId <= 0L)
+                        return false;
+
+                    return IsInRange(sourcePosition, QuantizedHitPointToWorld(targetRef), abilityId, config);
+
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsInRange(Vector3 sourcePosition, Vector3 targetPosition, CombatAbilityId abilityId, CombatConfig config)
+        {
+            var range = GetRange(abilityId, config);
+            return (sourcePosition - targetPosition).sqrMagnitude <= range * range;
+        }
+
+        private static Vector3 QuantizedHitPointToWorld(CombatTargetRef targetRef)
+        {
+            const float quantization = 0.01f;
+            return new Vector3(
+                targetRef.HitPointXQ * quantization,
+                targetRef.HitPointYQ * quantization,
+                targetRef.HitPointZQ * quantization);
         }
     }
 }

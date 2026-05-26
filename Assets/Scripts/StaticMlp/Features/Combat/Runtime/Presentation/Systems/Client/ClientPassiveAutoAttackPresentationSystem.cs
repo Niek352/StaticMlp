@@ -39,11 +39,11 @@ namespace StaticMlp.Features.Combat
                 _players.Add(player.GID);
 
                 var currentTarget = player.Read<PassiveAutoAttackState>().CurrentTarget;
-                if (currentTarget.Raw == 0ul)
+                if (currentTarget.Kind != CombatTargetKind.ActorEntity || currentTarget.Entity.Raw == 0ul)
                     continue;
 
-                _currentTargets.Add(currentTarget);
-                _currentTargetRaws.Add(currentTarget.Raw);
+                _currentTargets.Add(currentTarget.Entity);
+                _currentTargetRaws.Add(currentTarget.Entity.Raw);
             }
         }
 
@@ -98,7 +98,7 @@ namespace StaticMlp.Features.Combat
                     continue;
 
                 ref readonly var intent = ref player.Read<PassiveAutoAttackIntent>();
-                if (!intent.Target.TryUnpack<ClientCoreWT>(out var target) || !target.Has<CharacterNetState>())
+                if (!TryGetTargetPosition(intent.Target, out var targetPosition))
                     continue;
 
                 var viewState = player.Has<PassiveAutoAttackViewState>()
@@ -108,7 +108,6 @@ namespace StaticMlp.Features.Combat
                     continue;
 
                 var shooterPosition = player.Read<CharacterNetState>().Position + Vector3.up;
-                var targetPosition = target.Read<CharacterNetState>().Position + Vector3.up;
                 _shots.Add(new ShotSnapshot(
                     player.GID,
                     intent.Target,
@@ -136,7 +135,8 @@ namespace StaticMlp.Features.Combat
                     ShotSequence = shot.Sequence
                 });
 
-                if (!shot.Target.TryUnpack<ClientCoreWT>(out var target))
+                if (shot.Target.Kind != CombatTargetKind.ActorEntity
+                    || !shot.Target.Entity.TryUnpack<ClientCoreWT>(out var target))
                     continue;
 
                 target.Set(new PassiveAutoAttackTargetViewState
@@ -167,13 +167,13 @@ namespace StaticMlp.Features.Combat
         private readonly struct ShotSnapshot
         {
             public readonly EntityGID Shooter;
-            public readonly EntityGID Target;
+            public readonly CombatTargetRef Target;
             public readonly uint Sequence;
             public readonly Vector3 Start;
             public readonly Vector3 End;
             public readonly float Lifetime;
 
-            public ShotSnapshot(EntityGID shooter, EntityGID target, uint sequence, Vector3 start, Vector3 end, float lifetime)
+            public ShotSnapshot(EntityGID shooter, CombatTargetRef target, uint sequence, Vector3 start, Vector3 end, float lifetime)
             {
                 Shooter = shooter;
                 Target = target;
@@ -182,6 +182,42 @@ namespace StaticMlp.Features.Combat
                 End = end;
                 Lifetime = lifetime;
             }
+        }
+
+        private static bool TryGetTargetPosition(CombatTargetRef targetRef, out Vector3 position)
+        {
+            switch (targetRef.Kind)
+            {
+                case CombatTargetKind.ActorEntity:
+                    if (targetRef.Entity.TryUnpack<ClientCoreWT>(out var target) && target.Has<CharacterNetState>())
+                    {
+                        position = target.Read<CharacterNetState>().Position + Vector3.up;
+                        return true;
+                    }
+
+                    break;
+
+                case CombatTargetKind.StaticPlacement:
+                    if (targetRef.PlacementId > 0L)
+                    {
+                        position = QuantizedHitPointToWorld(targetRef);
+                        return true;
+                    }
+
+                    break;
+            }
+
+            position = default;
+            return false;
+        }
+
+        private static Vector3 QuantizedHitPointToWorld(CombatTargetRef targetRef)
+        {
+            const float quantization = 0.01f;
+            return new Vector3(
+                targetRef.HitPointXQ * quantization,
+                targetRef.HitPointYQ * quantization,
+                targetRef.HitPointZQ * quantization);
         }
     }
 }

@@ -1,14 +1,9 @@
 {
-    "name": "StaticMlp.Features.OpenWorldResources",
+    "name": "StaticMlp.Features.OpenWorldResources.Contracts",
     "rootNamespace": "StaticMlp.Features.OpenWorldResources",
     "references": [
         "FFS.StaticEcs",
-        "FFS.StaticPack",
-        "Ecs.Networking",
-        "Game.Core",
-        "StaticMlp.Features.OpenWorldResources.Contracts",
-        "StaticMlp.Features.OpenWorldGeneration.Contracts",
-        "StaticMlp.Features.OpenWorldGeneration.Logic"
+        "StaticMlp.Features.OpenWorldGeneration.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

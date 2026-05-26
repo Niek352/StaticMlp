@@ -75,6 +75,16 @@ namespace StaticMlp.Features.OpenWorldResources
                 RemainingAmount = state.RemainingAmount,
                 Flags = state.Flags
             });
+            entity.Set<OpenWorldResourceTargetable>();
+            entity.Set(new OpenWorldResourceTargetState
+            {
+                PlacementId = placement.PlacementId,
+                ChunkId = placement.ChunkId,
+                KindIdValue = state.KindIdValue,
+                RemainingAmount = state.RemainingAmount,
+                Flags = state.Flags,
+                WorldPosition = placement.Position
+            });
             entity.Set(new ViewTransform
             {
                 RenderPosition = placement.Position,

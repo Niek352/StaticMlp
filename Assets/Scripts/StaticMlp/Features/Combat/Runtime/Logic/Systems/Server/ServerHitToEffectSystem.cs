@@ -30,13 +30,28 @@ namespace StaticMlp.Features.Combat
         private static void ApplyHit(SW.Entity hit, CombatConfig combatConfig, StatusesConfig statusesConfig)
         {
             ref readonly var data = ref hit.Read<CombatHit>();
+            SW.SendEvent(new CombatTargetHitEvent
+            {
+                Source = data.Source,
+                Target = data.Target,
+                AbilityId = data.AbilityId,
+                ClientCommandId = data.ClientCommandId
+            });
+
+            if (data.Target.Kind != CombatTargetKind.ActorEntity)
+            {
+                hit.Destroy();
+                return;
+            }
+
+            var actorTarget = data.Target.Entity;
 
             switch (data.AbilityId)
             {
                 case CombatAbilityId.PoisonArrow:
                     EffectCommands.CreateDamage(
                         data.Source,
-                        data.Target,
+                        actorTarget,
                         combatConfig.PoisonArrowDamage,
                         DamageType.Physical,
                         data.ClientCommandId,
@@ -44,7 +59,7 @@ namespace StaticMlp.Features.Combat
                         maxDepth: combatConfig.MaxChainDepth);
                     StatusEffectCommands.CreatePoisonStatus(
                         data.Source,
-                        data.Target,
+                        actorTarget,
                         statusesConfig.PoisonDuration,
                         statusesConfig.PoisonTickInterval,
                         statusesConfig.PoisonPower,
@@ -58,7 +73,7 @@ namespace StaticMlp.Features.Combat
                 case CombatAbilityId.FireFlask:
                     EffectCommands.CreateDamage(
                         data.Source,
-                        data.Target,
+                        actorTarget,
                         combatConfig.FireFlaskDamage,
                         DamageType.Fire,
                         data.ClientCommandId,
@@ -69,7 +84,7 @@ namespace StaticMlp.Features.Combat
                 default:
                     EffectCommands.CreateDamage(
                         data.Source,
-                        data.Target,
+                        actorTarget,
                         combatConfig.DamageValue,
                         DamageType.Physical,
                         data.ClientCommandId,

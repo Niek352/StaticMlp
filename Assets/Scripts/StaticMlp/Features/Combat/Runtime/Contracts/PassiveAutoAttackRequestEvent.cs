@@ -9,10 +9,10 @@ namespace StaticMlp.Features.Combat
     {
         public const ushort NETWORK_EVENT_ID = 57021;
 
-        public EntityGID Target;
+        public CombatTargetRef Target;
         public uint ShotSequence;
 
-        public PassiveAutoAttackRequestEvent(EntityGID target, uint shotSequence)
+        public PassiveAutoAttackRequestEvent(CombatTargetRef target, uint shotSequence)
         {
             Target = target;
             ShotSequence = shotSequence;
