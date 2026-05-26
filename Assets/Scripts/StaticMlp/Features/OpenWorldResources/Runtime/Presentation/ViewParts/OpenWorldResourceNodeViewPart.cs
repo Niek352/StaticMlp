@@ -15,6 +15,8 @@ namespace StaticMlp.Features.OpenWorldResources
         [SerializeField] private Color _woodCanopyColor = new(0.2f, 0.62f, 0.24f, 1f);
         [SerializeField] private Color _stoneColor = new(0.48f, 0.52f, 0.55f, 1f);
         [SerializeField] private Color _amountPipColor = new(0.95f, 0.78f, 0.28f, 1f);
+        [SerializeField] private Color _hitFlashColor = new(1f, 0.95f, 0.55f, 1f);
+        [SerializeField] private Color _depletionPulseColor = new(1f, 0.35f, 0.18f, 1f);
 
         private GameObject _visualRoot;
         private GameObject _amountIndicatorRoot;
@@ -48,9 +50,11 @@ namespace StaticMlp.Features.OpenWorldResources
                 throw new InvalidOperationException($"{nameof(OpenWorldResourceNodeViewState)} max amount must be positive.");
 
             BuildVisual(component.KindIdValue);
-            _visualRoot.transform.localScale = Vector3.one * component.Scale;
+            var pulseScale = 1f + component.DepletionPulseIntensity * 0.25f;
+            _visualRoot.transform.localScale = Vector3.one * component.Scale * pulseScale;
             ApplyAmountIndicator(component.RemainingAmount, component.MaxAmount);
-            SetVisualActive(!IsInactive(component.Flags) && component.RemainingAmount > 0);
+            ApplyFeedback(component.HitFlashIntensity, component.DepletionPulseIntensity);
+            SetVisualActive((!IsInactive(component.Flags) && component.RemainingAmount > 0) || component.DepletionPulseIntensity > 0f);
         }
 
         private void BuildVisual(ushort kindId)
@@ -172,6 +176,33 @@ namespace StaticMlp.Features.OpenWorldResources
             DestroyMaterial(ref _stoneMaterial);
             DestroyMaterial(ref _amountPipMaterial);
             _hasActiveKind = false;
+        }
+
+        private void ApplyFeedback(float hitFlashIntensity, float depletionPulseIntensity)
+        {
+            var feedbackColor = Color.Lerp(_hitFlashColor, _depletionPulseColor, depletionPulseIntensity);
+            var intensity = Mathf.Clamp01(Mathf.Max(hitFlashIntensity, depletionPulseIntensity));
+
+            switch (_activeKindId)
+            {
+                case WOOD_KIND:
+                    ApplyMaterialFeedback(_trunkMaterial, _woodTrunkColor, feedbackColor, intensity);
+                    ApplyMaterialFeedback(_canopyMaterial, _woodCanopyColor, feedbackColor, intensity);
+                    break;
+                case STONE_KIND:
+                    ApplyMaterialFeedback(_stoneMaterial, _stoneColor, feedbackColor, intensity);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unknown open world resource node kind: {_activeKindId}.");
+            }
+        }
+
+        private static void ApplyMaterialFeedback(Material material, Color baseColor, Color feedbackColor, float intensity)
+        {
+            if (material == null)
+                throw new InvalidOperationException($"{nameof(OpenWorldResourceNodeViewPart)} feedback material is not built.");
+
+            material.color = Color.Lerp(baseColor, feedbackColor, intensity);
         }
 
         private static void RemoveCollider(GameObject target)

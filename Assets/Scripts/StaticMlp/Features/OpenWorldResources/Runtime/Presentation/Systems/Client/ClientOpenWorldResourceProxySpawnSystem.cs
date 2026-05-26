@@ -96,7 +96,8 @@ namespace StaticMlp.Features.OpenWorldResources
                 RemainingAmount = state.RemainingAmount,
                 MaxAmount = OpenWorldResourceNodeRules.StartingAmount(placement.KindId),
                 Flags = state.Flags,
-                Scale = placement.Scale
+                Scale = placement.Scale,
+                PreviousRemainingAmount = state.RemainingAmount
             });
             proxyIndex.Register(placement.PlacementId, entity.GID);
         }

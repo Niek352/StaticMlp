@@ -70,6 +70,17 @@ namespace StaticMlp.Features.OpenWorldResources
                 HitPointZQ = target.HitPointZQ,
                 WasDepleted = wasDepleted
             });
+
+            if (wasDepleted)
+            {
+                SW.SendEvent(new OpenWorldResourceDepletionHazardEvent
+                {
+                    SourcePlayer = evt.Source,
+                    PlacementId = target.PlacementId,
+                    KindId = placement.KindId,
+                    Origin = placement.Position
+                });
+            }
         }
     }
 }

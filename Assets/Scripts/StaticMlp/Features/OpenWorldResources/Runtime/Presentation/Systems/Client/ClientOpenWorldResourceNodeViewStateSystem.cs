@@ -25,6 +25,8 @@ namespace StaticMlp.Features.OpenWorldResources
                 viewState.MaxAmount = OpenWorldResourceNodeRules.StartingAmount(new ResourcePlacementKindId(nodeState.KindIdValue));
                 viewState.Flags = OpenWorldResourceOverlayFlags.None;
                 viewState.Scale = nodeTransform.Scale;
+                if (viewState.PreviousRemainingAmount == 0 && nodeState.RemainingAmount > 0)
+                    viewState.PreviousRemainingAmount = nodeState.RemainingAmount;
             }
         }
     }

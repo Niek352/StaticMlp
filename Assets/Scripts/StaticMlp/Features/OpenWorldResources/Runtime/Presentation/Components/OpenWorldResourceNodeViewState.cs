@@ -9,5 +9,8 @@ namespace StaticMlp.Features.OpenWorldResources
         public int MaxAmount;
         public OpenWorldResourceOverlayFlags Flags;
         public float Scale;
+        public int PreviousRemainingAmount;
+        public float HitFlashIntensity;
+        public float DepletionPulseIntensity;
     }
 }

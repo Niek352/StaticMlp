@@ -38,6 +38,7 @@ namespace StaticMlp.Features.OpenWorldResources
             systems.Add(new ClientOpenWorldChunkOverlayApplySystem(), GameplaySystemOrder.ClientApplyNetworkState + 50);
             systems.Add(new ClientOpenWorldResourceProxySpawnSystem(), GameplaySystemOrder.ClientPresentation - 30);
             systems.Add(new ClientOpenWorldResourceNodeViewStateSystem(), ViewSystemOrder.BuildPresentationState);
+            systems.Add(new ClientOpenWorldResourceNodeFeedbackSystem(), (short)(ViewSystemOrder.BuildPresentationState + 1));
             systems.Add(new ClientOpenWorldResourceNodeViewBindSystem(), ViewSystemOrder.BindViews - 1);
         }
 

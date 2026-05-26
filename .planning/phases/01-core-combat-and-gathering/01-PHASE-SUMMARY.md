@@ -1,6 +1,6 @@
 # Phase 1: Core Combat and Gathering Summary
 
-**Combat gathering now produces shared resource pickups, and players carry limited raw materials in an owner-only Multi inventory.**
+**Combat gathering now produces pickups, carried raw inventory, server depletion hazards, and client-readable resource feedback.**
 
 ## Current State
 
@@ -20,6 +20,7 @@
 - `01-02-PLAN.md` completed: active aim targeting chooses actor or resource targets, server validation accepts both through Combat-owned checks, and static placement hits emit `CombatTargetHitEvent`.
 - `01-03-PLAN.md` completed: OpenWorldResources consumes static-placement hit facts, reduces sparse overlay amounts, marks depletion, and emits `OpenWorldResourceHarvestedEvent`.
 - `01-04-PLAN.md` completed: ResourcesInventoryMinimal now owns a Multi-backed carried inventory, shared pickup entities, server collection, and client magnetic presentation.
+- `01-05-PLAN.md` completed: resource depletion emits server-authoritative physical hazard pulses, and client resource proxies show hit/depletion feedback.
 
 ## Implementation Progress
 
@@ -29,7 +30,7 @@
 | `01-02-PLAN.md` | Done | `01-02-SUMMARY.md` |
 | `01-03-PLAN.md` | Done | `01-03-SUMMARY.md` |
 | `01-04-PLAN.md` | Done | `01-04-SUMMARY.md` |
-| `01-05-PLAN.md` | Not started | Pending |
+| `01-05-PLAN.md` | Done | `01-05-SUMMARY.md` |
 | `01-06-PLAN.md` | Not started | Pending |
 
 ## Update Rule
@@ -44,6 +45,7 @@ After each plan is executed:
 ## Open Issues
 
 - Unity replication/codegen and compile checks are pending after the `UseAbilityCommand`, `PassiveAutoAttackRequestEvent`, `ResourcesInventory`, and `ResourcePickup` source contract changes.
+- Unity compile/play checks are pending for the `01-05` resource hazard and feedback source changes.
 
 ---
 *Phase: 01-core-combat-and-gathering*

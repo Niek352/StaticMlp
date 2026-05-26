@@ -7,9 +7,11 @@
         "Ecs.Networking",
         "Game.Core",
         "StaticMlp.Features.Combat.Contracts",
+        "StaticMlp.Features.Effects.Logic",
         "StaticMlp.Features.OpenWorldResources.Contracts",
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
         "StaticMlp.Features.OpenWorldGeneration.Logic",
+        "StaticMlp.Features.Shared.Logic",
         "StaticMlp.Features.Settlement.Contracts"
     ],
     "includePlatforms": [],
