@@ -3,7 +3,8 @@
     "rootNamespace": "StaticMlp.Features.OpenWorldResources",
     "references": [
         "FFS.StaticEcs",
-        "StaticMlp.Features.OpenWorldGeneration.Contracts"
+        "StaticMlp.Features.OpenWorldGeneration.Contracts",
+        "StaticMlp.Features.Settlement.Contracts"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

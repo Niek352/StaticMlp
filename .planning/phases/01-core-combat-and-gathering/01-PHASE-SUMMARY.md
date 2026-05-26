@@ -1,6 +1,6 @@
 # Phase 1: Core Combat and Gathering Summary
 
-**Combat can now select actor or static-placement targets from active aim and emit validated hit facts without mutating resource overlays.**
+**Combat can now select actor or static-placement targets, and resource hit facts mutate OpenWorldResources overlays into harvest facts.**
 
 ## Current State
 
@@ -18,6 +18,7 @@
 - Architecture decision recorded: resources are attacked through combat target facts, but OpenWorldResources remains the only owner of resource overlay mutation.
 - `01-01-PLAN.md` completed: combat target refs, combat hit facts, and OpenWorldResources target read models are in source.
 - `01-02-PLAN.md` completed: active aim targeting chooses actor or resource targets, server validation accepts both through Combat-owned checks, and static placement hits emit `CombatTargetHitEvent`.
+- `01-03-PLAN.md` completed: OpenWorldResources consumes static-placement hit facts, reduces sparse overlay amounts, marks depletion, and emits `OpenWorldResourceHarvestedEvent`.
 
 ## Implementation Progress
 
@@ -25,7 +26,7 @@
 | --- | --- | --- |
 | `01-01-PLAN.md` | Done | `01-01-SUMMARY.md` |
 | `01-02-PLAN.md` | Done | `01-02-SUMMARY.md` |
-| `01-03-PLAN.md` | Not started | Pending |
+| `01-03-PLAN.md` | Done | `01-03-SUMMARY.md` |
 | `01-04-PLAN.md` | Not started | Pending |
 | `01-05-PLAN.md` | Not started | Pending |
 | `01-06-PLAN.md` | Not started | Pending |
