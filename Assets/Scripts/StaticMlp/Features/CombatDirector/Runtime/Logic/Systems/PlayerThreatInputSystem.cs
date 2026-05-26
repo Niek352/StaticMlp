@@ -112,8 +112,7 @@ namespace StaticMlp.Features.CombatDirector
             if (!player.Has<ResourcesInventory>())
                 return 0f;
 
-            ref readonly var inventory = ref player.Read<ResourcesInventory>();
-            return inventory.Wood + inventory.Stone;
+            return ResourcesInventoryAccess.TotalAmount(player);
         }
 
         private float GetActionNoise(EntityGID playerGid)

@@ -1,13 +1,12 @@
 {
-    "name": "StaticMlp.Features.ResourcesInventoryMinimal",
+    "name": "StaticMlp.Features.ResourcesInventoryMinimal.Presentation",
     "rootNamespace": "StaticMlp.Features.ResourcesInventoryMinimal",
     "references": [
         "FFS.StaticEcs",
-        "FFS.StaticPack",
         "Ecs.Networking",
         "Game.Core",
-        "StaticMlp.Features.Settlement.Contracts",
-        "StaticMlp.Features.OpenWorldResources.Contracts"
+        "StaticMlp.Features.EcsViews",
+        "StaticMlp.Features.ResourcesInventoryMinimal"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
