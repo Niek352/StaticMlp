@@ -14,7 +14,8 @@ namespace StaticMlp.Tests.Settlement
         [Test]
         public void BedSlotRules_ReserveOccupyAndRelease()
         {
-            var worker = new EntityGID(10);
+            using var scope = new SettlementOperationTestWorldScope();
+            var worker = scope.CreateFinishedBuilding().GID;
             var reserved = BedSlotRules.Reserve(new BedSlotState(0, BedSlotStatus.Free), worker);
             var occupied = BedSlotRules.Occupy(reserved, worker);
             var released = BedSlotRules.Release(occupied);
@@ -29,8 +30,11 @@ namespace StaticMlp.Tests.Settlement
         [Test]
         public void BedSlotRules_BlockedSlotRejectsReservation()
         {
+            using var scope = new SettlementOperationTestWorldScope();
+            var worker = scope.CreateFinishedBuilding().GID;
+
             Assert.Throws<InvalidOperationException>(() =>
-                BedSlotRules.Reserve(new BedSlotState(0, BedSlotStatus.Blocked), new EntityGID(10)));
+                BedSlotRules.Reserve(new BedSlotState(0, BedSlotStatus.Blocked), worker));
         }
 
         [Test]

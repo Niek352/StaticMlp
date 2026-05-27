@@ -47,6 +47,14 @@ Canonical UX status для текущего Settlement vertical slice. Research 
 
 Важно: `Interact` больше не делает deposit напрямую. `Interact` только открывает панель. Deposit/build/operation clicks остаются typed UI intents и уходят через request/event pipeline.
 
+### Phase 2 Workbench Recipe Selection
+
+Status: `Implemented, needs Unity verification`.
+
+The Workbench panel now shows the active recipe and available recipe choices from `AvailableRecipesQuery`. The first-pass picker uses the existing buttons only: the primary button performs the currently selected Workbench action, and the secondary button cycles between worker assignment, output claiming, and `SetProductionRecipeRequestEvent` for the next available recipe. The UI does not switch recipes locally; it forwards selection intent through the typed request path and waits for replicated `ProductionStationOperationState.ActiveRecipeId`.
+
+Server validation rejects invalid targets, out-of-range peers, recipes outside the station, locked recipes, in-progress work, and recipe changes that would strand incompatible buffered inputs. Planks, Simple Parts, and Repair Kits are the initial Workbench choices. Richer picker layout remains prefab/UI wiring polish.
+
 ## Interaction Focus
 
 **Feature:** `StaticMlp.Features.Interaction`  

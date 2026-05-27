@@ -12,6 +12,7 @@
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
         "StaticMlp.Features.OpenWorldResources",
         "StaticMlp.Features.ResourcesInventoryMinimal",
+        "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Generated",
         "StaticMlp.Features.Shared.Logic"
     ],

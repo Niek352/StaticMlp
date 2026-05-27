@@ -517,11 +517,13 @@ namespace StaticMlp.Tests.Combat
         {
             using var serverScope = new CombatTestServerWorldScope();
             using var clientScope = new CampFlowPresentationClientWorldScope();
+            var site = serverScope.CreateNetworkedConstructionSite();
             SW.SetResource(new NetInbox());
             CW.GetResource<NetOutbox>().Clear();
             var receiver = SW.RegisterEventReceiver<NetworkEventFromClient<DepositConstructionResourcesRequestEvent>>();
+            var sendSystem = new ClientNetworkEventSendSystem();
             var request = new DepositConstructionResourcesRequestEvent(
-                default,
+                site.GID,
                 new[]
                 {
                     new ResourceAmount(ResourceCatalog.WoodId, 3),
@@ -531,28 +533,37 @@ namespace StaticMlp.Tests.Combat
                 RequestId = new RequestId(123)
             };
 
-            CW.SendToServer(request);
-            CW.GetResource<NetOutbox>().FlushNetworkEventBatches();
-            var packet = CW.GetResource<NetOutbox>().Packets[0];
-
-            Assert.That(PacketCodec.Decode(new NetworkPeerId(1), packet.Payload, SW.GetResource<NetInbox>()), Is.True);
-            new ServerNetworkEventApplySystem().Update();
-
-            var receivedCount = 0;
-            foreach (var received in receiver)
+            sendSystem.Init();
+            try
             {
-                receivedCount++;
-                Assert.That(received.Value.SourcePeer, Is.EqualTo(new NetworkPeerId(1)));
-                Assert.That(received.Value.Value.RequestId, Is.EqualTo(new RequestId(123)));
-                Assert.That(received.Value.Value.Resources.Length, Is.EqualTo(2));
-                Assert.That(received.Value.Value.Resources[0].Id, Is.EqualTo(ResourceCatalog.WoodId));
-                Assert.That(received.Value.Value.Resources[0].Amount, Is.EqualTo(3));
-                Assert.That(received.Value.Value.Resources[1].Id, Is.EqualTo(ResourceCatalog.PlanksId));
-                Assert.That(received.Value.Value.Resources[1].Amount, Is.EqualTo(2));
-            }
+                CW.SendToServer(request);
+                sendSystem.Update();
+                CW.GetResource<NetOutbox>().FlushNetworkEventBatches();
+                var packet = CW.GetResource<NetOutbox>().Packets[0];
 
-            SW.DeleteEventReceiver(ref receiver);
-            Assert.That(receivedCount, Is.EqualTo(1));
+                Assert.That(PacketCodec.Decode(new NetworkPeerId(1), packet.Payload, SW.GetResource<NetInbox>()), Is.True);
+                new ServerNetworkEventApplySystem().Update();
+
+                var receivedCount = 0;
+                foreach (var received in receiver)
+                {
+                    receivedCount++;
+                    Assert.That(received.Value.SourcePeer, Is.EqualTo(new NetworkPeerId(1)));
+                    Assert.That(received.Value.Value.RequestId, Is.EqualTo(new RequestId(123)));
+                    Assert.That(received.Value.Value.Resources.Length, Is.EqualTo(2));
+                    Assert.That(received.Value.Value.Resources[0].Id, Is.EqualTo(ResourceCatalog.WoodId));
+                    Assert.That(received.Value.Value.Resources[0].Amount, Is.EqualTo(3));
+                    Assert.That(received.Value.Value.Resources[1].Id, Is.EqualTo(ResourceCatalog.PlanksId));
+                    Assert.That(received.Value.Value.Resources[1].Amount, Is.EqualTo(2));
+                }
+
+                Assert.That(receivedCount, Is.EqualTo(1));
+            }
+            finally
+            {
+                sendSystem.Destroy();
+                SW.DeleteEventReceiver(ref receiver);
+            }
         }
 
         [Test]
@@ -560,6 +571,7 @@ namespace StaticMlp.Tests.Combat
         {
             using var serverScope = new CombatTestServerWorldScope();
             using var clientScope = new CampFlowPresentationClientWorldScope();
+            var site = serverScope.CreateNetworkedConstructionSite();
             CW.SetResource(new NetInbox());
             SW.GetResource<NetOutbox>().Clear();
             var receiver = CW.RegisterEventReceiver<NetworkEventFromServer<DepositConstructionResourcesResultEvent>>();
@@ -567,7 +579,7 @@ namespace StaticMlp.Tests.Combat
             {
                 RequestId = new RequestId(456),
                 Status = RequestStatus.Accepted,
-                Site = default,
+                Site = site.GID,
                 AcceptedResources = new[]
                 {
                     new ResourceAmount(ResourceCatalog.StoneId, 4),

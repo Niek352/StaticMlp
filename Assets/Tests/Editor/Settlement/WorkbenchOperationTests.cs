@@ -184,6 +184,128 @@ namespace StaticMlp.Tests.Settlement
             Assert.That(SettlementSharedResourcesAccess.TotalUsed(storage), Is.EqualTo(5));
         }
 
+        [Test]
+        public void ClaimProductionOutputHandler_TransfersOutputFromInactiveRecipe()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var peer = new NetworkPeerId(1);
+            var storage = scope.CreateSharedResources(capacity: 10, wood: 1);
+            var station = CreateProductionWorkbench(Vector3.zero);
+            scope.CreatePlayer(peer, Vector3.zero);
+            ref var state = ref station.Mut<ProductionStationOperationState>();
+            state.ActiveRecipeId = ProductionRecipeCatalog.WorkbenchSimplePartsId.Value;
+            ref var outputs = ref station.Ref<SW.Multi<ProductionStationOutputResource>>();
+            SetOutput(ref outputs, ResourceCatalog.PlanksId, 2);
+            var system = new ServerClaimProductionOutputToStorageSystem();
+            system.Init();
+
+            var result = new ClaimProductionOutputHandler().Handle(
+                peer,
+                new ClaimProductionOutputRequestEvent(station.GID, ResourceCatalog.PlanksId, 2));
+            try { system.Update(); }
+            finally { system.Destroy(); }
+
+            Assert.That(result.Status, Is.EqualTo(RequestStatus.Accepted));
+            Assert.That(result.TransferredAmount, Is.EqualTo(2));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.PlanksId), Is.EqualTo(2));
+            Assert.That(ProductionStationResourceAccess.GetOutput(station, ResourceCatalog.PlanksId), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void SetProductionRecipeHandler_AcceptsValidCompletedWorkbenchRecipeSwitch()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var peer = new NetworkPeerId(1);
+            var station = CreateProductionWorkbench(Vector3.zero);
+            scope.CreatePlayer(peer, Vector3.zero);
+
+            var result = new SetProductionRecipeHandler().Handle(
+                peer,
+                new SetProductionRecipeRequestEvent(
+                    station.GID,
+                    ProductionRecipeCatalog.WorkbenchSimplePartsId.Value));
+
+            Assert.That(result.Status, Is.EqualTo(RequestStatus.Accepted));
+            Assert.That(result.ActiveRecipeId, Is.EqualTo(ProductionRecipeCatalog.WorkbenchSimplePartsId.Value));
+            Assert.That(station.Read<ProductionStationOperationState>().ActiveRecipe, Is.EqualTo(ProductionRecipeCatalog.WorkbenchSimplePartsId));
+        }
+
+        [Test]
+        public void SetProductionRecipeHandler_RejectsInvalidTarget()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var peer = new NetworkPeerId(1);
+            scope.CreatePlayer(peer, Vector3.zero);
+
+            var result = new SetProductionRecipeHandler().Handle(
+                peer,
+                new SetProductionRecipeRequestEvent(
+                    default,
+                    ProductionRecipeCatalog.WorkbenchSimplePartsId.Value));
+
+            Assert.That(result.Status, Is.EqualTo(RequestStatus.Rejected));
+        }
+
+        [Test]
+        public void SetProductionRecipeHandler_RejectsWrongStationRecipeIds()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var peer = new NetworkPeerId(1);
+            var station = CreateProductionWorkbench(Vector3.zero);
+            scope.CreatePlayer(peer, Vector3.zero);
+            ref var state = ref station.Mut<ProductionStationOperationState>();
+            state.StationId = 999;
+
+            var result = new SetProductionRecipeHandler().Handle(
+                peer,
+                new SetProductionRecipeRequestEvent(
+                    station.GID,
+                    ProductionRecipeCatalog.WorkbenchSimplePartsId.Value));
+
+            Assert.That(result.Status, Is.EqualTo(RequestStatus.Rejected));
+            Assert.That(station.Read<ProductionStationOperationState>().ActiveRecipe, Is.EqualTo(ProductionRecipeCatalog.WorkbenchPlanksId));
+        }
+
+        [Test]
+        public void SetProductionRecipeHandler_RejectsSwitchWhileWorkIsInProgress()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var peer = new NetworkPeerId(1);
+            var station = CreateProductionWorkbench(Vector3.zero);
+            scope.CreatePlayer(peer, Vector3.zero);
+            ref var state = ref station.Mut<ProductionStationOperationState>();
+            state.WorkDone = 1f;
+
+            var result = new SetProductionRecipeHandler().Handle(
+                peer,
+                new SetProductionRecipeRequestEvent(
+                    station.GID,
+                    ProductionRecipeCatalog.WorkbenchSimplePartsId.Value));
+
+            Assert.That(result.Status, Is.EqualTo(RequestStatus.Rejected));
+            Assert.That(station.Read<ProductionStationOperationState>().ActiveRecipe, Is.EqualTo(ProductionRecipeCatalog.WorkbenchPlanksId));
+        }
+
+        [Test]
+        public void SetProductionRecipeHandler_RejectsSwitchWithWrongStationBufferedInputs()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var peer = new NetworkPeerId(1);
+            var station = CreateProductionWorkbench(Vector3.zero);
+            scope.CreatePlayer(peer, Vector3.zero);
+            ref var inputs = ref station.Ref<SW.Multi<ProductionStationInputResource>>();
+            SetInput(ref inputs, ResourceCatalog.WoodId, 1);
+
+            var result = new SetProductionRecipeHandler().Handle(
+                peer,
+                new SetProductionRecipeRequestEvent(
+                    station.GID,
+                    ProductionRecipeCatalog.WorkbenchRepairKitsId.Value));
+
+            Assert.That(result.Status, Is.EqualTo(RequestStatus.Rejected));
+            Assert.That(station.Read<ProductionStationOperationState>().ActiveRecipe, Is.EqualTo(ProductionRecipeCatalog.WorkbenchPlanksId));
+        }
+
         private static SW.Entity CreateProductionWorkbench(Vector3 position)
         {
             var station = SW.NewEntity<Default>();

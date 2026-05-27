@@ -93,7 +93,7 @@ namespace StaticMlp.Tests.Settlement
             AssertResource(ResourceCatalog.SimplePartsId, ResourceFamily.Refined, ResourceUsageFlags.ProductionOutput, 0);
             AssertResource(ResourceCatalog.RepairKitsId, ResourceFamily.Stability, ResourceUsageFlags.Repair, 0);
             AssertResource(ResourceCatalog.FoodId, ResourceFamily.Flow, ResourceUsageFlags.Upkeep, 0);
-            AssertResource(ResourceCatalog.FuelId, ResourceFamily.Flow, ResourceUsageFlags.Fuel, 0);
+            AssertResource(ResourceCatalog.FuelId, ResourceFamily.Flow, ResourceUsageFlags.Fuel, 10);
             AssertResource(ResourceCatalog.ResearchDataId, ResourceFamily.Progression, ResourceUsageFlags.Progression, 0);
             AssertResource(ResourceCatalog.MedicineId, ResourceFamily.Stability, ResourceUsageFlags.Upkeep, 0);
             AssertResource(ResourceCatalog.OreId, ResourceFamily.Raw, ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.ProductionInput | ResourceUsageFlags.ProductionOutput, 0);

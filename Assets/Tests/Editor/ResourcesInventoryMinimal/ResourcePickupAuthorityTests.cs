@@ -346,6 +346,10 @@ namespace StaticMlp.Tests.ResourcesInventoryMinimal
                     typeof(ResourcePickup).Assembly,
                     typeof(ResourcesInventoryPresentationFeature).Assembly);
                 CW.Initialize();
+                CW.SetResource(new GameTime
+                {
+                    DeltaTime = 1f / 60f
+                });
                 CW.SetResource(ResourcesInventoryConfig.CreateDefault());
             }
 

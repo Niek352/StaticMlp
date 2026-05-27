@@ -69,7 +69,7 @@ namespace StaticMlp.Features.Settlement
                 ResourceFamily.Flow,
                 ResourceUsageFlags.Fuel | ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.ProductionInput,
                 isSettlementStored: true,
-                startingSettlementAmount: 0),
+                startingSettlementAmount: 10),
             new(
                 ResearchDataId,
                 "Research Data",

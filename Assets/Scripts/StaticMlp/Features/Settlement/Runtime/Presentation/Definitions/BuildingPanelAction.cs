@@ -13,6 +13,7 @@ namespace StaticMlp.Features.Settlement
         public readonly byte SlotIndex;
         public readonly ResourceId Resource;
         public readonly int Amount;
+        public readonly ushort RecipeId;
 
         public BuildingPanelAction(
             BuildingPanelActionKind kind,
@@ -23,7 +24,8 @@ namespace StaticMlp.Features.Settlement
             EntityGID worker = default,
             byte slotIndex = 0,
             ResourceId resource = default,
-            int amount = 0)
+            int amount = 0,
+            ushort recipeId = 0)
         {
             Kind = kind;
             Label = label;
@@ -34,6 +36,7 @@ namespace StaticMlp.Features.Settlement
             SlotIndex = slotIndex;
             Resource = resource;
             Amount = amount;
+            RecipeId = recipeId;
         }
 
         public bool IsDefined => Kind != BuildingPanelActionKind.None;

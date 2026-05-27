@@ -51,7 +51,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
 
             var col = _orb.GetComponent<Collider>();
             if (col != null)
-                Destroy(col);
+                DestroyUnityObject(col);
 
             _orbMaterial = new Material(Shader.Find("Standard"))
             {
@@ -64,15 +64,23 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         {
             if (_orb != null)
             {
-                Destroy(_orb);
+                DestroyUnityObject(_orb);
                 _orb = null;
             }
 
             if (_orbMaterial != null)
             {
-                Destroy(_orbMaterial);
+                DestroyUnityObject(_orbMaterial);
                 _orbMaterial = null;
             }
+        }
+
+        private static void DestroyUnityObject(Object obj)
+        {
+            if (Application.isPlaying)
+                Destroy(obj);
+            else
+                DestroyImmediate(obj);
         }
 
         private void OnDestroy()

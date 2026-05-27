@@ -9,19 +9,20 @@ namespace StaticMlp.Features.Buildings
     public static class DepositConstructionResourcesEventCodec
     {
         private const int MAX_RESOURCES_PER_DEPOSIT = 64;
+        private const int MAX_DEPOSIT_PAYLOAD_BYTES = 512;
 
         public static void Register()
         {
             NetworkEventRegistry.Register<DepositConstructionResourcesRequestEvent>(
                 DepositConstructionResourcesRequestEvent.NETWORK_EVENT_ID,
                 NetDelivery.ReliableSequenced,
-                32,
+                MAX_DEPOSIT_PAYLOAD_BYTES,
                 WriteRequest,
                 ReadRequest);
             NetworkEventRegistry.Register<DepositConstructionResourcesResultEvent>(
                 DepositConstructionResourcesResultEvent.NETWORK_EVENT_ID,
                 NetDelivery.ReliableSequenced,
-                32,
+                MAX_DEPOSIT_PAYLOAD_BYTES,
                 WriteResult,
                 ReadResult);
         }

@@ -124,6 +124,7 @@ namespace StaticMlp.Features.Settlement
                 AnchorId = anchorRef.Anchor,
                 DisplayName = definition.DisplayName,
                 Enabled = workbench.Enabled,
+                ActiveRecipeId = workbench.ActiveRecipeId,
                 RecipeName = recipe.Code,
                 WorkDone = workbench.WorkDone,
                 WorkRequired = recipe.WorkRequired,
@@ -131,8 +132,9 @@ namespace StaticMlp.Features.Settlement
                 OutputCapacity = definition.Operation.StorageCapacity,
                 WorkerSlotCount = workbench.WorkerSlotCount
             };
+            PopulateRecipeChoices(workbench.Station, workbench.ActiveRecipe, ref state.RecipeChoices);
             CopyProductionInputs(target, in recipe, ref state.Inputs);
-            CopyProductionOutputs(target, in recipe, ref state.Outputs);
+            CopyProductionOutputs(target, workbench.Station, ref state.Outputs);
             PopulateWorkerSlots(ref state);
             return state;
         }
@@ -386,6 +388,24 @@ namespace StaticMlp.Features.Settlement
             }
         }
 
+        private static void PopulateRecipeChoices(
+            ProductionStationId stationId,
+            ProductionRecipeId activeRecipeId,
+            ref FixedList128Bytes<WorkbenchRecipeChoice> target)
+        {
+            foreach (var recipe in AvailableRecipesQuery.Filter(ProductionRecipeCatalog.All))
+            {
+                if (recipe.StationId != stationId)
+                    continue;
+
+                if (target.Length == target.Capacity)
+                    throw new InvalidOperationException(
+                        $"{nameof(WorkbenchPanelState)} cannot hold more than {target.Capacity} recipe choices.");
+
+                target.Add(new WorkbenchRecipeChoice(recipe.Id.Value, recipe.Id == activeRecipeId));
+            }
+        }
+
         private static bool TryFindAssignedSlot(in ExtractionPanelState state, out BuildingWorkerSlot slot)
         {
             for (var i = 0; i < state.WorkerSlots.Length; i++)
@@ -529,21 +549,44 @@ namespace StaticMlp.Features.Settlement
 
         private static void CopyProductionOutputs(
             CW.Entity station,
-            in ProductionRecipeDefinition recipe,
+            ProductionStationId stationId,
             ref FixedList128Bytes<ProductionResourceBufferEntry> target)
         {
-            for (var i = 0; i < recipe.Outputs.Length; i++)
+            for (var recipeIndex = 0; recipeIndex < ProductionRecipeCatalog.All.Count; recipeIndex++)
             {
-                if (target.Length == target.Capacity)
-                    throw new InvalidOperationException(
-                        $"{nameof(WorkbenchPanelState)} cannot hold more than {target.Capacity} resource rows.");
+                var recipe = ProductionRecipeCatalog.All[recipeIndex];
+                if (recipe.StationId != stationId)
+                    continue;
 
-                var output = recipe.Outputs[i];
-                target.Add(new ProductionResourceBufferEntry(
-                    output.Id,
-                    ProductionStationResourceAccess.GetProjectedOutput(station, output.Id),
-                    output.Amount));
+                for (var outputIndex = 0; outputIndex < recipe.Outputs.Length; outputIndex++)
+                {
+                    var output = recipe.Outputs[outputIndex];
+                    if (ContainsProductionOutput(in target, output.Id))
+                        continue;
+
+                    if (target.Length == target.Capacity)
+                        throw new InvalidOperationException(
+                            $"{nameof(WorkbenchPanelState)} cannot hold more than {target.Capacity} resource rows.");
+
+                    target.Add(new ProductionResourceBufferEntry(
+                        output.Id,
+                        ProductionStationResourceAccess.GetProjectedOutput(station, output.Id),
+                        output.Amount));
+                }
             }
+        }
+
+        private static bool ContainsProductionOutput(
+            in FixedList128Bytes<ProductionResourceBufferEntry> target,
+            ResourceId resourceId)
+        {
+            for (var i = 0; i < target.Length; i++)
+            {
+                if (target[i].Id == resourceId)
+                    return true;
+            }
+
+            return false;
         }
 
         private static void AddProductionInput(

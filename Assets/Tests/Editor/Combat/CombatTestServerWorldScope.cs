@@ -51,6 +51,7 @@ namespace StaticMlp.Tests.Combat
                 typeof(LoadoutLogicFeature).Assembly,
                 typeof(BuildingConstructionCompletedEvent).Assembly,
                 typeof(BuildingsGameplayFeature).Assembly,
+                typeof(CombatTargetHitEvent).Assembly,
                 typeof(CombatLogicFeature).Assembly,
                 typeof(EffectProcessedTag).Assembly,
                 typeof(EffectsLogicFeature).Assembly,

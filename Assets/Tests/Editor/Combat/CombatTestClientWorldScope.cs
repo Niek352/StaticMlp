@@ -8,6 +8,7 @@ using StaticMlp.Features.Statuses;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
+using StaticMlp.Game.Input;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
 using StaticMlp.Networking.Replication;
@@ -49,6 +50,7 @@ namespace StaticMlp.Tests.Combat
             CW.GetResource<ClientLocalChunkLease>().Replace(new[] { clientLocalChunk });
             CW.RegisterChunk(clientLocalChunk, ChunkOwnerType.Self, clusterId: 0);
             CW.SetResource(new GameTime());
+            CW.SetResource(new ClientInputState());
             CW.SetResource(new CombatConfig());
             CW.SetResource(new StatusesConfig());
             CW.SetResource(new CombatPresentationConfig());

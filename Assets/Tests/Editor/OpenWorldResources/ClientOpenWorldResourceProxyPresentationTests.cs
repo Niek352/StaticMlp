@@ -181,6 +181,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                     typeof(ViewTransform).Assembly,
                     typeof(ClientCoreWT).Assembly,
                     typeof(OpenWorldChunkGenerationCompleted).Assembly,
+                    typeof(OpenWorldResourceTargetable).Assembly,
                     typeof(OpenWorldResourcesGameplayFeature).Assembly,
                     typeof(OpenWorldResourcesPresentationFeature).Assembly,
                     typeof(ViewPath).Assembly);

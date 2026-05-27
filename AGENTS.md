@@ -70,6 +70,7 @@ Gameplay systems should only:
 - Register every component, tag, event, and link type between `Create()` and `Initialize()`.
 - Use `W.Types().RegisterAll(...)` when appropriate.
 - Call `W.Tick()` once after systems update.
+- `Multi<T>` indexers return by reference. When reading indexed rows, bind with `ref readonly var row = ref rows[i]` or `ref var row = ref rows[i]`; do not copy with `var row = rows[i]` or consume fields through `rows[i].Field`.
 - Do not store `Entity` across frames; use `EntityGID` for persistent references.
 - Do not expose entity references as raw `ulong`, `*Raw`, or similar gameplay/replication contract fields. Use `EntityGID`; touch `.Raw` only at explicit serialization/codegen boundaries.
 - Default query mode is Strict. Do not modify filtered component/tag types on other entities while iterating.

@@ -1,4 +1,5 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Networking;
@@ -13,7 +14,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         public void Update()
         {
             var config = CW.GetResource<ResourcesInventoryConfig>();
-            var step = config.PickupMagnetSpeed * Time.deltaTime;
+            var step = config.PickupMagnetSpeed * CW.GetResource<GameTime>().DeltaTime;
 
             foreach (var pickup in CW.Query<All<ResourcePickup, ViewTransform, ResourcePickupViewState>>().Entities())
             {

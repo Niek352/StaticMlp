@@ -203,6 +203,7 @@ namespace StaticMlp.Features.Settlement
             builder.Append(state.Enabled ? "Enabled" : "Disabled");
             builder.Append("\nRecipe: ");
             builder.Append(state.RecipeName);
+            AppendRecipeChoices(builder, in state);
             builder.Append("\nWork: ");
             builder.Append(Mathf.RoundToInt(state.WorkDone));
             builder.Append(" / ");
@@ -227,6 +228,28 @@ namespace StaticMlp.Features.Settlement
 
             AppendProductionBuffer(builder, "Inputs", in state.Inputs);
             AppendProductionBuffer(builder, "Outputs", in state.Outputs);
+        }
+
+        private static void AppendRecipeChoices(StringBuilder builder, in WorkbenchPanelState state)
+        {
+            builder.Append("\nAvailable recipes: ");
+            if (state.RecipeChoices.Length == 0)
+            {
+                builder.Append("none");
+                return;
+            }
+
+            for (var i = 0; i < state.RecipeChoices.Length; i++)
+            {
+                if (i > 0)
+                    builder.Append(" / ");
+
+                var choice = state.RecipeChoices[i];
+                var recipe = ProductionRecipeCatalog.Get(new ProductionRecipeId(choice.RecipeId));
+                builder.Append(recipe.Code);
+                if (choice.IsActive)
+                    builder.Append(" (active)");
+            }
         }
 
         private static void AppendShelter(StringBuilder builder, in ShelterPanelState state)

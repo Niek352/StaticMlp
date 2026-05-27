@@ -9,6 +9,7 @@ namespace StaticMlp.Features.Settlement
         public SettlementAnchorId AnchorId;
         public string DisplayName;
         public bool Enabled;
+        public ushort ActiveRecipeId;
         public string RecipeName;
         public float WorkDone;
         public float WorkRequired;
@@ -17,6 +18,7 @@ namespace StaticMlp.Features.Settlement
         public byte WorkerSlotCount;
         public byte AssignedWorkerCount;
         public FixedList128Bytes<BuildingWorkerSlot> WorkerSlots;
+        public FixedList128Bytes<WorkbenchRecipeChoice> RecipeChoices;
         public FixedList128Bytes<ProductionResourceBufferEntry> Inputs;
         public FixedList128Bytes<ProductionResourceBufferEntry> Outputs;
     }

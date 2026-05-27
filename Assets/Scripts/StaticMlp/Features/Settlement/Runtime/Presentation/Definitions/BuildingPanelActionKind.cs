@@ -9,6 +9,8 @@ namespace StaticMlp.Features.Settlement
         UnassignWorker = 4,
         CollectExtractionOutput = 5,
         DepositCarriedResourcesToStockpile = 6,
-        ClaimProductionOutput = 7
+        ClaimProductionOutput = 7,
+        SetProductionRecipe = 8,
+        CycleWorkbenchAction = 9
     }
 }

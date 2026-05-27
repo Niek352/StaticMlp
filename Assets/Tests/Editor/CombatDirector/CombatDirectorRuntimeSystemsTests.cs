@@ -6,6 +6,7 @@ using StaticMlp.Features.CombatDirector;
 using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.OpenWorldResources;
 using StaticMlp.Features.ResourcesInventoryMinimal;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
@@ -86,6 +87,8 @@ namespace StaticMlp.Tests.CombatDirector
         {
             using var scope = new CombatDirectorTestServerWorldScope();
             var player = scope.CreatePlayer(new NetworkPeerId(11), Vector3.zero);
+            ResourcesInventoryAccess.Initialize(player, ResourcesInventory.MAX_SLOTS);
+            ResourcesInventoryAccess.Add(player, new ResourceAmount(ResourceCatalog.WoodId, 12));
 
             var cellTrackingSystem = new CombatCellTrackingSystem();
             var threatInputSystem = new PlayerThreatInputSystem();
@@ -383,7 +386,7 @@ namespace StaticMlp.Tests.CombatDirector
             var directorEntity = scope.GetDirectorEntity();
             directorEntity.Mut<DirectorState>().Phase = DirectorPhase.PressureEvent;
 
-            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.AmbientPoint, allowsAmbient: true);
+            scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.AmbientPoint, allowsAmbient: true, allowsPressureEvent: false);
             selectionSystem.Update();
             Assert.That(directorEntity.Has<SelectedSpawnSource>(), Is.False);
 
@@ -406,7 +409,7 @@ namespace StaticMlp.Tests.CombatDirector
             var directorEntity = scope.GetDirectorEntity();
             directorEntity.Mut<DirectorState>().Phase = DirectorPhase.PressureEvent;
             directorEntity.Mut<ThreatBudget>().Current = 20f;
-            var source = scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.AmbientPoint, allowsAmbient: true);
+            var source = scope.CreateSpawnSource(new Vector3(20f, 0f, 0f), isActive: true, kind: SpawnSourceKind.AmbientPoint, allowsAmbient: true, allowsPressureEvent: false);
             var request = scope.CreateSpawnRequest(source, EnemyRole.Swarmer, count: 1);
             var requestGid = request.GID;
 

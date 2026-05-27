@@ -20,6 +20,7 @@ namespace StaticMlp.Features.Settlement
             ProjectionRegistry.Register<BedrollShelterState>();
             DepositCarriedResourcesToStockpileEventCodec.Register();
             ClaimProductionOutputEventCodec.Register();
+            SetProductionRecipeEventCodec.Register();
             RequestRegistry.Register<DepositCarriedResourcesToStockpileRequestEvent, DepositCarriedResourcesToStockpileResultEvent>(
                 new DepositCarriedResourcesToStockpileHandler(),
                 projector: null,
@@ -30,6 +31,10 @@ namespace StaticMlp.Features.Settlement
                 serverOrder: GameplaySystemOrder.Gameplay - 40);
             RequestRegistry.Register<ClaimProductionOutputRequestEvent, ClaimProductionOutputResultEvent>(
                 new ClaimProductionOutputHandler(),
+                projector: null,
+                serverOrder: GameplaySystemOrder.Gameplay - 40);
+            RequestRegistry.Register<SetProductionRecipeRequestEvent, SetProductionRecipeResultEvent>(
+                new SetProductionRecipeHandler(),
                 projector: null,
                 serverOrder: GameplaySystemOrder.Gameplay - 40);
         }

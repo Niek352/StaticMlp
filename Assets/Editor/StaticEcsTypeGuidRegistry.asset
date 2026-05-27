@@ -791,6 +791,24 @@ MonoBehaviour:
       - className: DepositCarriedResourcesToStockpileResultEvent
         namespaceName: StaticMlp.Features.Settlement
         assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 69bdee89-872f-4804-8f31-a266a82808c0
+      current:
+        className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5840afa6-1ce5-4156-b8e3-4d734a965b69
+      current:
+        className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
     links: []
     linksList: []
     multi: []
@@ -1570,6 +1588,24 @@ MonoBehaviour:
         assembly: StaticMlp.Features.Settlement.Contracts
       history:
       - className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 69bdee89-872f-4804-8f31-a266a82808c0
+      current:
+        className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5840afa6-1ce5-4156-b8e3-4d734a965b69
+      current:
+        className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeResultEvent
         namespaceName: StaticMlp.Features.Settlement
         assembly: StaticMlp.Features.Settlement.Contracts
     links: []

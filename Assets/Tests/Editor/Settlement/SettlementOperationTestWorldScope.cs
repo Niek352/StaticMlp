@@ -26,6 +26,7 @@ namespace StaticMlp.Tests.Settlement
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
                 typeof(ResourcesInventoryMinimalGameplayFeature).Assembly,
                 typeof(BuildingWorkerAssignmentState).Assembly,
+                typeof(PlayerTag).Assembly,
                 typeof(SettlementWorkerTag).Assembly,
                 typeof(BuildingConstructionCompletedEvent).Assembly);
             SW.Initialize();
@@ -33,6 +34,11 @@ namespace StaticMlp.Tests.Settlement
             {
                 FixedStepSeconds = 1f
             });
+            SW.SetResource(new SettlementProgressionState
+            {
+                SettlementLevel = 1
+            });
+            SW.SetResource(new SettlementUnlockState());
         }
 
         public SW.Entity CreateSharedResources(int capacity = 0, int wood = 0, int stone = 0, int fuel = 0)
