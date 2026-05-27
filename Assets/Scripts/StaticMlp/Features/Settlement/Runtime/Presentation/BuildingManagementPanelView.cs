@@ -110,6 +110,8 @@ namespace StaticMlp.Features.Settlement
                     break;
                 case BuildingPanelKind.WorkbenchPanel:
                     AppendWorkbench(builder, in state.Workbench);
+                    AppendActionStatus(builder, in state.PrimaryAction);
+                    AppendActionStatus(builder, in state.SecondaryAction);
                     break;
                 case BuildingPanelKind.ShelterPanel:
                     AppendShelter(builder, in state.Shelter);
@@ -225,8 +227,6 @@ namespace StaticMlp.Features.Settlement
 
             AppendProductionBuffer(builder, "Inputs", in state.Inputs);
             AppendProductionBuffer(builder, "Outputs", in state.Outputs);
-            AppendActionStatus(builder, in state.PrimaryAction);
-            AppendActionStatus(builder, in state.SecondaryAction);
         }
 
         private static void AppendShelter(StringBuilder builder, in ShelterPanelState state)

@@ -206,6 +206,13 @@ namespace StaticMlp.Networking.Replication.Generated {
                 NetDelivery.ReliableSequenced,
                 sendRate: ExtractionOperationStateReplication.SendRate);
 
+            ReplicationRegistry.RegisterComponent<ProductionStationOperationState>(
+                ReplicatedComponentIds.ProductionStationOperationState,
+                ReplicationAuthority.Server,
+                ReplicationAudience.All,
+                NetDelivery.ReliableSequenced,
+                sendRate: ProductionStationOperationStateReplication.SendRate);
+
             ReplicationRegistry.RegisterComponent<SettlementAnchorRef>(
                 ReplicatedComponentIds.SettlementAnchorRef,
                 ReplicationAuthority.Server,
@@ -226,13 +233,6 @@ namespace StaticMlp.Networking.Replication.Generated {
                 ReplicationAudience.All,
                 NetDelivery.ReliableSequenced,
                 sendRate: StockpileOperationStateReplication.SendRate);
-
-            ReplicationRegistry.RegisterComponent<WorkbenchOperationState>(
-                ReplicatedComponentIds.WorkbenchOperationState,
-                ReplicationAuthority.Server,
-                ReplicationAudience.All,
-                NetDelivery.ReliableSequenced,
-                sendRate: WorkbenchOperationStateReplication.SendRate);
 
             ReplicationRegistry.RegisterComponent<BuildingWorkerAssignmentState>(
                 ReplicatedComponentIds.BuildingWorkerAssignmentState,
@@ -324,7 +324,7 @@ namespace StaticMlp.Networking.Replication.Generated {
             ReplicationRegistry.RegisterNetworkEntity(10, 1, 500);
             ReplicationRegistry.RegisterNetworkEntity(9, 1, 400);
             ReplicationRegistry.RegisterNetworkEntity(1, 1, 1);
-            ReplicationRegistry.RegisterNetworkEntity(11, 1, 410);
+            ReplicationRegistry.RegisterNetworkEntity(11, 2, 410);
             ReplicationRegistry.RegisterNetworkEntity(7, 1, 300);
             ReplicationRegistry.RegisterNetworkEntity(6, 1, 0);
             ReplicationRegistry.RegisterNetworkEntity(2, 1, 2);

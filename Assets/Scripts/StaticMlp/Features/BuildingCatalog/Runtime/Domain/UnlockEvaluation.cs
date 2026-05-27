@@ -1,3 +1,5 @@
+using StaticMlp.Features.Settlement;
+
 namespace StaticMlp.Features.BuildingCatalog
 {
     public static class UnlockEvaluation

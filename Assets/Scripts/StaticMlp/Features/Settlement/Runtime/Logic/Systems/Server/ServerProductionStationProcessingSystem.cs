@@ -30,8 +30,8 @@ namespace StaticMlp.Features.Settlement
 
                 if (!enabled)
                 {
-                    ref var state = ref ReplicationMut.Mut<ProductionStationOperationState>(station);
-                    state.BlockedReasonValue = (byte)ProductionStationBlockedReason.None;
+                    ref var disabledState = ref ReplicationMut.Mut<ProductionStationOperationState>(station);
+                    disabledState.BlockedReasonValue = (byte)ProductionStationBlockedReason.None;
                     continue;
                 }
 

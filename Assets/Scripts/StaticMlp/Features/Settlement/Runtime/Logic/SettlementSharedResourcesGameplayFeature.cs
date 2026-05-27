@@ -55,11 +55,6 @@ namespace StaticMlp.Features.Settlement
             SW.SetResource(new SettlementUnlockState());
         }
 
-        public override void RegisterClientResources()
-        {
-            CW.SetResource(new SettlementProgressionState { SettlementLevel = 1 });
-        }
-
         public override void RegisterServerSystems(ServerSystemsBuilder systems)
         {
             systems.Add(new ServerSettlementSharedResourcesSpawnSystem(), (short)(GameplaySystemOrder.ServerConnectionGameplay - 15));
@@ -73,6 +68,11 @@ namespace StaticMlp.Features.Settlement
             systems.Add(new ServerProductionStationProcessingSystem(), GameplaySystemOrder.Gameplay - 46);
             systems.Add(new ServerTransferExtractionOutputToStockpileSystem(), GameplaySystemOrder.Gameplay - 39);
             systems.Add(new ServerClaimProductionOutputToStorageSystem(), GameplaySystemOrder.Gameplay - 39);
+        }
+
+        public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
+        {
+            systems.Add(new ClientSettlementProgressionBootstrapSystem(), GameplaySystemOrder.ClientApplyNetworkState - 20);
         }
     }
 }

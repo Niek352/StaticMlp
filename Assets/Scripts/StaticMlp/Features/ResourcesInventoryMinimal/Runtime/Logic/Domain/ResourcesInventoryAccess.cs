@@ -39,8 +39,9 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             var amount = 0;
             for (var i = 0; i < rows.Length; i++)
             {
-                if (rows[i].Id == id)
-                    amount += rows[i].Amount;
+                var row = rows.Get(i);
+                if (row.Id == id)
+                    amount += row.Amount;
             }
 
             return amount;
@@ -61,7 +62,10 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
                     $"Target resource amount buffer has {target.Length} slots, but carried inventory has {rows.Length} rows.");
 
             for (var i = 0; i < rows.Length; i++)
-                target[i] = new ResourceAmount(rows[i].Id, rows[i].Amount);
+            {
+                var row = rows.Get(i);
+                target[i] = new ResourceAmount(row.Id, row.Amount);
+            }
 
             return rows.Length;
         }
@@ -147,7 +151,8 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
 
             for (var i = 0; i < rows.Length; i++)
             {
-                ValidateRow(rows.Get(i).Id, rows.Get(i).Amount);
+                var row = rows.Get(i);
+                ValidateRow(row.Id, row.Amount);
             }
         }
 
@@ -166,7 +171,8 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         {
             for (var i = 0; i < rows.Length; i++)
             {
-                if (rows[i].Id == id)
+                var row = rows.Get(i);
+                if (row.Id == id)
                     return i;
             }
 
@@ -195,7 +201,10 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         {
             var total = 0;
             for (var i = 0; i < rows.Length; i++)
-                total += rows[i].Amount;
+            {
+                var row = rows.Get(i);
+                total += row.Amount;
+            }
 
             return total;
         }

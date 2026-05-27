@@ -27,10 +27,10 @@ namespace StaticMlp.Networking.Replication {
         public const ushort ConstructionSiteState = 23961;
         public const ushort ConstructionTransform = 31104;
         public const ushort ExtractionOperationState = 51973;
+        public const ushort ProductionStationOperationState = 25616;
         public const ushort SettlementAnchorRef = 55002;
         public const ushort SettlementSharedResources = 16446;
         public const ushort StockpileOperationState = 13660;
-        public const ushort WorkbenchOperationState = 49713;
         public const ushort BuildingWorkerAssignmentState = 2454;
         public const ushort SettlementCampBuilderJobState = 19134;
         public const ushort SettlementWorkerAssignment = 19782;

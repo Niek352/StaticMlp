@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement
 {
@@ -10,9 +11,9 @@ namespace StaticMlp.Features.Settlement
         public bool HasConstructedBuilding(int buildingIdValue)
         {
             var targetId = new BuildingId((ushort)buildingIdValue);
-            foreach (var entity in SW.Query<All<FinishedBuildingTag, BuildingNetworkDefinition>>().Entities())
+            foreach (var entity in SW.Query<All<FinishedBuildingTag, ConstructionSiteState>>().Entities())
             {
-                if (entity.Read<BuildingNetworkDefinition>().Id == targetId)
+                if (new BuildingId(entity.Read<ConstructionSiteState>().BuildingId) == targetId)
                     return true;
             }
 

@@ -1,3 +1,5 @@
+using StaticMlp.Features.BuildingCatalog;
+
 namespace StaticMlp.Features.Settlement
 {
     public readonly struct ProductionRecipeDefinition

@@ -486,6 +486,15 @@ MonoBehaviour:
       - className: ResourcePickup
         namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
         assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: d37b9b22-ea96-49e0-bc20-4ab248c04c98
+      current:
+        className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -746,6 +755,42 @@ MonoBehaviour:
       - className: SetBuildingWorkerAssignmentResultEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: ccc0e591-1c90-44ce-ac59-047f5d0ae639
+      current:
+        className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: fc29ab6d-b684-4536-bad6-527667fe3893
+      current:
+        className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: f3375d59-1f44-427b-bd38-50cc4378a875
+      current:
+        className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 9d390ef1-31c4-411f-a5f6-c5725f647a33
+      current:
+        className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
     links: []
     linksList: []
     multi: []
@@ -1222,6 +1267,15 @@ MonoBehaviour:
       - className: ResourcePickup
         namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
         assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: d37b9b22-ea96-49e0-bc20-4ab248c04c98
+      current:
+        className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
     tags: []
     events:
     - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
@@ -1482,6 +1536,42 @@ MonoBehaviour:
       - className: SetBuildingWorkerAssignmentResultEvent
         namespaceName: StaticMlp.Features.Settlement.Workers
         assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: ccc0e591-1c90-44ce-ac59-047f5d0ae639
+      current:
+        className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: fc29ab6d-b684-4536-bad6-527667fe3893
+      current:
+        className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: f3375d59-1f44-427b-bd38-50cc4378a875
+      current:
+        className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 9d390ef1-31c4-411f-a5f6-c5725f647a33
+      current:
+        className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
     links: []
     linksList: []
     multi: []
