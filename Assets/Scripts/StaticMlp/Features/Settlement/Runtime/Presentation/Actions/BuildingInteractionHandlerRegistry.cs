@@ -9,6 +9,7 @@ namespace StaticMlp.Features.Settlement
         {
             new DepositConstructionResourcesInteractionHandler(),
             new ContributeBuildWorkInteractionHandler(),
+            new DepositCarriedResourcesToStockpileInteractionHandler(),
             new OpenOperationIntentInteractionHandler()
         };
 

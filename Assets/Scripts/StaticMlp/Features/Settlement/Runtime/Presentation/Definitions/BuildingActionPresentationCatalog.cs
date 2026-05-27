@@ -57,7 +57,7 @@ namespace StaticMlp.Features.Settlement
             new(
                 BuildingInteractionKind.StoreItems,
                 "Building panel primary button",
-                "Opens the storage operation summary."),
+                "Sends a request to deposit carried raw resources into shared storage."),
             new(
                 BuildingInteractionKind.WithdrawItems,
                 "Building panel primary button",

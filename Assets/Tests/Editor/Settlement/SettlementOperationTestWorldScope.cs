@@ -1,10 +1,14 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
+using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
+using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
+using UnityEngine;
 
 namespace StaticMlp.Tests.Settlement
 {
@@ -19,6 +23,7 @@ namespace StaticMlp.Tests.Settlement
             SW.Types().RegisterAll(
                 typeof(ServerWT).Assembly,
                 typeof(SettlementSharedResourcesGameplayFeature).Assembly,
+                typeof(ResourcesInventoryMinimalGameplayFeature).Assembly,
                 typeof(BuildingWorkerAssignmentState).Assembly,
                 typeof(SettlementWorkerTag).Assembly,
                 typeof(BuildingConstructionCompletedEvent).Assembly);
@@ -46,6 +51,47 @@ namespace StaticMlp.Tests.Settlement
         public SW.Entity CreateFinishedBuilding()
         {
             return SW.NewEntity<Default>();
+        }
+
+        public SW.Entity CreateFinishedStockpile(Vector3 position)
+        {
+            var entity = CreateFinishedBuilding();
+            entity.Set<FinishedBuildingTag>();
+            entity.Set(new ConstructionSiteState
+            {
+                BuildingId = BuildingCatalogData.StockpileId.Value,
+                Phase = ConstructionPhase.Completed
+            });
+            entity.Set(new ConstructionTransform
+            {
+                Position = position,
+                Rotation = Quaternion.identity
+            });
+            entity.Set(new StockpileOperationState
+            {
+                ContributedCapacity = 200,
+                Enabled = true
+            });
+            return entity;
+        }
+
+        public SW.Entity CreatePlayer(NetworkPeerId owner, Vector3 position)
+        {
+            var player = SW.NewEntity<Default>();
+            player.Set<PlayerTag>();
+            player.Set(new NetworkIdentity
+            {
+                Owner = owner,
+                Authority = NetworkAuthority.Owner,
+                NetworkArchetypeId = 0
+            });
+            player.Set(new CharacterNetState
+            {
+                Position = position,
+                Rotation = Quaternion.identity
+            });
+            ResourcesInventoryAccess.Initialize(player, ResourcesInventory.MAX_SLOTS);
+            return player;
         }
 
         public void Dispose()

@@ -46,6 +46,26 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             return amount;
         }
 
+        public static int CopyAmounts<TWorld>(World<TWorld>.Entity entity, ResourceAmount[] target)
+            where TWorld : struct, IWorldType
+        {
+            if (target == null)
+                throw new ArgumentNullException(nameof(target));
+
+            ref readonly var inventory = ref entity.Read<ResourcesInventory>();
+            ref readonly var rows = ref entity.Ref<World<TWorld>.Multi<CarriedResourceEntry>>();
+            ValidateRows(in rows, inventory.Capacity);
+
+            if (target.Length < rows.Length)
+                throw new InvalidOperationException(
+                    $"Target resource amount buffer has {target.Length} slots, but carried inventory has {rows.Length} rows.");
+
+            for (var i = 0; i < rows.Length; i++)
+                target[i] = new ResourceAmount(rows[i].Id, rows[i].Amount);
+
+            return rows.Length;
+        }
+
         public static int Add(SW.Entity entity, ResourceAmount resource)
         {
             ValidateResourceAmount(resource);

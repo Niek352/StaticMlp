@@ -16,6 +16,11 @@ namespace StaticMlp.Features.Settlement
             ProjectionRegistry.Register<ExtractionOperationState>();
             ProjectionRegistry.Register<WorkbenchOperationState>();
             ProjectionRegistry.Register<BedrollShelterState>();
+            DepositCarriedResourcesToStockpileEventCodec.Register();
+            RequestRegistry.Register<DepositCarriedResourcesToStockpileRequestEvent, DepositCarriedResourcesToStockpileResultEvent>(
+                new DepositCarriedResourcesToStockpileHandler(),
+                projector: null,
+                serverOrder: GameplaySystemOrder.Gameplay - 41);
             RequestRegistry.Register<CollectExtractionOutputRequestEvent, CollectExtractionOutputResultEvent>(
                 new CollectExtractionOutputHandler(),
                 projector: null,

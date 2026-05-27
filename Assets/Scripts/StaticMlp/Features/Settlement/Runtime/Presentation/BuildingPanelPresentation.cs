@@ -38,6 +38,7 @@ namespace StaticMlp.Features.Settlement
                     return next;
                 case BuildingPanelKind.StockpilePanel:
                     next.Stockpile = BuildStockpile(target, in definition);
+                    next.PrimaryAction = CreateDepositCarriedResourcesToStockpileAction(in next.Stockpile);
                     return next;
                 case BuildingPanelKind.ExtractionPanel:
                     next.Extraction = BuildExtraction(target, in definition);
@@ -248,6 +249,17 @@ namespace StaticMlp.Features.Settlement
                 state.Target,
                 resource: state.OutputResource,
                 amount: state.BufferAmount);
+        }
+
+        private static BuildingPanelAction CreateDepositCarriedResourcesToStockpileAction(in StockpilePanelState state)
+        {
+            var enabled = StockpileRules.HasAvailableCapacity(state.Capacity, state.UsedCapacity);
+            return new BuildingPanelAction(
+                BuildingPanelActionKind.DepositCarriedResourcesToStockpile,
+                "Store Items",
+                enabled,
+                enabled ? string.Empty : "Stockpile storage is full.",
+                state.Target);
         }
 
         private static string ResolveAssignDisabledReason(bool hasFreeSlot, bool hasWorker)

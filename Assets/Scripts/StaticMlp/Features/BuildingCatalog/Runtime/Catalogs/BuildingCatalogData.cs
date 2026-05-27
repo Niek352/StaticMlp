@@ -73,7 +73,7 @@ namespace StaticMlp.Features.BuildingCatalog
                     new BuildingInteractionDefinition(BuildingInteractionKind.ContributeBuildWork, displayName: "Build", requiresCompletedBuilding: false),
                     new BuildingInteractionDefinition(
                         BuildingInteractionKind.StoreItems,
-                        displayName: "Open Storage",
+                        displayName: "Store Items",
                         requiresCompletedBuilding: true,
                         STORE_ITEMS_PRIORITY),
                     new BuildingInteractionDefinition(BuildingInteractionKind.WithdrawItems, displayName: "Withdraw", requiresCompletedBuilding: true)

@@ -18,7 +18,6 @@ namespace StaticMlp.Features.Settlement
                    || kind == BuildingInteractionKind.TriggerRepair
                    || kind == BuildingInteractionKind.Extract
                    || kind == BuildingInteractionKind.Rest
-                   || kind == BuildingInteractionKind.StoreItems
                    || kind == BuildingInteractionKind.WithdrawItems;
         }
 

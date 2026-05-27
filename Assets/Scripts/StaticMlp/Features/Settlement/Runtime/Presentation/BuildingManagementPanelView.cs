@@ -101,6 +101,7 @@ namespace StaticMlp.Features.Settlement
                     break;
                 case BuildingPanelKind.StockpilePanel:
                     AppendStockpile(builder, in state.Stockpile);
+                    AppendActionStatus(builder, in state.PrimaryAction);
                     break;
                 case BuildingPanelKind.ExtractionPanel:
                     AppendExtraction(builder, in state.Extraction);

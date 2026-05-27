@@ -78,6 +78,9 @@ namespace StaticMlp.Features.Settlement
                 case BuildingPanelActionKind.CollectExtractionOutput:
                     SendCollectExtractionOutput(action);
                     return;
+                case BuildingPanelActionKind.DepositCarriedResourcesToStockpile:
+                    SendDepositCarriedResourcesToStockpile(action.Target);
+                    return;
                 default:
                     throw new InvalidOperationException($"Unsupported building panel action {action.Kind}.");
             }
@@ -119,6 +122,12 @@ namespace StaticMlp.Features.Settlement
                 action.Resource,
                 action.Amount);
             RequestApi.Send<CollectExtractionOutputRequestEvent, CollectExtractionOutputResultEvent>(request);
+        }
+
+        private static void SendDepositCarriedResourcesToStockpile(EntityGID target)
+        {
+            var request = new DepositCarriedResourcesToStockpileRequestEvent(target);
+            RequestApi.Send<DepositCarriedResourcesToStockpileRequestEvent, DepositCarriedResourcesToStockpileResultEvent>(request);
         }
 
         private static void HandleClose()

@@ -11,7 +11,8 @@
         "StaticMlp.Features.Settlement.Workers.Contracts",
         "StaticMlp.Features.CampFlow.Contracts",
         "StaticMlp.Features.BuildingCatalog",
-        "StaticMlp.Features.Buildings.Contracts"
+        "StaticMlp.Features.Buildings.Contracts",
+        "StaticMlp.Features.ResourcesInventoryMinimal"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
