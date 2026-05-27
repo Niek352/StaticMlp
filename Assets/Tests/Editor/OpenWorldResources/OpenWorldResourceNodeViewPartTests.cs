@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.OpenWorldResources;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                 var part = root.AddComponent<OpenWorldResourceNodeViewPart>();
                 part.Apply(new OpenWorldResourceNodeViewState
                 {
-                    KindIdValue = 1,
+                    KindIdValue = OpenWorldGenerationConfig.TREE_RESOURCE_KIND,
                     RemainingAmount = 3,
                     MaxAmount = 5,
                     Flags = OpenWorldResourceOverlayFlags.None,
@@ -44,7 +45,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                 var part = root.AddComponent<OpenWorldResourceNodeViewPart>();
                 part.Apply(new OpenWorldResourceNodeViewState
                 {
-                    KindIdValue = 2,
+                    KindIdValue = OpenWorldGenerationConfig.ORE_RESOURCE_KIND,
                     RemainingAmount = 8,
                     MaxAmount = 8,
                     Flags = OpenWorldResourceOverlayFlags.None,
@@ -55,6 +56,40 @@ namespace StaticMlp.Tests.OpenWorldResources
                 Assert.That(visual, Is.Not.Null);
                 Assert.That(visual.gameObject.activeSelf, Is.True);
                 Assert.That(visual.Find("Stone Boulder"), Is.Not.Null);
+                Assert.That(CountActivePips(visual), Is.EqualTo(5));
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        [TestCase(OpenWorldGenerationConfig.SPORE_POD_RESOURCE_KIND, 4, "Spore Stem", "Spore Cap")]
+        [TestCase(OpenWorldGenerationConfig.CHEST_RESOURCE_KIND, 6, "Resource Chest Body", "Resource Chest Band")]
+        public void Apply_Phase2State_CreatesDistinctVisualAndAmountIndicator(
+            ushort kindId,
+            int maxAmount,
+            string primaryVisualName,
+            string secondaryVisualName)
+        {
+            var root = new GameObject("Resource Node View Test");
+            try
+            {
+                var part = root.AddComponent<OpenWorldResourceNodeViewPart>();
+                part.Apply(new OpenWorldResourceNodeViewState
+                {
+                    KindIdValue = kindId,
+                    RemainingAmount = maxAmount,
+                    MaxAmount = maxAmount,
+                    Flags = OpenWorldResourceOverlayFlags.None,
+                    Scale = 1f
+                });
+
+                var visual = root.transform.Find("Resource Node Visual");
+                Assert.That(visual, Is.Not.Null);
+                Assert.That(visual.gameObject.activeSelf, Is.True);
+                Assert.That(visual.Find(primaryVisualName), Is.Not.Null);
+                Assert.That(visual.Find(secondaryVisualName), Is.Not.Null);
                 Assert.That(CountActivePips(visual), Is.EqualTo(5));
             }
             finally
@@ -80,7 +115,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                 var part = root.AddComponent<OpenWorldResourceNodeViewPart>();
                 part.Apply(new OpenWorldResourceNodeViewState
                 {
-                    KindIdValue = 1,
+                    KindIdValue = OpenWorldGenerationConfig.TREE_RESOURCE_KIND,
                     RemainingAmount = 5,
                     MaxAmount = 5,
                     Flags = OpenWorldResourceOverlayFlags.None,
@@ -89,9 +124,9 @@ namespace StaticMlp.Tests.OpenWorldResources
 
                 part.Apply(new OpenWorldResourceNodeViewState
                 {
-                    KindIdValue = 2,
-                    RemainingAmount = 8,
-                    MaxAmount = 8,
+                    KindIdValue = OpenWorldGenerationConfig.CHEST_RESOURCE_KIND,
+                    RemainingAmount = 6,
+                    MaxAmount = 6,
                     Flags = OpenWorldResourceOverlayFlags.None,
                     Scale = 1f
                 });
@@ -100,7 +135,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                 var visual = root.transform.Find("Resource Node Visual");
                 Assert.That(visual, Is.Not.Null);
                 Assert.That(visual.Find("Wood Trunk"), Is.Null);
-                Assert.That(visual.Find("Stone Boulder"), Is.Not.Null);
+                Assert.That(visual.Find("Resource Chest Body"), Is.Not.Null);
                 Assert.That(CountActivePips(visual), Is.EqualTo(5));
             }
             finally
@@ -126,7 +161,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                 }));
                 Assert.Throws<System.InvalidOperationException>(() => part.Apply(new OpenWorldResourceNodeViewState
                 {
-                    KindIdValue = 1,
+                    KindIdValue = OpenWorldGenerationConfig.TREE_RESOURCE_KIND,
                     RemainingAmount = 1,
                     MaxAmount = 0,
                     Flags = OpenWorldResourceOverlayFlags.None,
@@ -147,7 +182,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                 var part = root.AddComponent<OpenWorldResourceNodeViewPart>();
                 part.Apply(new OpenWorldResourceNodeViewState
                 {
-                    KindIdValue = 1,
+                    KindIdValue = OpenWorldGenerationConfig.TREE_RESOURCE_KIND,
                     RemainingAmount = 5,
                     MaxAmount = 5,
                     Flags = flag,

@@ -8,8 +8,10 @@ namespace StaticMlp.Features.OpenWorldResources
     {
         private static readonly OpenWorldResourceHazardDefinition[] Definitions =
         {
-            new(new ResourcePlacementKindId(1), 2f, 6f, DamageType.Physical),
-            new(new ResourcePlacementKindId(2), 2.5f, 8f, DamageType.Physical)
+            new(new ResourcePlacementKindId(OpenWorldGenerationConfig.TREE_RESOURCE_KIND), 2f, 6f, DamageType.Physical),
+            new(new ResourcePlacementKindId(OpenWorldGenerationConfig.ORE_RESOURCE_KIND), 2.5f, 8f, DamageType.Physical),
+            new(new ResourcePlacementKindId(OpenWorldGenerationConfig.SPORE_POD_RESOURCE_KIND), 2f, 5f, DamageType.Poison),
+            new(new ResourcePlacementKindId(OpenWorldGenerationConfig.CHEST_RESOURCE_KIND), 2.75f, 9f, DamageType.Explosion)
         };
 
         public static ref readonly OpenWorldResourceHazardDefinition Get(ResourcePlacementKindId kindId)

@@ -17,7 +17,7 @@ namespace StaticMlp.Features.Settlement
             if (index < 0)
                 throw new InvalidOperationException($"Settlement storage is missing resource id {resourceId.Value}.");
 
-            return rows[index].Amount;
+            return rows.Get(index).Amount;
         }
 
         public static int GetProjectedAmount(CW.Entity entity, ResourceId resourceId)
@@ -28,7 +28,7 @@ namespace StaticMlp.Features.Settlement
             if (index < 0)
                 throw new InvalidOperationException($"Projected settlement storage is missing resource id {resourceId.Value}.");
 
-            return rows[index].Value.Amount;
+            return rows.Get(index).Value.Amount;
         }
 
         public static int TotalUsed<TWorld>(World<TWorld>.Entity entity)

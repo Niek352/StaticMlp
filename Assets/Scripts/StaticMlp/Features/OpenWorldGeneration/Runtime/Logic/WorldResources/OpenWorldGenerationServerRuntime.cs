@@ -5,10 +5,10 @@ namespace StaticMlp.Features.OpenWorldGeneration
 {
     public sealed class OpenWorldGenerationServerRuntime : IResource, IDisposable
     {
-        public const int DEFAULT_MAX_CHUNK_GENERATIONS_PER_FRAME = 1;
-        public const int DEFAULT_MAX_CLUSTER_SNAPSHOTS_PER_FRAME = 1;
-        public const int DEFAULT_STATIC_STREAMING_RADIUS_IN_CHUNKS = 4;
-        public const int DEFAULT_SERVER_GEOMETRY_LOD = 1;
+        public const int DEFAULT_MAX_CHUNK_GENERATIONS_PER_FRAME = OpenWorldGenerationConfig.DEFAULT_MAX_CHUNK_GENERATIONS_PER_FRAME;
+        public const int DEFAULT_MAX_CLUSTER_SNAPSHOTS_PER_FRAME = OpenWorldGenerationConfig.DEFAULT_MAX_CLUSTER_SNAPSHOTS_PER_FRAME;
+        public const int DEFAULT_STATIC_STREAMING_RADIUS_IN_CHUNKS = OpenWorldGenerationConfig.DEFAULT_STATIC_STREAMING_RADIUS_IN_CHUNKS;
+        public const int DEFAULT_SERVER_GEOMETRY_LOD = OpenWorldGenerationConfig.DEFAULT_SERVER_GEOMETRY_LOD;
 
         public OpenWorldGenerationServerRuntime(
             WorldGenerationRequest defaultRequest,
@@ -42,14 +42,7 @@ namespace StaticMlp.Features.OpenWorldGeneration
         public static OpenWorldGenerationServerRuntime CreateDefault()
         {
             return new OpenWorldGenerationServerRuntime(
-                new WorldGenerationRequest(
-                    new WorldGenerationSeed(12345),
-                    WorldChunkBounds.Default,
-                    128f,
-                    12,
-                    0,
-                    true,
-                    6f),
+                OpenWorldGenerationConfig.CreateDefaultRequest(),
                 DEFAULT_MAX_CHUNK_GENERATIONS_PER_FRAME);
         }
 

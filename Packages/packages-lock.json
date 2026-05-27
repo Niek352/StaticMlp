@@ -46,7 +46,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "9533a6c7019459d4bf9084057f6047172b9e96aa"
+      "hash": "5ecf19df31a2e1c4795851b0d1d52a17c695c5ed"
     },
     "com.projectdawn.navigation": {
       "version": "file:com.projectdawn.navigation",

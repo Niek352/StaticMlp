@@ -92,7 +92,7 @@ namespace StaticMlp.Networking.Requests
 
                     projected.Clear();
                     for (var i = 0; i < authoritative.Length; i++)
-                        projected.Add(new ProjectedMulti<T>(authoritative[i]));
+                        projected.Add(new ProjectedMulti<T>(authoritative.Get(i)));
                 }
 
                 foreach (var entity in CW.Query<All<CW.Multi<ProjectedMulti<T>>>>().Entities())

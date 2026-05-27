@@ -40,13 +40,13 @@ namespace StaticMlp.Features.OpenWorldGeneration
         public static OpenWorldChunkGenerationRuntime CreateDefault()
         {
             return new OpenWorldChunkGenerationRuntime(
-                new WorldGenerationSeed(12345),
+                new WorldGenerationSeed(OpenWorldGenerationConfig.DEFAULT_WORLD_SEED),
                 WorldChunkBounds.Default,
-                128f,
-                -7f,
-                12,
-                true,
-                6f);
+                OpenWorldGenerationConfig.DEFAULT_CHUNK_WORLD_SIZE,
+                OpenWorldGenerationConfig.WATER_LEVEL,
+                OpenWorldGenerationConfig.DEFAULT_BASE_QUAD_COUNT,
+                OpenWorldGenerationConfig.DEFAULT_ADD_SKIRTS,
+                OpenWorldGenerationConfig.DEFAULT_SKIRT_DEPTH);
         }
 
         public void CompleteScheduledJobs()

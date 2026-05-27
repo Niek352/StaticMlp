@@ -427,7 +427,7 @@ namespace StaticMlp.Features.Settlement
                     throw new InvalidOperationException(
                         $"{nameof(ConstructionPanelState)} cannot hold more than {target.Capacity} construction resource rows.");
 
-                var row = rows[i].Value;
+                ref var row = ref rows[i].Value;
                 target.Add(new ConstructionResourceViewEntry(row.Id, row.Required, row.Delivered));
             }
         }
@@ -443,7 +443,7 @@ namespace StaticMlp.Features.Settlement
                     throw new InvalidOperationException(
                         $"{nameof(StockpilePanelState)} cannot hold more than {target.Capacity} stored resource rows.");
 
-                var row = rows[i].Value;
+                ref var row = ref rows[i].Value;
                 target.Add(new SettlementResourceViewEntry(row.Id, row.Amount));
             }
         }

@@ -4,8 +4,8 @@ namespace StaticMlp.Features.OpenWorldGeneration
 {
     public static class OpenWorldGenerationLayerCatalog
     {
-        public const int HEIGHTMAP_RESOLUTION = 128;
-        public const int SURFACE_HEIGHT_PADDING_SAMPLES = 1;
+        public const int HEIGHTMAP_RESOLUTION = OpenWorldGenerationConfig.HEIGHTMAP_RESOLUTION;
+        public const int SURFACE_HEIGHT_PADDING_SAMPLES = OpenWorldGenerationConfig.SURFACE_HEIGHT_PADDING_SAMPLES;
 
         public static LayerProcLiteRuntime CreateRuntime(OpenWorldChunkGenerationRuntime config)
         {

@@ -186,7 +186,7 @@ namespace StaticMlp.Features.Settlement
                     throw new System.InvalidOperationException(
                         $"{nameof(BuildingContextPanelState)} cannot hold more than {target.Capacity} construction resource rows.");
 
-                var row = rows[i].Value;
+                ref var row = ref rows[i].Value;
                 target.Add(new ConstructionResourceViewEntry(row.Id, row.Required, row.Delivered));
             }
         }

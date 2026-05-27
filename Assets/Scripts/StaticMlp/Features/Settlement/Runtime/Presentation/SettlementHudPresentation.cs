@@ -100,7 +100,7 @@ namespace StaticMlp.Features.Settlement
                     throw new InvalidOperationException(
                         $"{nameof(SettlementHudState)} cannot hold more than {target.Capacity} settlement resource rows.");
 
-                var row = rows[i].Value;
+                ref var row = ref rows[i].Value;
                 target.Add(new SettlementResourceViewEntry(row.Id, row.Amount));
             }
         }

@@ -127,7 +127,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
 
             for (var i = 0; i < rows.Length; i++)
             {
-                ValidateRow(rows[i].Id, rows[i].Amount);
+                ValidateRow(rows.Get(i).Id, rows.Get(i).Amount);
             }
         }
 

@@ -45,10 +45,10 @@ namespace StaticMlp.Tests.OpenWorldResources
             Assert.That(state.Flags, Is.EqualTo(OpenWorldResourceOverlayFlags.None));
         }
 
-        [TestCase((ushort)1, (ushort)1)]
-        [TestCase((ushort)2, (ushort)10)]
-        [TestCase((ushort)3, (ushort)12)]
-        [TestCase((ushort)4, (ushort)11)]
+        [TestCase(OpenWorldGenerationConfig.TREE_RESOURCE_KIND, (ushort)1)]
+        [TestCase(OpenWorldGenerationConfig.ORE_RESOURCE_KIND, (ushort)10)]
+        [TestCase(OpenWorldGenerationConfig.SPORE_POD_RESOURCE_KIND, (ushort)12)]
+        [TestCase(OpenWorldGenerationConfig.CHEST_RESOURCE_KIND, (ushort)11)]
         public void ServerCommand_ProfileKind_EmitsConfiguredHarvestResource(ushort kindId, ushort expectedResourceId)
         {
             using var scope = new OpenWorldResourcesHarvestWorldScope(createServer: true, createClient: false);
@@ -118,13 +118,18 @@ namespace StaticMlp.Tests.OpenWorldResources
             Assert.That(harvested.HitPointZQ, Is.EqualTo(0));
         }
 
-        [Test]
-        public void ServerCommand_DepletedResource_CreatesHazardDamageEffect()
+        [TestCase(OpenWorldGenerationConfig.TREE_RESOURCE_KIND, DamageType.Physical)]
+        [TestCase(OpenWorldGenerationConfig.ORE_RESOURCE_KIND, DamageType.Physical)]
+        [TestCase(OpenWorldGenerationConfig.SPORE_POD_RESOURCE_KIND, DamageType.Poison)]
+        [TestCase(OpenWorldGenerationConfig.CHEST_RESOURCE_KIND, DamageType.Explosion)]
+        public void ServerCommand_DepletedResource_CreatesConfiguredHazardDamageEffect(
+            ushort kindId,
+            DamageType expectedDamageType)
         {
             using var scope = new OpenWorldResourcesHarvestWorldScope(createServer: true, createClient: false);
             var peer = new NetworkPeerId(16);
             scope.CreateServerPlayer(peer, Vector3.zero);
-            var placement = CreatePlacement(109, new Vector3(2f, 0f, 0f));
+            var placement = CreatePlacement(109 + kindId, new Vector3(2f, 0f, 0f), kindId);
             scope.RegisterServerPlacement(placement);
             var target = scope.CreateServerCharacterWithHealth(new Vector3(2.5f, 0f, 0f), current: 100f, max: 100f);
             Assert.That(SW.GetResource<OpenWorldChunkOverlayStore>().TryApplyResourceState(placement.ChunkId, new OpenWorldResourceOverlayState
@@ -144,7 +149,7 @@ namespace StaticMlp.Tests.OpenWorldResources
 
                 Assert.That(count, Is.EqualTo(1));
                 Assert.That(harvested.WasDepleted, Is.True);
-                Assert.That(CountDamageEffectsFor(target.GID), Is.EqualTo(1));
+                Assert.That(CountDamageEffectsFor(target.GID, expectedDamageType), Is.EqualTo(1));
             }
             finally
             {
@@ -335,12 +340,13 @@ namespace StaticMlp.Tests.OpenWorldResources
             };
         }
 
-        private static int CountDamageEffectsFor(EntityGID targetGid)
+        private static int CountDamageEffectsFor(EntityGID targetGid, DamageType damageType)
         {
             var count = 0;
-            foreach (var effect in SW.Query<All<DamageEffectTag, EffectTarget>>().Entities())
+            foreach (var effect in SW.Query<All<DamageEffectTag, EffectTarget, DamageData>>().Entities())
             {
-                if (effect.Read<EffectTarget>().Value.Equals(targetGid))
+                if (effect.Read<EffectTarget>().Value.Equals(targetGid)
+                    && effect.Read<DamageData>().Type == damageType)
                     count++;
             }
 

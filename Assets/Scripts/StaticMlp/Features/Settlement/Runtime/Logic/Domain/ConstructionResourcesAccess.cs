@@ -132,7 +132,7 @@ namespace StaticMlp.Features.Settlement
             ref readonly var rows = ref entity.Ref<World<TWorld>.Multi<ConstructionResourceEntry>>();
             var resources = new ResourceAmount[rows.Length];
             for (var i = 0; i < rows.Length; i++)
-                resources[i] = new ResourceAmount(rows[i].Id, Math.Max(0, rows[i].Required - rows[i].Delivered));
+                resources[i] = new ResourceAmount(rows.Get(i).Id, Math.Max(0, rows[i].Required - rows[i].Delivered));
 
             return resources;
         }
@@ -142,7 +142,7 @@ namespace StaticMlp.Features.Settlement
             ref readonly var rows = ref ClientProjection.ReadMulti<ConstructionResourceEntry>(entity);
             var resources = new ResourceAmount[rows.Length];
             for (var i = 0; i < rows.Length; i++)
-                resources[i] = new ResourceAmount(rows[i].Value.Id, Math.Max(0, rows[i].Value.Required - rows[i].Value.Delivered));
+                resources[i] = new ResourceAmount(rows.Get(i).Value.Id, Math.Max(0, rows[i].Value.Required - rows[i].Value.Delivered));
 
             return resources;
         }

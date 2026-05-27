@@ -18,13 +18,13 @@ namespace StaticMlp.Tests.OpenWorldResources
         public void ProxySpawn_WritesResourceNodeViewStateWithMaxAmountAndFlags()
         {
             using var scope = new ClientOpenWorldResourcesWorldScope();
-            var placement = CreatePlacement(placementId: 101, kindId: 2);
+            var placement = CreatePlacement(placementId: 101, kindId: OpenWorldGenerationConfig.ORE_RESOURCE_KIND);
 
             SpawnProxy(placement);
 
             var proxy = GetProxy(placement.PlacementId);
             ref readonly var viewState = ref proxy.Read<OpenWorldResourceNodeViewState>();
-            Assert.That(viewState.KindIdValue, Is.EqualTo(2));
+            Assert.That(viewState.KindIdValue, Is.EqualTo(OpenWorldGenerationConfig.ORE_RESOURCE_KIND));
             Assert.That(viewState.RemainingAmount, Is.EqualTo(8));
             Assert.That(viewState.MaxAmount, Is.EqualTo(8));
             Assert.That(viewState.Flags, Is.EqualTo(OpenWorldResourceOverlayFlags.None));
@@ -35,7 +35,7 @@ namespace StaticMlp.Tests.OpenWorldResources
         public void ResourceNodeViewBind_CreatesRuntimeViewWithoutResourcesPrefab()
         {
             using var scope = new ClientOpenWorldResourcesWorldScope();
-            var placement = CreatePlacement(placementId: 103, kindId: 2);
+            var placement = CreatePlacement(placementId: 103, kindId: OpenWorldGenerationConfig.ORE_RESOURCE_KIND);
             SpawnProxy(placement);
 
             var proxy = GetProxy(placement.PlacementId);
@@ -60,7 +60,7 @@ namespace StaticMlp.Tests.OpenWorldResources
         public void OverlayUpdates_WriteResourceNodeViewStateAmountAndFlags()
         {
             using var scope = new ClientOpenWorldResourcesWorldScope();
-            var placement = CreatePlacement(placementId: 102, kindId: 2);
+            var placement = CreatePlacement(placementId: 102, kindId: OpenWorldGenerationConfig.ORE_RESOURCE_KIND);
             SpawnProxy(placement);
 
             var system = new ClientOpenWorldChunkOverlayApplySystem();
@@ -76,7 +76,7 @@ namespace StaticMlp.Tests.OpenWorldResources
                         new OpenWorldResourceOverlayState
                         {
                             PlacementId = placement.PlacementId,
-                            KindIdValue = 2,
+                            KindIdValue = OpenWorldGenerationConfig.ORE_RESOURCE_KIND,
                             RemainingAmount = 4,
                             Flags = OpenWorldResourceOverlayFlags.Respawning,
                             RespawnTick = 33
@@ -141,7 +141,7 @@ namespace StaticMlp.Tests.OpenWorldResources
             {
                 CW.SendEvent(new OpenWorldChunkGenerationCompleted(
                     placement.ChunkId,
-                    128f,
+                    OpenWorldGenerationConfig.DEFAULT_CHUNK_WORLD_SIZE,
                     0,
                     default,
                     default,

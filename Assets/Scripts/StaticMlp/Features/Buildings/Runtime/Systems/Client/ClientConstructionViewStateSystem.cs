@@ -46,7 +46,7 @@ namespace StaticMlp.Features.Buildings
                     throw new InvalidOperationException(
                         $"{nameof(ConstructionViewState)} cannot hold more than {target.Capacity} resource rows.");
 
-                var row = rows[i].Value;
+                ref var row = ref rows[i].Value;
                 target.Add(new ConstructionResourceViewEntry(row.Id, row.Required, row.Delivered));
             }
         }

@@ -256,15 +256,35 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
         private static Color32 ToVertexColor(SurfaceSample sample)
         {
-            if (sample.WaterMask > 0.5f)
-                return new Color32(50, 95, 150, 255);
+            if (sample.WaterMask > OpenWorldGenerationConfig.WATER_BIOME_MASK_THRESHOLD)
+                return new Color32(
+                    OpenWorldGenerationConfig.WATER_VERTEX_COLOR_R,
+                    OpenWorldGenerationConfig.WATER_VERTEX_COLOR_G,
+                    OpenWorldGenerationConfig.WATER_VERTEX_COLOR_B,
+                    OpenWorldGenerationConfig.VERTEX_COLOR_A);
 
             return sample.PrimaryMaterialId switch
             {
-                1 => new Color32(72, 122, 62, 255),
-                2 => new Color32(105, 94, 74, 255),
-                3 => new Color32(170, 164, 140, 255),
-                _ => new Color32(82, 110, 72, 255)
+                1 => new Color32(
+                    OpenWorldGenerationConfig.GRASS_VERTEX_COLOR_R,
+                    OpenWorldGenerationConfig.GRASS_VERTEX_COLOR_G,
+                    OpenWorldGenerationConfig.GRASS_VERTEX_COLOR_B,
+                    OpenWorldGenerationConfig.VERTEX_COLOR_A),
+                2 => new Color32(
+                    OpenWorldGenerationConfig.DIRT_VERTEX_COLOR_R,
+                    OpenWorldGenerationConfig.DIRT_VERTEX_COLOR_G,
+                    OpenWorldGenerationConfig.DIRT_VERTEX_COLOR_B,
+                    OpenWorldGenerationConfig.VERTEX_COLOR_A),
+                3 => new Color32(
+                    OpenWorldGenerationConfig.ROCK_VERTEX_COLOR_R,
+                    OpenWorldGenerationConfig.ROCK_VERTEX_COLOR_G,
+                    OpenWorldGenerationConfig.ROCK_VERTEX_COLOR_B,
+                    OpenWorldGenerationConfig.VERTEX_COLOR_A),
+                _ => new Color32(
+                    OpenWorldGenerationConfig.FALLBACK_VERTEX_COLOR_R,
+                    OpenWorldGenerationConfig.FALLBACK_VERTEX_COLOR_G,
+                    OpenWorldGenerationConfig.FALLBACK_VERTEX_COLOR_B,
+                    OpenWorldGenerationConfig.VERTEX_COLOR_A)
             };
         }
     }

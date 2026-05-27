@@ -1,5 +1,6 @@
 using System;
 using StaticMlp.Features.EcsViews;
+using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Game.Presentation;
 using UnityEngine;
 
@@ -7,13 +8,19 @@ namespace StaticMlp.Features.OpenWorldResources
 {
     public sealed class OpenWorldResourceNodeViewPart : MonoBehaviour, IEntityViewPart<OpenWorldResourceNodeViewState>
     {
-        private const ushort WOOD_KIND = 1;
-        private const ushort STONE_KIND = 2;
+        private const ushort WOOD_KIND = OpenWorldGenerationConfig.TREE_RESOURCE_KIND;
+        private const ushort STONE_KIND = OpenWorldGenerationConfig.ORE_RESOURCE_KIND;
+        private const ushort SPORE_POD_KIND = OpenWorldGenerationConfig.SPORE_POD_RESOURCE_KIND;
+        private const ushort CHEST_KIND = OpenWorldGenerationConfig.CHEST_RESOURCE_KIND;
         private const int AMOUNT_PIP_COUNT = 5;
 
         [SerializeField] private Color _woodTrunkColor = new(0.45f, 0.26f, 0.12f, 1f);
         [SerializeField] private Color _woodCanopyColor = new(0.2f, 0.62f, 0.24f, 1f);
         [SerializeField] private Color _stoneColor = new(0.48f, 0.52f, 0.55f, 1f);
+        [SerializeField] private Color _sporeStemColor = new(0.53f, 0.47f, 0.74f, 1f);
+        [SerializeField] private Color _sporeCapColor = new(0.77f, 0.33f, 0.68f, 1f);
+        [SerializeField] private Color _chestBodyColor = new(0.52f, 0.31f, 0.14f, 1f);
+        [SerializeField] private Color _chestBandColor = new(0.86f, 0.68f, 0.28f, 1f);
         [SerializeField] private Color _amountPipColor = new(0.95f, 0.78f, 0.28f, 1f);
         [SerializeField] private Color _hitFlashColor = new(1f, 0.95f, 0.55f, 1f);
         [SerializeField] private Color _depletionPulseColor = new(1f, 0.35f, 0.18f, 1f);
@@ -24,6 +31,10 @@ namespace StaticMlp.Features.OpenWorldResources
         private Material _trunkMaterial;
         private Material _canopyMaterial;
         private Material _stoneMaterial;
+        private Material _sporeStemMaterial;
+        private Material _sporeCapMaterial;
+        private Material _chestBodyMaterial;
+        private Material _chestBandMaterial;
         private Material _amountPipMaterial;
         private ushort _activeKindId;
         private bool _hasActiveKind;
@@ -61,7 +72,10 @@ namespace StaticMlp.Features.OpenWorldResources
         {
             if (_visualRoot != null && _hasActiveKind && _activeKindId == kindId)
                 return;
-            if (kindId != WOOD_KIND && kindId != STONE_KIND)
+            if (kindId != WOOD_KIND
+                && kindId != STONE_KIND
+                && kindId != SPORE_POD_KIND
+                && kindId != CHEST_KIND)
                 throw new InvalidOperationException($"Unknown open world resource node kind: {kindId}.");
 
             DestroyVisual();
@@ -79,6 +93,12 @@ namespace StaticMlp.Features.OpenWorldResources
                     break;
                 case STONE_KIND:
                     BuildStoneVisual(_visualRoot.transform);
+                    break;
+                case SPORE_POD_KIND:
+                    BuildSporePodVisual(_visualRoot.transform);
+                    break;
+                case CHEST_KIND:
+                    BuildChestVisual(_visualRoot.transform);
                     break;
                 default:
                     throw new InvalidOperationException($"Unknown open world resource node kind: {kindId}.");
@@ -119,6 +139,56 @@ namespace StaticMlp.Features.OpenWorldResources
             RemoveCollider(stone);
             _stoneMaterial = RuntimeVisualMaterial.Create(_stoneColor);
             stone.GetComponent<Renderer>().sharedMaterial = _stoneMaterial;
+        }
+
+        private void BuildSporePodVisual(Transform root)
+        {
+            var stem = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            stem.name = "Spore Stem";
+            stem.transform.SetParent(root, worldPositionStays: false);
+            stem.transform.localPosition = new Vector3(0f, 0.45f, 0f);
+            stem.transform.localScale = new Vector3(0.22f, 0.45f, 0.22f);
+            RemoveCollider(stem);
+            _sporeStemMaterial = RuntimeVisualMaterial.Create(_sporeStemColor);
+            stem.GetComponent<Renderer>().sharedMaterial = _sporeStemMaterial;
+
+            var cap = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            cap.name = "Spore Cap";
+            cap.transform.SetParent(root, worldPositionStays: false);
+            cap.transform.localPosition = new Vector3(0f, 0.95f, 0f);
+            cap.transform.localScale = new Vector3(0.95f, 0.5f, 0.95f);
+            RemoveCollider(cap);
+            _sporeCapMaterial = RuntimeVisualMaterial.Create(_sporeCapColor);
+            cap.GetComponent<Renderer>().sharedMaterial = _sporeCapMaterial;
+        }
+
+        private void BuildChestVisual(Transform root)
+        {
+            var body = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            body.name = "Resource Chest Body";
+            body.transform.SetParent(root, worldPositionStays: false);
+            body.transform.localPosition = new Vector3(0f, 0.35f, 0f);
+            body.transform.localScale = new Vector3(1.1f, 0.55f, 0.75f);
+            RemoveCollider(body);
+            _chestBodyMaterial = RuntimeVisualMaterial.Create(_chestBodyColor);
+            body.GetComponent<Renderer>().sharedMaterial = _chestBodyMaterial;
+
+            var lid = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            lid.name = "Resource Chest Lid";
+            lid.transform.SetParent(root, worldPositionStays: false);
+            lid.transform.localPosition = new Vector3(0f, 0.7f, 0f);
+            lid.transform.localScale = new Vector3(1.18f, 0.22f, 0.82f);
+            RemoveCollider(lid);
+            lid.GetComponent<Renderer>().sharedMaterial = _chestBodyMaterial;
+
+            var band = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            band.name = "Resource Chest Band";
+            band.transform.SetParent(root, worldPositionStays: false);
+            band.transform.localPosition = new Vector3(0f, 0.58f, -0.42f);
+            band.transform.localScale = new Vector3(0.18f, 0.72f, 0.08f);
+            RemoveCollider(band);
+            _chestBandMaterial = RuntimeVisualMaterial.Create(_chestBandColor);
+            band.GetComponent<Renderer>().sharedMaterial = _chestBandMaterial;
         }
 
         private void BuildAmountIndicator(Transform root)
@@ -174,6 +244,10 @@ namespace StaticMlp.Features.OpenWorldResources
             DestroyMaterial(ref _trunkMaterial);
             DestroyMaterial(ref _canopyMaterial);
             DestroyMaterial(ref _stoneMaterial);
+            DestroyMaterial(ref _sporeStemMaterial);
+            DestroyMaterial(ref _sporeCapMaterial);
+            DestroyMaterial(ref _chestBodyMaterial);
+            DestroyMaterial(ref _chestBandMaterial);
             DestroyMaterial(ref _amountPipMaterial);
             _hasActiveKind = false;
         }
@@ -191,6 +265,14 @@ namespace StaticMlp.Features.OpenWorldResources
                     break;
                 case STONE_KIND:
                     ApplyMaterialFeedback(_stoneMaterial, _stoneColor, feedbackColor, intensity);
+                    break;
+                case SPORE_POD_KIND:
+                    ApplyMaterialFeedback(_sporeStemMaterial, _sporeStemColor, feedbackColor, intensity);
+                    ApplyMaterialFeedback(_sporeCapMaterial, _sporeCapColor, feedbackColor, intensity);
+                    break;
+                case CHEST_KIND:
+                    ApplyMaterialFeedback(_chestBodyMaterial, _chestBodyColor, feedbackColor, intensity);
+                    ApplyMaterialFeedback(_chestBandMaterial, _chestBandColor, feedbackColor, intensity);
                     break;
                 default:
                     throw new InvalidOperationException($"Unknown open world resource node kind: {_activeKindId}.");

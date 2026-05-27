@@ -67,8 +67,8 @@ namespace StaticMlp.Tests.ResourcesInventoryMinimal
             Assert.That(pickup.Read<ResourcePickup>().IsPickedUp, Is.True);
             Assert.That(ResourcesInventoryAccess.GetAmount(player, ResourceCatalog.WoodId), Is.EqualTo(23));
             Assert.That(rows.Length, Is.EqualTo(2));
-            Assert.That(rows[0].Amount, Is.EqualTo(ResourcesInventory.MAX_STACK_AMOUNT));
-            Assert.That(rows[1].Amount, Is.EqualTo(3));
+            Assert.That(rows.Get(0).Amount, Is.EqualTo(ResourcesInventory.MAX_STACK_AMOUNT));
+            Assert.That(rows.Get(1).Amount, Is.EqualTo(3));
         }
 
         [Test]

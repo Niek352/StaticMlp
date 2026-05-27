@@ -32,7 +32,9 @@ namespace StaticMlp.Features.OpenWorldGeneration.Jobs
             float moisture = LayerProcLiteMath.ValueNoise(WorldSeed, new int2((int)worldPos.x, (int)worldPos.y));
             byte biomeId = OpenWorldSurfaceRules.SelectBiomeId(height, moisture, waterMask);
             byte materialId = OpenWorldSurfaceRules.SelectMaterialId(height, waterMask);
-            float wetness = math.saturate((WaterLevel + 3f - height) / 6f);
+            float wetness = math.saturate(
+                (WaterLevel + OpenWorldGenerationConfig.WETNESS_HEIGHT_OFFSET - height)
+                / OpenWorldGenerationConfig.WETNESS_HEIGHT_RANGE);
 
             Surfaces[index] = new OpenWorldNativeSurfaceSample(height, normal, biomeId, materialId, 0f, waterMask, wetness);
         }

@@ -55,8 +55,8 @@ namespace StaticMlp.Tests.Settlement
 
             ref var slots = ref finished.Ref<SW.Multi<BedSlotState>>();
             Assert.That(slots.Length, Is.EqualTo(2));
-            Assert.That(slots[0].Status, Is.EqualTo(BedSlotStatus.Free));
-            Assert.That(slots[1].Status, Is.EqualTo(BedSlotStatus.Free));
+            Assert.That(slots.Get(0).Status, Is.EqualTo(BedSlotStatus.Free));
+            Assert.That(slots.Get(1).Status, Is.EqualTo(BedSlotStatus.Free));
         }
     }
 }

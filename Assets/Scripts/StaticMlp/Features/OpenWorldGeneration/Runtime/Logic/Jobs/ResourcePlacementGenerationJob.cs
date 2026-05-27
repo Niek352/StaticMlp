@@ -13,18 +13,20 @@ namespace StaticMlp.Features.OpenWorldGeneration.Jobs
     [BurstCompile]
     public struct ResourcePlacementGenerationJob : IJob
     {
-        public const int RESOURCE_CANDIDATES_PER_CHUNK = 24;
-        public const int SPAWN_CANDIDATES_PER_CHUNK = 8;
-        public const int FALLBACK_GRID_SIZE = 16;
-        public const float MAX_WATER_MASK = 0.35f;
-        public const float MIN_NORMAL_Y = 0.85f;
-        public const float RESOURCE_MARGIN_FRACTION = 0.08f;
-        public const float SPAWN_MARGIN_FRACTION = 0.18f;
+        public const int RESOURCE_CANDIDATES_PER_CHUNK = OpenWorldGenerationConfig.RESOURCE_CANDIDATES_PER_CHUNK;
+        public const int SPAWN_CANDIDATES_PER_CHUNK = OpenWorldGenerationConfig.SPAWN_CANDIDATES_PER_CHUNK;
+        public const int FALLBACK_GRID_SIZE = OpenWorldGenerationConfig.PLACEMENT_FALLBACK_GRID_SIZE;
+        public const float MAX_WATER_MASK = OpenWorldGenerationConfig.PLACEMENT_MAX_WATER_MASK;
+        public const float MIN_NORMAL_Y = OpenWorldGenerationConfig.PLACEMENT_MIN_NORMAL_Y;
+        public const float RESOURCE_MARGIN_FRACTION = OpenWorldGenerationConfig.RESOURCE_MARGIN_FRACTION;
+        public const float SPAWN_MARGIN_FRACTION = OpenWorldGenerationConfig.SPAWN_MARGIN_FRACTION;
 
-        private static readonly ResourcePlacementKindId WOOD_RESOURCE = new(1);
-        private static readonly ResourcePlacementKindId STONE_RESOURCE = new(2);
-        private static readonly SpawnPlacementKindId WILDLIFE_SPAWN = new(1);
-        private static readonly SpawnPlacementKindId HIGHLAND_SPAWN = new(2);
+        private static readonly ResourcePlacementKindId TREE_RESOURCE = new(OpenWorldGenerationConfig.TREE_RESOURCE_KIND);
+        private static readonly ResourcePlacementKindId ORE_RESOURCE = new(OpenWorldGenerationConfig.ORE_RESOURCE_KIND);
+        private static readonly ResourcePlacementKindId SPORE_POD_RESOURCE = new(OpenWorldGenerationConfig.SPORE_POD_RESOURCE_KIND);
+        private static readonly ResourcePlacementKindId CHEST_RESOURCE = new(OpenWorldGenerationConfig.CHEST_RESOURCE_KIND);
+        private static readonly SpawnPlacementKindId WILDLIFE_SPAWN = new(OpenWorldGenerationConfig.WILDLIFE_SPAWN_KIND);
+        private static readonly SpawnPlacementKindId HIGHLAND_SPAWN = new(OpenWorldGenerationConfig.HIGHLAND_SPAWN_KIND);
 
         public WorldChunkId ChunkId;
         public LayerProcLiteChunkId LayerChunkId;
@@ -46,24 +48,38 @@ namespace StaticMlp.Features.OpenWorldGeneration.Jobs
 
             for (int i = 0; i < RESOURCE_CANDIDATES_PER_CHUNK; i++)
             {
-                var candidate = CreateCandidate(11, i, RESOURCE_MARGIN_FRACTION);
+                var candidate = CreateCandidate(
+                    11,
+                    i,
+                    RESOURCE_MARGIN_FRACTION,
+                    OpenWorldGenerationConfig.RESOURCE_SCALE_MIN,
+                    OpenWorldGenerationConfig.RESOURCE_SCALE_MAX);
                 if (!candidate.Valid)
                     continue;
 
                 ResourcePlacements[resourceWritten++] = new ResourcePlacement(
                     LayerProcLiteDeterministicHash.CreateStablePositiveId(WorldSeed, LayerChunkId, 11, i),
-                    SelectResourceKind(candidate.Surface),
+                    SelectResourceKind(
+                        candidate.Surface,
+                        LayerProcLiteDeterministicHash.Unit(LayerProcLiteDeterministicHash.Hash(WorldSeed, LayerChunkId, 23, i))),
                     ChunkId,
                     new Vector3(candidate.Position.x, candidate.Position.y, candidate.Position.z),
                     candidate.YawDegrees,
                     candidate.Scale);
             }
 
-            if (resourceWritten == 0 && TryCreateFallbackCandidate(17, out var fallback))
+            if (resourceWritten == 0
+                && TryCreateFallbackCandidate(
+                    17,
+                    OpenWorldGenerationConfig.FALLBACK_RESOURCE_SCALE_MIN,
+                    OpenWorldGenerationConfig.FALLBACK_RESOURCE_SCALE_MAX,
+                    out var fallback))
             {
                 ResourcePlacements[resourceWritten++] = new ResourcePlacement(
                     LayerProcLiteDeterministicHash.CreateStablePositiveId(WorldSeed, LayerChunkId, 17, 0),
-                    SelectResourceKind(fallback.Surface),
+                    SelectResourceKind(
+                        fallback.Surface,
+                        LayerProcLiteDeterministicHash.Unit(LayerProcLiteDeterministicHash.Hash(WorldSeed, LayerChunkId, 29, 0))),
                     ChunkId,
                     new Vector3(fallback.Position.x, fallback.Position.y, fallback.Position.z),
                     fallback.YawDegrees,
@@ -72,7 +88,12 @@ namespace StaticMlp.Features.OpenWorldGeneration.Jobs
 
             for (int i = 0; i < SPAWN_CANDIDATES_PER_CHUNK; i++)
             {
-                var candidate = CreateCandidate(31, i, SPAWN_MARGIN_FRACTION);
+                var candidate = CreateCandidate(
+                    31,
+                    i,
+                    SPAWN_MARGIN_FRACTION,
+                    OpenWorldGenerationConfig.SPAWN_SCALE_MIN,
+                    OpenWorldGenerationConfig.SPAWN_SCALE_MAX);
                 if (!candidate.Valid)
                     continue;
 
@@ -84,7 +105,12 @@ namespace StaticMlp.Features.OpenWorldGeneration.Jobs
                     candidate.Scale);
             }
 
-            if (spawnWritten == 0 && TryCreateFallbackCandidate(41, out var fallbackSpawn))
+            if (spawnWritten == 0
+                && TryCreateFallbackCandidate(
+                    41,
+                    OpenWorldGenerationConfig.SPAWN_SCALE_MIN,
+                    OpenWorldGenerationConfig.SPAWN_SCALE_MAX,
+                    out var fallbackSpawn))
             {
                 SpawnPlacements[spawnWritten++] = new SpawnPlacement(
                     SelectSpawnKind(fallbackSpawn.Surface),
@@ -98,7 +124,12 @@ namespace StaticMlp.Features.OpenWorldGeneration.Jobs
             SpawnPlacementCount[0] = spawnWritten;
         }
 
-        private OpenWorldNativePlacementCandidate CreateCandidate(int stream, int index, float marginFraction)
+        private OpenWorldNativePlacementCandidate CreateCandidate(
+            int stream,
+            int index,
+            float marginFraction,
+            float scaleMin,
+            float scaleMax)
         {
             float margin = ChunkWorldSize * marginFraction;
             float usableSize = ChunkWorldSize - margin * 2f;
@@ -118,11 +149,15 @@ namespace StaticMlp.Features.OpenWorldGeneration.Jobs
                 true,
                 new float3(x, surface.Height, z),
                 LayerProcLiteDeterministicHash.Unit(LayerProcLiteDeterministicHash.Hash(WorldSeed, LayerChunkId, stream + 2, index)) * 360f,
-                math.lerp(0.8f, 1.35f, LayerProcLiteDeterministicHash.Unit(LayerProcLiteDeterministicHash.Hash(WorldSeed, LayerChunkId, 13, index))),
+                math.lerp(scaleMin, scaleMax, LayerProcLiteDeterministicHash.Unit(LayerProcLiteDeterministicHash.Hash(WorldSeed, LayerChunkId, 13, index))),
                 surface);
         }
 
-        private bool TryCreateFallbackCandidate(int stream, out OpenWorldNativePlacementCandidate candidate)
+        private bool TryCreateFallbackCandidate(
+            int stream,
+            float scaleMin,
+            float scaleMax,
+            out OpenWorldNativePlacementCandidate candidate)
         {
             float cellSize = ChunkWorldSize / FALLBACK_GRID_SIZE;
             float originX = ChunkId.X * ChunkWorldSize;
@@ -145,7 +180,10 @@ namespace StaticMlp.Features.OpenWorldGeneration.Jobs
                     true,
                     new float3(x, surface.Height, z),
                     LayerProcLiteDeterministicHash.Unit(LayerProcLiteDeterministicHash.Hash(WorldSeed, LayerChunkId, stream + 1, cell)) * 360f,
-                    math.lerp(0.9f, 1.15f, LayerProcLiteDeterministicHash.Unit(LayerProcLiteDeterministicHash.Hash(WorldSeed, LayerChunkId, 43, 0))),
+                    math.lerp(
+                        scaleMin,
+                        scaleMax,
+                        LayerProcLiteDeterministicHash.Unit(LayerProcLiteDeterministicHash.Hash(WorldSeed, LayerChunkId, 43, 0))),
                     surface);
                 return true;
             }
@@ -185,9 +223,16 @@ namespace StaticMlp.Features.OpenWorldGeneration.Jobs
                 LayerProcLiteMath.Bilinear(s00.Wetness, s10.Wetness, s01.Wetness, s11.Wetness, tx, tz));
         }
 
-        private static ResourcePlacementKindId SelectResourceKind(OpenWorldNativeSurfaceSample sample)
+        private static ResourcePlacementKindId SelectResourceKind(OpenWorldNativeSurfaceSample sample, float chestRoll)
         {
-            return sample.PrimaryMaterialId >= 3 || sample.BiomeId == 3 ? STONE_RESOURCE : WOOD_RESOURCE;
+            if (chestRoll < OpenWorldGenerationConfig.CHEST_PLACEMENT_CHANCE)
+                return CHEST_RESOURCE;
+            if (sample.BiomeId == 2 || sample.Wetness >= OpenWorldGenerationConfig.SPORE_MIN_WETNESS)
+                return SPORE_POD_RESOURCE;
+            if (sample.BiomeId == 3 || sample.PrimaryMaterialId >= 2)
+                return ORE_RESOURCE;
+
+            return TREE_RESOURCE;
         }
 
         private static SpawnPlacementKindId SelectSpawnKind(OpenWorldNativeSurfaceSample sample)

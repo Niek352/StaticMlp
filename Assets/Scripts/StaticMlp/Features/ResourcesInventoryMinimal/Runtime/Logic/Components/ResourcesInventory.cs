@@ -37,8 +37,8 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             writer.WriteInt(rows.Length);
             for (var i = 0; i < rows.Length; i++)
             {
-                writer.WriteUshort(rows[i].Id.Value);
-                writer.WriteInt(rows[i].Amount);
+                writer.WriteUshort(rows.Get(i).Id.Value);
+                writer.WriteInt(rows.Get(i).Amount);
             }
         }
 

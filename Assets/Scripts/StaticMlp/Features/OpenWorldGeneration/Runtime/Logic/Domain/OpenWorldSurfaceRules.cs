@@ -9,31 +9,45 @@ namespace StaticMlp.Features.OpenWorldGeneration
         public static float SampleHeight(uint worldSeed, float worldX, float worldZ)
         {
             float seed = worldSeed;
-            float low = math.sin((worldX + seed * 17.13f) * 0.0065f) * math.cos((worldZ - seed * 9.71f) * 0.0065f) * 24f;
-            float mid = math.sin((worldX - seed * 3.37f) * 0.021f + (worldZ + seed * 2.11f) * 0.008f) * 7f;
-            float ridgeWave = math.sin((worldX + seed) * 0.018f) * math.cos((worldZ - seed) * 0.015f);
-            float ridge = ridgeWave * ridgeWave * 8f;
-            return low + mid + ridge - 9f;
+            float low = math.sin(
+                            (worldX + seed * OpenWorldGenerationConfig.NATIVE_HEIGHT_LOW_SEED_X_SCALE)
+                            * OpenWorldGenerationConfig.NATIVE_HEIGHT_LOW_NOISE_SCALE)
+                        * math.cos(
+                            (worldZ - seed * OpenWorldGenerationConfig.NATIVE_HEIGHT_LOW_SEED_Z_SCALE)
+                            * OpenWorldGenerationConfig.NATIVE_HEIGHT_LOW_NOISE_SCALE)
+                        * OpenWorldGenerationConfig.NATIVE_HEIGHT_LOW_AMPLITUDE;
+            float mid = math.sin(
+                            (worldX - seed * OpenWorldGenerationConfig.NATIVE_HEIGHT_MID_SEED_X_SCALE)
+                            * OpenWorldGenerationConfig.NATIVE_HEIGHT_MID_NOISE_SCALE_X
+                            + (worldZ + seed * OpenWorldGenerationConfig.NATIVE_HEIGHT_MID_SEED_Z_SCALE)
+                            * OpenWorldGenerationConfig.NATIVE_HEIGHT_MID_NOISE_SCALE_Z)
+                        * OpenWorldGenerationConfig.NATIVE_HEIGHT_MID_AMPLITUDE;
+            float ridgeWave = math.sin(
+                                  (worldX + seed) * OpenWorldGenerationConfig.NATIVE_HEIGHT_RIDGE_NOISE_SCALE_X)
+                              * math.cos(
+                                  (worldZ - seed) * OpenWorldGenerationConfig.NATIVE_HEIGHT_RIDGE_NOISE_SCALE_Z);
+            float ridge = ridgeWave * ridgeWave * OpenWorldGenerationConfig.NATIVE_HEIGHT_RIDGE_AMPLITUDE;
+            return low + mid + ridge + OpenWorldGenerationConfig.NATIVE_HEIGHT_OFFSET;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static byte SelectBiomeId(float height, float moisture, float waterMask)
         {
-            if (waterMask > 0.5f)
+            if (waterMask > OpenWorldGenerationConfig.WATER_BIOME_MASK_THRESHOLD)
                 return 4;
-            if (height > 14f)
+            if (height > OpenWorldGenerationConfig.MOUNTAIN_BIOME_MIN_HEIGHT)
                 return 3;
-            return moisture > 0.55f ? (byte)2 : (byte)1;
+            return moisture > OpenWorldGenerationConfig.WET_BIOME_MIN_MOISTURE ? (byte)2 : (byte)1;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static byte SelectMaterialId(float height, float waterMask)
         {
-            if (waterMask > 0.5f)
+            if (waterMask > OpenWorldGenerationConfig.WATER_BIOME_MASK_THRESHOLD)
                 return 0;
-            if (height > 16f)
+            if (height > OpenWorldGenerationConfig.HIGH_ROCK_MATERIAL_MIN_HEIGHT)
                 return 3;
-            if (height > 8f)
+            if (height > OpenWorldGenerationConfig.ROCK_MATERIAL_MIN_HEIGHT)
                 return 2;
             return 1;
         }
@@ -41,17 +55,37 @@ namespace StaticMlp.Features.OpenWorldGeneration
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint SelectVertexColorRgba(OpenWorldNativeSurfaceSample sample)
         {
-            if (sample.WaterMask > 0.5f)
-                return PackRgba(50, 95, 150, 255);
+            if (sample.WaterMask > OpenWorldGenerationConfig.WATER_BIOME_MASK_THRESHOLD)
+                return PackRgba(
+                    OpenWorldGenerationConfig.WATER_VERTEX_COLOR_R,
+                    OpenWorldGenerationConfig.WATER_VERTEX_COLOR_G,
+                    OpenWorldGenerationConfig.WATER_VERTEX_COLOR_B,
+                    OpenWorldGenerationConfig.VERTEX_COLOR_A);
 
             if (sample.PrimaryMaterialId == 1)
-                return PackRgba(72, 122, 62, 255);
+                return PackRgba(
+                    OpenWorldGenerationConfig.GRASS_VERTEX_COLOR_R,
+                    OpenWorldGenerationConfig.GRASS_VERTEX_COLOR_G,
+                    OpenWorldGenerationConfig.GRASS_VERTEX_COLOR_B,
+                    OpenWorldGenerationConfig.VERTEX_COLOR_A);
             if (sample.PrimaryMaterialId == 2)
-                return PackRgba(105, 94, 74, 255);
+                return PackRgba(
+                    OpenWorldGenerationConfig.DIRT_VERTEX_COLOR_R,
+                    OpenWorldGenerationConfig.DIRT_VERTEX_COLOR_G,
+                    OpenWorldGenerationConfig.DIRT_VERTEX_COLOR_B,
+                    OpenWorldGenerationConfig.VERTEX_COLOR_A);
             if (sample.PrimaryMaterialId == 3)
-                return PackRgba(170, 164, 140, 255);
+                return PackRgba(
+                    OpenWorldGenerationConfig.ROCK_VERTEX_COLOR_R,
+                    OpenWorldGenerationConfig.ROCK_VERTEX_COLOR_G,
+                    OpenWorldGenerationConfig.ROCK_VERTEX_COLOR_B,
+                    OpenWorldGenerationConfig.VERTEX_COLOR_A);
 
-            return PackRgba(82, 110, 72, 255);
+            return PackRgba(
+                OpenWorldGenerationConfig.FALLBACK_VERTEX_COLOR_R,
+                OpenWorldGenerationConfig.FALLBACK_VERTEX_COLOR_G,
+                OpenWorldGenerationConfig.FALLBACK_VERTEX_COLOR_B,
+                OpenWorldGenerationConfig.VERTEX_COLOR_A);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

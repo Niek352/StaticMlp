@@ -26,9 +26,9 @@ namespace StaticMlp.Features.Settlement
             writer.WriteInt(rows.Length);
             for (var i = 0; i < rows.Length; i++)
             {
-                writer.WriteUshort(rows[i].Id.Value);
-                writer.WriteInt(rows[i].Required);
-                writer.WriteInt(rows[i].Delivered);
+                writer.WriteUshort(rows.Get(i).Id.Value);
+                writer.WriteInt(rows.Get(i).Required);
+                writer.WriteInt(rows.Get(i).Delivered);
             }
         }
 
@@ -65,7 +65,7 @@ namespace StaticMlp.Features.Settlement
 
             for (var i = 0; i < rows.Length; i++)
             {
-                ValidateRow(rows[i].Id, rows[i].Required, rows[i].Delivered);
+                ValidateRow(rows.Get(i).Id, rows.Get(i).Required, rows.Get(i).Delivered);
                 for (var j = i + 1; j < rows.Length; j++)
                 {
                     if (rows[i].Id == rows[j].Id)

@@ -7,18 +7,20 @@ namespace StaticMlp.Features.OpenWorldGeneration
     [Obsolete("Use OpenWorldChunkGenerationSystem instead")]
     public static class OpenWorldPlacementGenerator
     {
-        public const float MAX_WATER_MASK = 0.35f;
-        public const float MIN_NORMAL_Y = 0.85f;
+        public const float MAX_WATER_MASK = OpenWorldGenerationConfig.PLACEMENT_MAX_WATER_MASK;
+        public const float MIN_NORMAL_Y = OpenWorldGenerationConfig.PLACEMENT_MIN_NORMAL_Y;
 
-        private const int RESOURCE_CANDIDATES_PER_CHUNK = 24;
-        private const int SPAWN_CANDIDATES_PER_CHUNK = 8;
-        private const int FALLBACK_GRID_SIZE = 16;
-        private const float RESOURCE_MARGIN_FRACTION = 0.08f;
-        private const float SPAWN_MARGIN_FRACTION = 0.18f;
-        private static readonly ResourcePlacementKindId WOOD_RESOURCE = new(1);
-        private static readonly ResourcePlacementKindId STONE_RESOURCE = new(2);
-        private static readonly SpawnPlacementKindId WILDLIFE_SPAWN = new(1);
-        private static readonly SpawnPlacementKindId HIGHLAND_SPAWN = new(2);
+        private const int RESOURCE_CANDIDATES_PER_CHUNK = OpenWorldGenerationConfig.RESOURCE_CANDIDATES_PER_CHUNK;
+        private const int SPAWN_CANDIDATES_PER_CHUNK = OpenWorldGenerationConfig.SPAWN_CANDIDATES_PER_CHUNK;
+        private const int FALLBACK_GRID_SIZE = OpenWorldGenerationConfig.PLACEMENT_FALLBACK_GRID_SIZE;
+        private const float RESOURCE_MARGIN_FRACTION = OpenWorldGenerationConfig.RESOURCE_MARGIN_FRACTION;
+        private const float SPAWN_MARGIN_FRACTION = OpenWorldGenerationConfig.SPAWN_MARGIN_FRACTION;
+        private static readonly ResourcePlacementKindId TREE_RESOURCE = new(OpenWorldGenerationConfig.TREE_RESOURCE_KIND);
+        private static readonly ResourcePlacementKindId ORE_RESOURCE = new(OpenWorldGenerationConfig.ORE_RESOURCE_KIND);
+        private static readonly ResourcePlacementKindId SPORE_POD_RESOURCE = new(OpenWorldGenerationConfig.SPORE_POD_RESOURCE_KIND);
+        private static readonly ResourcePlacementKindId CHEST_RESOURCE = new(OpenWorldGenerationConfig.CHEST_RESOURCE_KIND);
+        private static readonly SpawnPlacementKindId WILDLIFE_SPAWN = new(OpenWorldGenerationConfig.WILDLIFE_SPAWN_KIND);
+        private static readonly SpawnPlacementKindId HIGHLAND_SPAWN = new(OpenWorldGenerationConfig.HIGHLAND_SPAWN_KIND);
 
         public static ResourcePlacement[] GenerateResourcePlacements(
             WorldChunkId chunkId,
@@ -37,11 +39,16 @@ namespace StaticMlp.Features.OpenWorldGeneration
 
                 placements.Add(new ResourcePlacement(
                     CreatePlacementId(request.Seed.Value, chunkId, 11, i),
-                    SelectResourceKind(candidate.Sample),
+                    SelectResourceKind(
+                        candidate.Sample,
+                        Unit(Hash(request.Seed.Value, chunkId, 23, i))),
                     chunkId,
                     candidate.Position,
                     candidate.YawDegrees,
-                    Mathf.Lerp(0.8f, 1.35f, Unit(Hash(request.Seed.Value, chunkId, 13, i)))));
+                    Mathf.Lerp(
+                        OpenWorldGenerationConfig.RESOURCE_SCALE_MIN,
+                        OpenWorldGenerationConfig.RESOURCE_SCALE_MAX,
+                        Unit(Hash(request.Seed.Value, chunkId, 13, i)))));
             }
 
             if (placements.Count == 0
@@ -49,11 +56,16 @@ namespace StaticMlp.Features.OpenWorldGeneration
             {
                 placements.Add(new ResourcePlacement(
                     CreatePlacementId(request.Seed.Value, chunkId, 17, 0),
-                    SelectResourceKind(fallback.Sample),
+                    SelectResourceKind(
+                        fallback.Sample,
+                        Unit(Hash(request.Seed.Value, chunkId, 29, 0))),
                     chunkId,
                     fallback.Position,
                     fallback.YawDegrees,
-                    Mathf.Lerp(0.8f, 1.35f, Unit(Hash(request.Seed.Value, chunkId, 19, 0)))));
+                    Mathf.Lerp(
+                        OpenWorldGenerationConfig.FALLBACK_RESOURCE_SCALE_MIN,
+                        OpenWorldGenerationConfig.FALLBACK_RESOURCE_SCALE_MAX,
+                        Unit(Hash(request.Seed.Value, chunkId, 19, 0)))));
             }
 
             return placements.ToArray();
@@ -79,7 +91,10 @@ namespace StaticMlp.Features.OpenWorldGeneration
                     chunkId,
                     candidate.Position,
                     candidate.YawDegrees,
-                    Mathf.Lerp(0.9f, 1.15f, Unit(Hash(request.Seed.Value, chunkId, 37, i)))));
+                    Mathf.Lerp(
+                        OpenWorldGenerationConfig.SPAWN_SCALE_MIN,
+                        OpenWorldGenerationConfig.SPAWN_SCALE_MAX,
+                        Unit(Hash(request.Seed.Value, chunkId, 37, i)))));
             }
 
             if (placements.Count == 0
@@ -90,7 +105,10 @@ namespace StaticMlp.Features.OpenWorldGeneration
                     chunkId,
                     fallback.Position,
                     fallback.YawDegrees,
-                    Mathf.Lerp(0.9f, 1.15f, Unit(Hash(request.Seed.Value, chunkId, 43, 0)))));
+                    Mathf.Lerp(
+                        OpenWorldGenerationConfig.SPAWN_SCALE_MIN,
+                        OpenWorldGenerationConfig.SPAWN_SCALE_MAX,
+                        Unit(Hash(request.Seed.Value, chunkId, 43, 0)))));
             }
 
             return placements.ToArray();
@@ -159,9 +177,16 @@ namespace StaticMlp.Features.OpenWorldGeneration
             return false;
         }
 
-        private static ResourcePlacementKindId SelectResourceKind(SurfaceSample sample)
+        private static ResourcePlacementKindId SelectResourceKind(SurfaceSample sample, float chestRoll)
         {
-            return sample.PrimaryMaterialId >= 3 || sample.BiomeId == 3 ? STONE_RESOURCE : WOOD_RESOURCE;
+            if (chestRoll < OpenWorldGenerationConfig.CHEST_PLACEMENT_CHANCE)
+                return CHEST_RESOURCE;
+            if (sample.BiomeId == 2 || sample.Wetness >= OpenWorldGenerationConfig.SPORE_MIN_WETNESS)
+                return SPORE_POD_RESOURCE;
+            if (sample.BiomeId == 3 || sample.PrimaryMaterialId >= 2)
+                return ORE_RESOURCE;
+
+            return TREE_RESOURCE;
         }
 
         private static SpawnPlacementKindId SelectSpawnKind(SurfaceSample sample)

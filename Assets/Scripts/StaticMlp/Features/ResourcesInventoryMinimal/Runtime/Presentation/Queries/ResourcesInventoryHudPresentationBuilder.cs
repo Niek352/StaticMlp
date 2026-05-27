@@ -36,7 +36,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
 
             for (var i = 0; i < rows.Length; i++)
             {
-                var row = rows[i];
+                ref var row = ref rows[i];
                 slots[i] = new ResourcesInventorySlotPresentation(
                     true,
                     ResourceCatalog.Get(row.Id).DisplayName,
