@@ -8,6 +8,7 @@ namespace StaticMlp.Features.Settlement
         AssignWorker = 3,
         UnassignWorker = 4,
         CollectExtractionOutput = 5,
-        DepositCarriedResourcesToStockpile = 6
+        DepositCarriedResourcesToStockpile = 6,
+        ClaimProductionOutput = 7
     }
 }

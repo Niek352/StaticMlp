@@ -5,6 +5,7 @@ using StaticMlp.Features.Buildings;
 using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Settlement.Workers;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
@@ -28,6 +29,10 @@ namespace StaticMlp.Tests.Settlement
                 typeof(SettlementWorkerTag).Assembly,
                 typeof(BuildingConstructionCompletedEvent).Assembly);
             SW.Initialize();
+            SW.SetResource(new SimulationTime
+            {
+                FixedStepSeconds = 1f
+            });
         }
 
         public SW.Entity CreateSharedResources(int capacity = 0, int wood = 0, int stone = 0)

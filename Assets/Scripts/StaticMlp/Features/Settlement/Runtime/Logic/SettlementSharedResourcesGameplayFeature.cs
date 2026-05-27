@@ -19,12 +19,17 @@ namespace StaticMlp.Features.Settlement
             ProjectionRegistry.RegisterMulti<ProductionStationOutputResource>();
             ProjectionRegistry.Register<BedrollShelterState>();
             DepositCarriedResourcesToStockpileEventCodec.Register();
+            ClaimProductionOutputEventCodec.Register();
             RequestRegistry.Register<DepositCarriedResourcesToStockpileRequestEvent, DepositCarriedResourcesToStockpileResultEvent>(
                 new DepositCarriedResourcesToStockpileHandler(),
                 projector: null,
                 serverOrder: GameplaySystemOrder.Gameplay - 41);
             RequestRegistry.Register<CollectExtractionOutputRequestEvent, CollectExtractionOutputResultEvent>(
                 new CollectExtractionOutputHandler(),
+                projector: null,
+                serverOrder: GameplaySystemOrder.Gameplay - 40);
+            RequestRegistry.Register<ClaimProductionOutputRequestEvent, ClaimProductionOutputResultEvent>(
+                new ClaimProductionOutputHandler(),
                 projector: null,
                 serverOrder: GameplaySystemOrder.Gameplay - 40);
         }
@@ -58,7 +63,9 @@ namespace StaticMlp.Features.Settlement
             systems.Add(new ServerWorkbenchBootstrapSystem(), GameplaySystemOrder.Gameplay - 48);
             systems.Add(new ServerExtractionBootstrapSystem(), GameplaySystemOrder.Gameplay - 48);
             systems.Add(new ServerExtractionOperationSystem(), GameplaySystemOrder.Gameplay - 47);
+            systems.Add(new ServerProductionStationProcessingSystem(), GameplaySystemOrder.Gameplay - 46);
             systems.Add(new ServerTransferExtractionOutputToStockpileSystem(), GameplaySystemOrder.Gameplay - 39);
+            systems.Add(new ServerClaimProductionOutputToStorageSystem(), GameplaySystemOrder.Gameplay - 39);
         }
     }
 }

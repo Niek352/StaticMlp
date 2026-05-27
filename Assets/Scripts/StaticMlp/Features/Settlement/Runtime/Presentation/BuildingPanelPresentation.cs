@@ -48,6 +48,7 @@ namespace StaticMlp.Features.Settlement
                 case BuildingPanelKind.WorkbenchPanel:
                     next.Workbench = BuildWorkbench(target, in definition);
                     next.PrimaryAction = CreateWorkerAction(in next.Workbench);
+                    next.SecondaryAction = CreateClaimProductionOutputAction(in next.Workbench);
                     return next;
                 case BuildingPanelKind.ShelterPanel:
                     next.Shelter = BuildShelter(target, in definition);
@@ -122,13 +123,16 @@ namespace StaticMlp.Features.Settlement
                 Target = target.GID,
                 AnchorId = anchorRef.Anchor,
                 DisplayName = definition.DisplayName,
+                Enabled = workbench.Enabled,
                 RecipeName = recipe.Code,
                 WorkDone = workbench.WorkDone,
                 WorkRequired = recipe.WorkRequired,
+                OutputAmount = ProductionStationResourceAccess.TotalProjectedOutputAmount(target),
+                OutputCapacity = definition.Operation.StorageCapacity,
                 WorkerSlotCount = workbench.WorkerSlotCount
             };
-            CopyAmounts(recipe.Inputs, ref state.Inputs);
-            CopyAmounts(recipe.Outputs, ref state.Outputs);
+            CopyProductionInputs(target, in recipe, ref state.Inputs);
+            CopyProductionOutputs(target, in recipe, ref state.Outputs);
             PopulateWorkerSlots(ref state);
             return state;
         }
@@ -251,6 +255,21 @@ namespace StaticMlp.Features.Settlement
                 amount: state.BufferAmount);
         }
 
+        private static BuildingPanelAction CreateClaimProductionOutputAction(in WorkbenchPanelState state)
+        {
+            var hasOutput = TryFindClaimableOutput(in state, out var output);
+            var hasCapacity = HasSharedStorageCapacity();
+            var enabled = hasOutput && hasCapacity;
+            return new BuildingPanelAction(
+                BuildingPanelActionKind.ClaimProductionOutput,
+                "Claim Output",
+                enabled,
+                enabled ? string.Empty : ResolveProductionClaimDisabledReason(hasOutput, hasCapacity),
+                state.Target,
+                resource: output.Id,
+                amount: output.Amount);
+        }
+
         private static BuildingPanelAction CreateDepositCarriedResourcesToStockpileAction(in StockpilePanelState state)
         {
             var enabled = StockpileRules.HasAvailableCapacity(state.Capacity, state.UsedCapacity);
@@ -271,6 +290,42 @@ namespace StaticMlp.Features.Settlement
                 return "No available worker belongs to this settlement.";
 
             return string.Empty;
+        }
+
+        private static string ResolveProductionClaimDisabledReason(bool hasOutput, bool hasCapacity)
+        {
+            if (!hasOutput)
+                return "Output buffer is empty.";
+
+            if (!hasCapacity)
+                return "Stockpile storage is full.";
+
+            return string.Empty;
+        }
+
+        private static bool HasSharedStorageCapacity()
+        {
+            var storageEntity = SettlementSharedResourcesQuery.GetClientEntity();
+            ref readonly var storage = ref ClientProjection.Read<SettlementSharedResources>(storageEntity);
+            return StockpileRules.HasAvailableCapacity(
+                storage.Capacity,
+                SettlementSharedResourcesAccess.TotalProjectedUsed(storageEntity));
+        }
+
+        private static bool TryFindClaimableOutput(in WorkbenchPanelState state, out ProductionResourceBufferEntry output)
+        {
+            for (var i = 0; i < state.Outputs.Length; i++)
+            {
+                var candidate = state.Outputs[i];
+                if (candidate.Amount <= 0)
+                    continue;
+
+                output = candidate;
+                return true;
+            }
+
+            output = default;
+            return false;
         }
 
         private static void PopulateWorkerSlots(ref ExtractionPanelState state)
@@ -460,16 +515,50 @@ namespace StaticMlp.Features.Settlement
             }
         }
 
-        private static void CopyAmounts(ResourceAmount[] source, ref FixedList128Bytes<ResourceAmount> target)
+        private static void CopyProductionInputs(
+            CW.Entity station,
+            in ProductionRecipeDefinition recipe,
+            ref FixedList128Bytes<ProductionResourceBufferEntry> target)
         {
-            for (var i = 0; i < source.Length; i++)
+            for (var i = 0; i < recipe.Inputs.Length; i++)
+                AddProductionInput(station, recipe.Inputs[i], ref target);
+
+            if (recipe.FuelRequirement.HasValue)
+                AddProductionInput(station, recipe.FuelRequirement.Value, ref target);
+        }
+
+        private static void CopyProductionOutputs(
+            CW.Entity station,
+            in ProductionRecipeDefinition recipe,
+            ref FixedList128Bytes<ProductionResourceBufferEntry> target)
+        {
+            for (var i = 0; i < recipe.Outputs.Length; i++)
             {
                 if (target.Length == target.Capacity)
                     throw new InvalidOperationException(
                         $"{nameof(WorkbenchPanelState)} cannot hold more than {target.Capacity} resource rows.");
 
-                target.Add(source[i]);
+                var output = recipe.Outputs[i];
+                target.Add(new ProductionResourceBufferEntry(
+                    output.Id,
+                    ProductionStationResourceAccess.GetProjectedOutput(station, output.Id),
+                    output.Amount));
             }
+        }
+
+        private static void AddProductionInput(
+            CW.Entity station,
+            ResourceAmount input,
+            ref FixedList128Bytes<ProductionResourceBufferEntry> target)
+        {
+            if (target.Length == target.Capacity)
+                throw new InvalidOperationException(
+                    $"{nameof(WorkbenchPanelState)} cannot hold more than {target.Capacity} resource rows.");
+
+            target.Add(new ProductionResourceBufferEntry(
+                input.Id,
+                ProductionStationResourceAccess.GetProjectedInput(station, input.Id),
+                input.Amount));
         }
 
         private static CW.Entity GetBuildingEntity(EntityGID gid)

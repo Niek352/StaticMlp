@@ -81,6 +81,9 @@ namespace StaticMlp.Features.Settlement
                 case BuildingPanelActionKind.DepositCarriedResourcesToStockpile:
                     SendDepositCarriedResourcesToStockpile(action.Target);
                     return;
+                case BuildingPanelActionKind.ClaimProductionOutput:
+                    SendClaimProductionOutput(action);
+                    return;
                 default:
                     throw new InvalidOperationException($"Unsupported building panel action {action.Kind}.");
             }
@@ -128,6 +131,15 @@ namespace StaticMlp.Features.Settlement
         {
             var request = new DepositCarriedResourcesToStockpileRequestEvent(target);
             RequestApi.Send<DepositCarriedResourcesToStockpileRequestEvent, DepositCarriedResourcesToStockpileResultEvent>(request);
+        }
+
+        private static void SendClaimProductionOutput(in BuildingPanelAction action)
+        {
+            var request = new ClaimProductionOutputRequestEvent(
+                action.Target,
+                action.Resource,
+                action.Amount);
+            RequestApi.Send<ClaimProductionOutputRequestEvent, ClaimProductionOutputResultEvent>(request);
         }
 
         private static void HandleClose()

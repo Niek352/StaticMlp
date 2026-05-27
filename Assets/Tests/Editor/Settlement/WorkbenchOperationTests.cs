@@ -1,9 +1,13 @@
 using System;
+using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
 using StaticMlp.Features.Settlement;
+using StaticMlp.Features.Settlement.Workers;
+using StaticMlp.Game;
 using StaticMlp.Networking;
+using StaticMlp.Networking.Requests;
 using UnityEngine;
 
 namespace StaticMlp.Tests.Settlement
@@ -94,6 +98,107 @@ namespace StaticMlp.Tests.Settlement
 
             Assert.That(ProductionStationResourceAccess.GetInput(station, ResourceCatalog.SimplePartsId), Is.EqualTo(2));
             Assert.That(ProductionStationResourceAccess.GetOutput(station, ResourceCatalog.RepairKitsId), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ServerProductionStationProcessingSystem_ConsumesSharedInputsAndCreatesOutput()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var storage = scope.CreateSharedResources(capacity: 100, wood: 2);
+            var station = CreateProductionWorkbench(Vector3.zero);
+            CreateAssignedWorker(station.GID);
+            SW.GetResource<SimulationTime>().FixedStepSeconds = 20f;
+
+            new ServerProductionStationProcessingSystem().Update();
+
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.WoodId), Is.EqualTo(0));
+            Assert.That(ProductionStationResourceAccess.GetInput(station, ResourceCatalog.WoodId), Is.EqualTo(0));
+            Assert.That(ProductionStationResourceAccess.GetOutput(station, ResourceCatalog.PlanksId), Is.EqualTo(1));
+            Assert.That(station.Read<ProductionStationOperationState>().WorkDone, Is.EqualTo(0f));
+        }
+
+        [Test]
+        public void ServerProductionStationProcessingSystem_DoesNotReserveInputsWhenOutputBufferIsFull()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var storage = scope.CreateSharedResources(capacity: 100, wood: 2);
+            var station = CreateProductionWorkbench(Vector3.zero);
+            CreateAssignedWorker(station.GID);
+            ref var outputs = ref station.Ref<SW.Multi<ProductionStationOutputResource>>();
+            SetOutput(ref outputs, ResourceCatalog.PlanksId, 24);
+            SW.GetResource<SimulationTime>().FixedStepSeconds = 20f;
+
+            new ServerProductionStationProcessingSystem().Update();
+
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.WoodId), Is.EqualTo(2));
+            Assert.That(ProductionStationResourceAccess.GetInput(station, ResourceCatalog.WoodId), Is.EqualTo(0));
+            Assert.That(ProductionStationResourceAccess.GetOutput(station, ResourceCatalog.PlanksId), Is.EqualTo(24));
+            Assert.That(station.Read<ProductionStationOperationState>().WorkDone, Is.EqualTo(0f));
+        }
+
+        [Test]
+        public void ClaimProductionOutputHandler_TransfersStationOutputWithinSharedStorageCapacity()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var peer = new NetworkPeerId(1);
+            var storage = scope.CreateSharedResources(capacity: 5, wood: 3);
+            var station = CreateProductionWorkbench(Vector3.zero);
+            scope.CreatePlayer(peer, Vector3.zero);
+            ref var outputs = ref station.Ref<SW.Multi<ProductionStationOutputResource>>();
+            SetOutput(ref outputs, ResourceCatalog.PlanksId, 4);
+            var system = new ServerClaimProductionOutputToStorageSystem();
+            system.Init();
+
+            var result = new ClaimProductionOutputHandler().Handle(
+                peer,
+                new ClaimProductionOutputRequestEvent(station.GID, ResourceCatalog.PlanksId, 4));
+            try { system.Update(); }
+            finally { system.Destroy(); }
+
+            Assert.That(result.Status, Is.EqualTo(RequestStatus.Accepted));
+            Assert.That(result.TransferredAmount, Is.EqualTo(2));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.PlanksId), Is.EqualTo(2));
+            Assert.That(ProductionStationResourceAccess.GetOutput(station, ResourceCatalog.PlanksId), Is.EqualTo(2));
+            Assert.That(SettlementSharedResourcesAccess.TotalUsed(storage), Is.EqualTo(5));
+        }
+
+        private static SW.Entity CreateProductionWorkbench(Vector3 position)
+        {
+            var station = SW.NewEntity<Default>();
+            station.Set<FinishedBuildingTag>();
+            station.Set(new ConstructionSiteState
+            {
+                BuildingId = BuildingCatalogData.WorkbenchId.Value,
+                Phase = ConstructionPhase.Completed
+            });
+            station.Set(new ConstructionTransform
+            {
+                Position = position,
+                Rotation = Quaternion.identity
+            });
+            station.Set(new ProductionStationOperationState
+            {
+                StationId = ProductionStationIds.Workbench.Value,
+                ActiveRecipeId = ProductionRecipeCatalog.WorkbenchPlanksId.Value,
+                Enabled = true,
+                WorkerSlotCount = 1,
+                WorkDone = 0f
+            });
+            ProductionStationResourceAccess.InitializeRows(station, ProductionStationIds.Workbench);
+            return station;
+        }
+
+        private static SW.Entity CreateAssignedWorker(EntityGID building)
+        {
+            var worker = SW.NewEntity<Default>();
+            worker.Set(new BuildingWorkerAssignmentState
+            {
+                Status = SettlementWorkerAssignmentStatus.Assigned,
+                AnchorId = SettlementAnchorCatalog.HomeCampId.Value,
+                Building = building,
+                SlotIndex = 0
+            });
+            return worker;
         }
 
         private static void SetInput(ref SW.Multi<ProductionStationInputResource> rows, ResourceId resourceId, int amount)

@@ -135,6 +135,15 @@ namespace StaticMlp.Features.Settlement
             if (fuel.Amount <= 0)
                 throw new InvalidOperationException(
                     $"Production recipe id {definition.Id.Value} has non-positive fuel amount {fuel.Amount}.");
+
+            for (var i = 0; i < definition.Inputs.Length; i++)
+            {
+                if (definition.Inputs[i].Id == fuel.Id)
+                {
+                    throw new InvalidOperationException(
+                        $"Production recipe id {definition.Id.Value} uses resource id {fuel.Id.Value} as both input and fuel.");
+                }
+            }
         }
     }
 }

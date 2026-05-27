@@ -197,12 +197,18 @@ namespace StaticMlp.Features.Settlement
         {
             builder.Append(state.DisplayName);
             builder.Append("\nWorkbench");
+            builder.Append("\nStatus: ");
+            builder.Append(state.Enabled ? "Enabled" : "Disabled");
             builder.Append("\nRecipe: ");
             builder.Append(state.RecipeName);
             builder.Append("\nWork: ");
             builder.Append(Mathf.RoundToInt(state.WorkDone));
             builder.Append(" / ");
             builder.Append(Mathf.RoundToInt(state.WorkRequired));
+            builder.Append("\nOutput buffer: ");
+            builder.Append(state.OutputAmount);
+            builder.Append(" / ");
+            builder.Append(state.OutputCapacity);
             builder.Append("\nWorkers: ");
             builder.Append(state.AssignedWorkerCount);
             builder.Append(" / ");
@@ -217,9 +223,10 @@ namespace StaticMlp.Features.Settlement
                 builder.Append(slot.Assigned ? $"Worker {slot.Worker.Raw}" : "Empty");
             }
 
-            AppendAmounts(builder, "Inputs", in state.Inputs);
-            AppendAmounts(builder, "Outputs", in state.Outputs);
-            builder.Append("\nRecipe and claim actions are unavailable until server requests exist.");
+            AppendProductionBuffer(builder, "Inputs", in state.Inputs);
+            AppendProductionBuffer(builder, "Outputs", in state.Outputs);
+            AppendActionStatus(builder, in state.PrimaryAction);
+            AppendActionStatus(builder, in state.SecondaryAction);
         }
 
         private static void AppendShelter(StringBuilder builder, in ShelterPanelState state)
@@ -283,10 +290,10 @@ namespace StaticMlp.Features.Settlement
             return builder.ToString();
         }
 
-        private static void AppendAmounts(
+        private static void AppendProductionBuffer(
             StringBuilder builder,
             string label,
-            in Unity.Collections.FixedList128Bytes<ResourceAmount> amounts)
+            in Unity.Collections.FixedList128Bytes<ProductionResourceBufferEntry> amounts)
         {
             builder.Append('\n');
             builder.Append(label);
@@ -306,6 +313,8 @@ namespace StaticMlp.Features.Settlement
                 builder.Append(ResourceCatalog.Get(amount.Id).DisplayName);
                 builder.Append(' ');
                 builder.Append(amount.Amount);
+                builder.Append(" / ");
+                builder.Append(amount.BatchAmount);
             }
         }
 
