@@ -1,8 +1,11 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
+using StaticMlp.Features.Effects;
 using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.OpenWorldResources;
+using StaticMlp.Features.Shared;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Input;
 using StaticMlp.Networking;
@@ -37,6 +40,94 @@ namespace StaticMlp.Tests.OpenWorldResources
             Assert.That(overlayStore.TryGetResource(placement.PlacementId, out var state), Is.True);
             Assert.That(state.RemainingAmount, Is.EqualTo(7));
             Assert.That(state.Flags, Is.EqualTo(OpenWorldResourceOverlayFlags.None));
+        }
+
+        [Test]
+        public void ServerCommand_TwoValidCommandsInSameTick_AcceptsOnlyOneHarvest()
+        {
+            using var scope = new OpenWorldResourcesHarvestWorldScope(createServer: true, createClient: false);
+            var peer = new NetworkPeerId(13);
+            scope.CreateServerPlayer(peer, Vector3.zero);
+            var placement = CreatePlacement(106, new Vector3(2f, 0f, 0f));
+            scope.RegisterServerPlacement(placement);
+
+            var firstCount = RunServerCommand(peer, CreateCommand(placement.PlacementId, placement.Position), out _);
+            var secondCount = RunServerCommand(peer, CreateCommand(placement.PlacementId, placement.Position), out _);
+
+            Assert.That(firstCount, Is.EqualTo(1));
+            Assert.That(secondCount, Is.EqualTo(0));
+            Assert.That(SW.GetResource<OpenWorldChunkOverlayStore>().TryGetResource(placement.PlacementId, out var state), Is.True);
+            Assert.That(state.RemainingAmount, Is.EqualTo(7));
+        }
+
+        [Test]
+        public void ServerCommand_AfterHarvestCooldown_AcceptsSecondHarvest()
+        {
+            using var scope = new OpenWorldResourcesHarvestWorldScope(createServer: true, createClient: false);
+            var peer = new NetworkPeerId(14);
+            scope.CreateServerPlayer(peer, Vector3.zero);
+            var placement = CreatePlacement(107, new Vector3(2f, 0f, 0f));
+            scope.RegisterServerPlacement(placement);
+
+            var firstCount = RunServerCommand(peer, CreateCommand(placement.PlacementId, placement.Position), out _);
+            scope.AdvanceSimulationSeconds(0.4f);
+            var secondCount = RunServerCommand(peer, CreateCommand(placement.PlacementId, placement.Position), out _);
+
+            Assert.That(firstCount, Is.EqualTo(1));
+            Assert.That(secondCount, Is.EqualTo(1));
+            Assert.That(SW.GetResource<OpenWorldChunkOverlayStore>().TryGetResource(placement.PlacementId, out var state), Is.True);
+            Assert.That(state.RemainingAmount, Is.EqualTo(6));
+        }
+
+        [Test]
+        public void ServerCommand_ClientHitPointInsideRange_EmitsAuthoritativePlacementPosition()
+        {
+            using var scope = new OpenWorldResourcesHarvestWorldScope(createServer: true, createClient: false);
+            var peer = new NetworkPeerId(15);
+            scope.CreateServerPlayer(peer, Vector3.zero);
+            var placement = CreatePlacement(108, new Vector3(2.25f, 0f, 0f));
+            scope.RegisterServerPlacement(placement);
+
+            var count = RunServerCommand(peer, CreateCommand(placement.PlacementId, new Vector3(3.5f, 0f, 0f)), out var harvested);
+
+            Assert.That(count, Is.EqualTo(1));
+            Assert.That(harvested.HitPointXQ, Is.EqualTo(225));
+            Assert.That(harvested.HitPointYQ, Is.EqualTo(0));
+            Assert.That(harvested.HitPointZQ, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ServerCommand_DepletedResource_CreatesHazardDamageEffect()
+        {
+            using var scope = new OpenWorldResourcesHarvestWorldScope(createServer: true, createClient: false);
+            var peer = new NetworkPeerId(16);
+            scope.CreateServerPlayer(peer, Vector3.zero);
+            var placement = CreatePlacement(109, new Vector3(2f, 0f, 0f));
+            scope.RegisterServerPlacement(placement);
+            var target = scope.CreateServerCharacterWithHealth(new Vector3(2.5f, 0f, 0f), current: 100f, max: 100f);
+            Assert.That(SW.GetResource<OpenWorldChunkOverlayStore>().TryApplyResourceState(placement.ChunkId, new OpenWorldResourceOverlayState
+            {
+                PlacementId = placement.PlacementId,
+                KindIdValue = placement.KindId.Value,
+                RemainingAmount = 1,
+                Flags = OpenWorldResourceOverlayFlags.None
+            }), Is.True);
+
+            var hazardSystem = new ServerOpenWorldResourceHazardSystem();
+            hazardSystem.Init();
+            try
+            {
+                var count = RunServerCommand(peer, CreateCommand(placement.PlacementId, placement.Position), out var harvested);
+                hazardSystem.Update();
+
+                Assert.That(count, Is.EqualTo(1));
+                Assert.That(harvested.WasDepleted, Is.True);
+                Assert.That(CountDamageEffectsFor(target.GID), Is.EqualTo(1));
+            }
+            finally
+            {
+                hazardSystem.Destroy();
+            }
         }
 
         [Test]
@@ -222,6 +313,18 @@ namespace StaticMlp.Tests.OpenWorldResources
             };
         }
 
+        private static int CountDamageEffectsFor(EntityGID targetGid)
+        {
+            var count = 0;
+            foreach (var effect in SW.Query<All<DamageEffectTag, EffectTarget>>().Entities())
+            {
+                if (effect.Read<EffectTarget>().Value.Equals(targetGid))
+                    count++;
+            }
+
+            return count;
+        }
+
         private sealed class OpenWorldResourcesHarvestWorldScope : IDisposable
         {
             public OpenWorldResourcesHarvestWorldScope(bool createServer, bool createClient)
@@ -256,6 +359,30 @@ namespace StaticMlp.Tests.OpenWorldResources
                     Position = position,
                     Rotation = Quaternion.identity
                 });
+            }
+
+            public SW.Entity CreateServerCharacterWithHealth(Vector3 position, float current, float max)
+            {
+                var entity = SW.NewEntity<Default>();
+                entity.Set(new CharacterNetState
+                {
+                    Position = position,
+                    Rotation = Quaternion.identity
+                });
+                entity.Set(new Health
+                {
+                    Current = current,
+                    Max = max
+                });
+                return entity;
+            }
+
+            public void AdvanceSimulationSeconds(float seconds)
+            {
+                var simulationTime = SW.GetResource<SimulationTime>();
+                var ticks = simulationTime.SecondsToTicks(seconds);
+                simulationTime.ServerTick += ticks;
+                simulationTime.ElapsedSeconds += ticks * simulationTime.FixedStepSeconds;
             }
 
             public void RegisterServerPlacement(ResourcePlacement placement)
@@ -337,6 +464,8 @@ namespace StaticMlp.Tests.OpenWorldResources
                 SW.Types().RegisterAll(
                     typeof(ServerWT).Assembly,
                     typeof(CharacterNetState).Assembly,
+                    typeof(EffectTag).Assembly,
+                    typeof(Health).Assembly,
                     typeof(OpenWorldResourceTargetState).Assembly,
                     typeof(OpenWorldResourcesGameplayFeature).Assembly);
                 NetworkEventRegistry.RegisterServerWorldTypes();
@@ -344,6 +473,11 @@ namespace StaticMlp.Tests.OpenWorldResources
 
                 var dirtyQueue = new OpenWorldChunkOverlayDirtyQueue();
                 SW.SetResource(new NetInbox());
+                SW.SetResource(new SimulationTime
+                {
+                    FixedStepSeconds = 1f / 30f
+                });
+                SW.SetResource(new CombatDebugLogBuffer());
                 SW.SetResource(new OpenWorldPlacementIndexStore());
                 SW.SetResource(new OpenWorldChunkOverlayStore(dirtyQueue));
                 SW.SetResource(dirtyQueue);

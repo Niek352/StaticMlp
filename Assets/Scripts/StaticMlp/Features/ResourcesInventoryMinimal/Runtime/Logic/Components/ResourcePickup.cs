@@ -26,6 +26,9 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         [ReplicatedField(Quantize = 0.01f)]
         public Vector3 Position;
 
+        [ReplicatedField(AllowZeroEntityGid = true)]
+        public EntityGID CollectorPlayer;
+
         [ReplicatedField]
         public bool IsPickedUp;
 
@@ -34,7 +37,12 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         public void Validate()
         {
             if (IsPickedUp)
+            {
+                if (CollectorPlayer.Equals(default(EntityGID)))
+                    throw new InvalidOperationException($"{nameof(ResourcePickup)} resource id {ResourceId} was picked up without a collector.");
+
                 return;
+            }
 
             if (ResourceId == 0)
                 throw new InvalidOperationException($"{nameof(ResourcePickup)} has no resource id.");
@@ -58,6 +66,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             writer.WriteUshort(ResourceId);
             writer.WriteInt(Amount);
             writer.WriteFloat(Position.x, Position.y, Position.z);
+            writer.WriteUlong(CollectorPlayer.Raw);
             writer.WriteBool(IsPickedUp);
         }
 
@@ -67,6 +76,8 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             ResourceId = reader.ReadUshort();
             Amount = reader.ReadInt();
             Position = new Vector3(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());
+            var collectorPlayerRaw = reader.ReadUlong();
+            CollectorPlayer = collectorPlayerRaw == 0ul ? default : new EntityGID(collectorPlayerRaw);
             IsPickedUp = reader.ReadBool();
             Validate();
         }

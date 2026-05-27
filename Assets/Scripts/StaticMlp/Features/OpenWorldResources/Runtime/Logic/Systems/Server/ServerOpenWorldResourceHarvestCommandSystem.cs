@@ -1,5 +1,6 @@
 using System;
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Systems.Server;
 using StaticMlp.Networking;
@@ -12,6 +13,7 @@ namespace StaticMlp.Features.OpenWorldResources
     {
         private const float HIT_POINT_QUANTIZATION = 0.01f;
         private const float HARVEST_INTERACTION_RANGE = 4f;
+        private const float HARVEST_COOLDOWN_SECONDS = 0.4f;
         private const ushort DEFAULT_TOOL_ID = 0;
 
         private EventReceiver<ServerWT, NetworkEventFromClient<TryHarvestOpenWorldResourceCommand>> _requests;
@@ -30,15 +32,17 @@ namespace StaticMlp.Features.OpenWorldResources
         {
             var placementIndex = SW.GetResource<OpenWorldPlacementIndexStore>();
             var overlayStore = SW.GetResource<OpenWorldChunkOverlayStore>();
+            var simulationTime = SW.GetResource<SimulationTime>();
 
             foreach (var request in _requests)
-                Handle(in request.Value, placementIndex, overlayStore);
+                Handle(in request.Value, placementIndex, overlayStore, simulationTime);
         }
 
         private static void Handle(
             in NetworkEventFromClient<TryHarvestOpenWorldResourceCommand> request,
             OpenWorldPlacementIndexStore placementIndex,
-            OpenWorldChunkOverlayStore overlayStore)
+            OpenWorldChunkOverlayStore overlayStore,
+            SimulationTime simulationTime)
         {
             var command = request.Value;
             if (command.ToolId != DEFAULT_TOOL_ID)
@@ -64,6 +68,10 @@ namespace StaticMlp.Features.OpenWorldResources
                 || !IsInRange(playerPosition, hitPoint))
                 return;
 
+            if (player.Has<OpenWorldResourceHarvestCooldownState>()
+                && simulationTime.ServerTick < player.Read<OpenWorldResourceHarvestCooldownState>().NextHarvestTick)
+                return;
+
             var currentState = overlayStore.GetEffectiveResourceState(placement);
             if (!IsActive(currentState))
                 return;
@@ -77,16 +85,29 @@ namespace StaticMlp.Features.OpenWorldResources
             if (!overlayStore.TryApplyResourceState(chunkId, nextState))
                 throw new InvalidOperationException($"Resource harvest for placement {command.PlacementId} did not change overlay state.");
 
+            SetCooldown(player, simulationTime);
+            var authoritativeHitPoint = QuantizeWorldPosition(placement.Position);
             SW.SendEvent(new OpenWorldResourceHarvestedEvent
             {
                 SourcePlayer = player.GID,
                 PlacementId = command.PlacementId,
                 Resource = harvestedResource,
-                HitPointXQ = command.HitPointXQ,
-                HitPointYQ = command.HitPointYQ,
-                HitPointZQ = command.HitPointZQ,
+                HitPointXQ = authoritativeHitPoint.x,
+                HitPointYQ = authoritativeHitPoint.y,
+                HitPointZQ = authoritativeHitPoint.z,
                 WasDepleted = wasDepleted
             });
+
+            if (wasDepleted)
+            {
+                SW.SendEvent(new OpenWorldResourceDepletionHazardEvent
+                {
+                    SourcePlayer = player.GID,
+                    PlacementId = placement.PlacementId,
+                    KindId = placement.KindId,
+                    Origin = placement.Position
+                });
+            }
         }
 
         private static bool IsActive(OpenWorldResourceOverlayState state)
@@ -107,6 +128,29 @@ namespace StaticMlp.Features.OpenWorldResources
                 command.HitPointXQ * HIT_POINT_QUANTIZATION,
                 command.HitPointYQ * HIT_POINT_QUANTIZATION,
                 command.HitPointZQ * HIT_POINT_QUANTIZATION);
+        }
+
+        private static (int x, int y, int z) QuantizeWorldPosition(Vector3 position)
+        {
+            return (
+                Mathf.RoundToInt(position.x / HIT_POINT_QUANTIZATION),
+                Mathf.RoundToInt(position.y / HIT_POINT_QUANTIZATION),
+                Mathf.RoundToInt(position.z / HIT_POINT_QUANTIZATION));
+        }
+
+        private static void SetCooldown(SW.Entity player, SimulationTime simulationTime)
+        {
+            var deadline = simulationTime.DeadlineAfter(HARVEST_COOLDOWN_SECONDS);
+            if (player.Has<OpenWorldResourceHarvestCooldownState>())
+            {
+                player.Mut<OpenWorldResourceHarvestCooldownState>().NextHarvestTick = deadline;
+                return;
+            }
+
+            player.Set(new OpenWorldResourceHarvestCooldownState
+            {
+                NextHarvestTick = deadline
+            });
         }
 
         private static bool IsInRange(Vector3 sourcePosition, Vector3 targetPosition)

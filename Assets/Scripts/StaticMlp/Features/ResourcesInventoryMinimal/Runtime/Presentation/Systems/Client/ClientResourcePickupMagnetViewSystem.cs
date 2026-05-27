@@ -2,7 +2,6 @@ using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Components;
 using StaticMlp.Game.Presentation;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Ownership;
 using UnityEngine;
 
 namespace StaticMlp.Features.ResourcesInventoryMinimal
@@ -13,9 +12,6 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
 
         public void Update()
         {
-            if (!TryGetLocalPlayerPosition(out var playerPosition))
-                return;
-
             var config = CW.GetResource<ResourcesInventoryConfig>();
             var step = config.PickupMagnetSpeed * Time.deltaTime;
 
@@ -34,9 +30,12 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
                 }
                 else if (!isConsumed)
                 {
-                    viewTransform.RenderPosition = Vector3.MoveTowards(viewTransform.RenderPosition, playerPosition, step);
-                    isConsumed = (viewTransform.RenderPosition - playerPosition).sqrMagnitude
-                                 <= VISUAL_CONSUME_DISTANCE * VISUAL_CONSUME_DISTANCE;
+                    if (TryGetCollectorPosition(pickupState.CollectorPlayer, out var collectorPosition))
+                    {
+                        viewTransform.RenderPosition = Vector3.MoveTowards(viewTransform.RenderPosition, collectorPosition, step);
+                        isConsumed = (viewTransform.RenderPosition - collectorPosition).sqrMagnitude
+                                     <= VISUAL_CONSUME_DISTANCE * VISUAL_CONSUME_DISTANCE;
+                    }
                 }
                 // When not magnetized: leave RenderPosition as-is.
                 // Initial position is set on spawn by ClientResourcePickupViewBindSystem.
@@ -48,19 +47,23 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             }
         }
 
-        private static bool TryGetLocalPlayerPosition(out Vector3 position)
+        private static bool TryGetCollectorPosition(EntityGID collectorPlayer, out Vector3 position)
         {
-            // Prefer the smoothed render position; it stays current even while standing still.
-            foreach (var player in CW.Query<All<LocalOwned, PlayerTag, ViewTransform>>().Entities())
+            if (collectorPlayer.Equals(default(EntityGID)) || !collectorPlayer.TryUnpack<ClientCoreWT>(out var collector))
             {
-                position = player.Read<ViewTransform>().RenderPosition;
+                position = default;
+                return false;
+            }
+
+            if (collector.Has<ViewTransform>())
+            {
+                position = collector.Read<ViewTransform>().RenderPosition;
                 return true;
             }
 
-            // Fallback: authoritative network position if ViewTransform not yet available.
-            foreach (var player in CW.Query<All<LocalOwned, PlayerTag, CharacterNetState>>().Entities())
+            if (collector.Has<CharacterNetState>())
             {
-                position = player.Read<CharacterNetState>().Position;
+                position = collector.Read<CharacterNetState>().Position;
                 return true;
             }
 

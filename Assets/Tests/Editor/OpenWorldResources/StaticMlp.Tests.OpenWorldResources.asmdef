@@ -12,7 +12,9 @@
         "StaticMlp.Features.OpenWorldResources",
         "StaticMlp.Features.OpenWorldResources.Presentation",
         "StaticMlp.Features.EcsViews",
-        "StaticMlp.Generated"
+        "StaticMlp.Generated",
+        "StaticMlp.Features.Effects.Logic",
+        "StaticMlp.Features.Shared.Logic"
     ],
     "includePlatforms": [
         "Editor"

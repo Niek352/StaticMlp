@@ -1,25 +1,26 @@
 using FFS.Libraries.StaticEcs;
+using StaticMlp.Game;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Replication;
-using UnityEngine;
 
 namespace StaticMlp.Features.ResourcesInventoryMinimal
 {
     /// <summary>
-    /// Counts down <see cref="ResourcePickupDespawnTimer"/> and despawns the entity
-    /// once the timer expires, giving the client enough time to play the magnet animation.
+    /// Despawns collected pickup entities when their server tick deadline expires,
+    /// giving the client enough time to play the magnet animation.
     /// </summary>
     public sealed class ServerResourcePickupCleanupSystem : ISystem
     {
         public void Update()
         {
+            var currentTick = SW.GetResource<SimulationTime>().ServerTick;
             foreach (var entity in SW.Query<All<ResourcePickupDespawnTimer>>().Entities())
             {
-                ref var timer = ref entity.Mut<ResourcePickupDespawnTimer>();
-                timer.RemainingSeconds -= Time.deltaTime;
+                ref readonly var timer = ref entity.Read<ResourcePickupDespawnTimer>();
+                if (currentTick < timer.DespawnAtTick)
+                    continue;
 
-                if (timer.RemainingSeconds <= 0f)
-                    NetworkEntityDespawner.DespawnAndDestroy(entity);
+                NetworkEntityDespawner.DespawnAndDestroy(entity);
             }
         }
     }

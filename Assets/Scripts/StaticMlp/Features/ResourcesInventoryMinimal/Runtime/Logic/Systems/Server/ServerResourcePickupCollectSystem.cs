@@ -1,5 +1,6 @@
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Settlement;
+using StaticMlp.Game;
 using StaticMlp.Game.Components;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Ownership;
@@ -15,6 +16,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         public void Update()
         {
             var config = SW.GetResource<ResourcesInventoryConfig>();
+            var simulationTime = SW.GetResource<SimulationTime>();
             var radiusSq = config.PickupCollectionRadius * config.PickupCollectionRadius;
 
             foreach (var pickup in SW.Query<All<ServerOwned, ResourcePickupTag, ResourcePickup, ResourcePickupSource>, None<ResourcePickupDespawnTimer>>().Entities())
@@ -41,10 +43,14 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
                 }
 
                 // Fully collected: mark as picked up and schedule delayed despawn.
-                // Do NOT despawn immediately — the client needs time to play the magnet animation.
+                // Do not despawn immediately; the client needs time to play the magnet animation.
                 ref var collectedPickup = ref ReplicationMut.Mut<ResourcePickup>(pickup);
+                collectedPickup.CollectorPlayer = collector.GID;
                 collectedPickup.IsPickedUp = true;
-                pickup.Set(new ResourcePickupDespawnTimer { RemainingSeconds = DESPAWN_DELAY_SECONDS });
+                pickup.Set(new ResourcePickupDespawnTimer
+                {
+                    DespawnAtTick = simulationTime.DeadlineAfter(DESPAWN_DELAY_SECONDS)
+                });
             }
         }
 
