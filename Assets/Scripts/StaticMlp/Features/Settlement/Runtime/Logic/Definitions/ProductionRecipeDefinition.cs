@@ -9,6 +9,7 @@ namespace StaticMlp.Features.Settlement
         public readonly ResourceAmount[] Outputs;
         public readonly float WorkRequired;
         public readonly ResourceAmount? FuelRequirement;
+        public readonly UnlockRequirement UnlockRequirement;
 
         public ProductionRecipeDefinition(
             ProductionStationId stationId,
@@ -17,7 +18,8 @@ namespace StaticMlp.Features.Settlement
             ResourceAmount[] inputs,
             ResourceAmount[] outputs,
             float workRequired,
-            ResourceAmount? fuelRequirement = null)
+            ResourceAmount? fuelRequirement = null,
+            UnlockRequirement unlockRequirement = default)
         {
             StationId = stationId;
             Id = id;
@@ -26,6 +28,7 @@ namespace StaticMlp.Features.Settlement
             Outputs = outputs;
             WorkRequired = workRequired;
             FuelRequirement = fuelRequirement;
+            UnlockRequirement = unlockRequirement;
         }
     }
 }

@@ -51,6 +51,13 @@ namespace StaticMlp.Features.Settlement
         {
             ResourceCatalogValidator.Validate(ResourceCatalog.All);
             SW.SetResource(new SettlementSharedResourcesFactory());
+            SW.SetResource(new SettlementProgressionState { SettlementLevel = 1 });
+            SW.SetResource(new SettlementUnlockState());
+        }
+
+        public override void RegisterClientResources()
+        {
+            CW.SetResource(new SettlementProgressionState { SettlementLevel = 1 });
         }
 
         public override void RegisterServerSystems(ServerSystemsBuilder systems)

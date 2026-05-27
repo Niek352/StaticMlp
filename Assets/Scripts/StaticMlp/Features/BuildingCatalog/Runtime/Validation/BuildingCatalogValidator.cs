@@ -52,6 +52,7 @@ namespace StaticMlp.Features.BuildingCatalog
                 ValidateInteractions(in definition);
                 ValidateProfiles(in definition);
                 ValidateOperationOutput(in definition);
+                ValidateUnlockRequirement(in definition);
             }
         }
 
@@ -124,6 +125,46 @@ namespace StaticMlp.Features.BuildingCatalog
             if (definition.Capabilities.HasFlag(BuildingCapabilityFlags.SupportsNpcInteraction)
                 && !definition.NpcProfile.IsDefined)
                 throw new InvalidOperationException($"Building id {definition.Id.Value} supports NPC interaction without an NPC profile.");
+        }
+
+        private static void ValidateUnlockRequirement(in BuildingDefinition definition)
+        {
+            var requirement = definition.UnlockRequirement;
+
+            switch (requirement.Kind)
+            {
+                case UnlockRequirementKind.None:
+                    return;
+
+                case UnlockRequirementKind.SettlementLevel:
+                    if (requirement.IntParameter <= 0)
+                        throw new InvalidOperationException(
+                            $"Building id {definition.Id.Value} has SettlementLevel unlock requirement with non-positive level {requirement.IntParameter}.");
+                    return;
+
+                case UnlockRequirementKind.BuildingConstructed:
+                    if (requirement.IntParameter <= 0)
+                        throw new InvalidOperationException(
+                            $"Building id {definition.Id.Value} has BuildingConstructed unlock requirement with invalid building id {requirement.IntParameter}.");
+
+                    var targetId = new BuildingId((ushort)requirement.IntParameter);
+                    if (!IsValidUnlockBuildingReference(definition.Id, targetId))
+                        throw new InvalidOperationException(
+                            $"Building id {definition.Id.Value} references unknown building id {targetId.Value} in its BuildingConstructed unlock requirement.");
+                    return;
+
+                default:
+                    throw new InvalidOperationException(
+                        $"Building id {definition.Id.Value} has unknown unlock requirement kind {requirement.Kind}.");
+            }
+        }
+
+        private static bool IsValidUnlockBuildingReference(BuildingId selfId, BuildingId targetId)
+        {
+            if (targetId.Value == 0 || targetId == selfId)
+                return false;
+
+            return BuildingCatalogData.TryGet(targetId, out _);
         }
 
         private static void ValidateOperationOutput(in BuildingDefinition definition)

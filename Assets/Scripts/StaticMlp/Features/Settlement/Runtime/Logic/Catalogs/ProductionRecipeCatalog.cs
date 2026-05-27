@@ -105,6 +105,7 @@ namespace StaticMlp.Features.Settlement
                 ValidateAmounts(definition.Id, definition.Inputs, "input", ResourceUsageFlags.ProductionInput);
                 ValidateAmounts(definition.Id, definition.Outputs, "output", ResourceUsageFlags.ProductionOutput);
                 ValidateFuel(definition);
+                ValidateUnlockRequirement(in definition);
             }
         }
 
@@ -154,6 +155,38 @@ namespace StaticMlp.Features.Settlement
                     throw new InvalidOperationException(
                         $"Production recipe id {definition.Id.Value} uses resource id {fuel.Id.Value} as both input and fuel.");
                 }
+            }
+        }
+
+        private static void ValidateUnlockRequirement(in ProductionRecipeDefinition definition)
+        {
+            var requirement = definition.UnlockRequirement;
+
+            switch (requirement.Kind)
+            {
+                case BuildingCatalog.UnlockRequirementKind.None:
+                    return;
+
+                case BuildingCatalog.UnlockRequirementKind.SettlementLevel:
+                    if (requirement.IntParameter <= 0)
+                        throw new InvalidOperationException(
+                            $"Production recipe id {definition.Id.Value} has SettlementLevel unlock requirement with non-positive level {requirement.IntParameter}.");
+                    return;
+
+                case BuildingCatalog.UnlockRequirementKind.BuildingConstructed:
+                    if (requirement.IntParameter <= 0)
+                        throw new InvalidOperationException(
+                            $"Production recipe id {definition.Id.Value} has BuildingConstructed unlock requirement with invalid building id {requirement.IntParameter}.");
+
+                    var targetId = new BuildingCatalog.BuildingId((ushort)requirement.IntParameter);
+                    if (!BuildingCatalog.BuildingCatalogData.TryGet(targetId, out _))
+                        throw new InvalidOperationException(
+                            $"Production recipe id {definition.Id.Value} references unknown building id {targetId.Value} in its BuildingConstructed unlock requirement.");
+                    return;
+
+                default:
+                    throw new InvalidOperationException(
+                        $"Production recipe id {definition.Id.Value} has unknown unlock requirement kind {requirement.Kind}.");
             }
         }
     }

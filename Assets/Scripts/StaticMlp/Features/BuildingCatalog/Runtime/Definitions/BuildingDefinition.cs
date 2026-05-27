@@ -16,6 +16,7 @@ namespace StaticMlp.Features.BuildingCatalog
         public readonly float BuildWorkRequired;
         public readonly BuildingInteractionDefinition[] Interactions;
         public readonly BuildingNpcProfileDefinition NpcProfile;
+        public readonly UnlockRequirement UnlockRequirement;
         public readonly BuildingOperationDefinition Operation;
 
         public BuildingDefinition(
@@ -30,7 +31,8 @@ namespace StaticMlp.Features.BuildingCatalog
             float buildWorkRequired,
             BuildingInteractionDefinition[] interactions,
             BuildingNpcProfileDefinition npcProfile,
-            BuildingOperationDefinition operation)
+            BuildingOperationDefinition operation,
+            UnlockRequirement unlockRequirement = default)
         {
             Id = id;
             Code = code;
@@ -43,6 +45,7 @@ namespace StaticMlp.Features.BuildingCatalog
             BuildWorkRequired = buildWorkRequired;
             Interactions = interactions;
             NpcProfile = npcProfile;
+            UnlockRequirement = unlockRequirement;
             Operation = operation;
         }
 
