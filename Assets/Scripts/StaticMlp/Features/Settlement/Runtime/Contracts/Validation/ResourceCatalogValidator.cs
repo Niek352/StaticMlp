@@ -22,6 +22,9 @@ namespace StaticMlp.Features.Settlement
                 if (definition.Family == ResourceFamily.None)
                     throw new InvalidOperationException($"Settlement resource id {definition.Id.Value} has no resource family.");
 
+                if (definition.Usage == ResourceUsageFlags.None)
+                    throw new InvalidOperationException($"Settlement resource id {definition.Id.Value} has no resource usage flags.");
+
                 if (definition.IsSettlementStored && definition.StartingSettlementAmount < 0)
                 {
                     throw new InvalidOperationException(

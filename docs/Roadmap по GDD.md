@@ -31,6 +31,8 @@ _Status:_ **Completed (Unity verification pending)** - the Phase 1 source path n
 
 _Status:_ Only the building interaction UX and resource overlay exist. Crafting stations, resource flows, bartering and economy sinks remain to be implemented.
 
+_Ownership note:_ `Settlement.Contracts owns resource ids` and storage contracts; `OpenWorldResources` owns node placement, overlay state and harvest metadata; `ResourcesInventoryMinimal` owns carried raw inventory. Economy cross-feature mutations must go through typed events or requests.
+
 ## Phase 3 – Settlement & NPC Systems
 
 1.  **Recruitment & acquisition**: Implement varied ways to recruit NPCs – rescue missions, duels/trials, destroying cursed objects, comfort‑based lures, production‑based spawning, persuasion, artificial companions and boss rewards.

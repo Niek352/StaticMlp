@@ -48,6 +48,23 @@ namespace StaticMlp.Tests.Settlement
         }
 
         [Test]
+        public void Validate_MissingUsage_Throws()
+        {
+            var definitions = new[]
+            {
+                new ResourceDefinition(
+                    new ResourceId(1),
+                    "Broken",
+                    ResourceFamily.Raw,
+                    ResourceUsageFlags.None,
+                    isSettlementStored: true,
+                    startingSettlementAmount: 0)
+            };
+
+            Assert.Throws<InvalidOperationException>(() => ResourceCatalogValidator.Validate(definitions));
+        }
+
+        [Test]
         public void Validate_MissingDisplayName_Throws()
         {
             var definitions = new[]
@@ -68,7 +85,7 @@ namespace StaticMlp.Tests.Settlement
         public void Validate_CurrentCatalog_DoesNotThrowAndCoversDesignLockFamilies()
         {
             Assert.DoesNotThrow(() => ResourceCatalogValidator.Validate(ResourceCatalog.All));
-            Assert.That(ResourceCatalog.All.Count, Is.EqualTo(9));
+            Assert.That(ResourceCatalog.All.Count, Is.EqualTo(13));
 
             AssertResource(ResourceCatalog.WoodId, ResourceFamily.Raw, ResourceUsageFlags.Construction, 50);
             AssertResource(ResourceCatalog.StoneId, ResourceFamily.Raw, ResourceUsageFlags.Construction, 25);
@@ -79,6 +96,10 @@ namespace StaticMlp.Tests.Settlement
             AssertResource(ResourceCatalog.FuelId, ResourceFamily.Flow, ResourceUsageFlags.Fuel, 0);
             AssertResource(ResourceCatalog.ResearchDataId, ResourceFamily.Progression, ResourceUsageFlags.Progression, 0);
             AssertResource(ResourceCatalog.MedicineId, ResourceFamily.Stability, ResourceUsageFlags.Upkeep, 0);
+            AssertResource(ResourceCatalog.OreId, ResourceFamily.Raw, ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.ProductionInput | ResourceUsageFlags.ProductionOutput, 0);
+            AssertResource(ResourceCatalog.ResinId, ResourceFamily.Raw, ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.ProductionInput | ResourceUsageFlags.ProductionOutput, 0);
+            AssertResource(ResourceCatalog.SporesId, ResourceFamily.Raw, ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.ProductionInput | ResourceUsageFlags.ProductionOutput, 0);
+            AssertResource(ResourceCatalog.IngotsId, ResourceFamily.Refined, ResourceUsageFlags.Construction | ResourceUsageFlags.Repair | ResourceUsageFlags.ProductionInput | ResourceUsageFlags.ProductionOutput, 0);
 
             var families = new HashSet<ResourceFamily>();
             for (var i = 0; i < ResourceCatalog.All.Count; i++)

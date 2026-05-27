@@ -11,6 +11,21 @@ namespace StaticMlp.Features.OpenWorldResources
             return OpenWorldResourceHarvestCatalog.Get(kindId).StartingAmount;
         }
 
+        public static int Armor(ResourcePlacementKindId kindId)
+        {
+            return OpenWorldResourceHarvestCatalog.Get(kindId).Armor;
+        }
+
+        public static int ResistancePercent(ResourcePlacementKindId kindId)
+        {
+            return OpenWorldResourceHarvestCatalog.Get(kindId).ResistancePercent;
+        }
+
+        public static OpenWorldResourceHarvestTag PreferredHarvestTags(ResourcePlacementKindId kindId)
+        {
+            return OpenWorldResourceHarvestCatalog.Get(kindId).PreferredHarvestTags;
+        }
+
         internal static bool IsDepleted(OpenWorldResourceOverlayState state)
         {
             return (state.Flags & OpenWorldResourceOverlayFlags.Depleted) != 0;

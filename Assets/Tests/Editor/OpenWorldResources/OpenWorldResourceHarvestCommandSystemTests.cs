@@ -4,6 +4,7 @@ using NUnit.Framework;
 using StaticMlp.Features.Effects;
 using StaticMlp.Features.OpenWorldGeneration;
 using StaticMlp.Features.OpenWorldResources;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Features.Shared;
 using StaticMlp.Game;
 using StaticMlp.Game.Components;
@@ -34,12 +35,33 @@ namespace StaticMlp.Tests.OpenWorldResources
             Assert.That(harvested.HitPointXQ, Is.EqualTo(200));
             Assert.That(harvested.HitPointYQ, Is.EqualTo(0));
             Assert.That(harvested.HitPointZQ, Is.EqualTo(0));
+            Assert.That(harvested.Resource.Id, Is.EqualTo(ResourceCatalog.OreId));
+            Assert.That(harvested.Resource.Amount, Is.EqualTo(1));
             Assert.That(harvested.WasDepleted, Is.False);
 
             var overlayStore = SW.GetResource<OpenWorldChunkOverlayStore>();
             Assert.That(overlayStore.TryGetResource(placement.PlacementId, out var state), Is.True);
             Assert.That(state.RemainingAmount, Is.EqualTo(7));
             Assert.That(state.Flags, Is.EqualTo(OpenWorldResourceOverlayFlags.None));
+        }
+
+        [TestCase((ushort)1, (ushort)1)]
+        [TestCase((ushort)2, (ushort)10)]
+        [TestCase((ushort)3, (ushort)12)]
+        [TestCase((ushort)4, (ushort)11)]
+        public void ServerCommand_ProfileKind_EmitsConfiguredHarvestResource(ushort kindId, ushort expectedResourceId)
+        {
+            using var scope = new OpenWorldResourcesHarvestWorldScope(createServer: true, createClient: false);
+            var peer = new NetworkPeerId(17);
+            scope.CreateServerPlayer(peer, Vector3.zero);
+            var placement = CreatePlacement(110 + kindId, new Vector3(2f, 0f, 0f), kindId);
+            scope.RegisterServerPlacement(placement);
+
+            var count = RunServerCommand(peer, CreateCommand(placement.PlacementId, placement.Position), out var harvested);
+
+            Assert.That(count, Is.EqualTo(1));
+            Assert.That(harvested.Resource.Id, Is.EqualTo(new ResourceId(expectedResourceId)));
+            Assert.That(harvested.Resource.Amount, Is.EqualTo(1));
         }
 
         [Test]
@@ -290,11 +312,11 @@ namespace StaticMlp.Tests.OpenWorldResources
             return count;
         }
 
-        private static ResourcePlacement CreatePlacement(long placementId, Vector3 position)
+        private static ResourcePlacement CreatePlacement(long placementId, Vector3 position, ushort kindId = 2)
         {
             return new ResourcePlacement(
                 placementId,
-                new ResourcePlacementKindId(2),
+                new ResourcePlacementKindId(kindId),
                 new WorldChunkId(1, 2),
                 position,
                 0f,

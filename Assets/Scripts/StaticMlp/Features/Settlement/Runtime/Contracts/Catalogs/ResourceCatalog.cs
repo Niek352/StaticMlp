@@ -14,6 +14,10 @@ namespace StaticMlp.Features.Settlement
         public static readonly ResourceId FuelId = new(7);
         public static readonly ResourceId ResearchDataId = new(8);
         public static readonly ResourceId MedicineId = new(9);
+        public static readonly ResourceId OreId = new(10);
+        public static readonly ResourceId ResinId = new(11);
+        public static readonly ResourceId SporesId = new(12);
+        public static readonly ResourceId IngotsId = new(13);
 
         private static readonly ResourceDefinition[] Definitions =
         {
@@ -78,6 +82,34 @@ namespace StaticMlp.Features.Settlement
                 "Medicine",
                 ResourceFamily.Stability,
                 ResourceUsageFlags.Upkeep | ResourceUsageFlags.ProductionOutput,
+                isSettlementStored: true,
+                startingSettlementAmount: 0),
+            new(
+                OreId,
+                "Ore",
+                ResourceFamily.Raw,
+                ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.ProductionInput | ResourceUsageFlags.ProductionOutput,
+                isSettlementStored: true,
+                startingSettlementAmount: 0),
+            new(
+                ResinId,
+                "Resin",
+                ResourceFamily.Raw,
+                ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.ProductionInput | ResourceUsageFlags.ProductionOutput,
+                isSettlementStored: true,
+                startingSettlementAmount: 0),
+            new(
+                SporesId,
+                "Spores",
+                ResourceFamily.Raw,
+                ResourceUsageFlags.ExpeditionReward | ResourceUsageFlags.ProductionInput | ResourceUsageFlags.ProductionOutput,
+                isSettlementStored: true,
+                startingSettlementAmount: 0),
+            new(
+                IngotsId,
+                "Ingots",
+                ResourceFamily.Refined,
+                ResourceUsageFlags.Construction | ResourceUsageFlags.Repair | ResourceUsageFlags.ProductionInput | ResourceUsageFlags.ProductionOutput,
                 isSettlementStored: true,
                 startingSettlementAmount: 0)
         };

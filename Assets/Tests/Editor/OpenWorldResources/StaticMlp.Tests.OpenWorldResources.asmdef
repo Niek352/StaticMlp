@@ -11,6 +11,7 @@
         "StaticMlp.Features.OpenWorldResources.Contracts",
         "StaticMlp.Features.OpenWorldResources",
         "StaticMlp.Features.OpenWorldResources.Presentation",
+        "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.EcsViews",
         "StaticMlp.Generated",
         "StaticMlp.Features.Effects.Logic",

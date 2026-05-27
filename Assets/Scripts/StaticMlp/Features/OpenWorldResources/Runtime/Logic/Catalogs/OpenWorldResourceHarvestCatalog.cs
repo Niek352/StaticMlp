@@ -8,8 +8,38 @@ namespace StaticMlp.Features.OpenWorldResources
     {
         private static readonly OpenWorldResourceHarvestDefinition[] Definitions =
         {
-            new(new ResourcePlacementKindId(1), 5, 1, new ResourceAmount(ResourceCatalog.WoodId, 1)),
-            new(new ResourcePlacementKindId(2), 8, 1, new ResourceAmount(ResourceCatalog.StoneId, 1))
+            new(
+                new ResourcePlacementKindId(1),
+                5,
+                1,
+                new ResourceAmount(ResourceCatalog.WoodId, 1),
+                1,
+                10,
+                OpenWorldResourceHarvestTag.Axe),
+            new(
+                new ResourcePlacementKindId(2),
+                8,
+                1,
+                new ResourceAmount(ResourceCatalog.OreId, 1),
+                4,
+                35,
+                OpenWorldResourceHarvestTag.Blunt | OpenWorldResourceHarvestTag.Lightning),
+            new(
+                new ResourcePlacementKindId(3),
+                4,
+                1,
+                new ResourceAmount(ResourceCatalog.SporesId, 1),
+                0,
+                5,
+                OpenWorldResourceHarvestTag.Fire),
+            new(
+                new ResourcePlacementKindId(4),
+                6,
+                1,
+                new ResourceAmount(ResourceCatalog.ResinId, 1),
+                2,
+                20,
+                OpenWorldResourceHarvestTag.Rune | OpenWorldResourceHarvestTag.Projectile)
         };
 
         public static ref readonly OpenWorldResourceHarvestDefinition Get(ResourcePlacementKindId kindId)

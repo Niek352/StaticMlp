@@ -98,8 +98,12 @@ If `ServerOpenWorldChunkSnapshotSystem` is still high, inspect real dynamic acto
 
 ## Boundaries
 
+- `Settlement.Contracts owns resource ids` and settlement storage contracts.
+- `OpenWorldResources` owns deterministic placement indexing, overlay state, and harvest profile metadata.
+- `ResourcesInventoryMinimal` owns carried raw inventory and pickup collection.
 - `OpenWorldGeneration` owns deterministic generation and spatial chunk interest.
 - `OpenWorldResources` may read chunk interest/loading state to send overlays, but must not take ownership of terrain generation.
 - Other features must not mutate resource overlay state directly. Send typed gameplay events/commands to this feature.
+- Settlement, inventory, and open-world resource cross-feature mutations must go through typed events or requests.
 - Do not manually edit generated replication files.
 - Do not add fallbacks that silently spawn replicated resource nodes when overlay state is missing.
