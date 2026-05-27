@@ -100,7 +100,7 @@
         </ResourcesInventoryHudView>
 
         <GameObject name="Panel" id="Panel" active="false">
-            <RectTransform m_AnchorMin="1, 1" m_AnchorMax="1, 1" m_Pivot="1, 1" m_SizeDelta="384, 300" m_AnchoredPosition="-18, -18" />
+            <RectTransform m_AnchorMin="1, 1" m_AnchorMax="1, 1" m_Pivot="1, 1" m_SizeDelta="384, 300" m_AnchoredPosition="-18, -355" />
             <Image m_Color="#162329E8" m_RaycastTarget="false" />
             <VerticalLayoutGroup
                 m_Padding.m_Left="14"
