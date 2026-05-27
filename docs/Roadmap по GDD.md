@@ -29,7 +29,7 @@ _Status:_ **Completed (Unity verification pending)** - the Phase 1 source path n
 4.  **Building unlocks**: Ensure each new building expands item pools or automation. For example, the Resin Forge unlocked by rescuing the Carpenter enables resin processing.
 5.  **Trading & barter**: Design merchants and factions that exchange items for resources rather than currency.
 
-_Status:_ Resource node generation, harvest profiles, depletion hazards and client visuals now cover trees, ores, spore pods and chests. Building interaction UX, resource overlays and carried-inventory deposit into settlement stockpiles exist. Crafting stations, bartering and broader economy sinks remain to be implemented.
+_Status:_ Resource node generation, harvest profiles, depletion hazards and client visuals now cover trees, ores, spore pods and chests. Building interaction UX, resource overlays and carried-inventory deposit into settlement stockpiles exist. Settlement now has generalized production station contracts and the current Workbench recipes/state are migrated onto them. Actual recipe processing, additional station buildings, bartering and broader economy sinks remain to be implemented.
 
 _Ownership note:_ `Settlement.Contracts owns resource ids` and storage contracts; `OpenWorldResources` owns node placement, overlay state and harvest metadata; `ResourcesInventoryMinimal` owns carried raw inventory. Economy cross-feature mutations must go through typed events or requests.
 

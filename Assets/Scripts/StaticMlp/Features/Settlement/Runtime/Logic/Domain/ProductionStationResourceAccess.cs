@@ -1,15 +1,16 @@
+using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement
 {
-    public static class WorkbenchResourceAccess
+    public static class ProductionStationResourceAccess
     {
         public static int GetInput<TWorld>(World<TWorld>.Entity entity, ResourceId resourceId)
             where TWorld : struct, IWorldType
         {
             ResourceCatalog.Get(resourceId);
-            ref readonly var rows = ref entity.Ref<World<TWorld>.Multi<WorkbenchInputResource>>();
+            ref readonly var rows = ref entity.Ref<World<TWorld>.Multi<ProductionStationInputResource>>();
             var index = FindInputIndex(in rows, resourceId);
             return index < 0 ? 0 : rows[index].Amount;
         }
@@ -18,27 +19,35 @@ namespace StaticMlp.Features.Settlement
             where TWorld : struct, IWorldType
         {
             ResourceCatalog.Get(resourceId);
-            ref readonly var rows = ref entity.Ref<World<TWorld>.Multi<WorkbenchOutputResource>>();
+            ref readonly var rows = ref entity.Ref<World<TWorld>.Multi<ProductionStationOutputResource>>();
             var index = FindOutputIndex(in rows, resourceId);
             return index < 0 ? 0 : rows[index].Amount;
         }
 
-        public static void InitializeRows(SW.Entity entity)
+        public static void InitializeRows(SW.Entity entity, ProductionStationId stationId)
         {
-            ref var inputs = ref entity.Add<SW.Multi<WorkbenchInputResource>>();
+            ref var inputs = ref entity.Add<SW.Multi<ProductionStationInputResource>>();
             inputs.Clear();
-            ref var outputs = ref entity.Add<SW.Multi<WorkbenchOutputResource>>();
+            ref var outputs = ref entity.Add<SW.Multi<ProductionStationOutputResource>>();
             outputs.Clear();
 
-            for (var i = 0; i < WorkbenchRecipeCatalog.All.Count; i++)
+            var hasRecipe = false;
+            for (var i = 0; i < ProductionRecipeCatalog.All.Count; i++)
             {
-                var recipe = WorkbenchRecipeCatalog.All[i];
+                var recipe = ProductionRecipeCatalog.All[i];
+                if (recipe.StationId != stationId)
+                    continue;
+
+                hasRecipe = true;
                 AddInputRows(ref inputs, recipe.Inputs);
                 AddOutputRows(ref outputs, recipe.Outputs);
             }
+
+            if (!hasRecipe)
+                throw new InvalidOperationException($"Production station id {stationId.Value} has no recipes.");
         }
 
-        private static void AddInputRows(ref SW.Multi<WorkbenchInputResource> rows, ResourceAmount[] amounts)
+        private static void AddInputRows(ref SW.Multi<ProductionStationInputResource> rows, ResourceAmount[] amounts)
         {
             for (var i = 0; i < amounts.Length; i++)
             {
@@ -47,11 +56,11 @@ namespace StaticMlp.Features.Settlement
                 if (FindInputIndex(in rows, amount.Id) >= 0)
                     continue;
 
-                rows.Add(new WorkbenchInputResource(amount.Id, 0));
+                rows.Add(new ProductionStationInputResource(amount.Id, 0));
             }
         }
 
-        private static void AddOutputRows(ref SW.Multi<WorkbenchOutputResource> rows, ResourceAmount[] amounts)
+        private static void AddOutputRows(ref SW.Multi<ProductionStationOutputResource> rows, ResourceAmount[] amounts)
         {
             for (var i = 0; i < amounts.Length; i++)
             {
@@ -60,11 +69,13 @@ namespace StaticMlp.Features.Settlement
                 if (FindOutputIndex(in rows, amount.Id) >= 0)
                     continue;
 
-                rows.Add(new WorkbenchOutputResource(amount.Id, 0));
+                rows.Add(new ProductionStationOutputResource(amount.Id, 0));
             }
         }
 
-        private static int FindInputIndex<TWorld>(in World<TWorld>.Multi<WorkbenchInputResource> rows, ResourceId resourceId)
+        private static int FindInputIndex<TWorld>(
+            in World<TWorld>.Multi<ProductionStationInputResource> rows,
+            ResourceId resourceId)
             where TWorld : struct, IWorldType
         {
             for (var i = 0; i < rows.Length; i++)
@@ -76,7 +87,9 @@ namespace StaticMlp.Features.Settlement
             return -1;
         }
 
-        private static int FindOutputIndex<TWorld>(in World<TWorld>.Multi<WorkbenchOutputResource> rows, ResourceId resourceId)
+        private static int FindOutputIndex<TWorld>(
+            in World<TWorld>.Multi<ProductionStationOutputResource> rows,
+            ResourceId resourceId)
             where TWorld : struct, IWorldType
         {
             for (var i = 0; i < rows.Length; i++)

@@ -11,35 +11,38 @@ namespace StaticMlp.Tests.Settlement
     public sealed class WorkbenchOperationTests
     {
         [Test]
-        public void WorkbenchRecipeCatalog_ContainsUniqueValidRecipes()
+        public void ProductionRecipeCatalog_ContainsUniqueValidWorkbenchRecipes()
         {
-            Assert.DoesNotThrow(() => WorkbenchRecipeCatalog.Validate(WorkbenchRecipeCatalog.All));
-            Assert.That(WorkbenchRecipeCatalog.All.Count, Is.EqualTo(3));
-            Assert.That(WorkbenchRecipeCatalog.Get(WorkbenchRecipeCatalog.PlanksId).Outputs[0].Id, Is.EqualTo(ResourceCatalog.PlanksId));
-            Assert.That(WorkbenchRecipeCatalog.Get(WorkbenchRecipeCatalog.SimplePartsId).Outputs[0].Id, Is.EqualTo(ResourceCatalog.SimplePartsId));
-            Assert.That(WorkbenchRecipeCatalog.Get(WorkbenchRecipeCatalog.RepairKitsId).Outputs[0].Id, Is.EqualTo(ResourceCatalog.RepairKitsId));
+            Assert.DoesNotThrow(() => ProductionRecipeCatalog.Validate(ProductionRecipeCatalog.All));
+            Assert.That(ProductionRecipeCatalog.All.Count, Is.EqualTo(3));
+            Assert.That(ProductionRecipeCatalog.Get(ProductionRecipeCatalog.WorkbenchPlanksId).StationId, Is.EqualTo(ProductionStationIds.Workbench));
+            Assert.That(ProductionRecipeCatalog.Get(ProductionRecipeCatalog.WorkbenchPlanksId).Outputs[0].Id, Is.EqualTo(ResourceCatalog.PlanksId));
+            Assert.That(ProductionRecipeCatalog.Get(ProductionRecipeCatalog.WorkbenchSimplePartsId).Outputs[0].Id, Is.EqualTo(ResourceCatalog.SimplePartsId));
+            Assert.That(ProductionRecipeCatalog.Get(ProductionRecipeCatalog.WorkbenchRepairKitsId).Outputs[0].Id, Is.EqualTo(ResourceCatalog.RepairKitsId));
         }
 
         [Test]
-        public void WorkbenchRecipeCatalog_RejectsDuplicateRecipeIds()
+        public void ProductionRecipeCatalog_RejectsDuplicateRecipeIds()
         {
             var recipes = new[]
             {
-                new WorkbenchRecipeDefinition(
-                    WorkbenchRecipeCatalog.PlanksId,
+                new ProductionRecipeDefinition(
+                    ProductionStationIds.Workbench,
+                    ProductionRecipeCatalog.WorkbenchPlanksId,
                     "one",
                     new[] { new ResourceAmount(ResourceCatalog.WoodId, 1) },
                     new[] { new ResourceAmount(ResourceCatalog.PlanksId, 1) },
                     1f),
-                new WorkbenchRecipeDefinition(
-                    WorkbenchRecipeCatalog.PlanksId,
+                new ProductionRecipeDefinition(
+                    ProductionStationIds.Workbench,
+                    ProductionRecipeCatalog.WorkbenchPlanksId,
                     "two",
                     new[] { new ResourceAmount(ResourceCatalog.WoodId, 1) },
                     new[] { new ResourceAmount(ResourceCatalog.PlanksId, 1) },
                     1f)
             };
 
-            Assert.Throws<InvalidOperationException>(() => WorkbenchRecipeCatalog.Validate(recipes));
+            Assert.Throws<InvalidOperationException>(() => ProductionRecipeCatalog.Validate(recipes));
         }
 
         [Test]
@@ -59,39 +62,41 @@ namespace StaticMlp.Tests.Settlement
             system.Update();
             system.Destroy();
 
-            var state = finished.Read<WorkbenchOperationState>();
+            var state = finished.Read<ProductionStationOperationState>();
             Assert.That(state.Enabled, Is.True);
-            Assert.That(state.ActiveRecipe, Is.EqualTo(WorkbenchRecipeCatalog.PlanksId));
+            Assert.That(state.Station, Is.EqualTo(ProductionStationIds.Workbench));
+            Assert.That(state.ActiveRecipe, Is.EqualTo(ProductionRecipeCatalog.WorkbenchPlanksId));
             Assert.That(state.WorkerSlotCount, Is.EqualTo(2));
             Assert.That(state.WorkDone, Is.EqualTo(0f));
-            Assert.That(WorkbenchResourceAccess.GetInput(finished, ResourceCatalog.WoodId), Is.EqualTo(0));
-            Assert.That(WorkbenchResourceAccess.GetOutput(finished, ResourceCatalog.PlanksId), Is.EqualTo(0));
-            Assert.That(finished.Ref<SW.Multi<WorkbenchInputResource>>().Length, Is.EqualTo(4));
-            Assert.That(finished.Ref<SW.Multi<WorkbenchOutputResource>>().Length, Is.EqualTo(3));
+            Assert.That(ProductionStationResourceAccess.GetInput(finished, ResourceCatalog.WoodId), Is.EqualTo(0));
+            Assert.That(ProductionStationResourceAccess.GetOutput(finished, ResourceCatalog.PlanksId), Is.EqualTo(0));
+            Assert.That(finished.Ref<SW.Multi<ProductionStationInputResource>>().Length, Is.EqualTo(4));
+            Assert.That(finished.Ref<SW.Multi<ProductionStationOutputResource>>().Length, Is.EqualTo(3));
         }
 
         [Test]
-        public void WorkbenchResourceAccess_ReadsArbitraryRecipeResourceRows()
+        public void ProductionStationResourceAccess_ReadsArbitraryRecipeResourceRows()
         {
             using var scope = new SettlementOperationTestWorldScope();
-            var workbench = scope.CreateFinishedBuilding();
-            workbench.Set(new WorkbenchOperationState
+            var station = scope.CreateFinishedBuilding();
+            station.Set(new ProductionStationOperationState
             {
-                ActiveRecipeId = WorkbenchRecipeCatalog.RepairKitsId.Value,
+                StationId = ProductionStationIds.Workbench.Value,
+                ActiveRecipeId = ProductionRecipeCatalog.WorkbenchRepairKitsId.Value,
                 Enabled = true,
                 WorkerSlotCount = 1
             });
-            WorkbenchResourceAccess.InitializeRows(workbench);
-            ref var inputs = ref workbench.Ref<SW.Multi<WorkbenchInputResource>>();
+            ProductionStationResourceAccess.InitializeRows(station, ProductionStationIds.Workbench);
+            ref var inputs = ref station.Ref<SW.Multi<ProductionStationInputResource>>();
             SetInput(ref inputs, ResourceCatalog.SimplePartsId, 2);
-            ref var outputs = ref workbench.Ref<SW.Multi<WorkbenchOutputResource>>();
+            ref var outputs = ref station.Ref<SW.Multi<ProductionStationOutputResource>>();
             SetOutput(ref outputs, ResourceCatalog.RepairKitsId, 1);
 
-            Assert.That(WorkbenchResourceAccess.GetInput(workbench, ResourceCatalog.SimplePartsId), Is.EqualTo(2));
-            Assert.That(WorkbenchResourceAccess.GetOutput(workbench, ResourceCatalog.RepairKitsId), Is.EqualTo(1));
+            Assert.That(ProductionStationResourceAccess.GetInput(station, ResourceCatalog.SimplePartsId), Is.EqualTo(2));
+            Assert.That(ProductionStationResourceAccess.GetOutput(station, ResourceCatalog.RepairKitsId), Is.EqualTo(1));
         }
 
-        private static void SetInput(ref SW.Multi<WorkbenchInputResource> rows, ResourceId resourceId, int amount)
+        private static void SetInput(ref SW.Multi<ProductionStationInputResource> rows, ResourceId resourceId, int amount)
         {
             for (var i = 0; i < rows.Length; i++)
             {
@@ -106,7 +111,7 @@ namespace StaticMlp.Tests.Settlement
             throw new InvalidOperationException($"Missing workbench input resource id {resourceId.Value}.");
         }
 
-        private static void SetOutput(ref SW.Multi<WorkbenchOutputResource> rows, ResourceId resourceId, int amount)
+        private static void SetOutput(ref SW.Multi<ProductionStationOutputResource> rows, ResourceId resourceId, int amount)
         {
             for (var i = 0; i < rows.Length; i++)
             {

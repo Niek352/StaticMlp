@@ -114,9 +114,9 @@ namespace StaticMlp.Features.Settlement
 
         private static WorkbenchPanelState BuildWorkbench(CW.Entity target, in BuildingDefinition definition)
         {
-            ref readonly var workbench = ref ClientProjection.Read<WorkbenchOperationState>(target);
+            ref readonly var workbench = ref ClientProjection.Read<ProductionStationOperationState>(target);
             ref readonly var anchorRef = ref ClientProjection.Read<SettlementAnchorRef>(target);
-            var recipe = WorkbenchRecipeCatalog.Get(workbench.ActiveRecipe);
+            var recipe = ProductionRecipeCatalog.Get(workbench.Station, workbench.ActiveRecipe);
             var state = new WorkbenchPanelState
             {
                 Target = target.GID,

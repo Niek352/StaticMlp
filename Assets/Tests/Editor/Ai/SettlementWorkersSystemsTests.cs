@@ -497,22 +497,23 @@ namespace StaticMlp.Tests.Ai
             bool enabled = true)
         {
             var entity = SW.NewEntity<Default>();
-            entity.Set(new WorkbenchOperationState
+            entity.Set(new ProductionStationOperationState
             {
-                ActiveRecipeId = WorkbenchRecipeCatalog.PlanksId.Value,
+                StationId = ProductionStationIds.Workbench.Value,
+                ActiveRecipeId = ProductionRecipeCatalog.WorkbenchPlanksId.Value,
                 Enabled = enabled,
                 WorkerSlotCount = 1,
                 WorkDone = 0f
             });
-            WorkbenchResourceAccess.InitializeRows(entity);
-            ref var inputs = ref entity.Ref<SW.Multi<WorkbenchInputResource>>();
+            ProductionStationResourceAccess.InitializeRows(entity, ProductionStationIds.Workbench);
+            ref var inputs = ref entity.Ref<SW.Multi<ProductionStationInputResource>>();
             SetWorkbenchInput(ref inputs, ResourceCatalog.WoodId, inputWood);
-            ref var outputs = ref entity.Ref<SW.Multi<WorkbenchOutputResource>>();
+            ref var outputs = ref entity.Ref<SW.Multi<ProductionStationOutputResource>>();
             SetWorkbenchOutput(ref outputs, ResourceCatalog.PlanksId, outputPlanks);
             return entity;
         }
 
-        private static void SetWorkbenchInput(ref SW.Multi<WorkbenchInputResource> rows, ResourceId resourceId, int amount)
+        private static void SetWorkbenchInput(ref SW.Multi<ProductionStationInputResource> rows, ResourceId resourceId, int amount)
         {
             for (var i = 0; i < rows.Length; i++)
             {
@@ -527,7 +528,7 @@ namespace StaticMlp.Tests.Ai
             throw new InvalidOperationException($"Missing workbench input resource id {resourceId.Value}.");
         }
 
-        private static void SetWorkbenchOutput(ref SW.Multi<WorkbenchOutputResource> rows, ResourceId resourceId, int amount)
+        private static void SetWorkbenchOutput(ref SW.Multi<ProductionStationOutputResource> rows, ResourceId resourceId, int amount)
         {
             for (var i = 0; i < rows.Length; i++)
             {

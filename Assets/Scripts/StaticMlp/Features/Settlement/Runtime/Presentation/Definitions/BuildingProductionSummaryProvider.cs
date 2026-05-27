@@ -18,12 +18,18 @@ namespace StaticMlp.Features.Settlement
             builder.Append(definition.Operation.WorkerSlots);
             builder.Append("\nRecipes: ");
 
-            for (var i = 0; i < WorkbenchRecipeCatalog.All.Count; i++)
+            var count = 0;
+            for (var i = 0; i < ProductionRecipeCatalog.All.Count; i++)
             {
-                if (i > 0)
+                var recipe = ProductionRecipeCatalog.All[i];
+                if (recipe.StationId != ProductionStationIds.Workbench)
+                    continue;
+
+                if (count > 0)
                     builder.Append(", ");
 
-                builder.Append(WorkbenchRecipeCatalog.All[i].Code);
+                builder.Append(recipe.Code);
+                count++;
             }
 
             return builder.ToString();

@@ -138,13 +138,13 @@ namespace StaticMlp.Features.Settlement.Workers
 
         public static bool TryFindGatherDemand(out SettlementWorkerDemand demand)
         {
-            foreach (var workbench in SW.Query<All<WorkbenchOperationState>>().Entities())
+            foreach (var station in SW.Query<All<ProductionStationOperationState>>().Entities())
             {
-                ref readonly var state = ref workbench.Read<WorkbenchOperationState>();
-                if (!state.Enabled)
+                ref readonly var state = ref station.Read<ProductionStationOperationState>();
+                if (!IsEnabledWorkbench(in state))
                     continue;
 
-                var recipe = WorkbenchRecipeCatalog.Get(state.ActiveRecipe);
+                var recipe = ProductionRecipeCatalog.Get(state.Station, state.ActiveRecipe);
                 for (var i = 0; i < recipe.Inputs.Length; i++)
                 {
                     var input = recipe.Inputs[i];
@@ -152,14 +152,14 @@ namespace StaticMlp.Features.Settlement.Workers
                     if (resource.Family != ResourceFamily.Raw)
                         continue;
 
-                    var missing = input.Amount - WorkbenchResourceAccess.GetInput(workbench, input.Id);
+                    var missing = input.Amount - ProductionStationResourceAccess.GetInput(station, input.Id);
                     if (missing <= 0)
                         continue;
 
                     demand = new SettlementWorkerDemand(
                         SettlementWorkerDemand.DemandKind.Gather,
                         AiTaskType.GatherResources,
-                        workbench.GID,
+                        station.GID,
                         input.Id,
                         missing);
                     return true;
@@ -181,24 +181,24 @@ namespace StaticMlp.Features.Settlement.Workers
             if (TryFindExtractionHaulDemand(out demand))
                 return true;
 
-            foreach (var workbench in SW.Query<All<WorkbenchOperationState>>().Entities())
+            foreach (var station in SW.Query<All<ProductionStationOperationState>>().Entities())
             {
-                ref readonly var state = ref workbench.Read<WorkbenchOperationState>();
-                if (!state.Enabled)
+                ref readonly var state = ref station.Read<ProductionStationOperationState>();
+                if (!IsEnabledWorkbench(in state))
                     continue;
 
-                var recipe = WorkbenchRecipeCatalog.Get(state.ActiveRecipe);
+                var recipe = ProductionRecipeCatalog.Get(state.Station, state.ActiveRecipe);
                 for (var i = 0; i < recipe.Outputs.Length; i++)
                 {
                     var output = recipe.Outputs[i];
-                    var amount = WorkbenchResourceAccess.GetOutput(workbench, output.Id);
+                    var amount = ProductionStationResourceAccess.GetOutput(station, output.Id);
                     if (amount <= 0)
                         continue;
 
                     demand = new SettlementWorkerDemand(
                         SettlementWorkerDemand.DemandKind.Haul,
                         AiTaskType.HaulResources,
-                        workbench.GID,
+                        station.GID,
                         output.Id,
                         amount);
                     return true;
@@ -246,21 +246,21 @@ namespace StaticMlp.Features.Settlement.Workers
 
         public static bool TryFindProcessDemand(out SettlementWorkerDemand demand)
         {
-            foreach (var workbench in SW.Query<All<WorkbenchOperationState>>().Entities())
+            foreach (var station in SW.Query<All<ProductionStationOperationState>>().Entities())
             {
-                ref readonly var state = ref workbench.Read<WorkbenchOperationState>();
-                if (!state.Enabled || state.WorkerSlotCount == 0)
+                ref readonly var state = ref station.Read<ProductionStationOperationState>();
+                if (!IsEnabledWorkbench(in state) || state.WorkerSlotCount == 0)
                     continue;
 
-                var recipe = WorkbenchRecipeCatalog.Get(state.ActiveRecipe);
-                if (state.WorkDone >= recipe.WorkRequired || !HasRecipeInputs(workbench, in recipe))
+                var recipe = ProductionRecipeCatalog.Get(state.Station, state.ActiveRecipe);
+                if (state.WorkDone >= recipe.WorkRequired || !HasRecipeInputs(station, in recipe))
                     continue;
 
                 var output = recipe.Outputs[0];
                 demand = new SettlementWorkerDemand(
                     SettlementWorkerDemand.DemandKind.Process,
                     AiTaskType.ProcessRecipe,
-                    workbench.GID,
+                    station.GID,
                     output.Id,
                     output.Amount);
                 return true;
@@ -270,16 +270,21 @@ namespace StaticMlp.Features.Settlement.Workers
             return false;
         }
 
-        private static bool HasRecipeInputs(SW.Entity workbench, in WorkbenchRecipeDefinition recipe)
+        private static bool HasRecipeInputs(SW.Entity station, in ProductionRecipeDefinition recipe)
         {
             for (var i = 0; i < recipe.Inputs.Length; i++)
             {
                 var input = recipe.Inputs[i];
-                if (WorkbenchResourceAccess.GetInput(workbench, input.Id) < input.Amount)
+                if (ProductionStationResourceAccess.GetInput(station, input.Id) < input.Amount)
                     return false;
             }
 
             return true;
+        }
+
+        private static bool IsEnabledWorkbench(in ProductionStationOperationState state)
+        {
+            return state.Enabled && state.Station == ProductionStationIds.Workbench;
         }
 
         private static bool HasEnabledStockpile()

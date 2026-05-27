@@ -14,7 +14,9 @@ namespace StaticMlp.Features.Settlement
             ProjectionRegistry.RegisterMulti<SettlementStoredResource>();
             ProjectionRegistry.Register<StockpileOperationState>();
             ProjectionRegistry.Register<ExtractionOperationState>();
-            ProjectionRegistry.Register<WorkbenchOperationState>();
+            ProjectionRegistry.Register<ProductionStationOperationState>();
+            ProjectionRegistry.RegisterMulti<ProductionStationInputResource>();
+            ProjectionRegistry.RegisterMulti<ProductionStationOutputResource>();
             ProjectionRegistry.Register<BedrollShelterState>();
             DepositCarriedResourcesToStockpileEventCodec.Register();
             RequestRegistry.Register<DepositCarriedResourcesToStockpileRequestEvent, DepositCarriedResourcesToStockpileResultEvent>(

@@ -40,14 +40,15 @@ namespace StaticMlp.Features.Settlement
                 || definition.Operation.WorkerSlots == 0)
                 throw new InvalidOperationException("Workbench building definition is missing production queue operation data.");
 
-            finishedEntity.Set(new WorkbenchOperationState
+            finishedEntity.Set(new ProductionStationOperationState
             {
-                ActiveRecipeId = WorkbenchRecipeCatalog.PlanksId.Value,
+                StationId = ProductionStationIds.Workbench.Value,
+                ActiveRecipeId = ProductionRecipeCatalog.WorkbenchPlanksId.Value,
                 Enabled = true,
                 WorkerSlotCount = definition.Operation.WorkerSlots,
                 WorkDone = 0f
             });
-            WorkbenchResourceAccess.InitializeRows(finishedEntity);
+            ProductionStationResourceAccess.InitializeRows(finishedEntity, ProductionStationIds.Workbench);
         }
     }
 }
