@@ -74,7 +74,7 @@ namespace StaticMlp.Tests.Settlement
             Assert.That(state.WorkDone, Is.EqualTo(0f));
             Assert.That(ProductionStationResourceAccess.GetInput(finished, ResourceCatalog.WoodId), Is.EqualTo(0));
             Assert.That(ProductionStationResourceAccess.GetOutput(finished, ResourceCatalog.PlanksId), Is.EqualTo(0));
-            Assert.That(finished.Ref<SW.Multi<ProductionStationInputResource>>().Length, Is.EqualTo(4));
+            Assert.That(finished.Ref<SW.Multi<ProductionStationInputResource>>().Length, Is.EqualTo(5));
             Assert.That(finished.Ref<SW.Multi<ProductionStationOutputResource>>().Length, Is.EqualTo(3));
         }
 
@@ -93,6 +93,7 @@ namespace StaticMlp.Tests.Settlement
             ProductionStationResourceAccess.InitializeRows(station, ProductionStationIds.Workbench);
             ref var inputs = ref station.Ref<SW.Multi<ProductionStationInputResource>>();
             SetInput(ref inputs, ResourceCatalog.SimplePartsId, 2);
+            SetInput(ref inputs, ResourceCatalog.FuelId, 1);
             ref var outputs = ref station.Ref<SW.Multi<ProductionStationOutputResource>>();
             SetOutput(ref outputs, ResourceCatalog.RepairKitsId, 1);
 
@@ -104,7 +105,7 @@ namespace StaticMlp.Tests.Settlement
         public void ServerProductionStationProcessingSystem_ConsumesSharedInputsAndCreatesOutput()
         {
             using var scope = new SettlementOperationTestWorldScope();
-            var storage = scope.CreateSharedResources(capacity: 100, wood: 2);
+            var storage = scope.CreateSharedResources(capacity: 100, wood: 2, fuel: 1);
             var station = CreateProductionWorkbench(Vector3.zero);
             CreateAssignedWorker(station.GID);
             SW.GetResource<SimulationTime>().FixedStepSeconds = 20f;
@@ -112,6 +113,7 @@ namespace StaticMlp.Tests.Settlement
             new ServerProductionStationProcessingSystem().Update();
 
             Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.WoodId), Is.EqualTo(0));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.FuelId), Is.EqualTo(0));
             Assert.That(ProductionStationResourceAccess.GetInput(station, ResourceCatalog.WoodId), Is.EqualTo(0));
             Assert.That(ProductionStationResourceAccess.GetOutput(station, ResourceCatalog.PlanksId), Is.EqualTo(1));
             Assert.That(station.Read<ProductionStationOperationState>().WorkDone, Is.EqualTo(0f));
@@ -121,7 +123,7 @@ namespace StaticMlp.Tests.Settlement
         public void ServerProductionStationProcessingSystem_DoesNotReserveInputsWhenOutputBufferIsFull()
         {
             using var scope = new SettlementOperationTestWorldScope();
-            var storage = scope.CreateSharedResources(capacity: 100, wood: 2);
+            var storage = scope.CreateSharedResources(capacity: 100, wood: 2, fuel: 1);
             var station = CreateProductionWorkbench(Vector3.zero);
             CreateAssignedWorker(station.GID);
             ref var outputs = ref station.Ref<SW.Multi<ProductionStationOutputResource>>();
@@ -131,9 +133,29 @@ namespace StaticMlp.Tests.Settlement
             new ServerProductionStationProcessingSystem().Update();
 
             Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.WoodId), Is.EqualTo(2));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.FuelId), Is.EqualTo(1));
             Assert.That(ProductionStationResourceAccess.GetInput(station, ResourceCatalog.WoodId), Is.EqualTo(0));
             Assert.That(ProductionStationResourceAccess.GetOutput(station, ResourceCatalog.PlanksId), Is.EqualTo(24));
             Assert.That(station.Read<ProductionStationOperationState>().WorkDone, Is.EqualTo(0f));
+            Assert.That(station.Read<ProductionStationOperationState>().BlockedReason, Is.EqualTo(ProductionStationBlockedReason.FullOutputBuffer));
+        }
+
+        [Test]
+        public void ServerProductionStationProcessingSystem_SetsBlockedStateWhenFuelIsMissing()
+        {
+            using var scope = new SettlementOperationTestWorldScope();
+            var storage = scope.CreateSharedResources(capacity: 100, wood: 2, fuel: 0);
+            var station = CreateProductionWorkbench(Vector3.zero);
+            CreateAssignedWorker(station.GID);
+            SW.GetResource<SimulationTime>().FixedStepSeconds = 20f;
+
+            new ServerProductionStationProcessingSystem().Update();
+
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.WoodId), Is.EqualTo(2));
+            Assert.That(SettlementSharedResourcesAccess.GetAmount(storage, ResourceCatalog.FuelId), Is.EqualTo(0));
+            Assert.That(ProductionStationResourceAccess.GetOutput(station, ResourceCatalog.PlanksId), Is.EqualTo(0));
+            Assert.That(station.Read<ProductionStationOperationState>().WorkDone, Is.EqualTo(0f));
+            Assert.That(station.Read<ProductionStationOperationState>().BlockedReason, Is.EqualTo(ProductionStationBlockedReason.MissingFuel));
         }
 
         [Test]

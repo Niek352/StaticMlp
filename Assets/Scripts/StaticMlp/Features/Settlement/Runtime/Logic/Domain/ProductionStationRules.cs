@@ -45,6 +45,23 @@ namespace StaticMlp.Features.Settlement
                    || HasInput(station, recipe.FuelRequirement.Value);
         }
 
+        public static bool IsBlockedByFuel(
+            SW.Entity station,
+            SW.Entity sharedStorage,
+            in ProductionRecipeDefinition recipe)
+        {
+            if (!recipe.FuelRequirement.HasValue)
+                return false;
+
+            var fuel = recipe.FuelRequirement.Value;
+            var stationHas = ProductionStationResourceAccess.GetInput(station, fuel.Id);
+            if (stationHas >= fuel.Amount)
+                return false;
+
+            var missing = fuel.Amount - stationHas;
+            return SettlementSharedResourcesAccess.GetAmount(sharedStorage, fuel.Id) < missing;
+        }
+
         public static bool TryReserveRecipeInputs(
             SW.Entity station,
             SW.Entity sharedStorage,

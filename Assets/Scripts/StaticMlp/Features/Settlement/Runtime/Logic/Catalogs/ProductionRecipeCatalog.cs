@@ -17,7 +17,8 @@ namespace StaticMlp.Features.Settlement
                 "planks",
                 new[] { new ResourceAmount(ResourceCatalog.WoodId, 2) },
                 new[] { new ResourceAmount(ResourceCatalog.PlanksId, 1) },
-                workRequired: 20f),
+                workRequired: 20f,
+                fuelRequirement: new ResourceAmount(ResourceCatalog.FuelId, 1)),
             new(
                 ProductionStationIds.Workbench,
                 WorkbenchSimplePartsId,
@@ -28,7 +29,8 @@ namespace StaticMlp.Features.Settlement
                     new ResourceAmount(ResourceCatalog.StoneId, 1)
                 },
                 new[] { new ResourceAmount(ResourceCatalog.SimplePartsId, 1) },
-                workRequired: 30f),
+                workRequired: 30f,
+                fuelRequirement: new ResourceAmount(ResourceCatalog.FuelId, 1)),
             new(
                 ProductionStationIds.Workbench,
                 WorkbenchRepairKitsId,
@@ -39,7 +41,8 @@ namespace StaticMlp.Features.Settlement
                     new ResourceAmount(ResourceCatalog.SimplePartsId, 1)
                 },
                 new[] { new ResourceAmount(ResourceCatalog.RepairKitsId, 1) },
-                workRequired: 45f)
+                workRequired: 45f,
+                fuelRequirement: new ResourceAmount(ResourceCatalog.FuelId, 1))
         };
 
         static ProductionRecipeCatalog()
@@ -99,13 +102,13 @@ namespace StaticMlp.Features.Settlement
                     throw new InvalidOperationException(
                         $"Production recipe id {definition.Id.Value} has non-positive work requirement {definition.WorkRequired}.");
 
-                ValidateAmounts(definition.Id, definition.Inputs, "input");
-                ValidateAmounts(definition.Id, definition.Outputs, "output");
+                ValidateAmounts(definition.Id, definition.Inputs, "input", ResourceUsageFlags.ProductionInput);
+                ValidateAmounts(definition.Id, definition.Outputs, "output", ResourceUsageFlags.ProductionOutput);
                 ValidateFuel(definition);
             }
         }
 
-        private static void ValidateAmounts(ProductionRecipeId recipeId, ResourceAmount[] amounts, string role)
+        private static void ValidateAmounts(ProductionRecipeId recipeId, ResourceAmount[] amounts, string role, ResourceUsageFlags requiredFlag)
         {
             if (amounts == null || amounts.Length == 0)
                 throw new InvalidOperationException($"Production recipe id {recipeId.Value} must define at least one {role}.");
@@ -114,7 +117,7 @@ namespace StaticMlp.Features.Settlement
             for (var i = 0; i < amounts.Length; i++)
             {
                 var amount = amounts[i];
-                ResourceCatalog.Get(amount.Id);
+                ref readonly var resource = ref ResourceCatalog.Get(amount.Id);
                 if (amount.Amount <= 0)
                     throw new InvalidOperationException(
                         $"Production recipe id {recipeId.Value} has non-positive {role} amount {amount.Amount}.");
@@ -122,6 +125,10 @@ namespace StaticMlp.Features.Settlement
                 if (!ids.Add(amount.Id))
                     throw new InvalidOperationException(
                         $"Production recipe id {recipeId.Value} has duplicate {role} resource id {amount.Id.Value}.");
+
+                if (!resource.Usage.HasFlag(requiredFlag))
+                    throw new InvalidOperationException(
+                        $"Production recipe id {recipeId.Value} uses resource id {amount.Id.Value} without {requiredFlag} flag as {role}.");
             }
         }
 
@@ -131,7 +138,11 @@ namespace StaticMlp.Features.Settlement
                 return;
 
             var fuel = definition.FuelRequirement.Value;
-            ResourceCatalog.Get(fuel.Id);
+            ref readonly var resource = ref ResourceCatalog.Get(fuel.Id);
+            if (!resource.Usage.HasFlag(ResourceUsageFlags.Fuel))
+                throw new InvalidOperationException(
+                    $"Production recipe id {definition.Id.Value} uses non-fuel resource id {fuel.Id.Value} as fuel.");
+
             if (fuel.Amount <= 0)
                 throw new InvalidOperationException(
                     $"Production recipe id {definition.Id.Value} has non-positive fuel amount {fuel.Amount}.");

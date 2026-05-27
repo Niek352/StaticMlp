@@ -23,26 +23,52 @@ namespace StaticMlp.Features.Settlement
                         $"Production station {station.GID.Raw} is marked finished but construction phase is {site.Phase}.");
 
                 ref readonly var snapshot = ref station.Read<ProductionStationOperationState>();
-                if (!snapshot.Enabled)
+                var enabled = snapshot.Enabled;
+                var stationId = snapshot.Station;
+                var activeRecipe = snapshot.ActiveRecipe;
+                var workerSlotCount = snapshot.WorkerSlotCount;
+
+                if (!enabled)
+                {
+                    ref var state = ref ReplicationMut.Mut<ProductionStationOperationState>(station);
+                    state.BlockedReasonValue = (byte)ProductionStationBlockedReason.None;
                     continue;
+                }
 
                 var building = BuildingCatalogData.Get(new BuildingId(site.BuildingId));
                 ValidateProductionBuilding(station, in building);
 
-                var recipe = ProductionRecipeCatalog.Get(snapshot.Station, snapshot.ActiveRecipe);
+                var recipe = ProductionRecipeCatalog.Get(stationId, activeRecipe);
+                ref var state = ref ReplicationMut.Mut<ProductionStationOperationState>(station);
+                state.BlockedReasonValue = (byte)ProductionStationBlockedReason.None;
+
                 if (!ProductionStationRules.CanFitOutputs(station, in recipe, building.Operation.StorageCapacity))
+                {
+                    state.BlockedReasonValue = (byte)ProductionStationBlockedReason.FullOutputBuffer;
                     continue;
+                }
 
                 var workerMultiplier = ProductionStationRules.ResolveWorkerMultiplier(
-                    snapshot.WorkerSlotCount,
+                    workerSlotCount,
                     CountAssignedWorkers(station.GID));
                 if (workerMultiplier <= 0)
+                {
+                    state.BlockedReasonValue = (byte)ProductionStationBlockedReason.NoWorkers;
                     continue;
+                }
+
+                if (ProductionStationRules.IsBlockedByFuel(station, sharedStorage, in recipe))
+                {
+                    state.BlockedReasonValue = (byte)ProductionStationBlockedReason.MissingFuel;
+                    continue;
+                }
 
                 if (!ProductionStationRules.TryReserveRecipeInputs(station, sharedStorage, in recipe))
+                {
+                    state.BlockedReasonValue = (byte)ProductionStationBlockedReason.MissingInputs;
                     continue;
+                }
 
-                ref var state = ref ReplicationMut.Mut<ProductionStationOperationState>(station);
                 var completed = ProductionStationRules.AdvanceWork(
                     ref state,
                     in recipe,

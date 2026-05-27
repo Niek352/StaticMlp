@@ -29,7 +29,9 @@ _Status:_ **Completed (Unity verification pending)** - the Phase 1 source path n
 4.  **Building unlocks**: Ensure each new building expands item pools or automation. For example, the Resin Forge unlocked by rescuing the Carpenter enables resin processing.
 5.  **Trading & barter**: Design merchants and factions that exchange items for resources rather than currency.
 
-_Status:_ Resource node generation, harvest profiles, depletion hazards and client visuals now cover trees, ores, spore pods and chests. Building interaction UX, resource overlays and carried-inventory deposit into settlement stockpiles exist. Settlement now has generalized production station contracts, current Workbench recipes/state, server-authoritative recipe processing and output claiming into shared storage. Additional station buildings, bartering and broader economy sinks remain to be implemented.
+_Status:_ Resource node generation, harvest profiles, depletion hazards and client visuals now cover trees, ores, spore pods and chests. Building interaction UX, resource overlays and carried-inventory deposit into settlement stockpiles exist. Settlement now has generalized production station contracts, current Workbench recipes/state, server-authoritative recipe processing with fuel requirements and explicit blocked-state reporting, and output claiming into shared storage. Additional station buildings, bartering and broader economy sinks remain to be implemented.
+
+_Sink boundaries:_ NPC upkeep (`Food`, `Medicine` `Upkeep` flags) is deferred to Phase 3 because the NPC task/comfort system is not yet built. Raid repairs (`Stone`, `SimpleParts`, `Ingots` `Repair` flags) are deferred to Phase 8 because base-defence encounters do not yet exist. Phase 2 active sinks are limited to construction, station fuel, and recipe crafting, all owned by existing Settlement systems.
 
 _Ownership note:_ `Settlement.Contracts owns resource ids` and storage contracts; `OpenWorldResources` owns node placement, overlay state and harvest metadata; `ResourcesInventoryMinimal` owns carried raw inventory. Economy cross-feature mutations must go through typed events or requests.
 

@@ -35,7 +35,7 @@ namespace StaticMlp.Tests.Settlement
             });
         }
 
-        public SW.Entity CreateSharedResources(int capacity = 0, int wood = 0, int stone = 0)
+        public SW.Entity CreateSharedResources(int capacity = 0, int wood = 0, int stone = 0, int fuel = 0)
         {
             var entity = SW.NewEntity<Default>();
             entity.Set<SettlementResourceStorageTag>();
@@ -47,7 +47,7 @@ namespace StaticMlp.Tests.Settlement
             rows.Add(new SettlementStoredResource(ResourceCatalog.SimplePartsId, 0));
             rows.Add(new SettlementStoredResource(ResourceCatalog.RepairKitsId, 0));
             rows.Add(new SettlementStoredResource(ResourceCatalog.FoodId, 0));
-            rows.Add(new SettlementStoredResource(ResourceCatalog.FuelId, 0));
+            rows.Add(new SettlementStoredResource(ResourceCatalog.FuelId, fuel));
             rows.Add(new SettlementStoredResource(ResourceCatalog.ResearchDataId, 0));
             rows.Add(new SettlementStoredResource(ResourceCatalog.MedicineId, 0));
             return entity;

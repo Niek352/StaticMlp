@@ -30,8 +30,12 @@ namespace StaticMlp.Features.Settlement
         [ReplicatedField]
         public float WorkDone;
 
+        [ReplicatedField]
+        public byte BlockedReasonValue;
+
         public ProductionStationId Station => new(StationId);
         public ProductionRecipeId ActiveRecipe => new(ActiveRecipeId);
+        public ProductionStationBlockedReason BlockedReason => (ProductionStationBlockedReason)BlockedReasonValue;
 
         public ComponentTypeConfig<ProductionStationOperationState> Config() =>
             new(guid: new Guid("d37b9b22-ea96-49e0-bc20-4ab248c04c98"));
@@ -44,6 +48,7 @@ namespace StaticMlp.Features.Settlement
             writer.WriteBool(Enabled);
             writer.WriteByte(WorkerSlotCount);
             writer.WriteFloat(WorkDone);
+            writer.WriteByte(BlockedReasonValue);
 
             ref readonly var inputs = ref self.Ref<World<TWorld>.Multi<ProductionStationInputResource>>();
             ValidateInputRows(in inputs);
@@ -72,6 +77,7 @@ namespace StaticMlp.Features.Settlement
             Enabled = reader.ReadBool();
             WorkerSlotCount = reader.ReadByte();
             WorkDone = reader.ReadFloat();
+            BlockedReasonValue = reader.ReadByte();
 
             var inputCount = reader.ReadInt();
             if (inputCount < 0 || inputCount > ResourceCatalog.All.Count)
