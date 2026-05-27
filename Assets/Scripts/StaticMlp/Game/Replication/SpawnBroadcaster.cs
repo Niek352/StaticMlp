@@ -13,7 +13,7 @@ namespace StaticMlp.Networking.Replication {
             ref var outbox = ref SW.GetResource<NetOutbox>();
             foreach (var peer in ServerPeerRegistry.Peers) {
                 var spawn = CreateSpawn(entity, peer);
-                Debug.Log($"[SpawnBroadcaster] Sending spawn gid={spawn.Gid.Raw} type={spawn.EntityType} owner={spawn.Owner.Value} to peer={peer.Value}");
+                //Debug.Log($"[SpawnBroadcaster] Sending spawn gid={spawn.Gid.Raw} type={spawn.EntityType} owner={spawn.Owner.Value} to peer={peer.Value}");
                 outbox.Enqueue(peer, PacketCodec.EncodeSpawn(spawn), NetDelivery.ReliableSequenced);
             }
         }
