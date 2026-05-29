@@ -5,6 +5,7 @@
         "StaticMlp.Features.BuildingCatalog",
         "StaticMlp.Features.Settlement.Contracts",
         "StaticMlp.Features.Settlement.Logic",
+        "StaticMlp.Features.Settlement.Presentation",
         "StaticMlp.Features.Settlement.Workers.Contracts",
         "StaticMlp.Features.Settlement.Workers.Logic",
         "StaticMlp.Features.Buildings.Contracts",

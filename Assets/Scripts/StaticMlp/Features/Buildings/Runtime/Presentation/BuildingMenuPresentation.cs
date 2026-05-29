@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Settlement;
@@ -23,14 +24,24 @@ namespace StaticMlp.Features.Buildings
             Cards = cards;
         }
 
-        public static BuildingMenuPresentation Create(in BuildingMenuState state)
+        public static BuildingMenuPresentation Create(
+            in BuildingMenuState state,
+            ISettlementUnlockReadModel unlockReadModel)
+        {
+            return Create(in state, BuildingCatalogData.All, unlockReadModel);
+        }
+
+        public static BuildingMenuPresentation Create(
+            in BuildingMenuState state,
+            IReadOnlyList<BuildingDefinition> definitions,
+            ISettlementUnlockReadModel unlockReadModel)
         {
             var selectedCategory = BuildingCategory.None;
             var selectedName = "Select a building";
 
             if (state.HasSelection)
             {
-                var selectedDefinition = BuildingCatalogData.Get(state.SelectedBuildingId);
+                var selectedDefinition = GetDefinition(definitions, state.SelectedBuildingId);
                 selectedCategory = selectedDefinition.Category;
                 selectedName = BuildingPresentationCatalog.Get(selectedDefinition.Id).DisplayName;
             }
@@ -38,14 +49,15 @@ namespace StaticMlp.Features.Buildings
             return new BuildingMenuPresentation(
                 state.IsOpen,
                 selectedName,
-                BuildCategories(selectedCategory),
-                BuildCards(state.SelectedBuildingId));
+                BuildCategories(definitions, selectedCategory),
+                BuildCards(definitions, state.SelectedBuildingId, unlockReadModel));
         }
 
-        private static BuildingMenuCategoryPresentation[] BuildCategories(BuildingCategory selectedCategory)
+        private static BuildingMenuCategoryPresentation[] BuildCategories(
+            IReadOnlyList<BuildingDefinition> definitions,
+            BuildingCategory selectedCategory)
         {
-            var definitions = BuildingCatalogData.All;
-            var categories = new BuildingMenuCategoryPresentation[CountCategories()];
+            var categories = new BuildingMenuCategoryPresentation[CountCategories(definitions)];
             var writeIndex = 0;
 
             for (var i = 0; i < definitions.Count; i++)
@@ -57,37 +69,41 @@ namespace StaticMlp.Features.Buildings
                 categories[writeIndex++] = new BuildingMenuCategoryPresentation(
                     category,
                     definitions[i].CategoryDisplayName,
-                    CountCards(category),
+                    CountCards(definitions, category),
                     selectedCategory == category);
             }
 
             return categories;
         }
 
-        private static BuildingMenuCardPresentation[] BuildCards(BuildingId selectedBuildingId)
+        private static BuildingMenuCardPresentation[] BuildCards(
+            IReadOnlyList<BuildingDefinition> definitions,
+            BuildingId selectedBuildingId,
+            ISettlementUnlockReadModel unlockReadModel)
         {
-            var definitions = BuildingCatalogData.All;
             var cards = new BuildingMenuCardPresentation[definitions.Count];
 
             for (var i = 0; i < definitions.Count; i++)
             {
                 var definition = definitions[i];
                 var presentation = BuildingPresentationCatalog.Get(definition.Id);
+                var isAvailable = UnlockEvaluation.IsMet(in definition.UnlockRequirement, unlockReadModel);
                 cards[i] = new BuildingMenuCardPresentation(
                     definition.Id,
                     definition.Category,
                     presentation.DisplayName,
                     definition.CategoryDisplayName,
                     FormatConstructionCost(definition.ConstructionCost),
-                    selectedBuildingId == definition.Id);
+                    selectedBuildingId == definition.Id,
+                    isAvailable,
+                    isAvailable ? string.Empty : FormatLockedReason(in definition.UnlockRequirement));
             }
 
             return cards;
         }
 
-        private static int CountCategories()
+        private static int CountCategories(IReadOnlyList<BuildingDefinition> definitions)
         {
-            var definitions = BuildingCatalogData.All;
             var count = 0;
 
             for (var i = 0; i < definitions.Count; i++)
@@ -111,9 +127,8 @@ namespace StaticMlp.Features.Buildings
             return count;
         }
 
-        private static int CountCards(BuildingCategory category)
+        private static int CountCards(IReadOnlyList<BuildingDefinition> definitions, BuildingCategory category)
         {
-            var definitions = BuildingCatalogData.All;
             var count = 0;
 
             for (var i = 0; i < definitions.Count; i++)
@@ -137,6 +152,37 @@ namespace StaticMlp.Features.Buildings
             }
 
             return false;
+        }
+
+        private static BuildingDefinition GetDefinition(
+            IReadOnlyList<BuildingDefinition> definitions,
+            BuildingId buildingId)
+        {
+            for (var i = 0; i < definitions.Count; i++)
+            {
+                if (definitions[i].Id == buildingId)
+                    return definitions[i];
+            }
+
+            throw new System.InvalidOperationException($"Missing building definition {buildingId.Value}.");
+        }
+
+        private static string FormatLockedReason(in UnlockRequirement requirement)
+        {
+            switch (requirement.Kind)
+            {
+                case UnlockRequirementKind.SettlementLevel:
+                    return $"Requires settlement level {requirement.IntParameter}.";
+
+                case UnlockRequirementKind.BuildingConstructed:
+                    return $"Requires {BuildingPresentationCatalog.Get(new BuildingId((ushort)requirement.IntParameter)).DisplayName}.";
+
+                case UnlockRequirementKind.None:
+                    return string.Empty;
+
+                default:
+                    throw new System.InvalidOperationException($"Unknown unlock requirement kind {requirement.Kind}.");
+            }
         }
 
         private static string FormatConstructionCost(ResourceAmount[] constructionCost)

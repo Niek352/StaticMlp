@@ -1,6 +1,7 @@
 using System;
 using Code.EcsUi.Mvc;
 using StaticMlp.Features.BuildingCatalog;
+using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Buildings
@@ -46,7 +47,7 @@ namespace StaticMlp.Features.Buildings
 
         private static BuildingMenuPresentation BuildPresentation(in BuildingMenuState state)
         {
-            return BuildingMenuPresentation.Create(in state);
+            return BuildingMenuPresentation.Create(in state, CW.GetResource<ClientSettlementUnlockState>());
         }
 
         private static void CloseMenu()
@@ -59,7 +60,10 @@ namespace StaticMlp.Features.Buildings
         private static void SelectBuilding(BuildingId buildingId)
         {
             ref var state = ref CW.GetResource<BuildingMenuState>();
-            BuildingCatalogData.Get(buildingId);
+            var definition = BuildingCatalogData.Get(buildingId);
+            if (!UnlockEvaluation.IsMet(in definition.UnlockRequirement, CW.GetResource<ClientSettlementUnlockState>()))
+                throw new InvalidOperationException($"Cannot select locked building {buildingId.Value}.");
+
             state.Select(buildingId);
         }
     }

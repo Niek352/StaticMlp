@@ -30,6 +30,7 @@ namespace StaticMlp.Features.Buildings
         [SerializeField] private TextMeshProUGUI _selectedBuildingLabel;
 
         private BuildingId[] _renderedCardIds;
+        private bool[] _renderedCardAvailability;
         private int _visibleCardCount;
         private UnityAction[] _cardClickActions;
         private UnityAction _closeClickAction;
@@ -51,6 +52,7 @@ namespace StaticMlp.Features.Buildings
             CheckCategoryBindings();
 
             _renderedCardIds = new BuildingId[_cardButtons.Length];
+            _renderedCardAvailability = new bool[_cardButtons.Length];
             _panelRoot.SetActive(false);
         }
 
@@ -103,6 +105,8 @@ namespace StaticMlp.Features.Buildings
         {
             if (slotIndex >= _visibleCardCount)
                 throw new InvalidOperationException($"{nameof(BuildingMenuView)} received a click from hidden card slot {slotIndex}.");
+            if (!_renderedCardAvailability[slotIndex])
+                throw new InvalidOperationException($"{nameof(BuildingMenuView)} received a click from locked card slot {slotIndex}.");
 
             _onBuildingClicked.Invoke(_renderedCardIds[slotIndex]);
         }
@@ -146,13 +150,19 @@ namespace StaticMlp.Features.Buildings
                     ? $"> {cards[i].DisplayName}"
                     : cards[i].DisplayName;
                 _cardCategoryLabels[i].text = cards[i].CategoryLabel;
-                _cardCostLabels[i].text = cards[i].CostLabel;
+                _cardCostLabels[i].text = cards[i].IsAvailable
+                    ? cards[i].CostLabel
+                    : $"Locked: {cards[i].LockedReason}";
+                _cardButtons[i].interactable = cards[i].IsAvailable;
+                _renderedCardAvailability[i] = cards[i].IsAvailable;
             }
 
             for (var i = cards.Length; i < _cardButtons.Length; i++)
             {
                 _cardRoots[i].SetActive(false);
                 _renderedCardIds[i] = default;
+                _renderedCardAvailability[i] = false;
+                _cardButtons[i].interactable = false;
             }
         }
 

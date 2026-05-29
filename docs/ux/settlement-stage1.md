@@ -51,9 +51,11 @@ Canonical UX status для текущего Settlement vertical slice. Research 
 
 Status: `Implemented, needs Unity verification`.
 
-The Workbench panel now shows the active recipe and available recipe choices from `AvailableRecipesQuery`. The first-pass picker uses the existing buttons only: the primary button performs the currently selected Workbench action, and the secondary button cycles between worker assignment, output claiming, and `SetProductionRecipeRequestEvent` for the next available recipe. The UI does not switch recipes locally; it forwards selection intent through the typed request path and waits for replicated `ProductionStationOperationState.ActiveRecipeId`.
+The Workbench panel now shows the active recipe and available recipe choices from `AvailableRecipesQuery`. Locked recipes are not offered as normal selectable options; the summary path reports `No unlocked recipes` if a station has no available recipe. The first-pass picker uses the existing buttons only: the primary button performs the currently selected Workbench action, and the secondary button cycles between worker assignment, output claiming, and `SetProductionRecipeRequestEvent` for the next available recipe. The UI does not switch recipes locally; it forwards selection intent through the typed request path and waits for replicated `ProductionStationOperationState.ActiveRecipeId`.
 
 Server validation rejects invalid targets, out-of-range peers, recipes outside the station, locked recipes, in-progress work, and recipe changes that would strand incompatible buffered inputs. Planks, Simple Parts, and Repair Kits are the initial Workbench choices. Richer picker layout remains prefab/UI wiring polish.
+
+NPC-specific unlock reasons are deferred to Phase 3; Phase 2 only formats settlement-level and constructed-building requirements.
 
 ## Interaction Focus
 
@@ -94,6 +96,8 @@ Stage1 HUD пока остается `Legacy Stage1`: он все еще чит�
 | Building cards: `CampCore`, `Stockpile`, `BedrollShelter`, `LumberCamp`, `StoneMine`, `Workbench` | Выбирает здание и переводит игрока в placement. | `BuildingMenuView -> BuildingMenuController.SelectBuilding -> BuildingMenuState.Select` | Реализовано, нужна Unity-проверка. |
 | `Close` | Закрывает меню и очищает selection. | `BuildingMenuController.CloseMenu` | Реализовано, нужна Unity-проверка. |
 | Build menu toggle input | Открывает/закрывает меню. | `ClientBuildingMenuSystem`, `BuildingsInputActions.BuildMenuToggle` | Hidden input, UX gap. |
+
+Unlock UX: building cards remain visible, but `BuildingMenuCardPresentation.IsAvailable` disables locked card buttons and the card cost line shows `Locked: <reason>`. Current reasons cover settlement level and constructed-building requirements; NPC-specific unlock reasons are deferred to Phase 3.
 
 Known gap: меню показывает cards и costs, но UX все еще должен явно объяснять, что выбор card переводит игрока в placement mode.
 

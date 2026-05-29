@@ -19,9 +19,8 @@ namespace StaticMlp.Features.Settlement
             builder.Append("\nRecipes: ");
 
             var count = 0;
-            for (var i = 0; i < ProductionRecipeCatalog.All.Count; i++)
+            foreach (var recipe in AvailableRecipesQuery.Filter(ProductionRecipeCatalog.All))
             {
-                var recipe = ProductionRecipeCatalog.All[i];
                 if (recipe.StationId != ProductionStationIds.Workbench)
                     continue;
 
@@ -31,6 +30,9 @@ namespace StaticMlp.Features.Settlement
                 builder.Append(recipe.Code);
                 count++;
             }
+
+            if (count == 0)
+                builder.Append("No unlocked recipes");
 
             return builder.ToString();
         }

@@ -8,6 +8,7 @@ namespace StaticMlp.Features.Settlement
         public void Init()
         {
             CW.SetResource(new SettlementProgressionState { SettlementLevel = 1 });
+            CW.SetResource(new ClientSettlementUnlockState());
         }
     }
 }

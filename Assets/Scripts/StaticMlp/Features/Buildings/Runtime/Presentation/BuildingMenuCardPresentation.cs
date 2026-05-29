@@ -10,6 +10,8 @@ namespace StaticMlp.Features.Buildings
         public readonly string CategoryLabel;
         public readonly string CostLabel;
         public readonly bool IsSelected;
+        public readonly bool IsAvailable;
+        public readonly string LockedReason;
 
         public BuildingMenuCardPresentation(
             BuildingId buildingId,
@@ -17,7 +19,9 @@ namespace StaticMlp.Features.Buildings
             string displayName,
             string categoryLabel,
             string costLabel,
-            bool isSelected)
+            bool isSelected,
+            bool isAvailable,
+            string lockedReason)
         {
             BuildingId = buildingId;
             Category = category;
@@ -25,6 +29,8 @@ namespace StaticMlp.Features.Buildings
             CategoryLabel = categoryLabel;
             CostLabel = costLabel;
             IsSelected = isSelected;
+            IsAvailable = isAvailable;
+            LockedReason = lockedReason;
         }
     }
 }
