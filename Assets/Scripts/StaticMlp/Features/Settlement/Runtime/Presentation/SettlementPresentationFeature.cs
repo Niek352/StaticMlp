@@ -22,6 +22,7 @@ namespace StaticMlp.Features.Settlement
             systems.Add(new ClientBuildingManagementPanelCloseInputSystem(), GameplaySystemOrder.ClientPresentation + 3);
             systems.Add(new ClientBuildingManagementPanelLifetimeSystem(), GameplaySystemOrder.ClientPresentation + 4);
             systems.Add(new ClientSettlementInteractionPromptStateSystem(), GameplaySystemOrder.ClientPresentation + 5);
+            systems.Add(new ClientSettlementTransferFeedbackSystem(), GameplaySystemOrder.ClientPresentation + 6);
             systems.Add(new StateDrivenPersistentControllerHostSystem<SettlementHudView, SettlementHudController, SettlementHudSession>(
                 manager => new SettlementHudController(manager, ResourcesViewFactory.CreateLazy<SettlementHudView>(HUD_VIEW_RESOURCE_PATH), hudBridge),
                 state => state.IsVisible), GameplaySystemOrder.ClientPresentation + 8);

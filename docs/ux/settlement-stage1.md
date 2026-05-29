@@ -57,6 +57,16 @@ Server validation rejects invalid targets, out-of-range peers, recipes outside t
 
 NPC-specific unlock reasons are deferred to Phase 3; Phase 2 only formats settlement-level and constructed-building requirements.
 
+### Phase 2 Resource Flow Feedback
+
+Status: `Implemented, needs Unity verification`.
+
+The Stockpile panel now shows shared storage use, remaining capacity, carried raw total, and the expected storage transfer before `Store Items` is clicked. The action is disabled when carried raw inventory is not ready, no raw resources are carried, or settlement storage is full.
+
+The Workbench panel now shows shared storage use, remaining capacity, claimable output, and the expected storage claim before `Claim Output` is clicked. Output claims remain typed requests; the panel only forwards intent and waits for server result/replicated state.
+
+Deposit and production claim result events update transient presentation feedback for the currently open building panel. Accepted stockpile deposits show `Stored <amount> resources`; accepted production claims show `Claimed <amount> <resource>`. Rejected zero-transfer results show `Storage full` when projected storage has no remaining capacity, otherwise a concise no-transfer message.
+
 ## Interaction Focus
 
 **Feature:** `StaticMlp.Features.Interaction`  
@@ -130,6 +140,10 @@ Known gap: invalid preview меняет material через `PlacementPreviewVie
 - [ ] Смена focus не меняет уже открытую building panel.
 - [ ] `Close` и `Cancel` закрывают building panel.
 - [ ] Primary/secondary actions показывают label, expected effect и disabled reason.
+- [ ] Stockpile panel shows carried raw, remaining capacity, expected storage transfer, and disabled reasons for no carried raw or full storage.
+- [ ] Workbench panel shows claimable output, shared storage remaining capacity, and expected storage claim.
+- [ ] Successful stockpile deposit result shows `Stored <amount> resources`; full storage or rejected deposit shows transient no-transfer feedback.
+- [ ] Successful production claim result shows `Claimed <amount> <resource>`; full storage or rejected claim shows transient no-transfer feedback.
 - [ ] `Interact` больше не делает deposit напрямую; deposit происходит через primary action в панели.
 - [ ] Старая постоянная `Stage1ContextPanelView` больше не появляется сама.
 - [ ] Stage1 HUD/objective, если виден, воспринимается как `Legacy Stage1`, а не как building interaction UX.

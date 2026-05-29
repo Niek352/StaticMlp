@@ -34,16 +34,18 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             for (var i = 0; i < slots.Length; i++)
                 slots[i] = ResourcesInventorySlotPresentation.Empty();
 
+            var totalAmount = 0;
             for (var i = 0; i < rows.Length; i++)
             {
                 ref var row = ref rows[i];
+                totalAmount += row.Amount;
                 slots[i] = new ResourcesInventorySlotPresentation(
                     true,
                     ResourceCatalog.Get(row.Id).DisplayName,
                     row.Amount);
             }
 
-            return new ResourcesInventoryHudPresentation(true, rows.Length, inventory.Capacity, slots);
+            return new ResourcesInventoryHudPresentation(true, rows.Length, inventory.Capacity, totalAmount, slots);
         }
     }
 }

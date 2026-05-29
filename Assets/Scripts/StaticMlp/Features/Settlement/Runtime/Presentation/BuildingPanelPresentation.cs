@@ -2,6 +2,7 @@ using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
+using StaticMlp.Features.ResourcesInventoryMinimal;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
@@ -26,7 +27,8 @@ namespace StaticMlp.Features.Settlement
                 IsOpen = true,
                 Target = session.Target,
                 Kind = kind,
-                Title = definition.DisplayName
+                Title = definition.DisplayName,
+                TransferFeedbackMessage = GetTransferFeedback(session.Target)
             };
 
             switch (kind)
@@ -83,12 +85,19 @@ namespace StaticMlp.Features.Settlement
             var storageEntity = SettlementSharedResourcesQuery.GetClientEntity();
             ref readonly var storage = ref ClientProjection.Read<SettlementSharedResources>(storageEntity);
             ref readonly var stockpile = ref ClientProjection.Read<StockpileOperationState>(target);
+            var usedCapacity = SettlementSharedResourcesAccess.TotalProjectedUsed(storageEntity);
+            var remainingCapacity = Math.Max(0, storage.Capacity - usedCapacity);
+            var inventory = ResourcesInventoryHudPresentationBuilder.Build();
             var state = new StockpilePanelState
             {
                 Target = target.GID,
                 DisplayName = definition.DisplayName,
-                UsedCapacity = SettlementSharedResourcesAccess.TotalProjectedUsed(storageEntity),
+                UsedCapacity = usedCapacity,
                 Capacity = storage.Capacity,
+                RemainingCapacity = remainingCapacity,
+                CarriedRawInventoryReady = inventory.IsReady,
+                CarriedRawAmount = inventory.TotalAmount,
+                ExpectedDepositAmount = inventory.IsReady ? Math.Min(inventory.TotalAmount, remainingCapacity) : 0,
                 ContributedCapacity = stockpile.ContributedCapacity
             };
             CopyProjectedStoredResources(storageEntity, ref state.Resources);
@@ -118,6 +127,10 @@ namespace StaticMlp.Features.Settlement
             ref readonly var workbench = ref ClientProjection.Read<ProductionStationOperationState>(target);
             ref readonly var anchorRef = ref ClientProjection.Read<SettlementAnchorRef>(target);
             var recipe = ProductionRecipeCatalog.Get(workbench.Station, workbench.ActiveRecipe);
+            var storageEntity = SettlementSharedResourcesQuery.GetClientEntity();
+            ref readonly var storage = ref ClientProjection.Read<SettlementSharedResources>(storageEntity);
+            var usedCapacity = SettlementSharedResourcesAccess.TotalProjectedUsed(storageEntity);
+            var remainingCapacity = Math.Max(0, storage.Capacity - usedCapacity);
             var state = new WorkbenchPanelState
             {
                 Target = target.GID,
@@ -130,11 +143,15 @@ namespace StaticMlp.Features.Settlement
                 WorkRequired = recipe.WorkRequired,
                 OutputAmount = ProductionStationResourceAccess.TotalProjectedOutputAmount(target),
                 OutputCapacity = definition.Operation.StorageCapacity,
+                SharedStorageUsedCapacity = usedCapacity,
+                SharedStorageCapacity = storage.Capacity,
+                SharedStorageRemainingCapacity = remainingCapacity,
                 WorkerSlotCount = workbench.WorkerSlotCount
             };
             PopulateRecipeChoices(workbench.Station, workbench.ActiveRecipe, ref state.RecipeChoices);
             CopyProductionInputs(target, in recipe, ref state.Inputs);
             CopyProductionOutputs(target, workbench.Station, ref state.Outputs);
+            PopulateWorkbenchClaimContext(ref state);
             PopulateWorkerSlots(ref state);
             return state;
         }
@@ -260,7 +277,7 @@ namespace StaticMlp.Features.Settlement
         private static BuildingPanelAction CreateClaimProductionOutputAction(in WorkbenchPanelState state)
         {
             var hasOutput = TryFindClaimableOutput(in state, out var output);
-            var hasCapacity = HasSharedStorageCapacity();
+            var hasCapacity = state.SharedStorageRemainingCapacity > 0;
             var enabled = hasOutput && hasCapacity;
             return new BuildingPanelAction(
                 BuildingPanelActionKind.ClaimProductionOutput,
@@ -274,13 +291,32 @@ namespace StaticMlp.Features.Settlement
 
         private static BuildingPanelAction CreateDepositCarriedResourcesToStockpileAction(in StockpilePanelState state)
         {
-            var enabled = StockpileRules.HasAvailableCapacity(state.Capacity, state.UsedCapacity);
+            var hasCapacity = StockpileRules.HasAvailableCapacity(state.Capacity, state.UsedCapacity);
+            var hasCarriedRawResources = state.CarriedRawInventoryReady && state.CarriedRawAmount > 0;
+            var enabled = hasCapacity && hasCarriedRawResources;
             return new BuildingPanelAction(
                 BuildingPanelActionKind.DepositCarriedResourcesToStockpile,
                 "Store Items",
                 enabled,
-                enabled ? string.Empty : "Stockpile storage is full.",
+                enabled ? string.Empty : ResolveStockpileDepositDisabledReason(state.CarriedRawInventoryReady, hasCarriedRawResources, hasCapacity),
                 state.Target);
+        }
+
+        private static string ResolveStockpileDepositDisabledReason(
+            bool carriedRawInventoryReady,
+            bool hasCarriedRawResources,
+            bool hasCapacity)
+        {
+            if (!hasCapacity)
+                return "Stockpile storage is full.";
+
+            if (!carriedRawInventoryReady)
+                return "Carried raw inventory is not ready.";
+
+            if (!hasCarriedRawResources)
+                return "No carried raw resources.";
+
+            return string.Empty;
         }
 
         private static string ResolveAssignDisabledReason(bool hasFreeSlot, bool hasWorker)
@@ -305,15 +341,6 @@ namespace StaticMlp.Features.Settlement
             return string.Empty;
         }
 
-        private static bool HasSharedStorageCapacity()
-        {
-            var storageEntity = SettlementSharedResourcesQuery.GetClientEntity();
-            ref readonly var storage = ref ClientProjection.Read<SettlementSharedResources>(storageEntity);
-            return StockpileRules.HasAvailableCapacity(
-                storage.Capacity,
-                SettlementSharedResourcesAccess.TotalProjectedUsed(storageEntity));
-        }
-
         private static bool TryFindClaimableOutput(in WorkbenchPanelState state, out ProductionResourceBufferEntry output)
         {
             for (var i = 0; i < state.Outputs.Length; i++)
@@ -328,6 +355,15 @@ namespace StaticMlp.Features.Settlement
 
             output = default;
             return false;
+        }
+
+        private static void PopulateWorkbenchClaimContext(ref WorkbenchPanelState state)
+        {
+            if (!TryFindClaimableOutput(in state, out var output))
+                return;
+
+            state.ClaimableOutputAmount = output.Amount;
+            state.ExpectedClaimAmount = Math.Min(output.Amount, state.SharedStorageRemainingCapacity);
         }
 
         private static void PopulateWorkerSlots(ref ExtractionPanelState state)
@@ -613,6 +649,15 @@ namespace StaticMlp.Features.Settlement
                 throw new InvalidOperationException($"Building panel target {gid.Raw} is not a construction/building entity.");
 
             return target;
+        }
+
+        private static string GetTransferFeedback(EntityGID target)
+        {
+            ref readonly var feedback = ref CW.GetResource<SettlementTransferFeedbackState>();
+            if (!feedback.HasMessage || feedback.Building != target)
+                return string.Empty;
+
+            return feedback.Message;
         }
     }
 }

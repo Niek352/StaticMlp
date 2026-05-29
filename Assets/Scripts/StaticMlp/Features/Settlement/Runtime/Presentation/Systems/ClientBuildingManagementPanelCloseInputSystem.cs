@@ -16,6 +16,8 @@ namespace StaticMlp.Features.Settlement
             if (!inputState.WasPressed(CoreInputActions.Cancel))
                 return;
 
+            ref var feedback = ref CW.GetResource<SettlementTransferFeedbackState>();
+            feedback.Clear();
             session.Close();
         }
     }

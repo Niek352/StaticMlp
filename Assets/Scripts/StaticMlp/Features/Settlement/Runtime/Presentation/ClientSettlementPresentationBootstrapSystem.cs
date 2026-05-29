@@ -13,6 +13,7 @@ namespace StaticMlp.Features.Settlement
             });
             CW.SetResource(new InteractionPromptState());
             CW.SetResource(new BuildingPanelSession());
+            CW.SetResource(new SettlementTransferFeedbackState());
             CW.SetResource(new SettlementContextPanelSession
             {
                 Mode = SettlementContextPanelMode.None,

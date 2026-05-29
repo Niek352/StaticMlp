@@ -15,6 +15,11 @@ namespace StaticMlp.Features.Settlement
         public float WorkRequired;
         public int OutputAmount;
         public int OutputCapacity;
+        public int SharedStorageUsedCapacity;
+        public int SharedStorageCapacity;
+        public int SharedStorageRemainingCapacity;
+        public int ClaimableOutputAmount;
+        public int ExpectedClaimAmount;
         public byte WorkerSlotCount;
         public byte AssignedWorkerCount;
         public FixedList128Bytes<BuildingWorkerSlot> WorkerSlots;

@@ -124,6 +124,7 @@ namespace StaticMlp.Features.Settlement
                     break;
             }
 
+            AppendTransferFeedback(builder, state.TransferFeedbackMessage);
             return builder.ToString();
         }
 
@@ -150,6 +151,12 @@ namespace StaticMlp.Features.Settlement
             builder.Append(state.Capacity);
             builder.Append("\nBuilding capacity: ");
             builder.Append(state.ContributedCapacity);
+            builder.Append("\nremaining capacity: ");
+            builder.Append(state.RemainingCapacity);
+            builder.Append("\ncarried raw: ");
+            builder.Append(state.CarriedRawInventoryReady ? state.CarriedRawAmount.ToString() : "not ready");
+            builder.Append("\nExpected storage transfer: ");
+            builder.Append(state.ExpectedDepositAmount);
 
             if (state.Resources.Length == 0)
             {
@@ -212,6 +219,15 @@ namespace StaticMlp.Features.Settlement
             builder.Append(state.OutputAmount);
             builder.Append(" / ");
             builder.Append(state.OutputCapacity);
+            builder.Append("\nShared storage: ");
+            builder.Append(state.SharedStorageUsedCapacity);
+            builder.Append(" / ");
+            builder.Append(state.SharedStorageCapacity);
+            builder.Append("\nremaining capacity: ");
+            builder.Append(state.SharedStorageRemainingCapacity);
+            AppendClaimableOutput(builder, in state);
+            builder.Append("\nExpected storage claim: ");
+            builder.Append(state.ExpectedClaimAmount);
             builder.Append("\nWorkers: ");
             builder.Append(state.AssignedWorkerCount);
             builder.Append(" / ");
@@ -228,6 +244,20 @@ namespace StaticMlp.Features.Settlement
 
             AppendProductionBuffer(builder, "Inputs", in state.Inputs);
             AppendProductionBuffer(builder, "Outputs", in state.Outputs);
+        }
+
+        private static void AppendClaimableOutput(StringBuilder builder, in WorkbenchPanelState state)
+        {
+            builder.Append("\nclaimable output: ");
+            if (!TryFindClaimableOutput(in state, out var output))
+            {
+                builder.Append("none");
+                return;
+            }
+
+            builder.Append(ResourceCatalog.Get(output.Id).DisplayName);
+            builder.Append(' ');
+            builder.Append(state.ClaimableOutputAmount);
         }
 
         private static void AppendRecipeChoices(StringBuilder builder, in WorkbenchPanelState state)
@@ -355,6 +385,33 @@ namespace StaticMlp.Features.Settlement
                 builder.Append("\nBlocked: ");
                 builder.Append(action.DisabledReason);
             }
+        }
+
+        private static void AppendTransferFeedback(StringBuilder builder, string message)
+        {
+            if (string.IsNullOrEmpty(message))
+                return;
+
+            builder.Append("\nFeedback: ");
+            builder.Append(message);
+        }
+
+        private static bool TryFindClaimableOutput(
+            in WorkbenchPanelState state,
+            out ProductionResourceBufferEntry output)
+        {
+            for (var i = 0; i < state.Outputs.Length; i++)
+            {
+                var candidate = state.Outputs[i];
+                if (candidate.Amount <= 0)
+                    continue;
+
+                output = candidate;
+                return true;
+            }
+
+            output = default;
+            return false;
         }
     }
 }

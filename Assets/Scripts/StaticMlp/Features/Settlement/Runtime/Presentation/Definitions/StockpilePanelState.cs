@@ -10,6 +10,10 @@ namespace StaticMlp.Features.Settlement
         public FixedList512Bytes<SettlementResourceViewEntry> Resources;
         public int UsedCapacity;
         public int Capacity;
+        public int RemainingCapacity;
+        public bool CarriedRawInventoryReady;
+        public int CarriedRawAmount;
+        public int ExpectedDepositAmount;
         public ushort ContributedCapacity;
     }
 }

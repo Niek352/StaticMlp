@@ -18,6 +18,8 @@ namespace StaticMlp.Features.Settlement
                 return;
             }
 
+            ref var feedback = ref CW.GetResource<SettlementTransferFeedbackState>();
+            feedback.Clear();
             session.Close();
         }
     }

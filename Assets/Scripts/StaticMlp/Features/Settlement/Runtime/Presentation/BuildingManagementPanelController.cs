@@ -312,6 +312,8 @@ namespace StaticMlp.Features.Settlement
 
         private static void HandleClose()
         {
+            ref var feedback = ref CW.GetResource<SettlementTransferFeedbackState>();
+            feedback.Clear();
             ref var session = ref CW.GetResource<BuildingPanelSession>();
             session.Close();
         }

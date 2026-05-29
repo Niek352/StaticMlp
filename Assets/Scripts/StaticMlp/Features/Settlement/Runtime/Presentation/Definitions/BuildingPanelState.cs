@@ -8,6 +8,7 @@ namespace StaticMlp.Features.Settlement
         public EntityGID Target;
         public BuildingPanelKind Kind;
         public string Title;
+        public string TransferFeedbackMessage;
         public BuildingPanelAction PrimaryAction;
         public BuildingPanelAction SecondaryAction;
         public ConstructionPanelState Construction;

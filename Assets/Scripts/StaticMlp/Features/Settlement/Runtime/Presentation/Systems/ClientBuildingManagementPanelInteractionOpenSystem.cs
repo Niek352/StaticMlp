@@ -38,6 +38,8 @@ namespace StaticMlp.Features.Settlement
                     throw new InvalidOperationException($"Interact target {press.Target.Raw} is not a construction/building entity.");
 
                 ref var session = ref CW.GetResource<BuildingPanelSession>();
+                ref var feedback = ref CW.GetResource<SettlementTransferFeedbackState>();
+                feedback.Clear();
                 session.Open(BuildingPanelRoute.Resolve(target), openedFromInteraction: true);
             }
         }

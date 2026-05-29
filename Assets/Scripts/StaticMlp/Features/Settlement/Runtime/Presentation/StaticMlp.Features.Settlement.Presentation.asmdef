@@ -24,6 +24,7 @@
         "StaticMlp.Features.Frontier.Presentation",
         "StaticMlp.Features.Loadout.Presentation",
         "StaticMlp.Features.Progression.Presentation",
+        "StaticMlp.Features.ResourcesInventoryMinimal.Presentation",
         "StaticMlp.Features.Settlement.Workers.Contracts",
         "StaticMlp.Features.BuildingCatalog",
         "StaticMlp.Features.Interaction",
