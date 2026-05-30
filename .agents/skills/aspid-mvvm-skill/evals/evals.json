@@ -1,0 +1,27 @@
+{
+  "skill_name": "aspid-mvvm",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Generate a ViewModel called InventoryViewModel with fields: items (List<string>, OneWayBind), capacity (int, TwoWayBind) and a command AddItem.",
+      "expected_output": "C# class InventoryViewModel annotated with [ViewModel], with [OneWayBind] List<string> _items, [TwoWayBind] int _capacity, and a method AddItem with [RelayCommand].",
+      "files": [],
+      "expectations": [
+        "The class is partial and sealed",
+        "Fields are private and annotated with the correct binding attributes",
+        "A method AddItem is present and decorated with [RelayCommand]"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a binder for TMP_SpriteRenderer that accepts a Sprite and updates the sprite property",
+      "expected_output": "Binder class deriving from MonoBinder implementing IBinder<Sprite> with a SetValue method updating spriteRenderer.sprite",
+      "files": [],
+      "expectations": [
+        "The binder inherits from MonoBinder",
+        "Implements IBinder<Sprite>",
+        "Has a SetValue method that assigns the sprite to the renderer"
+      ]
+    }
+  ]
+}

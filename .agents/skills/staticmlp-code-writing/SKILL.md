@@ -73,7 +73,8 @@ Validation/          explicit validation rules at trust/gameplay boundaries
 Queries/             named ECS/domain query helpers
 Seeds/               seed data and manifests
 Input/               feature-local input mapping/translation
-Controllers/         MVC controllers
+Controllers/         legacy MVC controllers and controller-like presentation mediators
+ViewModels/          Aspid.MVVM ViewModels and MVVM command/state adapters
 Views/               passive view classes
 ViewParts/           IEntityViewPart/MonoBehaviour view parts
 Actions/             AI/action packages; semantic subfolders like Actions/AttackEnemy are allowed here

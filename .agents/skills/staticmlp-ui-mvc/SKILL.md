@@ -27,7 +27,8 @@ Use the feature folder-layout rule in `.agents/skills/staticmlp-code-writing/SKI
 
 - view-state components go in `Components/`;
 - client visual systems go in `Systems/Client`;
-- MVC controllers go in `Controllers/`;
+- legacy MVC controllers go in `Controllers/`;
+- Aspid.MVVM ViewModels go in `ViewModels/`;
 - passive view classes go in `Views/`;
 - `IEntityViewPart`/MonoBehaviour view parts go in `ViewParts/`;
 - presentation `IResource` types go in `WorldResources/`, not `Resources/`.

@@ -1,0 +1,17 @@
+{
+    "name": "Aspid.StaticEcs",
+    "rootNamespace": "Aspid.StaticEcs",
+    "references": [
+        "Aspid.MVVM",
+        "FFS.StaticEcs"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

@@ -50,7 +50,7 @@ Gameplay systems should only:
 - Keep gameplay, replication, transport, ownership, and presentation code in separate modules.
 - Split feature modules into `Runtime/Logic` and `Runtime/Presentation` when both concerns exist.
 - `Runtime/Logic` owns gameplay state, replicated contracts, simulation, validation, and server/client-core systems.
-- `Runtime/Presentation` owns client-only view state, view sync, visual systems, MVC, and Unity-facing presentation code.
+- `Runtime/Presentation` owns client-only view state, view sync, visual systems, MVVM/window presentation, and Unity-facing presentation code.
 - Do not place Unity presentation code, view components, or client-only visuals in `Runtime/Logic`.
 - Do not place gameplay rules, replicated state mutation, or server authority logic in `Runtime/Presentation`.
 - Put shared gameplay/bootstrap contracts in `Game.Core`; put ordinary gameplay features in their own `StaticMlp.Features.FeatureX` asmdef.
@@ -117,7 +117,7 @@ Do not replicate ownership tags directly. Replicate only `NetworkIdentity`, then
 - Null UI references are bugs. Fail fast instead of using defensive `if (x != null)` guards.
 - Do not write `ValidateReferences` or scene/hierarchy search helpers instead of explicit inspector wiring.
 - Feature `MonoBehaviour` classes must stay view-only: inspector references, Unity callbacks, passive rendering, and forwarding UI intent.
-- Feature UI composition and MVC lifecycle must be owned by ECS/bootstrap systems, not by feature `MonoBehaviour` classes.
+- Feature UI composition and MVVM/window lifecycle must be owned by ECS/bootstrap systems, not by feature `MonoBehaviour` classes.
 
 ## Code Style
 

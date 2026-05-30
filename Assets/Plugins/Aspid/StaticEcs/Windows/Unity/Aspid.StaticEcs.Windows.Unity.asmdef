@@ -1,0 +1,19 @@
+{
+    "name": "Aspid.StaticEcs.Windows.Unity",
+    "rootNamespace": "Aspid.StaticEcs.Windows",
+    "references": [
+        "Aspid.MVVM",
+        "Aspid.StaticEcs.Windows",
+        "UniTask",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

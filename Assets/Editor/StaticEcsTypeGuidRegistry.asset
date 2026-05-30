@@ -1651,3 +1651,3368 @@ MonoBehaviour:
     links: []
     linksList: []
     multi: []
+  - worldTypeFullName: Aspid.StaticEcs.Tests.EcsLinkRegistryTests+TestWorld
+    components:
+    - guid: 2ac6d128-cd2c-48a4-a18b-6cd79cefe903
+      current:
+        className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+      history:
+      - className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+    - guid: f6427f09-7e12-4b61-b453-b0837d8d08ba
+      current:
+        className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
+      history:
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
+    - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
+      current:
+        className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: 85f080de-0634-4b3d-bc95-c361c73d7f98
+      current:
+        className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: f84abac5-9978-4f04-85e7-3f91c43d8192
+      current:
+        className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+      history:
+      - className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+    - guid: 8d47b71d-f6a0-4ecf-9b4e-b9a3d8fae6c1
+      current:
+        className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+      history:
+      - className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+    - guid: ce5bcff2-7cdb-4b27-8c53-66c6639e28fa
+      current:
+        className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+      history:
+      - className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+    - guid: 3ee4b71a-e2d1-4446-9301-a36017ab984b
+      current:
+        className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 2fd68c53-cf5c-4d13-94cc-1ad5420a82d7
+      current:
+        className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 33487314-85fa-4e81-85ac-35fe029e1a78
+      current:
+        className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 755a5754-79b6-42da-a8b3-71788f063f4a
+      current:
+        className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 31db70ec-ecdd-4c31-89a6-c85c3507cfe2
+      current:
+        className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 8f1e0f0d-e2d6-456c-ae4a-21e661e9620b
+      current:
+        className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: cd4f4133-8327-48f1-a557-1490506cc236
+      current:
+        className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 86c31ffc-b59f-4cf0-b0ec-f1886e4bcf40
+      current:
+        className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 4a6ac13f-d0a4-4180-b15a-c544f665fafd
+      current:
+        className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      history:
+      - className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+    - guid: 641d2d15-83f0-4328-8b35-4063e914bc61
+      current:
+        className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      history:
+      - className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+    - guid: 27e11c20-b722-493e-aa56-1727a24a01e3
+      current:
+        className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: b7e9c3a1-5d2f-4e8b-9c1d-3a8f5e2b7c4d
+      current:
+        className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: 6abb3da8-3525-48cb-8265-f041b1cf0ba3
+      current:
+        className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: 859f7dd8-e326-40be-8ba0-669c9304b3d5
+      current:
+        className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c35019c4-4469-4ae6-a59f-4a9d10d9efaa
+      current:
+        className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c6f1d334-a1e4-4472-a7a0-311c3e84fd54
+      current:
+        className: ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+      history:
+      - className: ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+    - guid: 70eaf461-6ab4-46d7-b4b7-49179f7ad6bf
+      current:
+        className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: 943d0dd7-7080-4d28-8afc-44a649ac2c01
+      current:
+        className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: e271ae45-3257-4897-955f-d411a1dac94f
+      current:
+        className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 1dbd74af-ce56-4e7f-9220-df2aea692e5e
+      current:
+        className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec03
+      current:
+        className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 81cc0b9a-2497-4926-8561-ac701776a1a9
+      current:
+        className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: d37b9b22-ea96-49e0-bc20-4ab248c04c98
+      current:
+        className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 1fd72b18-30b4-4f37-ae61-b95f52eafb65
+      current:
+        className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 23efe9a1-a281-40d2-b288-c8dcdd3220e5
+      current:
+        className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 934eb4df-f887-40dd-b8bf-8750466e74b8
+      current:
+        className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec04
+      current:
+        className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec01
+      current:
+        className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec02
+      current:
+        className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: e9cc6b5e-b289-4855-b926-26b14830f97c
+      current:
+        className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 4b90f4d5-861f-4105-a2a5-48d8dbb5f9c8
+      current:
+        className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 8249f97b-a1dd-4f58-a8e0-f90ac8474588
+      current:
+        className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 83d6a5f5-44e1-40df-b527-9b2d3a1c2fd4
+      current:
+        className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 3cc73376-44db-4a4d-8fe3-c42ef153f7c8
+      current:
+        className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 0a82e952-f0ee-4dca-9f7d-0eb3217b6a31
+      current:
+        className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
+      history:
+      - className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
+    - guid: 0e2fb7fd-8e3c-45fc-a42b-5e197de8d603
+      current:
+        className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 1435a86b-0f3d-4a6f-8868-d4a3d49e6102
+      current:
+        className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 5f83b1cd-ae0a-4d1a-a6f7-2a7f4a984101
+      current:
+        className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    tags: []
+    events:
+    - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
+      current:
+        className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+      history:
+      - className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+    - guid: 2f724a92-c50a-49e6-a020-b69eea5148e7
+      current:
+        className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 51c3b5fd-fc92-4e07-9f3d-87d56666d845
+      current:
+        className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 50a2bb5d-99e0-4f12-abb7-d181b1133cb0
+      current:
+        className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: 998f596e-433b-4b10-b557-03b292444df2
+      current:
+        className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: 5d30f087-d3b5-411c-b3be-92faf9f9551f
+      current:
+        className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: f5910f59-cf18-4370-bfad-7251af0cb3d4
+      current:
+        className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: b877f5b3-e768-4e7c-8c5a-816ced8e01f2
+      current:
+        className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+      current:
+        className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
+      current:
+        className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b
+      current:
+        className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c
+      current:
+        className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+      current:
+        className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e
+      current:
+        className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: d6e7f8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0a
+      current:
+        className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f
+      current:
+        className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: 998f596e-435b-4b10-b557-03b292444df2
+      current:
+        className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+      history:
+      - className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+    - guid: ccc0e591-1c90-44ce-ac59-047f5d0ae639
+      current:
+        className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: fc29ab6d-b684-4536-bad6-527667fe3893
+      current:
+        className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5f01bc7a-7dbd-4b65-8adc-b120c440e628
+      current:
+        className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: da08195c-38df-4d75-a487-9de75ffe9bb5
+      current:
+        className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: f3375d59-1f44-427b-bd38-50cc4378a875
+      current:
+        className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 9d390ef1-31c4-411f-a5f6-c5725f647a33
+      current:
+        className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 69bdee89-872f-4804-8f31-a266a82808c0
+      current:
+        className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5840afa6-1ce5-4156-b8e3-4d734a965b69
+      current:
+        className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 12082f54-6fde-4583-b6c6-61879520d99c
+      current:
+        className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: f591b513-010f-479b-bfc7-9b91423e0801
+      current:
+        className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: be4c4d8c-c0f4-4a34-a072-a4a274a01bb8
+      current:
+        className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 7e6fce4d-cf07-4db8-b036-c682ef468c3b
+      current:
+        className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    links: []
+    linksList: []
+    multi: []
+  - worldTypeFullName: Aspid.StaticEcs.Examples.ExampleWorld
+    components:
+    - guid: 2ac6d128-cd2c-48a4-a18b-6cd79cefe903
+      current:
+        className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+      history:
+      - className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+    - guid: f6427f09-7e12-4b61-b453-b0837d8d08ba
+      current:
+        className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
+      history:
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
+    - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
+      current:
+        className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: 85f080de-0634-4b3d-bc95-c361c73d7f98
+      current:
+        className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: f84abac5-9978-4f04-85e7-3f91c43d8192
+      current:
+        className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+      history:
+      - className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+    - guid: 8d47b71d-f6a0-4ecf-9b4e-b9a3d8fae6c1
+      current:
+        className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+      history:
+      - className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+    - guid: ce5bcff2-7cdb-4b27-8c53-66c6639e28fa
+      current:
+        className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+      history:
+      - className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+    - guid: 3ee4b71a-e2d1-4446-9301-a36017ab984b
+      current:
+        className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 2fd68c53-cf5c-4d13-94cc-1ad5420a82d7
+      current:
+        className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 33487314-85fa-4e81-85ac-35fe029e1a78
+      current:
+        className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 755a5754-79b6-42da-a8b3-71788f063f4a
+      current:
+        className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 31db70ec-ecdd-4c31-89a6-c85c3507cfe2
+      current:
+        className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 8f1e0f0d-e2d6-456c-ae4a-21e661e9620b
+      current:
+        className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: cd4f4133-8327-48f1-a557-1490506cc236
+      current:
+        className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 86c31ffc-b59f-4cf0-b0ec-f1886e4bcf40
+      current:
+        className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 4a6ac13f-d0a4-4180-b15a-c544f665fafd
+      current:
+        className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      history:
+      - className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+    - guid: 641d2d15-83f0-4328-8b35-4063e914bc61
+      current:
+        className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      history:
+      - className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+    - guid: 27e11c20-b722-493e-aa56-1727a24a01e3
+      current:
+        className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: b7e9c3a1-5d2f-4e8b-9c1d-3a8f5e2b7c4d
+      current:
+        className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: 6abb3da8-3525-48cb-8265-f041b1cf0ba3
+      current:
+        className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: 859f7dd8-e326-40be-8ba0-669c9304b3d5
+      current:
+        className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c35019c4-4469-4ae6-a59f-4a9d10d9efaa
+      current:
+        className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c6f1d334-a1e4-4472-a7a0-311c3e84fd54
+      current:
+        className: ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+      history:
+      - className: ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+    - guid: 70eaf461-6ab4-46d7-b4b7-49179f7ad6bf
+      current:
+        className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: 943d0dd7-7080-4d28-8afc-44a649ac2c01
+      current:
+        className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: e271ae45-3257-4897-955f-d411a1dac94f
+      current:
+        className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 1dbd74af-ce56-4e7f-9220-df2aea692e5e
+      current:
+        className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec03
+      current:
+        className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 81cc0b9a-2497-4926-8561-ac701776a1a9
+      current:
+        className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: d37b9b22-ea96-49e0-bc20-4ab248c04c98
+      current:
+        className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 1fd72b18-30b4-4f37-ae61-b95f52eafb65
+      current:
+        className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 23efe9a1-a281-40d2-b288-c8dcdd3220e5
+      current:
+        className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 934eb4df-f887-40dd-b8bf-8750466e74b8
+      current:
+        className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec04
+      current:
+        className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec01
+      current:
+        className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec02
+      current:
+        className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: e9cc6b5e-b289-4855-b926-26b14830f97c
+      current:
+        className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 4b90f4d5-861f-4105-a2a5-48d8dbb5f9c8
+      current:
+        className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 8249f97b-a1dd-4f58-a8e0-f90ac8474588
+      current:
+        className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 83d6a5f5-44e1-40df-b527-9b2d3a1c2fd4
+      current:
+        className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 3cc73376-44db-4a4d-8fe3-c42ef153f7c8
+      current:
+        className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 0a82e952-f0ee-4dca-9f7d-0eb3217b6a31
+      current:
+        className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
+      history:
+      - className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
+    - guid: 0e2fb7fd-8e3c-45fc-a42b-5e197de8d603
+      current:
+        className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 1435a86b-0f3d-4a6f-8868-d4a3d49e6102
+      current:
+        className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 5f83b1cd-ae0a-4d1a-a6f7-2a7f4a984101
+      current:
+        className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    tags: []
+    events:
+    - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
+      current:
+        className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+      history:
+      - className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+    - guid: 2f724a92-c50a-49e6-a020-b69eea5148e7
+      current:
+        className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 51c3b5fd-fc92-4e07-9f3d-87d56666d845
+      current:
+        className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 50a2bb5d-99e0-4f12-abb7-d181b1133cb0
+      current:
+        className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: 998f596e-433b-4b10-b557-03b292444df2
+      current:
+        className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: 5d30f087-d3b5-411c-b3be-92faf9f9551f
+      current:
+        className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: f5910f59-cf18-4370-bfad-7251af0cb3d4
+      current:
+        className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: b877f5b3-e768-4e7c-8c5a-816ced8e01f2
+      current:
+        className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+      current:
+        className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
+      current:
+        className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b
+      current:
+        className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c
+      current:
+        className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+      current:
+        className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e
+      current:
+        className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: d6e7f8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0a
+      current:
+        className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f
+      current:
+        className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: 998f596e-435b-4b10-b557-03b292444df2
+      current:
+        className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+      history:
+      - className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+    - guid: ccc0e591-1c90-44ce-ac59-047f5d0ae639
+      current:
+        className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: fc29ab6d-b684-4536-bad6-527667fe3893
+      current:
+        className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5f01bc7a-7dbd-4b65-8adc-b120c440e628
+      current:
+        className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: da08195c-38df-4d75-a487-9de75ffe9bb5
+      current:
+        className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: f3375d59-1f44-427b-bd38-50cc4378a875
+      current:
+        className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 9d390ef1-31c4-411f-a5f6-c5725f647a33
+      current:
+        className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 69bdee89-872f-4804-8f31-a266a82808c0
+      current:
+        className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5840afa6-1ce5-4156-b8e3-4d734a965b69
+      current:
+        className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 12082f54-6fde-4583-b6c6-61879520d99c
+      current:
+        className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: f591b513-010f-479b-bfc7-9b91423e0801
+      current:
+        className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: be4c4d8c-c0f4-4a34-a072-a4a274a01bb8
+      current:
+        className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 7e6fce4d-cf07-4db8-b036-c682ef468c3b
+      current:
+        className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    links: []
+    linksList: []
+    multi: []
+  - worldTypeFullName: Aspid.StaticEcs.Windows.Tests.WindowsControllerTests+TestWorld
+    components:
+    - guid: 2ac6d128-cd2c-48a4-a18b-6cd79cefe903
+      current:
+        className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+      history:
+      - className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+    - guid: f6427f09-7e12-4b61-b453-b0837d8d08ba
+      current:
+        className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
+      history:
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
+    - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
+      current:
+        className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: 85f080de-0634-4b3d-bc95-c361c73d7f98
+      current:
+        className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: f84abac5-9978-4f04-85e7-3f91c43d8192
+      current:
+        className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+      history:
+      - className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+    - guid: 8d47b71d-f6a0-4ecf-9b4e-b9a3d8fae6c1
+      current:
+        className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+      history:
+      - className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+    - guid: ce5bcff2-7cdb-4b27-8c53-66c6639e28fa
+      current:
+        className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+      history:
+      - className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+    - guid: 3ee4b71a-e2d1-4446-9301-a36017ab984b
+      current:
+        className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 2fd68c53-cf5c-4d13-94cc-1ad5420a82d7
+      current:
+        className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 33487314-85fa-4e81-85ac-35fe029e1a78
+      current:
+        className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 755a5754-79b6-42da-a8b3-71788f063f4a
+      current:
+        className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 31db70ec-ecdd-4c31-89a6-c85c3507cfe2
+      current:
+        className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 8f1e0f0d-e2d6-456c-ae4a-21e661e9620b
+      current:
+        className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: cd4f4133-8327-48f1-a557-1490506cc236
+      current:
+        className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 86c31ffc-b59f-4cf0-b0ec-f1886e4bcf40
+      current:
+        className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 4a6ac13f-d0a4-4180-b15a-c544f665fafd
+      current:
+        className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      history:
+      - className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+    - guid: 641d2d15-83f0-4328-8b35-4063e914bc61
+      current:
+        className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      history:
+      - className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+    - guid: 27e11c20-b722-493e-aa56-1727a24a01e3
+      current:
+        className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: b7e9c3a1-5d2f-4e8b-9c1d-3a8f5e2b7c4d
+      current:
+        className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: 6abb3da8-3525-48cb-8265-f041b1cf0ba3
+      current:
+        className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: 859f7dd8-e326-40be-8ba0-669c9304b3d5
+      current:
+        className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c35019c4-4469-4ae6-a59f-4a9d10d9efaa
+      current:
+        className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c6f1d334-a1e4-4472-a7a0-311c3e84fd54
+      current:
+        className: ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+      history:
+      - className: ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+    - guid: 70eaf461-6ab4-46d7-b4b7-49179f7ad6bf
+      current:
+        className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: 943d0dd7-7080-4d28-8afc-44a649ac2c01
+      current:
+        className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: e271ae45-3257-4897-955f-d411a1dac94f
+      current:
+        className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 1dbd74af-ce56-4e7f-9220-df2aea692e5e
+      current:
+        className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec03
+      current:
+        className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 81cc0b9a-2497-4926-8561-ac701776a1a9
+      current:
+        className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: d37b9b22-ea96-49e0-bc20-4ab248c04c98
+      current:
+        className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 1fd72b18-30b4-4f37-ae61-b95f52eafb65
+      current:
+        className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 23efe9a1-a281-40d2-b288-c8dcdd3220e5
+      current:
+        className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 934eb4df-f887-40dd-b8bf-8750466e74b8
+      current:
+        className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec04
+      current:
+        className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec01
+      current:
+        className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec02
+      current:
+        className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: e9cc6b5e-b289-4855-b926-26b14830f97c
+      current:
+        className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 4b90f4d5-861f-4105-a2a5-48d8dbb5f9c8
+      current:
+        className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 8249f97b-a1dd-4f58-a8e0-f90ac8474588
+      current:
+        className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 83d6a5f5-44e1-40df-b527-9b2d3a1c2fd4
+      current:
+        className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 3cc73376-44db-4a4d-8fe3-c42ef153f7c8
+      current:
+        className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 0a82e952-f0ee-4dca-9f7d-0eb3217b6a31
+      current:
+        className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
+      history:
+      - className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
+    - guid: 0e2fb7fd-8e3c-45fc-a42b-5e197de8d603
+      current:
+        className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 1435a86b-0f3d-4a6f-8868-d4a3d49e6102
+      current:
+        className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 5f83b1cd-ae0a-4d1a-a6f7-2a7f4a984101
+      current:
+        className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    tags: []
+    events:
+    - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
+      current:
+        className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+      history:
+      - className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+    - guid: 2f724a92-c50a-49e6-a020-b69eea5148e7
+      current:
+        className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 51c3b5fd-fc92-4e07-9f3d-87d56666d845
+      current:
+        className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 50a2bb5d-99e0-4f12-abb7-d181b1133cb0
+      current:
+        className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: 998f596e-433b-4b10-b557-03b292444df2
+      current:
+        className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: 5d30f087-d3b5-411c-b3be-92faf9f9551f
+      current:
+        className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: f5910f59-cf18-4370-bfad-7251af0cb3d4
+      current:
+        className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: b877f5b3-e768-4e7c-8c5a-816ced8e01f2
+      current:
+        className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+      current:
+        className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
+      current:
+        className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b
+      current:
+        className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c
+      current:
+        className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+      current:
+        className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e
+      current:
+        className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: d6e7f8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0a
+      current:
+        className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f
+      current:
+        className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: 998f596e-435b-4b10-b557-03b292444df2
+      current:
+        className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+      history:
+      - className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+    - guid: ccc0e591-1c90-44ce-ac59-047f5d0ae639
+      current:
+        className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: fc29ab6d-b684-4536-bad6-527667fe3893
+      current:
+        className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5f01bc7a-7dbd-4b65-8adc-b120c440e628
+      current:
+        className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: da08195c-38df-4d75-a487-9de75ffe9bb5
+      current:
+        className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: f3375d59-1f44-427b-bd38-50cc4378a875
+      current:
+        className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 9d390ef1-31c4-411f-a5f6-c5725f647a33
+      current:
+        className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 69bdee89-872f-4804-8f31-a266a82808c0
+      current:
+        className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5840afa6-1ce5-4156-b8e3-4d734a965b69
+      current:
+        className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 12082f54-6fde-4583-b6c6-61879520d99c
+      current:
+        className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: f591b513-010f-479b-bfc7-9b91423e0801
+      current:
+        className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: be4c4d8c-c0f4-4a34-a072-a4a274a01bb8
+      current:
+        className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 7e6fce4d-cf07-4db8-b036-c682ef468c3b
+      current:
+        className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    links: []
+    linksList: []
+    multi: []
+  - worldTypeFullName: Aspid.StaticEcs.Windows.Tests.WindowsControllerTests+MissingWorld
+    components:
+    - guid: 2ac6d128-cd2c-48a4-a18b-6cd79cefe903
+      current:
+        className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+      history:
+      - className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+    - guid: f6427f09-7e12-4b61-b453-b0837d8d08ba
+      current:
+        className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
+      history:
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
+    - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
+      current:
+        className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: 85f080de-0634-4b3d-bc95-c361c73d7f98
+      current:
+        className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: f84abac5-9978-4f04-85e7-3f91c43d8192
+      current:
+        className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+      history:
+      - className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+    - guid: 8d47b71d-f6a0-4ecf-9b4e-b9a3d8fae6c1
+      current:
+        className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+      history:
+      - className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+    - guid: ce5bcff2-7cdb-4b27-8c53-66c6639e28fa
+      current:
+        className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+      history:
+      - className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+    - guid: 3ee4b71a-e2d1-4446-9301-a36017ab984b
+      current:
+        className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 2fd68c53-cf5c-4d13-94cc-1ad5420a82d7
+      current:
+        className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 33487314-85fa-4e81-85ac-35fe029e1a78
+      current:
+        className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 755a5754-79b6-42da-a8b3-71788f063f4a
+      current:
+        className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 31db70ec-ecdd-4c31-89a6-c85c3507cfe2
+      current:
+        className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 8f1e0f0d-e2d6-456c-ae4a-21e661e9620b
+      current:
+        className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: cd4f4133-8327-48f1-a557-1490506cc236
+      current:
+        className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 86c31ffc-b59f-4cf0-b0ec-f1886e4bcf40
+      current:
+        className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 4a6ac13f-d0a4-4180-b15a-c544f665fafd
+      current:
+        className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      history:
+      - className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+    - guid: 641d2d15-83f0-4328-8b35-4063e914bc61
+      current:
+        className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      history:
+      - className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+    - guid: 27e11c20-b722-493e-aa56-1727a24a01e3
+      current:
+        className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: b7e9c3a1-5d2f-4e8b-9c1d-3a8f5e2b7c4d
+      current:
+        className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: 6abb3da8-3525-48cb-8265-f041b1cf0ba3
+      current:
+        className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: 859f7dd8-e326-40be-8ba0-669c9304b3d5
+      current:
+        className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c35019c4-4469-4ae6-a59f-4a9d10d9efaa
+      current:
+        className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c6f1d334-a1e4-4472-a7a0-311c3e84fd54
+      current:
+        className: ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+      history:
+      - className: ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+    - guid: 70eaf461-6ab4-46d7-b4b7-49179f7ad6bf
+      current:
+        className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: 943d0dd7-7080-4d28-8afc-44a649ac2c01
+      current:
+        className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: e271ae45-3257-4897-955f-d411a1dac94f
+      current:
+        className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 1dbd74af-ce56-4e7f-9220-df2aea692e5e
+      current:
+        className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec03
+      current:
+        className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 81cc0b9a-2497-4926-8561-ac701776a1a9
+      current:
+        className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: d37b9b22-ea96-49e0-bc20-4ab248c04c98
+      current:
+        className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 1fd72b18-30b4-4f37-ae61-b95f52eafb65
+      current:
+        className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 23efe9a1-a281-40d2-b288-c8dcdd3220e5
+      current:
+        className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 934eb4df-f887-40dd-b8bf-8750466e74b8
+      current:
+        className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec04
+      current:
+        className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec01
+      current:
+        className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec02
+      current:
+        className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: e9cc6b5e-b289-4855-b926-26b14830f97c
+      current:
+        className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 4b90f4d5-861f-4105-a2a5-48d8dbb5f9c8
+      current:
+        className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 8249f97b-a1dd-4f58-a8e0-f90ac8474588
+      current:
+        className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 83d6a5f5-44e1-40df-b527-9b2d3a1c2fd4
+      current:
+        className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 3cc73376-44db-4a4d-8fe3-c42ef153f7c8
+      current:
+        className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 0a82e952-f0ee-4dca-9f7d-0eb3217b6a31
+      current:
+        className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
+      history:
+      - className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
+    - guid: 0e2fb7fd-8e3c-45fc-a42b-5e197de8d603
+      current:
+        className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 1435a86b-0f3d-4a6f-8868-d4a3d49e6102
+      current:
+        className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 5f83b1cd-ae0a-4d1a-a6f7-2a7f4a984101
+      current:
+        className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    tags: []
+    events:
+    - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
+      current:
+        className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+      history:
+      - className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+    - guid: 2f724a92-c50a-49e6-a020-b69eea5148e7
+      current:
+        className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 51c3b5fd-fc92-4e07-9f3d-87d56666d845
+      current:
+        className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 50a2bb5d-99e0-4f12-abb7-d181b1133cb0
+      current:
+        className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: 998f596e-433b-4b10-b557-03b292444df2
+      current:
+        className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: 5d30f087-d3b5-411c-b3be-92faf9f9551f
+      current:
+        className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: f5910f59-cf18-4370-bfad-7251af0cb3d4
+      current:
+        className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: b877f5b3-e768-4e7c-8c5a-816ced8e01f2
+      current:
+        className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+      current:
+        className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
+      current:
+        className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b
+      current:
+        className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c
+      current:
+        className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+      current:
+        className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e
+      current:
+        className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: d6e7f8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0a
+      current:
+        className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f
+      current:
+        className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: 998f596e-435b-4b10-b557-03b292444df2
+      current:
+        className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+      history:
+      - className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+    - guid: ccc0e591-1c90-44ce-ac59-047f5d0ae639
+      current:
+        className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: fc29ab6d-b684-4536-bad6-527667fe3893
+      current:
+        className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5f01bc7a-7dbd-4b65-8adc-b120c440e628
+      current:
+        className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: da08195c-38df-4d75-a487-9de75ffe9bb5
+      current:
+        className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: f3375d59-1f44-427b-bd38-50cc4378a875
+      current:
+        className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 9d390ef1-31c4-411f-a5f6-c5725f647a33
+      current:
+        className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 69bdee89-872f-4804-8f31-a266a82808c0
+      current:
+        className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5840afa6-1ce5-4156-b8e3-4d734a965b69
+      current:
+        className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 12082f54-6fde-4583-b6c6-61879520d99c
+      current:
+        className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: f591b513-010f-479b-bfc7-9b91423e0801
+      current:
+        className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: be4c4d8c-c0f4-4a34-a072-a4a274a01bb8
+      current:
+        className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 7e6fce4d-cf07-4db8-b036-c682ef468c3b
+      current:
+        className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    links: []
+    linksList: []
+    multi: []
+  - worldTypeFullName: Aspid.StaticEcs.Windows.Examples.EcsWindowsExample+ExampleWorld
+    components:
+    - guid: 2ac6d128-cd2c-48a4-a18b-6cd79cefe903
+      current:
+        className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+      history:
+      - className: NetworkIdentity
+        namespaceName: StaticMlp.Networking
+        assembly: Ecs.Networking
+    - guid: f6427f09-7e12-4b61-b453-b0837d8d08ba
+      current:
+        className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
+      history:
+      - className: ViewTransform
+        namespaceName: StaticMlp.Game.Presentation
+        assembly: Game.Core
+    - guid: 5f52be22-6d13-4f7a-9d2c-111111111111
+      current:
+        className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: CharacterNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: 85f080de-0634-4b3d-bc95-c361c73d7f98
+      current:
+        className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+      history:
+      - className: PhysicsCubeNetState
+        namespaceName: StaticMlp.Game.Components
+        assembly: Game.Core
+    - guid: f84abac5-9978-4f04-85e7-3f91c43d8192
+      current:
+        className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+      history:
+      - className: AiNetState
+        namespaceName: StaticMlp.Features.AiBots
+        assembly: StaticMlp.Features.AiBots
+    - guid: 8d47b71d-f6a0-4ecf-9b4e-b9a3d8fae6c1
+      current:
+        className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+      history:
+      - className: CampFlowProgression
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+    - guid: ce5bcff2-7cdb-4b27-8c53-66c6639e28fa
+      current:
+        className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+      history:
+      - className: CampFlowViewState
+        namespaceName: StaticMlp.Features.CampFlow
+        assembly: StaticMlp.Features.CampFlow.Contracts
+    - guid: 3ee4b71a-e2d1-4446-9301-a36017ab984b
+      current:
+        className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: DirectorState
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 2fd68c53-cf5c-4d13-94cc-1ad5420a82d7
+      current:
+        className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemyArchetype
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 33487314-85fa-4e81-85ac-35fe029e1a78
+      current:
+        className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+      history:
+      - className: EnemySpawnSource
+        namespaceName: StaticMlp.Features.CombatDirector
+        assembly: StaticMlp.Features.CombatDirector.Contracts
+    - guid: 755a5754-79b6-42da-a8b3-71788f063f4a
+      current:
+        className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ActiveExpeditionState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 31db70ec-ecdd-4c31-89a6-c85c3507cfe2
+      current:
+        className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: BossEncounterState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 8f1e0f0d-e2d6-456c-ae4a-21e661e9620b
+      current:
+        className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ExpeditionAvailabilityState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: cd4f4133-8327-48f1-a557-1490506cc236
+      current:
+        className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: RaidScheduleState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 86c31ffc-b59f-4cf0-b0ec-f1886e4bcf40
+      current:
+        className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+      history:
+      - className: ThreatState
+        namespaceName: StaticMlp.Features.Frontier
+        assembly: StaticMlp.Features.Frontier.Logic
+    - guid: 4a6ac13f-d0a4-4180-b15a-c544f665fafd
+      current:
+        className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      history:
+      - className: BossLoadoutPreparationState
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+    - guid: 641d2d15-83f0-4328-8b35-4063e914bc61
+      current:
+        className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+      history:
+      - className: BossPreparedLoadoutSnapshot
+        namespaceName: StaticMlp.Features.Loadout
+        assembly: StaticMlp.Features.Loadout.Logic
+    - guid: 27e11c20-b722-493e-aa56-1727a24a01e3
+      current:
+        className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: NpcIdentity
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: b7e9c3a1-5d2f-4e8b-9c1d-3a8f5e2b7c4d
+      current:
+        className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcRosterRecord
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: 6abb3da8-3525-48cb-8265-f041b1cf0ba3
+      current:
+        className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldChunkRef
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: 859f7dd8-e326-40be-8ba0-669c9304b3d5
+      current:
+        className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeState
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c35019c4-4469-4ae6-a59f-4a9d10d9efaa
+      current:
+        className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+      history:
+      - className: OpenWorldResourceNodeTransform
+        namespaceName: StaticMlp.Features.OpenWorldResources
+        assembly: StaticMlp.Features.OpenWorldResources
+    - guid: c6f1d334-a1e4-4472-a7a0-311c3e84fd54
+      current:
+        className: ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+      history:
+      - className: ProgressionState
+        namespaceName: StaticMlp.Features.Progression
+        assembly: StaticMlp.Features.Progression.Logic
+    - guid: 70eaf461-6ab4-46d7-b4b7-49179f7ad6bf
+      current:
+        className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcePickup
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: 943d0dd7-7080-4d28-8afc-44a649ac2c01
+      current:
+        className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+      history:
+      - className: ResourcesInventory
+        namespaceName: StaticMlp.Features.ResourcesInventoryMinimal
+        assembly: StaticMlp.Features.ResourcesInventoryMinimal
+    - guid: e271ae45-3257-4897-955f-d411a1dac94f
+      current:
+        className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SettlementAnchorRef
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 1dbd74af-ce56-4e7f-9220-df2aea692e5e
+      current:
+        className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: BedrollShelterState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec03
+      current:
+        className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 81cc0b9a-2497-4926-8561-ac701776a1a9
+      current:
+        className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ExtractionOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: d37b9b22-ea96-49e0-bc20-4ab248c04c98
+      current:
+        className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ProductionStationOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 1fd72b18-30b4-4f37-ae61-b95f52eafb65
+      current:
+        className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: SettlementSharedResources
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 23efe9a1-a281-40d2-b288-c8dcdd3220e5
+      current:
+        className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: StockpileOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 934eb4df-f887-40dd-b8bf-8750466e74b8
+      current:
+        className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: WorkbenchOperationState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec04
+      current:
+        className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionProgress
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec01
+      current:
+        className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionSiteState
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: 0d11fbba-0d66-40e4-973b-c19cdfb4ec02
+      current:
+        className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+      history:
+      - className: ConstructionTransform
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Logic
+    - guid: e9cc6b5e-b289-4855-b926-26b14830f97c
+      current:
+        className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: BuildingWorkerAssignmentState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 4b90f4d5-861f-4105-a2a5-48d8dbb5f9c8
+      current:
+        className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementCampBuilderJobState
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 8249f97b-a1dd-4f58-a8e0-f90ac8474588
+      current:
+        className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerAssignment
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 83d6a5f5-44e1-40df-b527-9b2d3a1c2fd4
+      current:
+        className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerIdentity
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 3cc73376-44db-4a4d-8fe3-c42ef153f7c8
+      current:
+        className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+      history:
+      - className: SettlementWorkerSummary
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Logic
+    - guid: 0a82e952-f0ee-4dca-9f7d-0eb3217b6a31
+      current:
+        className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
+      history:
+      - className: Health
+        namespaceName: StaticMlp.Features.Shared
+        assembly: StaticMlp.Features.Shared.Logic
+    - guid: 0e2fb7fd-8e3c-45fc-a42b-5e197de8d603
+      current:
+        className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusContext
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 1435a86b-0f3d-4a6f-8868-d4a3d49e6102
+      current:
+        className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusStrength
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    - guid: 5f83b1cd-ae0a-4d1a-a6f7-2a7f4a984101
+      current:
+        className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+      history:
+      - className: StatusTarget
+        namespaceName: StaticMlp.Features.Statuses
+        assembly: StaticMlp.Features.Statuses.Logic
+    tags: []
+    events:
+    - guid: 7f3b4b29-2bd0-4bc5-b548-2e09e302db47
+      current:
+        className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+      history:
+      - className: SpawnPhysicsCubeRequestEvent
+        namespaceName: StaticMlp.Game.Systems
+        assembly: Game.Core
+    - guid: 2f724a92-c50a-49e6-a020-b69eea5148e7
+      current:
+        className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionPressedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 51c3b5fd-fc92-4e07-9f3d-87d56666d845
+      current:
+        className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+      history:
+      - className: InputActionReleasedEvent
+        namespaceName: StaticMlp.Game.Input
+        assembly: Game.Core
+    - guid: 50a2bb5d-99e0-4f12-abb7-d181b1133cb0
+      current:
+        className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: BuildConstructionRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: 998f596e-433b-4b10-b557-03b292444df2
+      current:
+        className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: BuildConstructionResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: 5d30f087-d3b5-411c-b3be-92faf9f9551f
+      current:
+        className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: DepositConstructionResourcesRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: f5910f59-cf18-4370-bfad-7251af0cb3d4
+      current:
+        className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: DepositConstructionResourcesResultEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: b877f5b3-e768-4e7c-8c5a-816ced8e01f2
+      current:
+        className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+      history:
+      - className: PlaceBuildingRequestEvent
+        namespaceName: StaticMlp.Features.Buildings
+        assembly: StaticMlp.Features.Buildings.Contracts
+    - guid: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+      current:
+        className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
+      current:
+        className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: ExtractNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b
+      current:
+        className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcRequestEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c
+      current:
+        className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+      history:
+      - className: RescueNpcResultEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Contracts
+    - guid: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+      current:
+        className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionAcceptedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e
+      current:
+        className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcAcquisitionRejectedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: d6e7f8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0a
+      current:
+        className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobCompletedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f
+      current:
+        className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+      history:
+      - className: NpcIncubationJobStartedEvent
+        namespaceName: StaticMlp.Features.Npc
+        assembly: StaticMlp.Features.Npc.Logic
+    - guid: 998f596e-435b-4b10-b557-03b292444df2
+      current:
+        className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+      history:
+      - className: OpenWorldChunkUnloadEvent
+        namespaceName: StaticMlp.Features.OpenWorldGeneration
+        assembly: StaticMlp.Features.OpenWorldGeneration.Contracts
+    - guid: ccc0e591-1c90-44ce-ac59-047f5d0ae639
+      current:
+        className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: fc29ab6d-b684-4536-bad6-527667fe3893
+      current:
+        className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: ClaimProductionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5f01bc7a-7dbd-4b65-8adc-b120c440e628
+      current:
+        className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: da08195c-38df-4d75-a487-9de75ffe9bb5
+      current:
+        className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: CollectExtractionOutputResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: f3375d59-1f44-427b-bd38-50cc4378a875
+      current:
+        className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 9d390ef1-31c4-411f-a5f6-c5725f647a33
+      current:
+        className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: DepositCarriedResourcesToStockpileResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 69bdee89-872f-4804-8f31-a266a82808c0
+      current:
+        className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeRequestEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 5840afa6-1ce5-4156-b8e3-4d734a965b69
+      current:
+        className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+      history:
+      - className: SetProductionRecipeResultEvent
+        namespaceName: StaticMlp.Features.Settlement
+        assembly: StaticMlp.Features.Settlement.Contracts
+    - guid: 12082f54-6fde-4583-b6c6-61879520d99c
+      current:
+        className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: f591b513-010f-479b-bfc7-9b91423e0801
+      current:
+        className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetBuildingWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: be4c4d8c-c0f4-4a34-a072-a4a274a01bb8
+      current:
+        className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetSettlementWorkerAssignmentRequestEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    - guid: 7e6fce4d-cf07-4db8-b036-c682ef468c3b
+      current:
+        className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+      history:
+      - className: SetSettlementWorkerAssignmentResultEvent
+        namespaceName: StaticMlp.Features.Settlement.Workers
+        assembly: StaticMlp.Features.Settlement.Workers.Contracts
+    links: []
+    linksList: []
+    multi: []

@@ -1,0 +1,19 @@
+{
+    "name": "Aspid.StaticEcs.Windows.Examples",
+    "rootNamespace": "Aspid.StaticEcs.Windows.Examples",
+    "references": [
+        "Aspid.MVVM",
+        "Aspid.StaticEcs.Windows",
+        "FFS.StaticEcs",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}
