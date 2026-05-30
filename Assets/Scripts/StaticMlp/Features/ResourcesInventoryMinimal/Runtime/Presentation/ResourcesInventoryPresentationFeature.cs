@@ -1,4 +1,6 @@
+using Aspid.StaticEcs;
 using Aspid.StaticEcs.Windows;
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Game.Presentation;
@@ -30,18 +32,23 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         {
             var hudBridge = new ResourcesInventoryHudBridgeSystem();
             var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
+            var registry = CW.GetResource<EcsLinkRegistry<ClientCoreWT>>();
+            registry.RegisterComponent<ResourcesInventoryHudViewModel, ResourcesInventoryHudViewData>(
+                static (viewModel, in data) => viewModel.Apply(in data));
 
             windows.RegisterWindow<ResourcesInventoryHudWindow, EcsWindowNoData, ResourcesInventoryHudView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<ResourcesInventoryHudView>(INVENTORY_HUD_VIEW_PATH),
                 EcsWindowLayer.Persistent,
                 persistentSortOrder: 20);
-            windows.RegisterViewModel<ResourcesInventoryHudWindow, EcsWindowNoData, ResourcesInventoryHudSlot, ResourcesInventoryHudViewModel>(
+            windows.RegisterLinkedViewModel<ResourcesInventoryHudWindow, EcsWindowNoData, ResourcesInventoryHudSlot, ResourcesInventoryHudViewModel>(
                 static _ => new ResourcesInventoryHudViewModel(),
+                static _ => ResolveSingletonPresentationEntity<ResourcesInventoryHudViewData>(),
                 EcsWindowOpenInputBindings.Ignore<ClientCoreWT, ResourcesInventoryHudWindow, EcsWindowNoData, ResourcesInventoryHudViewModel>);
 
             CW.SetResource(ResourcesInventoryConfig.CreateDefault());
             systems.Add(new ClientResourcePickupViewBindSystem(), ViewSystemOrder.BindViews - 10);
             systems.Add(new ClientResourcePickupMagnetViewSystem(), ViewSystemOrder.BuildPresentationState);
+            systems.Add(new ClientResourcesInventoryPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 29);
             systems.Add(new PersistentEcsWindowHostSystem<ClientCoreWT, ResourcesInventoryHudWindow>(), GameplaySystemOrder.ClientPresentation + 30);
             systems.Add(hudBridge, GameplaySystemOrder.ClientPresentation + 31);
         }
@@ -49,6 +56,15 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
         public override void RegisterClientViewSync(ViewSyncBuilder views)
         {
             views.Register<ResourcePickupViewState>();
+        }
+
+        private static EntityGID ResolveSingletonPresentationEntity<TComponent>()
+            where TComponent : struct, IComponent
+        {
+            foreach (var entity in CW.Query<All<TComponent>>().Entities())
+                return entity.GID;
+
+            throw new System.InvalidOperationException($"{typeof(TComponent).FullName} entity is missing.");
         }
     }
 }

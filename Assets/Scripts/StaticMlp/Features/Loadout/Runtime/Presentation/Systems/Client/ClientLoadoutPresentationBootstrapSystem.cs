@@ -7,7 +7,7 @@ namespace StaticMlp.Features.Loadout
     {
         public void Init()
         {
-            // No IResource presentation states to initialize; bridges read directly from logic components.
+            CW.NewEntity<Default>().Set(new LoadoutPreparationViewData());
         }
     }
 }

@@ -1,15 +1,23 @@
-using Aspid.StaticEcs.Windows;
+using System;
+using Aspid.MVVM;
 
 namespace StaticMlp.Features.ResourcesInventoryMinimal
 {
-    public sealed class ResourcesInventoryHudViewModel : EcsWindowViewModelBase
+    [ViewModel]
+    public sealed partial class ResourcesInventoryHudViewModel
     {
-        public ResourcesInventoryHudPresentation Presentation { get; private set; }
+        [OneWayBind] private ResourcesInventoryHudPresentation _presentation;
 
-        public void Sync(in ResourcesInventoryHudPresentation presentation)
+        public event Action Changed;
+
+        public void Apply(in ResourcesInventoryHudViewData data)
         {
-            Presentation = presentation;
-            NotifyChanged();
+            Presentation = data.Presentation;
+        }
+
+        partial void OnPresentationChanged(ResourcesInventoryHudPresentation newValue)
+        {
+            Changed?.Invoke();
         }
     }
 }

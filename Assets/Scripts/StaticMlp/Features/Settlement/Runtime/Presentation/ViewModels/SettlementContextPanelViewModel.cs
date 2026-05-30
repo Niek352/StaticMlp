@@ -1,26 +1,30 @@
 using System;
-using Aspid.StaticEcs.Windows;
+using Aspid.MVVM;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class SettlementContextPanelViewModel : EcsWindowViewModelBase
+    [ViewModel]
+    public sealed partial class SettlementContextPanelViewModel
     {
-        public BuildingContextPanelState Building { get; private set; }
-        public WorkerContextPanelState Worker { get; private set; }
-        public SettlementContextPanelMode Mode { get; private set; }
+        [OneWayBind] private SettlementContextPanelViewData _data;
 
-        public void Sync(
-            in BuildingContextPanelState building,
-            in WorkerContextPanelState worker,
-            SettlementContextPanelMode mode)
+        public event Action Changed;
+
+        public BuildingContextPanelState Building => Data.Building;
+        public WorkerContextPanelState Worker => Data.Worker;
+        public SettlementContextPanelMode Mode => Data.Mode;
+
+        public void Apply(in SettlementContextPanelViewData data)
         {
-            Building = building;
-            Worker = worker;
-            Mode = mode;
-            NotifyChanged();
+            Data = data;
+        }
+
+        partial void OnDataChanged(SettlementContextPanelViewData newValue)
+        {
+            Changed?.Invoke();
         }
 
         public void HandlePrimaryAction()

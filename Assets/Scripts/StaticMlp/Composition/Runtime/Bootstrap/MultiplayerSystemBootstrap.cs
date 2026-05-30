@@ -1,3 +1,4 @@
+using Aspid.StaticEcs;
 using Aspid.StaticEcs.Windows;
 using FFS.Libraries.StaticEcs.Unity;
 using StaticMlp.Features.EcsViews;
@@ -65,6 +66,7 @@ namespace StaticMlp.Composition
             systemsBuilder.Add(new BindEntityViewSystem(viewFactory), ViewSystemOrder.BindViews);
             systemsBuilder.Add(new EcsWindowRequestSystem<ClientCoreWT>(), GameplaySystemOrder.ClientPresentation - 1);
             GameplayFeatureDiscovery.RegisterClientCoreSystems(systemsBuilder);
+            systemsBuilder.Add(new EcsLinkSyncSystem<ClientCoreWT>(), ViewSystemOrder.ApplyPresentationState - 1);
             GameplayFeatureDiscovery.RegisterClientViewSync(
                 new ViewSyncBuilder(systemsBuilder, ViewSystemOrder.ApplyPresentationState));
             systemsBuilder.Add(new DestroyEntityViewSystem(), ViewSystemOrder.DestroyViews);

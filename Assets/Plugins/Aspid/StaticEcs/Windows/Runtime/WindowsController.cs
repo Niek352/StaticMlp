@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Aspid.MVVM;
+using Aspid.StaticEcs;
 using Cysharp.Threading.Tasks;
 using FFS.Libraries.StaticEcs;
 
@@ -97,6 +98,47 @@ namespace Aspid.StaticEcs.Windows
             }
 
             var slot = new SlotEntry<TWindow, TInput, TSlot, TViewModel>(factory, applyInput);
+            entry.SlotsByType.Add(slotType, slot);
+            entry.Slots.Add(slot);
+        }
+
+        public void RegisterLinkedViewModel<TWindow, TInput, TSlot, TViewModel>(
+            Func<EcsWindowContext<TWorld, TWindow, TInput>, TViewModel> factory,
+            Func<EcsWindowContext<TWorld, TWindow, TInput>, EntityGID> entityResolver,
+            EcsWindowOpenInputBinding<TWorld, TWindow, TInput, TViewModel> applyInput)
+            where TWindow : struct, IEcsWindow
+            where TSlot : struct, IEcsWindowSlot
+            where TViewModel : class, IViewModel
+        {
+            ThrowIfDisposed();
+
+            if (factory == null)
+                throw new ArgumentNullException(nameof(factory));
+
+            if (entityResolver == null)
+                throw new ArgumentNullException(nameof(entityResolver));
+
+            if (applyInput == null)
+                throw new ArgumentNullException(nameof(applyInput));
+
+            var entry = GetEntry(typeof(TWindow));
+            if (entry.InputType != typeof(TInput))
+            {
+                throw new InvalidOperationException(
+                    $"ECS window `{typeof(TWindow).FullName}` expects input `{entry.InputType.FullName}`, not `{typeof(TInput).FullName}`.");
+            }
+
+            var slotType = typeof(TSlot);
+            if (entry.SlotsByType.ContainsKey(slotType))
+            {
+                throw new InvalidOperationException(
+                    $"ECS window `{typeof(TWindow).FullName}` already has a ViewModel registered for slot `{slotType.FullName}`.");
+            }
+
+            var slot = new LinkedSlotEntry<TWindow, TInput, TSlot, TViewModel>(
+                factory,
+                entityResolver,
+                applyInput);
             entry.SlotsByType.Add(slotType, slot);
             entry.Slots.Add(slot);
         }
@@ -725,11 +767,76 @@ namespace Aspid.StaticEcs.Windows
                 WindowEntry entry,
                 object input);
 
-            public void DisposeViewModel()
+            public virtual void DisposeViewModel()
             {
                 ViewModel?.DisposeViewModel();
                 ViewModel = null;
                 IsBound = false;
+            }
+        }
+
+        private sealed class LinkedSlotEntry<TWindow, TInput, TSlot, TViewModel> : SlotEntry
+            where TWindow : struct, IEcsWindow
+            where TSlot : struct, IEcsWindowSlot
+            where TViewModel : class, IViewModel
+        {
+            private readonly Func<EcsWindowContext<TWorld, TWindow, TInput>, TViewModel> _factory;
+            private readonly Func<EcsWindowContext<TWorld, TWindow, TInput>, EntityGID> _entityResolver;
+            private readonly EcsWindowOpenInputBinding<TWorld, TWindow, TInput, TViewModel> _applyInput;
+            private EcsLink<TWorld, TViewModel> _link;
+
+            public LinkedSlotEntry(
+                Func<EcsWindowContext<TWorld, TWindow, TInput>, TViewModel> factory,
+                Func<EcsWindowContext<TWorld, TWindow, TInput>, EntityGID> entityResolver,
+                EcsWindowOpenInputBinding<TWorld, TWindow, TInput, TViewModel> applyInput)
+                : base(typeof(TSlot), typeof(TViewModel))
+            {
+                _factory = factory;
+                _entityResolver = entityResolver;
+                _applyInput = applyInput;
+            }
+
+            public override void CreateIfMissingAndApply(
+                WindowsController<TWorld> windows,
+                WindowEntry entry,
+                object input)
+            {
+                if (entry.WindowType != typeof(TWindow) || entry.InputType != typeof(TInput))
+                {
+                    throw new InvalidOperationException(
+                        $"ECS window `{entry.WindowType.FullName}` slot `{SlotType.FullName}` was requested with invalid input type.");
+                }
+
+                var context = new EcsWindowContext<TWorld, TWindow, TInput>(windows, (TInput)input);
+                if (ViewModel == null)
+                {
+                    var viewModel = _factory(context);
+                    if (viewModel == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"Factory returned null ViewModel `{typeof(TViewModel).FullName}` for ECS window `{entry.WindowType.FullName}` slot `{SlotType.FullName}`.");
+                    }
+
+                    ViewModel = viewModel;
+                }
+
+                _applyInput((TViewModel)ViewModel, in context);
+
+                var gid = _entityResolver(context);
+                if (_link != null && !_link.IsDisposed && _link.EntityGID == gid)
+                    return;
+
+                _link?.Dispose();
+                var entity = gid.Unpack<TWorld>();
+                var registry = World<TWorld>.GetResource<EcsLinkRegistry<TWorld>>();
+                _link = registry.Attach(entity, (TViewModel)ViewModel);
+            }
+
+            public override void DisposeViewModel()
+            {
+                _link?.Dispose();
+                _link = null;
+                base.DisposeViewModel();
             }
         }
 

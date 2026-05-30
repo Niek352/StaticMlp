@@ -1,38 +1,41 @@
 using System;
+using Aspid.MVVM;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Buildings;
-using Aspid.StaticEcs.Windows;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class BuildingManagementPanelViewModel : EcsWindowViewModelBase
+    [ViewModel]
+    public sealed partial class BuildingManagementPanelViewModel
     {
+        [OneWayBind] private BuildingPanelState _displayState;
+
         private BuildingPanelState _sourceState;
-        private BuildingPanelState _displayState;
         private EntityGID _workbenchActionTarget;
         private int _workbenchActionIndex;
 
-        public BuildingPanelState State => _displayState;
+        public event Action Changed;
 
-        public void Sync(in BuildingPanelState state)
+        public BuildingPanelState State => DisplayState;
+
+        public void Apply(in BuildingManagementPanelViewData data)
         {
-            _sourceState = state;
+            _sourceState = data.State;
             ClampWorkbenchActionSelection(in _sourceState);
-            _displayState = BuildDisplayState(in _sourceState);
-            NotifyChanged();
+            DisplayState = BuildDisplayState(in _sourceState);
         }
 
         public void HandlePrimaryAction()
         {
-            HandlePanelAction(_displayState.PrimaryAction);
+            HandlePanelAction(DisplayState.PrimaryAction);
         }
 
         public void HandleSecondaryAction()
         {
-            HandlePanelAction(_displayState.SecondaryAction);
+            HandlePanelAction(DisplayState.SecondaryAction);
         }
 
         public void Close()
@@ -136,8 +139,12 @@ namespace StaticMlp.Features.Settlement
                 throw new InvalidOperationException("Workbench action cycling requires at least two actions.");
 
             _workbenchActionIndex = (_workbenchActionIndex + 1) % actionCount;
-            _displayState = BuildDisplayState(in _sourceState);
-            NotifyChanged();
+            DisplayState = BuildDisplayState(in _sourceState);
+        }
+
+        partial void OnDisplayStateChanged(BuildingPanelState newValue)
+        {
+            Changed?.Invoke();
         }
 
         private static int CountWorkbenchActions(in BuildingPanelState state)

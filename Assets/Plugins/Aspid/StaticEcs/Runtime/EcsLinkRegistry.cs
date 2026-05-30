@@ -25,20 +25,32 @@ namespace Aspid.StaticEcs
 
             var gid = entity.GID;
             var viewModelType = typeof(TViewModel);
-            var key = new LinkKey(gid, viewModelType);
-
-            if (_linksByKey.ContainsKey(key))
-                throw new InvalidOperationException(
-                    $"ECS link already exists for entity `{gid.Raw}` and ViewModel `{viewModelType.FullName}`.");
+            ThrowIfLinkExists(gid, viewModelType);
 
             var viewModel = factory(gid);
             if (viewModel == null)
                 throw new InvalidOperationException(
                     $"ECS link factory returned null for ViewModel `{viewModelType.FullName}`.");
 
+            return Attach(entity, viewModel, disposeViewModel);
+        }
+
+        public EcsLink<TWorld, TViewModel> Attach<TViewModel>(
+            World<TWorld>.Entity entity,
+            TViewModel viewModel,
+            bool disposeViewModel = false)
+            where TViewModel : class, IViewModel
+        {
+            if (viewModel == null)
+                throw new ArgumentNullException(nameof(viewModel));
+
+            var gid = entity.GID;
+            var viewModelType = typeof(TViewModel);
+            ThrowIfLinkExists(gid, viewModelType);
+
             var link = new EcsLink<TWorld, TViewModel>(this, gid, viewModel, disposeViewModel);
             var entry = new LinkEntry<TViewModel>(link);
-            AddLink(key, entry);
+            AddLink(new LinkKey(gid, viewModelType), entry);
             ApplyInitial(entry, entity);
 
             return link;
@@ -110,6 +122,14 @@ namespace Aspid.StaticEcs
             }
 
             links.Add(link);
+        }
+
+        private void ThrowIfLinkExists(EntityGID gid, Type viewModelType)
+        {
+            var key = new LinkKey(gid, viewModelType);
+            if (_linksByKey.ContainsKey(key))
+                throw new InvalidOperationException(
+                    $"ECS link already exists for entity `{gid.Raw}` and ViewModel `{viewModelType.FullName}`.");
         }
 
         private void RegisterBinding(IBinding binding)

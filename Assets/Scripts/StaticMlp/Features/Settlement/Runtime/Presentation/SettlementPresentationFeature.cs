@@ -1,4 +1,6 @@
+using Aspid.StaticEcs;
 using Aspid.StaticEcs.Windows;
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking;
 
@@ -18,37 +20,50 @@ namespace StaticMlp.Features.Settlement
             var buildingPanelBridge = new BuildingManagementPanelBridgeSystem();
             var contextPanelBridge = new SettlementContextPanelCompositeBridgeSystem();
             var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
+            var registry = CW.GetResource<EcsLinkRegistry<ClientCoreWT>>();
+            registry.RegisterComponent<SettlementHudViewModel, SettlementHudViewData>(
+                static (viewModel, in data) => viewModel.Apply(in data));
+            registry.RegisterComponent<InteractionPromptViewModel, InteractionPromptViewData>(
+                static (viewModel, in data) => viewModel.Apply(in data));
+            registry.RegisterComponent<BuildingManagementPanelViewModel, BuildingManagementPanelViewData>(
+                static (viewModel, in data) => viewModel.Apply(in data));
+            registry.RegisterComponent<SettlementContextPanelViewModel, SettlementContextPanelViewData>(
+                static (viewModel, in data) => viewModel.Apply(in data));
 
             windows.RegisterWindow<SettlementHudWindow, EcsWindowNoData, SettlementHudView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<SettlementHudView>(HUD_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Persistent,
                 persistentSortOrder: 0);
-            windows.RegisterViewModel<SettlementHudWindow, EcsWindowNoData, SettlementHudSlot, SettlementHudViewModel>(
+            windows.RegisterLinkedViewModel<SettlementHudWindow, EcsWindowNoData, SettlementHudSlot, SettlementHudViewModel>(
                 static _ => new SettlementHudViewModel(),
+                static _ => ResolveSingletonPresentationEntity<SettlementHudViewData>(),
                 EcsWindowOpenInputBindings.Ignore<ClientCoreWT, SettlementHudWindow, EcsWindowNoData, SettlementHudViewModel>);
 
             windows.RegisterWindow<InteractionPromptWindow, EcsWindowNoData, InteractionPromptView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<InteractionPromptView>(INTERACTION_PROMPT_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Persistent,
                 persistentSortOrder: 95);
-            windows.RegisterViewModel<InteractionPromptWindow, EcsWindowNoData, InteractionPromptSlot, InteractionPromptViewModel>(
+            windows.RegisterLinkedViewModel<InteractionPromptWindow, EcsWindowNoData, InteractionPromptSlot, InteractionPromptViewModel>(
                 static _ => new InteractionPromptViewModel(),
+                static _ => ResolveSingletonPresentationEntity<InteractionPromptViewData>(),
                 EcsWindowOpenInputBindings.Ignore<ClientCoreWT, InteractionPromptWindow, EcsWindowNoData, InteractionPromptViewModel>);
 
             windows.RegisterWindow<BuildingManagementPanelWindow, EcsWindowNoData, BuildingManagementPanelView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<BuildingManagementPanelView>(BUILDING_MANAGEMENT_PANEL_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Persistent,
                 persistentSortOrder: 110);
-            windows.RegisterViewModel<BuildingManagementPanelWindow, EcsWindowNoData, BuildingManagementPanelSlot, BuildingManagementPanelViewModel>(
+            windows.RegisterLinkedViewModel<BuildingManagementPanelWindow, EcsWindowNoData, BuildingManagementPanelSlot, BuildingManagementPanelViewModel>(
                 static _ => new BuildingManagementPanelViewModel(),
+                static _ => ResolveSingletonPresentationEntity<BuildingManagementPanelViewData>(),
                 EcsWindowOpenInputBindings.Ignore<ClientCoreWT, BuildingManagementPanelWindow, EcsWindowNoData, BuildingManagementPanelViewModel>);
 
             windows.RegisterWindow<SettlementContextPanelWindow, EcsWindowNoData, SettlementContextPanelView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<SettlementContextPanelView>(CONTEXT_PANEL_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Persistent,
                 persistentSortOrder: 100);
-            windows.RegisterViewModel<SettlementContextPanelWindow, EcsWindowNoData, SettlementContextPanelSlot, SettlementContextPanelViewModel>(
+            windows.RegisterLinkedViewModel<SettlementContextPanelWindow, EcsWindowNoData, SettlementContextPanelSlot, SettlementContextPanelViewModel>(
                 static _ => new SettlementContextPanelViewModel(),
+                static _ => ResolveSingletonPresentationEntity<SettlementContextPanelViewData>(),
                 EcsWindowOpenInputBindings.Ignore<ClientCoreWT, SettlementContextPanelWindow, EcsWindowNoData, SettlementContextPanelViewModel>);
 
             systems.Add(new ClientSettlementPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 1);
@@ -72,6 +87,15 @@ namespace StaticMlp.Features.Settlement
             systems.Add(new StateDrivenEcsWindowHostSystem<ClientCoreWT, SettlementContextPanelWindow, SettlementContextPanelSession>(
                 static (in SettlementContextPanelSession state) => state.Mode != SettlementContextPanelMode.None), GameplaySystemOrder.ClientPresentation + 15);
             systems.Add(contextPanelBridge, GameplaySystemOrder.ClientPresentation + 16);
+        }
+
+        private static EntityGID ResolveSingletonPresentationEntity<TComponent>()
+            where TComponent : struct, IComponent
+        {
+            foreach (var entity in CW.Query<All<TComponent>>().Entities())
+                return entity.GID;
+
+            throw new System.InvalidOperationException($"{typeof(TComponent).FullName} entity is missing.");
         }
     }
 }

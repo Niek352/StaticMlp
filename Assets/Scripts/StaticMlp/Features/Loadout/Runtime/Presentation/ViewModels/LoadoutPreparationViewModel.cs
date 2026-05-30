@@ -28,21 +28,17 @@ namespace StaticMlp.Features.Loadout
             return "None";
         }
 
-        public void Sync(
-            bool isAvailable,
-            bool canPrepareBoss,
-            bool isBossCommitted,
-            LoadoutModuleId selectedPrimaryModuleId)
+        public void Apply(in LoadoutPreparationViewData data)
         {
-            IsAvailable = isAvailable;
-            CanPrepareBoss = canPrepareBoss;
-            IsBossCommitted = isBossCommitted;
-            SelectedPrimaryModuleName = DescribeModule(selectedPrimaryModuleId);
-            PoisonArrowSelected = selectedPrimaryModuleId == LoadoutModuleCatalog.PoisonArrowModuleId;
-            FireFlaskSelected = selectedPrimaryModuleId == LoadoutModuleCatalog.FireFlaskModuleId;
-            PoisonArrowInteractable = !isBossCommitted;
-            FireFlaskInteractable = !isBossCommitted;
-            ConfirmInteractable = isAvailable && !isBossCommitted;
+            IsAvailable = data.IsAvailable;
+            CanPrepareBoss = data.CanPrepareBoss;
+            IsBossCommitted = data.IsBossCommitted;
+            SelectedPrimaryModuleName = DescribeModule(data.SelectedPrimaryModuleId);
+            PoisonArrowSelected = data.SelectedPrimaryModuleId == LoadoutModuleCatalog.PoisonArrowModuleId;
+            FireFlaskSelected = data.SelectedPrimaryModuleId == LoadoutModuleCatalog.FireFlaskModuleId;
+            PoisonArrowInteractable = !data.IsBossCommitted;
+            FireFlaskInteractable = !data.IsBossCommitted;
+            ConfirmInteractable = data.IsAvailable && !data.IsBossCommitted;
             Summary = CreateSummary();
 
             SelectPoisonArrowCommand.NotifyCanExecuteChanged();

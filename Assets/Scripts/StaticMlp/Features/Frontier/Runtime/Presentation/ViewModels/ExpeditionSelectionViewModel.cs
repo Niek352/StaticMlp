@@ -1,12 +1,16 @@
-using Aspid.StaticEcs.Windows;
+using System;
+using Aspid.MVVM;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Frontier
 {
-    public sealed class ExpeditionSelectionViewModel : EcsWindowViewModelBase
+    [ViewModel]
+    public sealed partial class ExpeditionSelectionViewModel
     {
-        public ExpeditionSelectionScreenState State { get; private set; }
+        [OneWayBind] private ExpeditionSelectionScreenState _state;
+
+        public event Action Changed;
 
         public static string DescribePreparedBuild(LoadoutModuleId moduleId)
         {
@@ -19,10 +23,14 @@ namespace StaticMlp.Features.Frontier
             return "Not prepared";
         }
 
-        public void Sync(in ExpeditionSelectionScreenState state)
+        public void Apply(in ExpeditionSelectionViewData data)
         {
-            State = state;
-            NotifyChanged();
+            State = data.State;
+        }
+
+        partial void OnStateChanged(ExpeditionSelectionScreenState newValue)
+        {
+            Changed?.Invoke();
         }
 
         public void StartExpedition()

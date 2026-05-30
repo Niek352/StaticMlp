@@ -1,4 +1,4 @@
-using Aspid.StaticEcs.Windows;
+using System;
 using StaticMlp.Features.CampFlow;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Loadout;
@@ -9,10 +9,9 @@ using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Frontier
 {
-    public sealed class ExpeditionSelectionBridgeSystem
-        : EcsWindowPresentationBridgeSystem<ClientCoreWT, ExpeditionSelectionWindow, ExpeditionSelectionSlot, ExpeditionSelectionViewModel>
+    public sealed class ExpeditionSelectionBridgeSystem : ISystem
     {
-        protected override void SyncPresentation(ExpeditionSelectionViewModel viewModel)
+        public void Update()
         {
             var state = new ExpeditionSelectionScreenState
             {
@@ -62,7 +61,14 @@ namespace StaticMlp.Features.Frontier
                   && state.ThreatPhase != ThreatPhase.RaidPending
                   && state.ThreatPhase != ThreatPhase.RaidActive;
 
-            viewModel.Sync(in state);
+            foreach (var entity in CW.Query<All<ExpeditionSelectionViewData>>().Entities())
+            {
+                ref var data = ref entity.Mut<ExpeditionSelectionViewData>();
+                data.State = state;
+                return;
+            }
+
+            throw new InvalidOperationException($"{nameof(ExpeditionSelectionViewData)} entity is missing.");
         }
     }
 }

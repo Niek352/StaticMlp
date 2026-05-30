@@ -1,18 +1,25 @@
+using System;
+using Aspid.MVVM;
 using StaticMlp.Features.BuildingCatalog;
-using Aspid.StaticEcs.Windows;
-using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Buildings
 {
-    public sealed class BuildingMenuViewModel : EcsWindowViewModelBase
+    [ViewModel]
+    public sealed partial class BuildingMenuViewModel
     {
-        public BuildingMenuPresentation Presentation { get; private set; }
+        [OneWayBind] private BuildingMenuPresentation _presentation;
 
-        public void Sync(in BuildingMenuState state)
+        public event Action Changed;
+
+        public void Apply(in BuildingMenuViewData data)
         {
-            Presentation = BuildingMenuPresentation.Create(in state, CW.GetResource<ClientSettlementUnlockState>());
-            NotifyChanged();
+            Presentation = data.Presentation;
+        }
+
+        partial void OnPresentationChanged(BuildingMenuPresentation newValue)
+        {
+            Changed?.Invoke();
         }
 
         public void CloseMenu()

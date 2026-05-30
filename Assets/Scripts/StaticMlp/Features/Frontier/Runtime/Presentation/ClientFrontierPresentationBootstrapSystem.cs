@@ -8,7 +8,8 @@ namespace StaticMlp.Features.Frontier
     {
         public void Init()
         {
-            // No IResource presentation states to initialize; bridges read directly from logic components.
+            CW.NewEntity<Default>().Set(new ExpeditionSelectionViewData());
+            CW.NewEntity<Default>().Set(new ThreatBannerViewData());
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Aspid.StaticEcs;
 using Aspid.StaticEcs.Windows;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
@@ -282,6 +283,7 @@ namespace StaticMlp.Composition
 
             _clientWindowsController = new WindowsController<ClientCoreWT>();
             CW.SetResource(_clientWindowsController);
+            CW.SetResource(new EcsLinkRegistry<ClientCoreWT>());
             MultiplayerSystemBootstrap.CreateClientCoreSystems(transportBackend);
             _clientStarted = true;
             Log("Client systems initialized");

@@ -3,6 +3,7 @@
     "rootNamespace": "Aspid.StaticEcs.Windows",
     "references": [
         "Aspid.MVVM",
+        "Aspid.StaticEcs",
         "FFS.StaticEcs",
         "UniTask"
     ],

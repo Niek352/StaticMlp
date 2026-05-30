@@ -1,15 +1,23 @@
-using Aspid.StaticEcs.Windows;
+using System;
+using Aspid.MVVM;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class InteractionPromptViewModel : EcsWindowViewModelBase
+    [ViewModel]
+    public sealed partial class InteractionPromptViewModel
     {
-        public InteractionPromptState State { get; private set; }
+        [OneWayBind] private InteractionPromptState _state;
 
-        public void Sync(in InteractionPromptState state)
+        public event Action Changed;
+
+        public void Apply(in InteractionPromptViewData data)
         {
-            State = state;
-            NotifyChanged();
+            State = data.State;
+        }
+
+        partial void OnStateChanged(InteractionPromptState newValue)
+        {
+            Changed?.Invoke();
         }
     }
 }

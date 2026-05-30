@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Aspid.MVVM;
+using Aspid.StaticEcs;
 using Aspid.StaticEcs.Windows;
 using Cysharp.Threading.Tasks;
 using FFS.Libraries.StaticEcs;
@@ -23,6 +24,7 @@ namespace Aspid.StaticEcs.Windows.Tests
 
             TestW.Create(WorldConfig.Default());
             TestW.Types()
+                .Component<TestPresentation>()
                 .Event<CloseTopEcsWindowRequest>()
                 .Event<CloseAllEcsWindowsRequest>()
                 .Event<SetAllEcsWindowsPresentationActiveRequest>()
@@ -36,6 +38,7 @@ namespace Aspid.StaticEcs.Windows.Tests
 
             _controller = new WindowsController<TestWorld>();
             TestW.SetResource(_controller);
+            TestW.SetResource(new EcsLinkRegistry<TestWorld>());
         }
 
         [TearDown]
@@ -398,32 +401,57 @@ namespace Aspid.StaticEcs.Windows.Tests
         }
 
         [Test]
-        public void PresentationBridge_SyncsOnlyWhileWindowIsActive()
+        public void RegisterLinkedViewModel_AttachesSlotViewModelToResolvedEntity()
         {
             RegisterMainWindow(registerHeaderViewModel: false);
-            RegisterMainItemsViewModel();
+            var entity = TestW.NewEntity<Default>();
+            entity.Set(new TestPresentation { Value = 17 });
+            RegisterMainItemsLinkedViewModel(entity.GID);
             _controller.RegisterOpenRequest<MainWindow, TestInput, OpenMainWindowRequest>();
-            _controller.RegisterCloseRequest<MainWindow, CloseMainWindowRequest>();
             InitializeRequestSystem();
 
-            var bridge = new TestBridgeSystem();
-            bridge.Init();
-            bridge.Update();
+            var registry = TestW.GetResource<EcsLinkRegistry<TestWorld>>();
+            registry.RegisterComponent<TestItemsViewModel, TestPresentation>(
+                static (viewModel, in presentation) => viewModel.ApplyPresentation(in presentation));
 
             TestW.SendEvent(new OpenMainWindowRequest(new TestInput(1)));
             _requestSystem.Update();
-            bridge.Update();
-            TestW.Tick();
 
             var viewModel = _controller.GetViewModel<MainWindow, MainItemsSlot, TestItemsViewModel>();
-            Assert.That(viewModel.SyncCount, Is.EqualTo(1));
+            Assert.That(viewModel.OwnerEntityId, Is.EqualTo(1));
+            Assert.That(viewModel.PresentationValue, Is.EqualTo(17));
+            Assert.That(viewModel.PresentationApplyCount, Is.EqualTo(1));
 
-            TestW.SendEvent(new CloseMainWindowRequest());
-            _requestSystem.Update();
-            bridge.Update();
+            TestW.Tick();
+            ref var presentation = ref entity.Mut<TestPresentation>();
+            presentation.Value = 23;
+            new EcsLinkSyncSystem<TestWorld>().Update();
 
-            Assert.That(viewModel.SyncCount, Is.EqualTo(1));
+            Assert.That(viewModel.PresentationValue, Is.EqualTo(23));
+            Assert.That(viewModel.PresentationApplyCount, Is.EqualTo(2));
         }
+
+        [Test]
+        public void Dispose_DisposesLinkedSlotLinkBeforeViewModel()
+        {
+            RegisterMainWindow(registerHeaderViewModel: false);
+            var entity = TestW.NewEntity<Default>();
+            entity.Set(new TestPresentation { Value = 31 });
+            RegisterMainItemsLinkedViewModel(entity.GID);
+
+            _controller.Open<MainWindow, TestInput>(new TestInput(1));
+            var viewModel = _controller.GetViewModel<MainWindow, MainItemsSlot, TestItemsViewModel>();
+
+            _controller.Dispose();
+
+            Assert.That(viewModel.DisposeCount, Is.EqualTo(1));
+            var registry = TestW.GetResource<EcsLinkRegistry<TestWorld>>();
+            Assert.DoesNotThrow(() =>
+            {
+                registry.Attach(entity, new TestItemsViewModel());
+            });
+        }
+
 
         [Test]
         public void RequestSystemInit_ThrowsWhenWindowsControllerResourceIsMissing()
@@ -508,6 +536,14 @@ namespace Aspid.StaticEcs.Windows.Tests
                 ApplyMainItemsInput);
         }
 
+        private void RegisterMainItemsLinkedViewModel(EntityGID gid)
+        {
+            _controller.RegisterLinkedViewModel<MainWindow, TestInput, MainItemsSlot, TestItemsViewModel>(
+                static _ => new TestItemsViewModel(),
+                _ => gid,
+                ApplyMainItemsInput);
+        }
+
         private void InitializeRequestSystem()
         {
             _requestSystem = new EcsWindowRequestSystem<TestWorld>();
@@ -585,6 +621,11 @@ namespace Aspid.StaticEcs.Windows.Tests
             {
                 Value = value;
             }
+        }
+
+        private struct TestPresentation : IComponent, ITrackableAdded, ITrackableChanged
+        {
+            public int Value;
         }
 
         private readonly struct OpenMainWindowRequest : IEcsWindowOpenRequest<MainWindow, TestInput>
@@ -749,7 +790,8 @@ namespace Aspid.StaticEcs.Windows.Tests
         private sealed class TestItemsViewModel : IViewModel, IDisposable
         {
             public int OwnerEntityId { get; private set; }
-            public int SyncCount { get; private set; }
+            public int PresentationValue { get; private set; }
+            public int PresentationApplyCount { get; private set; }
             public int DisposeCount { get; private set; }
 
             public void ApplyInput(int ownerEntityId)
@@ -757,9 +799,10 @@ namespace Aspid.StaticEcs.Windows.Tests
                 OwnerEntityId = ownerEntityId;
             }
 
-            public void SyncPresentation()
+            public void ApplyPresentation(in TestPresentation presentation)
             {
-                SyncCount++;
+                PresentationValue = presentation.Value;
+                PresentationApplyCount++;
             }
 
             public FindBindableMemberResult FindBindableMember(in FindBindableMemberParameters parameters)
@@ -770,15 +813,6 @@ namespace Aspid.StaticEcs.Windows.Tests
             public void Dispose()
             {
                 DisposeCount++;
-            }
-        }
-
-        private sealed class TestBridgeSystem
-            : EcsWindowPresentationBridgeSystem<TestWorld, MainWindow, MainItemsSlot, TestItemsViewModel>
-        {
-            protected override void SyncPresentation(TestItemsViewModel viewModel)
-            {
-                viewModel.SyncPresentation();
             }
         }
     }

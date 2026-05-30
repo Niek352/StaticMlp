@@ -156,6 +156,43 @@ namespace Aspid.StaticEcs.Tests
         }
 
         [Test]
+        public void Attach_AppliesInitialStateWithoutOwningViewModelByDefault()
+        {
+            var entity = TestW.NewEntity<Default>();
+            entity.Set(new TestComponent { Value = 13 });
+            var viewModel = new TestViewModel();
+
+            var registry = TestW.GetResource<EcsLinkRegistry<TestWorld>>();
+            registry.RegisterComponent<TestViewModel, TestComponent>(ApplyTestComponent);
+            var link = registry.Attach(entity, viewModel);
+
+            Assert.That(link.ViewModel, Is.SameAs(viewModel));
+            Assert.That(viewModel.ComponentValue, Is.EqualTo(13));
+            Assert.That(viewModel.ComponentApplyCount, Is.EqualTo(1));
+
+            link.Dispose();
+
+            Assert.That(viewModel.IsDisposed, Is.False);
+            Assert.DoesNotThrow(() =>
+            {
+                registry.Attach(entity, new TestViewModel());
+            });
+        }
+
+        [Test]
+        public void Attach_DisposesViewModelWhenRequested()
+        {
+            var entity = TestW.NewEntity<Default>();
+            var viewModel = new TestViewModel();
+            var registry = TestW.GetResource<EcsLinkRegistry<TestWorld>>();
+
+            var link = registry.Attach(entity, viewModel, disposeViewModel: true);
+            link.Dispose();
+
+            Assert.That(viewModel.IsDisposed, Is.True);
+        }
+
+        [Test]
         public void Sync_DisposesViewModelWhenLinkedEntityDies()
         {
             var entity = TestW.NewEntity<Default>();

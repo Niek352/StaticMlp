@@ -1,16 +1,23 @@
-using Aspid.StaticEcs.Windows;
+using System;
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class BuildingManagementPanelBridgeSystem
-        : EcsWindowPresentationBridgeSystem<ClientCoreWT, BuildingManagementPanelWindow, BuildingManagementPanelSlot, BuildingManagementPanelViewModel>
+    public sealed class BuildingManagementPanelBridgeSystem : ISystem
     {
-        protected override void SyncPresentation(BuildingManagementPanelViewModel viewModel)
+        public void Update()
         {
             ref readonly var session = ref CW.GetResource<BuildingPanelSession>();
             var state = BuildingPanelPresentation.Build(in session);
-            viewModel.Sync(in state);
+            foreach (var entity in CW.Query<All<BuildingManagementPanelViewData>>().Entities())
+            {
+                ref var data = ref entity.Mut<BuildingManagementPanelViewData>();
+                data.State = state;
+                return;
+            }
+
+            throw new InvalidOperationException($"{nameof(BuildingManagementPanelViewData)} entity is missing.");
         }
     }
 }

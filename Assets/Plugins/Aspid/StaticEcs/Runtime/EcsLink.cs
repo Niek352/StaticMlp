@@ -27,7 +27,7 @@ namespace Aspid.StaticEcs
 
         public TViewModel ViewModel { get; }
 
-        internal bool IsDisposed { get; private set; }
+        public bool IsDisposed { get; private set; }
 
         public void Dispose()
         {

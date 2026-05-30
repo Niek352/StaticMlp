@@ -1,15 +1,23 @@
-using Aspid.StaticEcs.Windows;
+using System;
+using Aspid.MVVM;
 
 namespace StaticMlp.Features.Frontier
 {
-    public sealed class ThreatBannerViewModel : EcsWindowViewModelBase
+    [ViewModel]
+    public sealed partial class ThreatBannerViewModel
     {
-        public ThreatBannerState State { get; private set; }
+        [OneWayBind] private ThreatBannerState _state;
 
-        public void Sync(in ThreatBannerState state)
+        public event Action Changed;
+
+        public void Apply(in ThreatBannerViewData data)
         {
-            State = state;
-            NotifyChanged();
+            State = data.State;
+        }
+
+        partial void OnStateChanged(ThreatBannerState newValue)
+        {
+            Changed?.Invoke();
         }
     }
 }

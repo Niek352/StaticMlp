@@ -1,4 +1,4 @@
-using Aspid.StaticEcs.Windows;
+using System;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.CampFlow;
 using StaticMlp.Features.Progression;
@@ -8,20 +8,10 @@ using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Loadout
 {
-    public sealed class ClientLoadoutPreparationViewModelSyncSystem : ISystem
+    public sealed class ClientLoadoutPreparationViewDataSystem : ISystem
     {
-        private WindowsController<ClientCoreWT> _windows;
-
-        public void Init()
-        {
-            _windows = CW.GetResource<WindowsController<ClientCoreWT>>();
-        }
-
         public void Update()
         {
-            if (!_windows.IsWindowActive<LoadoutPreparationWindow>())
-                return;
-
             var selectedPrimaryModuleId = LoadoutModuleCatalog.PoisonArrowModuleId;
             foreach (var player in CW.Query<All<OwnerLoadoutSelection>>().Entities())
             {
@@ -51,15 +41,17 @@ namespace StaticMlp.Features.Loadout
                 break;
             }
 
-            var viewModel = _windows.GetViewModel<
-                LoadoutPreparationWindow,
-                LoadoutPreparationSlot,
-                LoadoutPreparationViewModel>();
-            viewModel.Sync(
-                isAvailable,
-                canPrepareBoss,
-                isBossCommitted,
-                selectedPrimaryModuleId);
+            foreach (var entity in CW.Query<All<LoadoutPreparationViewData>>().Entities())
+            {
+                ref var data = ref entity.Mut<LoadoutPreparationViewData>();
+                data.IsAvailable = isAvailable;
+                data.CanPrepareBoss = canPrepareBoss;
+                data.IsBossCommitted = isBossCommitted;
+                data.SelectedPrimaryModuleId = selectedPrimaryModuleId;
+                return;
+            }
+
+            throw new InvalidOperationException($"{nameof(LoadoutPreparationViewData)} entity is missing.");
         }
     }
 }

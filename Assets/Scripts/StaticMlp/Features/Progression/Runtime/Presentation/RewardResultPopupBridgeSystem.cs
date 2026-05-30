@@ -1,4 +1,4 @@
-using Aspid.StaticEcs.Windows;
+using System;
 using StaticMlp.Features.CampFlow;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Settlement;
@@ -7,10 +7,9 @@ using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Progression
 {
-    public sealed class RewardResultPopupBridgeSystem
-        : EcsWindowPresentationBridgeSystem<ClientCoreWT, RewardResultPopupWindow, RewardResultPopupSlot, RewardResultPopupViewModel>
+    public sealed class RewardResultPopupBridgeSystem : ISystem
     {
-        protected override void SyncPresentation(RewardResultPopupViewModel viewModel)
+        public void Update()
         {
             ref readonly var session = ref CW.GetResource<RewardResultPopupSession>();
 
@@ -33,7 +32,14 @@ namespace StaticMlp.Features.Progression
                 }
             }
 
-            viewModel.Sync(in data);
+            foreach (var entity in CW.Query<All<RewardResultPopupViewData>>().Entities())
+            {
+                ref var viewData = ref entity.Mut<RewardResultPopupViewData>();
+                viewData = data;
+                return;
+            }
+
+            throw new InvalidOperationException($"{nameof(RewardResultPopupViewData)} entity is missing.");
         }
 
         private static RewardPackageId ResolveReward(uint newlyAppliedMask)
@@ -46,7 +52,7 @@ namespace StaticMlp.Features.Progression
                     return reward.Id;
             }
 
-            throw new System.InvalidOperationException($"Unable to resolve Stage 1 reward from mask {newlyAppliedMask}.");
+            throw new InvalidOperationException($"Unable to resolve Stage 1 reward from mask {newlyAppliedMask}.");
         }
 
         private static int GetGrantedAmount(RewardPackageDefinition rewardDefinition, Settlement.ResourceId resourceId)

@@ -18,6 +18,10 @@ namespace StaticMlp.Features.Settlement
             {
                 Mode = SettlementContextPanelMode.None,
             });
+            CW.NewEntity<Default>().Set(new SettlementHudViewData());
+            CW.NewEntity<Default>().Set(new InteractionPromptViewData());
+            CW.NewEntity<Default>().Set(new BuildingManagementPanelViewData());
+            CW.NewEntity<Default>().Set(new SettlementContextPanelViewData());
         }
     }
 }

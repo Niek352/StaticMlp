@@ -1,4 +1,5 @@
 using System;
+using Aspid.StaticEcs;
 using Aspid.StaticEcs.Windows;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.EcsViews;
@@ -59,12 +60,17 @@ namespace StaticMlp.Features.Buildings
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
             var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
+            var registry = CW.GetResource<EcsLinkRegistry<ClientCoreWT>>();
+            registry.RegisterComponent<BuildingMenuViewModel, BuildingMenuViewData>(
+                static (viewModel, in data) => viewModel.Apply(in data));
+
             windows.RegisterWindow<BuildingMenuWindow, EcsWindowNoData, BuildingMenuView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<BuildingMenuView>(BUILDING_MENU_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Persistent,
                 persistentSortOrder: 80);
-            windows.RegisterViewModel<BuildingMenuWindow, EcsWindowNoData, BuildingMenuSlot, BuildingMenuViewModel>(
+            windows.RegisterLinkedViewModel<BuildingMenuWindow, EcsWindowNoData, BuildingMenuSlot, BuildingMenuViewModel>(
                 static _ => new BuildingMenuViewModel(),
+                static _ => ResolveSingletonPresentationEntity<BuildingMenuViewData>(),
                 EcsWindowOpenInputBindings.Ignore<ClientCoreWT, BuildingMenuWindow, EcsWindowNoData, BuildingMenuViewModel>);
 
             systems.Add(new ClientConstructionInteractableFocusPointSystem(), (short)(GameplaySystemOrder.ClientInput + 10));
@@ -75,6 +81,7 @@ namespace StaticMlp.Features.Buildings
             systems.Add(new ClientPlacementConfirmSystem(), (short)(GameplaySystemOrder.Gameplay - 80));
             systems.Add(new ClientConstructionInteractionSystem(), (short)(GameplaySystemOrder.Gameplay - 5));
             systems.Add(new ClientConstructionViewStateSystem(), ViewSystemOrder.BuildPresentationState);
+            systems.Add(new ClientBuildingMenuPresentationBootstrapSystem(), (short)(GameplaySystemOrder.ClientPresentation + 19));
             systems.Add(new StateDrivenEcsWindowHostSystem<ClientCoreWT, BuildingMenuWindow, BuildingMenuState>(
                 static (in BuildingMenuState state) => state.IsOpen), (short)(GameplaySystemOrder.ClientPresentation + 20));
             systems.Add(new ClientBuildingMenuBridgeSystem(), (short)(GameplaySystemOrder.ClientPresentation + 21));
@@ -84,6 +91,15 @@ namespace StaticMlp.Features.Buildings
         {
             views.Register<PlacementPreviewViewState>();
             views.Register<ConstructionViewState>();
+        }
+
+        private static EntityGID ResolveSingletonPresentationEntity<TComponent>()
+            where TComponent : struct, IComponent
+        {
+            foreach (var entity in CW.Query<All<TComponent>>().Entities())
+                return entity.GID;
+
+            throw new InvalidOperationException($"{typeof(TComponent).FullName} entity is missing.");
         }
 
         private static void RegisterBuilding(BuildingDefinition definition)

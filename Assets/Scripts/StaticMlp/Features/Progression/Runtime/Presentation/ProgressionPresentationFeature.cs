@@ -1,4 +1,6 @@
+using Aspid.StaticEcs;
 using Aspid.StaticEcs.Windows;
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking;
 
@@ -12,12 +14,16 @@ namespace StaticMlp.Features.Progression
         {
             var bridge = new RewardResultPopupBridgeSystem();
             var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
+            var registry = CW.GetResource<EcsLinkRegistry<ClientCoreWT>>();
+            registry.RegisterComponent<RewardResultPopupViewModel, RewardResultPopupViewData>(
+                static (viewModel, in data) => viewModel.Apply(in data));
 
             windows.RegisterWindow<RewardResultPopupWindow, EcsWindowNoData, RewardResultPopupView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<RewardResultPopupView>(REWARD_RESULT_POPUP_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Popup);
-            windows.RegisterViewModel<RewardResultPopupWindow, EcsWindowNoData, RewardResultPopupSlot, RewardResultPopupViewModel>(
+            windows.RegisterLinkedViewModel<RewardResultPopupWindow, EcsWindowNoData, RewardResultPopupSlot, RewardResultPopupViewModel>(
                 static _ => new RewardResultPopupViewModel(),
+                static _ => ResolveSingletonPresentationEntity<RewardResultPopupViewData>(),
                 EcsWindowOpenInputBindings.Ignore<ClientCoreWT, RewardResultPopupWindow, EcsWindowNoData, RewardResultPopupViewModel>);
 
             systems.Add(new ClientProgressionPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 40);
@@ -26,6 +32,15 @@ namespace StaticMlp.Features.Progression
             systems.Add(new StateDrivenEcsWindowHostSystem<ClientCoreWT, RewardResultPopupWindow, RewardResultPopupSession>(
                 static (in RewardResultPopupSession session) => session.IsVisible), GameplaySystemOrder.ClientPresentation + 44);
             systems.Add(bridge, GameplaySystemOrder.ClientPresentation + 45);
+        }
+
+        private static EntityGID ResolveSingletonPresentationEntity<TComponent>()
+            where TComponent : struct, IComponent
+        {
+            foreach (var entity in CW.Query<All<TComponent>>().Entities())
+                return entity.GID;
+
+            throw new System.InvalidOperationException($"{typeof(TComponent).FullName} entity is missing.");
         }
     }
 }

@@ -9,6 +9,7 @@ namespace StaticMlp.Features.Progression
         {
             CW.SetResource(new RewardResultPopupSession());
             CW.SetResource(new ProgressionHudState());
+            CW.NewEntity<Default>().Set(new RewardResultPopupViewData());
         }
     }
 }

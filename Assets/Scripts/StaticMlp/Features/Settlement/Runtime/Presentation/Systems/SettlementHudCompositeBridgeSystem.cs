@@ -1,4 +1,5 @@
-using Aspid.StaticEcs.Windows;
+using System;
+using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Progression;
@@ -6,20 +7,29 @@ using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class SettlementHudCompositeBridgeSystem
-        : EcsWindowPresentationBridgeSystem<ClientCoreWT, SettlementHudWindow, SettlementHudSlot, SettlementHudViewModel>
+    public sealed class SettlementHudCompositeBridgeSystem : ISystem
     {
-        protected override void SyncPresentation(SettlementHudViewModel viewModel)
+        public void Update()
         {
-            var settlement = SettlementHudPresentation.Build();
-            var expedition = ExpeditionHudPresentation.Build();
-            var loadout = LoadoutHudPresentation.Build();
-            var threat = ThreatHudPresentation.Build();
-            var raid = RaidHudPresentation.Build();
-            var boss = BossHudPresentation.Build();
-            var progression = ProgressionHudPresentation.Build();
+            var viewData = new SettlementHudViewData
+            {
+                Settlement = SettlementHudPresentation.Build(),
+                Expedition = ExpeditionHudPresentation.Build(),
+                Loadout = LoadoutHudPresentation.Build(),
+                Threat = ThreatHudPresentation.Build(),
+                Raid = RaidHudPresentation.Build(),
+                Boss = BossHudPresentation.Build(),
+                Progression = ProgressionHudPresentation.Build()
+            };
 
-            viewModel.Sync(in settlement, in expedition, in loadout, in threat, in raid, in boss, in progression);
+            foreach (var entity in CW.Query<All<SettlementHudViewData>>().Entities())
+            {
+                ref var data = ref entity.Mut<SettlementHudViewData>();
+                data = viewData;
+                return;
+            }
+
+            throw new InvalidOperationException($"{nameof(SettlementHudViewData)} entity is missing.");
         }
     }
 }

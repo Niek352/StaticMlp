@@ -1,4 +1,4 @@
-using Aspid.StaticEcs.Windows;
+using System;
 using StaticMlp.Features.CampFlow;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Settlement;
@@ -7,10 +7,9 @@ using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Frontier
 {
-    public sealed class ThreatBannerBridgeSystem
-        : EcsWindowPresentationBridgeSystem<ClientCoreWT, ThreatBannerWindow, ThreatBannerSlot, ThreatBannerViewModel>
+    public sealed class ThreatBannerBridgeSystem : ISystem
     {
-        protected override void SyncPresentation(ThreatBannerViewModel viewModel)
+        public void Update()
         {
             var state = new ThreatBannerState
             {
@@ -31,7 +30,14 @@ namespace StaticMlp.Features.Frontier
                 }
             }
 
-            viewModel.Sync(in state);
+            foreach (var entity in CW.Query<All<ThreatBannerViewData>>().Entities())
+            {
+                ref var data = ref entity.Mut<ThreatBannerViewData>();
+                data.State = state;
+                return;
+            }
+
+            throw new InvalidOperationException($"{nameof(ThreatBannerViewData)} entity is missing.");
         }
     }
 }

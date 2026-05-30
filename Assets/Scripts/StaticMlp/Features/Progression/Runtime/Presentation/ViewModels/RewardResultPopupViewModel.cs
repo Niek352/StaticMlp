@@ -1,11 +1,15 @@
-using Aspid.StaticEcs.Windows;
+using System;
+using Aspid.MVVM;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Progression
 {
-    public sealed class RewardResultPopupViewModel : EcsWindowViewModelBase
+    [ViewModel]
+    public sealed partial class RewardResultPopupViewModel
     {
-        public RewardResultPopupViewData Data { get; private set; }
+        [OneWayBind] private RewardResultPopupViewData _data;
+
+        public event Action Changed;
 
         public static string DescribeReward(RewardPackageId rewardPackageId)
         {
@@ -15,10 +19,14 @@ namespace StaticMlp.Features.Progression
             return $"Reward {rewardPackageId.Value}";
         }
 
-        public void Sync(in RewardResultPopupViewData data)
+        public void Apply(in RewardResultPopupViewData data)
         {
             Data = data;
-            NotifyChanged();
+        }
+
+        partial void OnDataChanged(RewardResultPopupViewData newValue)
+        {
+            Changed?.Invoke();
         }
 
         public void ClosePopup()

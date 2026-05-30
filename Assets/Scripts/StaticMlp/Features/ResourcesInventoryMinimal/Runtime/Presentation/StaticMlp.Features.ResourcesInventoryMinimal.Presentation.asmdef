@@ -7,6 +7,7 @@
         "Game.Core",
         "Aspid.MVVM",
         "Aspid.StaticEcs.Windows",
+        "Aspid.StaticEcs",
         "Aspid.StaticEcs.Windows.Unity",
         "UniTask",
         "Unity.TextMeshPro",

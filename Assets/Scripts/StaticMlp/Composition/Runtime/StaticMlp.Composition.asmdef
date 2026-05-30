@@ -18,7 +18,8 @@
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "UnityEngine.UI",
-        "Aspid.StaticEcs.Windows"
+        "Aspid.StaticEcs.Windows",
+        "Aspid.StaticEcs"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
