@@ -1,3 +1,4 @@
+using Aspid.StaticEcs.Windows;
 using FFS.Libraries.StaticEcs.Unity;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Game.Bootstrap;
@@ -62,6 +63,7 @@ namespace StaticMlp.Composition
             ClientCoreSys.Add(new ClientNetworkEventApplySystem(), order: -760);
             var systemsBuilder = new ClientCoreSystemsBuilder();
             systemsBuilder.Add(new BindEntityViewSystem(viewFactory), ViewSystemOrder.BindViews);
+            systemsBuilder.Add(new EcsWindowRequestSystem<ClientCoreWT>(), GameplaySystemOrder.ClientPresentation - 1);
             GameplayFeatureDiscovery.RegisterClientCoreSystems(systemsBuilder);
             GameplayFeatureDiscovery.RegisterClientViewSync(
                 new ViewSyncBuilder(systemsBuilder, ViewSystemOrder.ApplyPresentationState));

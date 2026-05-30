@@ -1,17 +1,15 @@
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace StaticMlp.Features.Progression
 {
-    public sealed class RewardResultPopupView : PrefabViewBase
+    public sealed class RewardResultPopupView : EcsWindowViewBase<RewardResultPopupSlot, RewardResultPopupViewModel>
     {
         [SerializeField] private GameObject panelRoot;
         [SerializeField] private Button closeButton;
         [SerializeField] private TextMeshProUGUI summaryLabel;
-
-        private System.Action _onCloseClicked;
 
         protected override void Awake()
         {
@@ -25,14 +23,15 @@ namespace StaticMlp.Features.Progression
                 throw new MissingReferenceException($"{nameof(RewardResultPopupView)} requires {nameof(summaryLabel)}.");
         }
 
-        public void Bind(System.Action onCloseClicked)
+        protected override void OnViewModelBound(RewardResultPopupViewModel viewModel)
         {
-            _onCloseClicked = onCloseClicked ?? throw new System.ArgumentNullException(nameof(onCloseClicked));
+            viewModel.Changed += Render;
+            Render();
         }
 
-        public void Unbind()
+        protected override void OnViewModelUnbound(RewardResultPopupViewModel viewModel)
         {
-            _onCloseClicked = null;
+            viewModel.Changed -= Render;
         }
 
         private void OnEnable()
@@ -45,11 +44,17 @@ namespace StaticMlp.Features.Progression
             closeButton.onClick.RemoveListener(HandleCloseClicked);
         }
 
-        public void Render(in RewardResultPopupViewData data)
+        private void Render()
+        {
+            var data = BoundViewModel.Data;
+            Render(in data);
+        }
+
+        private void Render(in RewardResultPopupViewData data)
         {
             panelRoot.SetActive(true);
             summaryLabel.text =
-                $"Reward: {RewardResultPopupController.DescribeReward(data.RewardPackageId)}\n" +
+                $"Reward: {RewardResultPopupViewModel.DescribeReward(data.RewardPackageId)}\n" +
                 $"Wood: {data.GrantedWood}\n" +
                 $"Stone: {data.GrantedStone}\n" +
                 $"WarCache: {data.GrantsRecoveredWarCacheFlag}\n" +
@@ -58,7 +63,7 @@ namespace StaticMlp.Features.Progression
 
         private void HandleCloseClicked()
         {
-            _onCloseClicked.Invoke();
+            BoundViewModel.ClosePopup();
         }
     }
 }

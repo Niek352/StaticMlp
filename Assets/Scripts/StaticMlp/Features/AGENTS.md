@@ -13,7 +13,7 @@ Rules for `StaticMlp.Features.*` modules. This file inherits the root `AGENTS.md
 
 - Prefer one feature per top-level folder and one asmdef per runtime module.
 - Follow `.agents/skills/staticmlp-code-writing/SKILL.md` for the canonical feature folder layout.
-- Place new or touched files in established role buckets such as `Components`, `Events`, `Systems`, `Factories`, `WorldResources`, `Ids`, `EntityTypes`, `NetworkEntityTypes`, `Domain`, `Catalogs`, `Definitions`, `Validation`, `Queries`, `Seeds`, `Input`, `Controllers`, `Views`, `ViewParts`, or `Actions`.
+- Place new or touched files in established role buckets such as `Components`, `Events`, `Systems`, `Factories`, `WorldResources`, `Ids`, `EntityTypes`, `NetworkEntityTypes`, `Domain`, `Catalogs`, `Definitions`, `Validation`, `Queries`, `Seeds`, `Input`, `Controllers`, `ViewModels`, `Views`, `ViewParts`, or `Actions`.
 - Do not invent arbitrary first-level folders. If no existing role bucket fits, stop and propose either a new feature boundary or a new folder-layout rule.
 - Use `WorldResources` for StaticEcs `IResource` scripts; do not create script folders named `Resources`.
 - Use `Systems/Client` and `Systems/Server` only when runtime behavior truly differs by context.

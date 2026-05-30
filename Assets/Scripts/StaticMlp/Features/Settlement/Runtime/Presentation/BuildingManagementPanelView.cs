@@ -1,13 +1,13 @@
 using System;
 using System.Text;
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class BuildingManagementPanelView : PrefabViewBase
+    public sealed class BuildingManagementPanelView : EcsWindowViewBase<BuildingManagementPanelSlot, BuildingManagementPanelViewModel>
     {
         [SerializeField] private GameObject panelRoot;
         [SerializeField] private Button primaryButton;
@@ -16,10 +16,6 @@ namespace StaticMlp.Features.Settlement
         [SerializeField] private TextMeshProUGUI primaryButtonLabel;
         [SerializeField] private TextMeshProUGUI secondaryButtonLabel;
         [SerializeField] private TextMeshProUGUI summaryLabel;
-
-        private Action _onPrimaryClicked;
-        private Action _onSecondaryClicked;
-        private Action _onCloseClicked;
 
         protected override void Awake()
         {
@@ -41,18 +37,14 @@ namespace StaticMlp.Features.Settlement
                 throw new MissingReferenceException($"{nameof(BuildingManagementPanelView)} requires {nameof(summaryLabel)}.");
         }
 
-        public void Bind(Action onPrimaryClicked, Action onSecondaryClicked, Action onCloseClicked)
+        protected override void OnViewModelBound(BuildingManagementPanelViewModel viewModel)
         {
-            _onPrimaryClicked = onPrimaryClicked ?? throw new ArgumentNullException(nameof(onPrimaryClicked));
-            _onSecondaryClicked = onSecondaryClicked ?? throw new ArgumentNullException(nameof(onSecondaryClicked));
-            _onCloseClicked = onCloseClicked ?? throw new ArgumentNullException(nameof(onCloseClicked));
+            viewModel.Changed += Render;
         }
 
-        public void Unbind()
+        protected override void OnViewModelUnbound(BuildingManagementPanelViewModel viewModel)
         {
-            _onPrimaryClicked = null;
-            _onSecondaryClicked = null;
-            _onCloseClicked = null;
+            viewModel.Changed -= Render;
         }
 
         private void OnEnable()
@@ -69,7 +61,13 @@ namespace StaticMlp.Features.Settlement
             closeButton.onClick.RemoveListener(HandleCloseClicked);
         }
 
-        public void Render(in BuildingPanelState state)
+        private void Render()
+        {
+            var state = BoundViewModel.State;
+            Render(in state);
+        }
+
+        private void Render(in BuildingPanelState state)
         {
             panelRoot.SetActive(true);
 
@@ -308,17 +306,17 @@ namespace StaticMlp.Features.Settlement
 
         private void HandlePrimaryClicked()
         {
-            _onPrimaryClicked.Invoke();
+            BoundViewModel.HandlePrimaryAction();
         }
 
         private void HandleSecondaryClicked()
         {
-            _onSecondaryClicked.Invoke();
+            BoundViewModel.HandleSecondaryAction();
         }
 
         private void HandleCloseClicked()
         {
-            _onCloseClicked.Invoke();
+            BoundViewModel.Close();
         }
 
         private static string FormatConstructionResources(in ConstructionPanelState state)

@@ -1,0 +1,23 @@
+{
+    "name": "Aspid.StaticEcs.Tests",
+    "rootNamespace": "Aspid.StaticEcs.Tests",
+    "references": [
+        "Aspid.MVVM",
+        "Aspid.StaticEcs",
+        "FFS.StaticEcs"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

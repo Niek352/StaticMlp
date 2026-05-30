@@ -1,12 +1,11 @@
-using System;
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace StaticMlp.Features.Loadout
 {
-    public sealed class LoadoutPreparationView : PrefabViewBase
+    public sealed class LoadoutPreparationView : EcsWindowViewBase<LoadoutPreparationSlot, LoadoutPreparationViewModel>
     {
         [SerializeField] private GameObject panelRoot;
         [SerializeField] private Button poisonArrowButton;
@@ -14,11 +13,6 @@ namespace StaticMlp.Features.Loadout
         [SerializeField] private Button confirmButton;
         [SerializeField] private Button closeButton;
         [SerializeField] private TextMeshProUGUI summaryLabel;
-
-        private Action _onPoisonArrowClicked;
-        private Action _onFireFlaskClicked;
-        private Action _onConfirmClicked;
-        private Action _onCloseClicked;
 
         protected override void Awake()
         {
@@ -38,24 +32,15 @@ namespace StaticMlp.Features.Loadout
                 throw new MissingReferenceException($"{nameof(LoadoutPreparationView)} requires {nameof(summaryLabel)}.");
         }
 
-        public void Bind(
-            Action onPoisonArrowClicked,
-            Action onFireFlaskClicked,
-            Action onConfirmClicked,
-            Action onCloseClicked)
+        protected override void OnViewModelBound(LoadoutPreparationViewModel viewModel)
         {
-            _onPoisonArrowClicked = onPoisonArrowClicked ?? throw new ArgumentNullException(nameof(onPoisonArrowClicked));
-            _onFireFlaskClicked = onFireFlaskClicked ?? throw new ArgumentNullException(nameof(onFireFlaskClicked));
-            _onConfirmClicked = onConfirmClicked ?? throw new ArgumentNullException(nameof(onConfirmClicked));
-            _onCloseClicked = onCloseClicked ?? throw new ArgumentNullException(nameof(onCloseClicked));
+            viewModel.SummaryChanged += HandleSummaryChanged;
+            Render();
         }
 
-        public void Unbind()
+        protected override void OnViewModelUnbound(LoadoutPreparationViewModel viewModel)
         {
-            _onPoisonArrowClicked = null;
-            _onFireFlaskClicked = null;
-            _onConfirmClicked = null;
-            _onCloseClicked = null;
+            viewModel.SummaryChanged -= HandleSummaryChanged;
         }
 
         private void OnEnable()
@@ -74,24 +59,21 @@ namespace StaticMlp.Features.Loadout
             closeButton.onClick.RemoveListener(HandleCloseClicked);
         }
 
-        public void Render(in LoadoutPreparationScreenState state)
+        private void Render()
         {
+            var viewModel = BoundViewModel;
             panelRoot.SetActive(true);
-            summaryLabel.text =
-                $"Build Preparation\n" +
-                $"Available: {state.IsAvailable}\n" +
-                $"Boss committed: {state.IsBossCommitted}\n" +
-                $"Boss preparation: {state.CanPrepareBoss}\n" +
-                $"Selected: {LoadoutPreparationController.DescribeModule(state.SelectedPrimaryModuleId)}";
+            summaryLabel.text = viewModel.Summary;
 
-            poisonArrowButton.interactable = state.PoisonArrowAvailable && !state.IsBossCommitted;
-            fireFlaskButton.interactable = state.FireFlaskAvailable && !state.IsBossCommitted;
-            confirmButton.interactable = state.CanConfirm;
+            poisonArrowButton.interactable = viewModel.PoisonArrowInteractable;
+            fireFlaskButton.interactable = viewModel.FireFlaskInteractable;
+            confirmButton.interactable = viewModel.ConfirmInteractable;
         }
 
-        private void HandlePoisonArrowClicked() => _onPoisonArrowClicked.Invoke();
-        private void HandleFireFlaskClicked() => _onFireFlaskClicked.Invoke();
-        private void HandleConfirmClicked() => _onConfirmClicked.Invoke();
-        private void HandleCloseClicked() => _onCloseClicked.Invoke();
+        private void HandleSummaryChanged(string _) => Render();
+        private void HandlePoisonArrowClicked() => BoundViewModel.SelectPoisonArrowCommand.Execute();
+        private void HandleFireFlaskClicked() => BoundViewModel.SelectFireFlaskCommand.Execute();
+        private void HandleConfirmClicked() => BoundViewModel.ConfirmBuildCommand.Execute();
+        private void HandleCloseClicked() => BoundViewModel.CloseCommand.Execute();
     }
 }

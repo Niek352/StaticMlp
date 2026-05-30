@@ -1,5 +1,5 @@
+using Aspid.StaticEcs.Windows;
 using StaticMlp.Features.CampFlow;
-using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
@@ -7,9 +7,10 @@ using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Frontier
 {
-    public sealed class ThreatBannerBridgeSystem : ControllerEcsBridgeSystem<ThreatBannerController>
+    public sealed class ThreatBannerBridgeSystem
+        : EcsWindowPresentationBridgeSystem<ClientCoreWT, ThreatBannerWindow, ThreatBannerSlot, ThreatBannerViewModel>
     {
-        protected override void SyncPresentation()
+        protected override void SyncPresentation(ThreatBannerViewModel viewModel)
         {
             var state = new ThreatBannerState
             {
@@ -30,7 +31,7 @@ namespace StaticMlp.Features.Frontier
                 }
             }
 
-            Controller.Apply(in state);
+            viewModel.Sync(in state);
         }
     }
 }

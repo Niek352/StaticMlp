@@ -3,10 +3,12 @@
         <RectTransform m_AnchorMin="0, 0" m_AnchorMax="0, 0" m_Pivot="0, 0" m_SizeDelta="0, 0" />
         <Canvas m_RenderMode="0" m_SortingOrder="20" />
         <CanvasScaler m_UiScaleMode="1" m_ReferenceResolution="1920, 1080" m_ScreenMatchMode="0" m_MatchWidthOrHeight="0.5" />
+        <CanvasGroup />
         <GraphicRaycaster />
         <ResourcesInventoryHudView
-            canvas="#Root"
-            graphicRaycaster="#Root"
+            _canvas="#Root"
+            _canvasGroup="#Root"
+            _graphicRaycaster="#Root"
             _panelRoot="#Panel"
             _summaryLabel="#SummaryLabel">
             <Field name="_slotRoots">

@@ -1,10 +1,10 @@
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using TMPro;
 using UnityEngine;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class InteractionPromptView : PrefabViewBase
+    public sealed class InteractionPromptView : EcsWindowViewBase<InteractionPromptSlot, InteractionPromptViewModel>
     {
         [SerializeField] private GameObject panelRoot;
         [SerializeField] private TextMeshProUGUI promptLabel;
@@ -22,7 +22,24 @@ namespace StaticMlp.Features.Settlement
                 throw new MissingReferenceException($"{nameof(InteractionPromptView)} requires {nameof(effectLabel)}.");
         }
 
-        public void Render(in InteractionPromptState state)
+        protected override void OnViewModelBound(InteractionPromptViewModel viewModel)
+        {
+            viewModel.Changed += Render;
+            Render();
+        }
+
+        protected override void OnViewModelUnbound(InteractionPromptViewModel viewModel)
+        {
+            viewModel.Changed -= Render;
+        }
+
+        private void Render()
+        {
+            var state = BoundViewModel.State;
+            Render(in state);
+        }
+
+        private void Render(in InteractionPromptState state)
         {
             panelRoot.SetActive(state.IsVisible);
             if (!state.IsVisible)

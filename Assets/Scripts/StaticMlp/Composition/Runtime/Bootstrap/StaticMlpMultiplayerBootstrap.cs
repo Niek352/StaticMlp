@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.Progression;
@@ -52,7 +52,7 @@ namespace StaticMlp.Composition
 
         private System.IDisposable _serverTransport;
         private System.IDisposable _clientTransport;
-        private IMvcManager _clientMvcManager;
+        private WindowsController<ClientCoreWT> _clientWindowsController;
         private MultiplayerStatusUi _multiplayerStatusUi;
         private GameObject _multiplayerStatusUiInstance;
         private bool _serverStarted;
@@ -280,8 +280,8 @@ namespace StaticMlp.Composition
                 _clientTransport = UtpTransportStartup.StartClient(connectHost, port, debugPingLatencyMs);
             }
 
-            _clientMvcManager = new MvcManager(new WindowStackManager());
-            CW.SetResource(new MvcManagerResource(_clientMvcManager));
+            _clientWindowsController = new WindowsController<ClientCoreWT>();
+            CW.SetResource(_clientWindowsController);
             MultiplayerSystemBootstrap.CreateClientCoreSystems(transportBackend);
             _clientStarted = true;
             Log("Client systems initialized");
@@ -355,6 +355,10 @@ namespace StaticMlp.Composition
             ReplicationRegistry.RegisterClientCoreGeneratedTypes();
             NetworkEventRegistry.RegisterClientWorldTypes();
             ProjectionRegistry.RegisterClientWorldTypes();
+            CW.Types()
+                .Event<CloseTopEcsWindowRequest>()
+                .Event<CloseAllEcsWindowsRequest>()
+                .Event<SetAllEcsWindowsPresentationActiveRequest>();
         }
 
         public void Shutdown()
@@ -369,8 +373,8 @@ namespace StaticMlp.Composition
                 if (ClientCoreSys.IsInitialized)
                     ClientCoreSys.Destroy();
 
-                _clientMvcManager?.Dispose();
-                _clientMvcManager = null;
+                _clientWindowsController?.Dispose();
+                _clientWindowsController = null;
 
                 if (CW.Status != WorldStatus.NotCreated)
                     CW.Destroy();

@@ -3,8 +3,12 @@
         <RectTransform m_AnchorMin="0, 0" m_AnchorMax="1, 1" m_SizeDelta="0, 0" />
         <Canvas m_RenderMode="ScreenSpaceOverlay" m_SortingOrder="90" />
         <CanvasScaler m_UiScaleMode="ScaleWithScreenSize" m_ReferenceResolution="1920, 1080" m_ScreenMatchMode="MatchWidthOrHeight" m_MatchWidthOrHeight="0.5" />
+        <CanvasGroup />
         <GraphicRaycaster />
         <LoadoutPreparationView
+            _canvas="#Root"
+            _canvasGroup="#Root"
+            _graphicRaycaster="#Root"
             panelRoot="#Panel"
             poisonArrowButton="#PoisonArrowButton"
             fireFlaskButton="#FireFlaskButton"

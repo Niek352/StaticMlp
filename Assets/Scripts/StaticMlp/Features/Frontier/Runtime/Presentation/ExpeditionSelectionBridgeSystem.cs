@@ -1,5 +1,5 @@
+using Aspid.StaticEcs.Windows;
 using StaticMlp.Features.CampFlow;
-using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Progression;
@@ -9,9 +9,10 @@ using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Frontier
 {
-    public sealed class ExpeditionSelectionBridgeSystem : ControllerEcsBridgeSystem<ExpeditionSelectionController>
+    public sealed class ExpeditionSelectionBridgeSystem
+        : EcsWindowPresentationBridgeSystem<ClientCoreWT, ExpeditionSelectionWindow, ExpeditionSelectionSlot, ExpeditionSelectionViewModel>
     {
-        protected override void SyncPresentation()
+        protected override void SyncPresentation(ExpeditionSelectionViewModel viewModel)
         {
             var state = new ExpeditionSelectionScreenState
             {
@@ -61,7 +62,7 @@ namespace StaticMlp.Features.Frontier
                   && state.ThreatPhase != ThreatPhase.RaidPending
                   && state.ThreatPhase != ThreatPhase.RaidActive;
 
-            Controller.Apply(in state);
+            viewModel.Sync(in state);
         }
     }
 }

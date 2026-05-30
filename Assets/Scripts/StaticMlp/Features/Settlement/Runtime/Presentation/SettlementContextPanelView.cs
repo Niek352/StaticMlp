@@ -1,10 +1,10 @@
 using System;
 using System.Text;
-using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.AiBots;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.Buildings;
+using Aspid.StaticEcs.Windows;
 using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
 using TMPro;
@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class SettlementContextPanelView : PrefabViewBase
+    public sealed class SettlementContextPanelView : EcsWindowViewBase<SettlementContextPanelSlot, SettlementContextPanelViewModel>
     {
         [SerializeField] private GameObject panelRoot;
         [SerializeField] private Button primaryButton;
@@ -21,9 +21,6 @@ namespace StaticMlp.Features.Settlement
         [SerializeField] private TextMeshProUGUI primaryButtonLabel;
         [SerializeField] private TextMeshProUGUI secondaryButtonLabel;
         [SerializeField] private TextMeshProUGUI summaryLabel;
-
-        private Action _onPrimaryClicked;
-        private Action _onSecondaryClicked;
 
         protected override void Awake()
         {
@@ -43,16 +40,14 @@ namespace StaticMlp.Features.Settlement
                 throw new MissingReferenceException($"{nameof(SettlementContextPanelView)} requires {nameof(summaryLabel)}.");
         }
 
-        public void Bind(Action onPrimaryClicked, Action onSecondaryClicked)
+        protected override void OnViewModelBound(SettlementContextPanelViewModel viewModel)
         {
-            _onPrimaryClicked = onPrimaryClicked ?? throw new ArgumentNullException(nameof(onPrimaryClicked));
-            _onSecondaryClicked = onSecondaryClicked ?? throw new ArgumentNullException(nameof(onSecondaryClicked));
+            viewModel.Changed += Render;
         }
 
-        public void Unbind()
+        protected override void OnViewModelUnbound(SettlementContextPanelViewModel viewModel)
         {
-            _onPrimaryClicked = null;
-            _onSecondaryClicked = null;
+            viewModel.Changed -= Render;
         }
 
         private void OnEnable()
@@ -67,7 +62,13 @@ namespace StaticMlp.Features.Settlement
             secondaryButton.onClick.RemoveListener(HandleSecondaryClicked);
         }
 
-        public void Render(
+        private void Render()
+        {
+            var viewModel = BoundViewModel;
+            Render(in viewModel.Building, in viewModel.Worker, viewModel.Mode);
+        }
+
+        private void Render(
             in BuildingContextPanelState building,
             in WorkerContextPanelState worker,
             SettlementContextPanelMode mode)
@@ -77,7 +78,7 @@ namespace StaticMlp.Features.Settlement
             else
                 RenderWorker(in worker);
         }
-        
+
 
         private void RenderBuilding(in BuildingContextPanelState state)
         {
@@ -199,12 +200,12 @@ namespace StaticMlp.Features.Settlement
 
         private void HandlePrimaryClicked()
         {
-            _onPrimaryClicked.Invoke();
+            BoundViewModel.HandlePrimaryAction();
         }
 
         private void HandleSecondaryClicked()
         {
-            _onSecondaryClicked.Invoke();
+            BoundViewModel.HandleSecondaryAction();
         }
 
         private static string FormatConstructionResources(in BuildingContextPanelState state)

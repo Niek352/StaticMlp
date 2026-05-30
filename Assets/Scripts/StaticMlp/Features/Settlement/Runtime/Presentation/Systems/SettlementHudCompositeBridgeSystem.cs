@@ -1,13 +1,15 @@
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Loadout;
 using StaticMlp.Features.Progression;
+using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class SettlementHudCompositeBridgeSystem : ControllerEcsBridgeSystem<SettlementHudController>
+    public sealed class SettlementHudCompositeBridgeSystem
+        : EcsWindowPresentationBridgeSystem<ClientCoreWT, SettlementHudWindow, SettlementHudSlot, SettlementHudViewModel>
     {
-        protected override void SyncPresentation()
+        protected override void SyncPresentation(SettlementHudViewModel viewModel)
         {
             var settlement = SettlementHudPresentation.Build();
             var expedition = ExpeditionHudPresentation.Build();
@@ -17,7 +19,7 @@ namespace StaticMlp.Features.Settlement
             var boss = BossHudPresentation.Build();
             var progression = ProgressionHudPresentation.Build();
 
-            Controller.Apply(in settlement, in expedition, in loadout, in threat, in raid, in boss, in progression);
+            viewModel.Sync(in settlement, in expedition, in loadout, in threat, in raid, in boss, in progression);
         }
     }
 }

@@ -1,12 +1,12 @@
 using System;
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace StaticMlp.Features.ResourcesInventoryMinimal
 {
-    public sealed class ResourcesInventoryHudView : PrefabViewBase
+    public sealed class ResourcesInventoryHudView : EcsWindowViewBase<ResourcesInventoryHudSlot, ResourcesInventoryHudViewModel>
     {
         private static readonly Color COLOR_OCCUPIED = new(0.24f, 0.36f, 0.31f, 0.95f);
         private static readonly Color COLOR_EMPTY = new(0.11f, 0.16f, 0.18f, 0.82f);
@@ -28,6 +28,23 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
                 throw new MissingReferenceException($"{nameof(ResourcesInventoryHudView)} requires {nameof(_summaryLabel)}.");
 
             CheckSlotBindings();
+        }
+
+        protected override void OnViewModelBound(ResourcesInventoryHudViewModel viewModel)
+        {
+            viewModel.Changed += Render;
+            Render();
+        }
+
+        protected override void OnViewModelUnbound(ResourcesInventoryHudViewModel viewModel)
+        {
+            viewModel.Changed -= Render;
+        }
+
+        private void Render()
+        {
+            var presentation = BoundViewModel.Presentation;
+            Render(in presentation);
         }
 
         public void Render(in ResourcesInventoryHudPresentation presentation)

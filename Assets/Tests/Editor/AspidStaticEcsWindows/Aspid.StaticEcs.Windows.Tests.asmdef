@@ -1,0 +1,24 @@
+{
+    "name": "Aspid.StaticEcs.Windows.Tests",
+    "rootNamespace": "Aspid.StaticEcs.Windows.Tests",
+    "references": [
+        "Aspid.MVVM",
+        "Aspid.StaticEcs.Windows",
+        "FFS.StaticEcs",
+        "UniTask"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

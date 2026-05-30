@@ -1,4 +1,5 @@
 using System;
+using Aspid.StaticEcs.Windows;
 using StaticMlp.Features.BuildingCatalog;
 using StaticMlp.Features.EcsViews;
 using StaticMlp.Features.Interaction;
@@ -15,6 +16,8 @@ namespace StaticMlp.Features.Buildings
 {
     public sealed class BuildingsGameplayFeature : GameplayFeature
     {
+        private const string BUILDING_MENU_VIEW_RESOURCE_PATH = "Views/Buildings/BuildingMenu";
+
         public override void RegisterNetworkEvents()
         {
             ProjectionRegistry.Register<ConstructionResources>();
@@ -55,14 +58,26 @@ namespace StaticMlp.Features.Buildings
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
+            var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
+            windows.RegisterWindow<BuildingMenuWindow, EcsWindowNoData, BuildingMenuView>(
+                EcsResourcesWindowShellViewFactory.CreateLazy<BuildingMenuView>(BUILDING_MENU_VIEW_RESOURCE_PATH),
+                EcsWindowLayer.Persistent,
+                persistentSortOrder: 80);
+            windows.RegisterViewModel<BuildingMenuWindow, EcsWindowNoData, BuildingMenuSlot, BuildingMenuViewModel>(
+                static _ => new BuildingMenuViewModel(),
+                EcsWindowOpenInputBindings.Ignore<ClientCoreWT, BuildingMenuWindow, EcsWindowNoData, BuildingMenuViewModel>);
+
             systems.Add(new ClientConstructionInteractableFocusPointSystem(), (short)(GameplaySystemOrder.ClientInput + 10));
             systems.Add(new ClientBuildingMenuSystem(), (short)(GameplaySystemOrder.ClientInput + 20));
+            systems.Add(new ClientBuildingMenuIntentSystem(), (short)(GameplaySystemOrder.ClientInput + 21));
             systems.Add(new ClientPlacementInputSystem(), (short)(GameplaySystemOrder.Gameplay - 90));
             systems.Add(new ClientPlacementValidationPreviewSystem(), (short)(GameplaySystemOrder.Gameplay - 85));
             systems.Add(new ClientPlacementConfirmSystem(), (short)(GameplaySystemOrder.Gameplay - 80));
             systems.Add(new ClientConstructionInteractionSystem(), (short)(GameplaySystemOrder.Gameplay - 5));
             systems.Add(new ClientConstructionViewStateSystem(), ViewSystemOrder.BuildPresentationState);
-            systems.Add(new ClientBuildingMenuMvcSystem(), (short)(GameplaySystemOrder.ClientPresentation + 20));
+            systems.Add(new StateDrivenEcsWindowHostSystem<ClientCoreWT, BuildingMenuWindow, BuildingMenuState>(
+                static (in BuildingMenuState state) => state.IsOpen), (short)(GameplaySystemOrder.ClientPresentation + 20));
+            systems.Add(new ClientBuildingMenuBridgeSystem(), (short)(GameplaySystemOrder.ClientPresentation + 21));
         }
 
         public override void RegisterClientViewSync(ViewSyncBuilder views)

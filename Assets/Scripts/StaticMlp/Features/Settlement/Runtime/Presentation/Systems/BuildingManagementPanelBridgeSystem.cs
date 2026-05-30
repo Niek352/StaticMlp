@@ -1,15 +1,16 @@
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class BuildingManagementPanelBridgeSystem : ControllerEcsBridgeSystem<BuildingManagementPanelController>
+    public sealed class BuildingManagementPanelBridgeSystem
+        : EcsWindowPresentationBridgeSystem<ClientCoreWT, BuildingManagementPanelWindow, BuildingManagementPanelSlot, BuildingManagementPanelViewModel>
     {
-        protected override void SyncPresentation()
+        protected override void SyncPresentation(BuildingManagementPanelViewModel viewModel)
         {
             ref readonly var session = ref CW.GetResource<BuildingPanelSession>();
             var state = BuildingPanelPresentation.Build(in session);
-            Controller.Apply(in state);
+            viewModel.Sync(in state);
         }
     }
 }

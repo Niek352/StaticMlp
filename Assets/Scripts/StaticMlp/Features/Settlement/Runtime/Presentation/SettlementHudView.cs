@@ -1,8 +1,8 @@
 using System;
 using System.Text;
-using Code.EcsUi.Mvc;
 using StaticMlp.Features.Frontier;
 using StaticMlp.Features.Loadout;
+using Aspid.StaticEcs.Windows;
 using StaticMlp.Features.Progression;
 using TMPro;
 using UnityEngine;
@@ -10,17 +10,13 @@ using UnityEngine.UI;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class SettlementHudView : PrefabViewBase
+    public sealed class SettlementHudView : EcsWindowViewBase<SettlementHudSlot, SettlementHudViewModel>
     {
         [SerializeField] private GameObject panelRoot;
         [SerializeField] private Button closeButton;
         [SerializeField] private Button buildButton;
         [SerializeField] private Button expeditionButton;
         [SerializeField] private TextMeshProUGUI summaryLabel;
-
-        private Action _onCloseClicked;
-        private Action _onBuildClicked;
-        private Action _onExpeditionClicked;
 
         protected override void Awake()
         {
@@ -38,18 +34,14 @@ namespace StaticMlp.Features.Settlement
                 throw new MissingReferenceException($"{nameof(SettlementHudView)} requires {nameof(summaryLabel)}.");
         }
 
-        public void Bind(Action onBuildClicked, Action onExpeditionClicked, Action onCloseClicked)
+        protected override void OnViewModelBound(SettlementHudViewModel viewModel)
         {
-            _onBuildClicked = onBuildClicked ?? throw new ArgumentNullException(nameof(onBuildClicked));
-            _onExpeditionClicked = onExpeditionClicked ?? throw new ArgumentNullException(nameof(onExpeditionClicked));
-            _onCloseClicked = onCloseClicked ?? throw new ArgumentNullException(nameof(onCloseClicked));
+            viewModel.Changed += Render;
         }
 
-        public void Unbind()
+        protected override void OnViewModelUnbound(SettlementHudViewModel viewModel)
         {
-            _onCloseClicked = null;
-            _onBuildClicked = null;
-            _onExpeditionClicked = null;
+            viewModel.Changed -= Render;
         }
 
         private void OnEnable()
@@ -66,7 +58,20 @@ namespace StaticMlp.Features.Settlement
             expeditionButton.onClick.RemoveListener(HandleExpeditionClicked);
         }
 
-        public void Render(
+        private void Render()
+        {
+            var viewModel = BoundViewModel;
+            Render(
+                in viewModel.Settlement,
+                in viewModel.Expedition,
+                in viewModel.Loadout,
+                in viewModel.Threat,
+                in viewModel.Raid,
+                in viewModel.Boss,
+                in viewModel.Progression);
+        }
+
+        private void Render(
             in SettlementHudState settlement,
             in ExpeditionHudState expedition,
             in LoadoutHudState loadout,
@@ -85,7 +90,7 @@ namespace StaticMlp.Features.Settlement
                 $"Camp stage: {settlement.SettlementStage}\n" +
                 $"Resources: {FormatResources(in settlement)}\n" +
                 $"Workers: {settlement.AssignedWorkers}/{settlement.TotalWorkers} assigned\n" +
-                $"Prepared build: {SettlementHudController.DescribeBuild(loadout.PreparedPrimaryModuleId)}\n" +
+                $"Prepared build: {SettlementHudViewModel.DescribeBuild(loadout.PreparedPrimaryModuleId)}\n" +
                 $"Expedition: {expedition.Availability} / {expedition.Activity}\n" +
                 $"Threat: {threat.ThreatPhase} / Raid {raid.Status}\n" +
                 $"Boss flags: Unlocked={progression.HasBossUnlocked} Tokens={progression.BossPreparationTokens}" +
@@ -97,17 +102,17 @@ namespace StaticMlp.Features.Settlement
 
         private void HandleCloseClicked()
         {
-            _onCloseClicked.Invoke();
+            BoundViewModel.CloseHud();
         }
 
         private void HandleBuildClicked()
         {
-            _onBuildClicked.Invoke();
+            BoundViewModel.OpenLoadoutPreparation();
         }
 
         private void HandleExpeditionClicked()
         {
-            _onExpeditionClicked.Invoke();
+            BoundViewModel.OpenExpeditionSelection();
         }
 
         private static string FormatResources(in SettlementHudState state)

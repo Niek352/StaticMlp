@@ -1,20 +1,17 @@
 using System;
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace StaticMlp.Features.Frontier
 {
-    public sealed class ExpeditionSelectionView : PrefabViewBase
+    public sealed class ExpeditionSelectionView : EcsWindowViewBase<ExpeditionSelectionSlot, ExpeditionSelectionViewModel>
     {
         [SerializeField] private GameObject panelRoot;
         [SerializeField] private Button startButton;
         [SerializeField] private Button closeButton;
         [SerializeField] private TextMeshProUGUI summaryLabel;
-
-        private Action _onStartClicked;
-        private Action _onCloseClicked;
 
         protected override void Awake()
         {
@@ -30,16 +27,15 @@ namespace StaticMlp.Features.Frontier
                 throw new MissingReferenceException($"{nameof(ExpeditionSelectionView)} requires {nameof(summaryLabel)}.");
         }
 
-        public void Bind(Action onStartClicked, Action onCloseClicked)
+        protected override void OnViewModelBound(ExpeditionSelectionViewModel viewModel)
         {
-            _onStartClicked = onStartClicked ?? throw new ArgumentNullException(nameof(onStartClicked));
-            _onCloseClicked = onCloseClicked ?? throw new ArgumentNullException(nameof(onCloseClicked));
+            viewModel.Changed += Render;
+            Render();
         }
 
-        public void Unbind()
+        protected override void OnViewModelUnbound(ExpeditionSelectionViewModel viewModel)
         {
-            _onStartClicked = null;
-            _onCloseClicked = null;
+            viewModel.Changed -= Render;
         }
 
         private void OnEnable()
@@ -54,26 +50,32 @@ namespace StaticMlp.Features.Frontier
             closeButton.onClick.RemoveListener(HandleCloseClicked);
         }
 
-        public void Render(in ExpeditionSelectionScreenState state)
+        private void Render()
+        {
+            var state = BoundViewModel.State;
+            Render(in state);
+        }
+
+        private void Render(in ExpeditionSelectionScreenState state)
         {
             panelRoot.SetActive(true);
             summaryLabel.text = state.IsBossEncounterMode
                 ? $"Boss Encounter\n" +
                   $"Target: Raider Chief\n" +
                   $"Status: {state.BossStatus}\n" +
-                  $"Prepared build: {ExpeditionSelectionController.DescribePreparedBuild(state.PreparedPrimaryModuleId)}\n" +
+                  $"Prepared build: {ExpeditionSelectionViewModel.DescribePreparedBuild(state.PreparedPrimaryModuleId)}\n" +
                   $"Threat: {state.ThreatPhase}"
                 : $"Expedition Selection\n" +
                   $"Destination: Nearby Raider Camp\n" +
                   $"Availability: {state.AvailabilityStatus}\n" +
                   $"Activity: {state.ActivityStatus}\n" +
-                  $"Prepared build: {ExpeditionSelectionController.DescribePreparedBuild(state.PreparedPrimaryModuleId)}\n" +
+                  $"Prepared build: {ExpeditionSelectionViewModel.DescribePreparedBuild(state.PreparedPrimaryModuleId)}\n" +
                   $"Reward: Recovered War Cache\n" +
                   $"Threat: {state.ThreatPhase}";
             startButton.interactable = state.CanStart;
         }
 
-        private void HandleStartClicked() => _onStartClicked.Invoke();
-        private void HandleCloseClicked() => _onCloseClicked.Invoke();
+        private void HandleStartClicked() => BoundViewModel.StartExpedition();
+        private void HandleCloseClicked() => BoundViewModel.Close();
     }
 }

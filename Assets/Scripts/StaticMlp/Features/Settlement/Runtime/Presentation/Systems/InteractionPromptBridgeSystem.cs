@@ -1,14 +1,15 @@
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Settlement
 {
-    public sealed class InteractionPromptBridgeSystem : ControllerEcsBridgeSystem<InteractionPromptController>
+    public sealed class InteractionPromptBridgeSystem
+        : EcsWindowPresentationBridgeSystem<ClientCoreWT, InteractionPromptWindow, InteractionPromptSlot, InteractionPromptViewModel>
     {
-        protected override void SyncPresentation()
+        protected override void SyncPresentation(InteractionPromptViewModel viewModel)
         {
             ref readonly var state = ref CW.GetResource<InteractionPromptState>();
-            Controller.Apply(in state);
+            viewModel.Sync(in state);
         }
     }
 }

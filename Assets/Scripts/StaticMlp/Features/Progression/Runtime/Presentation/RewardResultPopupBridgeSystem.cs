@@ -1,5 +1,5 @@
+using Aspid.StaticEcs.Windows;
 using StaticMlp.Features.CampFlow;
-using Code.EcsUi.Mvc;
 using FFS.Libraries.StaticEcs;
 using StaticMlp.Features.Settlement;
 using StaticMlp.Networking;
@@ -7,9 +7,10 @@ using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Progression
 {
-    public sealed class RewardResultPopupBridgeSystem : ControllerEcsBridgeSystem<RewardResultPopupController>
+    public sealed class RewardResultPopupBridgeSystem
+        : EcsWindowPresentationBridgeSystem<ClientCoreWT, RewardResultPopupWindow, RewardResultPopupSlot, RewardResultPopupViewModel>
     {
-        protected override void SyncPresentation()
+        protected override void SyncPresentation(RewardResultPopupViewModel viewModel)
         {
             ref readonly var session = ref CW.GetResource<RewardResultPopupSession>();
 
@@ -32,7 +33,7 @@ namespace StaticMlp.Features.Progression
                 }
             }
 
-            Controller.Apply(in data);
+            viewModel.Sync(in data);
         }
 
         private static RewardPackageId ResolveReward(uint newlyAppliedMask)

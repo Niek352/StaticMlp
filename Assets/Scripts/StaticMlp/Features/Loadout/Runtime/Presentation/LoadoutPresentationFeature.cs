@@ -1,4 +1,4 @@
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using StaticMlp.Game.Bootstrap;
 using StaticMlp.Networking;
 
@@ -10,12 +10,18 @@ namespace StaticMlp.Features.Loadout
 
         public override void RegisterClientCoreSystems(ClientCoreSystemsBuilder systems)
         {
-            var bridge = new LoadoutPreparationBridgeSystem();
+            var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
+
+            windows.RegisterWindow<LoadoutPreparationWindow, EcsWindowNoData, LoadoutPreparationView>(
+                EcsResourcesWindowShellViewFactory.CreateLazy<LoadoutPreparationView>(BUILD_PREPARATION_VIEW_RESOURCE_PATH),
+                EcsWindowLayer.Fullscreen);
+            windows.RegisterViewModel<LoadoutPreparationWindow, EcsWindowNoData, LoadoutPreparationSlot, LoadoutPreparationViewModel>(
+                static _ => new LoadoutPreparationViewModel(),
+                EcsWindowOpenInputBindings.Ignore<ClientCoreWT, LoadoutPreparationWindow, EcsWindowNoData, LoadoutPreparationViewModel>);
 
             systems.Add(new ClientLoadoutPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 20);
-            systems.Add(new ControllerRegistrationSystem<LoadoutPreparationView, LoadoutPreparationController>(
-                new LoadoutPreparationController(ResourcesViewFactory.CreateLazy<LoadoutPreparationView>(BUILD_PREPARATION_VIEW_RESOURCE_PATH), bridge)), GameplaySystemOrder.ClientPresentation + 24);
-            systems.Add(bridge, GameplaySystemOrder.ClientPresentation + 25);
+            systems.Add(new ClientLoadoutPreparationIntentSystem(), GameplaySystemOrder.ClientPresentation + 24);
+            systems.Add(new ClientLoadoutPreparationViewModelSyncSystem(), GameplaySystemOrder.ClientPresentation + 25);
         }
     }
 }

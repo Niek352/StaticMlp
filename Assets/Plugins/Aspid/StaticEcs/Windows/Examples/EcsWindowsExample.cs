@@ -227,12 +227,22 @@ namespace Aspid.StaticEcs.Windows.Examples
             }
         }
 
-        public sealed class InventoryItemsBridgeSystem
-            : EcsWindowPresentationBridgeSystem<ExampleWorld, InventoryWindow, InventoryItemsSlot, InventoryItemsViewModel>
+        public sealed class InventoryItemsBridgeSystem : ISystem
         {
-            protected override void SyncPresentation(InventoryItemsViewModel viewModel)
+            private WindowsController<ExampleWorld> _windows;
+
+            public void Init()
             {
+                _windows = ExampleW.GetResource<WindowsController<ExampleWorld>>();
+            }
+
+            public void Update()
+            {
+                if (!_windows.IsWindowActive<InventoryWindow>())
+                    return;
+
                 ref readonly var state = ref ExampleW.GetResource<InventoryWindowState>();
+                var viewModel = _windows.GetViewModel<InventoryWindow, InventoryItemsSlot, InventoryItemsViewModel>();
                 viewModel.SyncInventoryState(state.ItemCount, state.Gold);
             }
         }

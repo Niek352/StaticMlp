@@ -4,6 +4,9 @@ This folder contains architecture and refactor work that should not be mixed wit
 
 ## Plans
 
+- [MVVM StaticEcs context handoff](mvvm-static-ecs/00_context_handoff.md): fresh-context handoff for the corrected Aspid.StaticEcs + Aspid.MVVM windows migration.
+- [MVVM StaticEcs architecture decision](mvvm-static-ecs/01_architecture_decision.md): target package boundaries and required ECS-to-ViewModel window linking API.
+- [MVVM StaticEcs migration plan](mvvm-static-ecs/02_migration_plan.md): phased migration order for feature views and ViewModels.
 - [06.02 Presentation State Problem Fixing](settlement/06.02_problem_fixing.md): executable plan for fixing `06_problem_presentation_state_flattening.md`.
 
 ## Audits

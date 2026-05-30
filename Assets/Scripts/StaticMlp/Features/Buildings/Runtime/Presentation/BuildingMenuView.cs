@@ -1,6 +1,6 @@
 using System;
 using StaticMlp.Features.BuildingCatalog;
-using Code.EcsUi.Mvc;
+using Aspid.StaticEcs.Windows;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace StaticMlp.Features.Buildings
 {
-    public sealed class BuildingMenuView : PrefabViewBase
+    public sealed class BuildingMenuView : EcsWindowViewBase<BuildingMenuSlot, BuildingMenuViewModel>
     {
         [Header("Hierarchy")]
         [SerializeField] private GameObject _panelRoot;
@@ -34,9 +34,6 @@ namespace StaticMlp.Features.Buildings
         private int _visibleCardCount;
         private UnityAction[] _cardClickActions;
         private UnityAction _closeClickAction;
-        private Action<BuildingId> _onBuildingClicked;
-        private Action _onCloseClicked;
-
         protected override void Awake()
         {
             base.Awake();
@@ -56,13 +53,22 @@ namespace StaticMlp.Features.Buildings
             _panelRoot.SetActive(false);
         }
 
-        public void Bind(Action<BuildingId> buildingClicked, Action closeClicked)
+        protected override void OnViewModelBound(BuildingMenuViewModel viewModel)
         {
-            if (_onBuildingClicked != null || _onCloseClicked != null)
-                throw new InvalidOperationException($"{nameof(BuildingMenuView)} is already bound to a controller.");
+            viewModel.Changed += Render;
+            BindButtons();
+        }
 
-            _onBuildingClicked = buildingClicked ?? throw new ArgumentNullException(nameof(buildingClicked));
-            _onCloseClicked = closeClicked ?? throw new ArgumentNullException(nameof(closeClicked));
+        protected override void OnViewModelUnbound(BuildingMenuViewModel viewModel)
+        {
+            viewModel.Changed -= Render;
+            UnbindButtons();
+        }
+
+        private void BindButtons()
+        {
+            if (_cardClickActions != null || _closeClickAction != null)
+                throw new InvalidOperationException($"{nameof(BuildingMenuView)} is already bound to a ViewModel.");
 
             _cardClickActions = new UnityAction[_cardButtons.Length];
             for (var i = 0; i < _cardButtons.Length; i++)
@@ -76,7 +82,7 @@ namespace StaticMlp.Features.Buildings
             _closeButton.onClick.AddListener(_closeClickAction);
         }
 
-        public void Unbind()
+        private void UnbindButtons()
         {
             if (_cardClickActions != null)
             {
@@ -89,8 +95,12 @@ namespace StaticMlp.Features.Buildings
 
             _cardClickActions = null;
             _closeClickAction = null;
-            _onBuildingClicked = null;
-            _onCloseClicked = null;
+        }
+
+        private void Render()
+        {
+            var presentation = BoundViewModel.Presentation;
+            Render(in presentation);
         }
 
         public void Render(in BuildingMenuPresentation presentation)
@@ -108,12 +118,12 @@ namespace StaticMlp.Features.Buildings
             if (!_renderedCardAvailability[slotIndex])
                 throw new InvalidOperationException($"{nameof(BuildingMenuView)} received a click from locked card slot {slotIndex}.");
 
-            _onBuildingClicked.Invoke(_renderedCardIds[slotIndex]);
+            BoundViewModel.SelectBuilding(_renderedCardIds[slotIndex]);
         }
 
         private void HandleCloseClicked()
         {
-            _onCloseClicked.Invoke();
+            BoundViewModel.CloseMenu();
         }
 
         private void RenderCategories(BuildingMenuCategoryPresentation[] categories)
@@ -163,34 +173,6 @@ namespace StaticMlp.Features.Buildings
                 _renderedCardIds[i] = default;
                 _renderedCardAvailability[i] = false;
                 _cardButtons[i].interactable = false;
-            }
-        }
-
-        private void CheckCardBindings()
-        {
-            if (_cardRoots == null || _cardRoots.Length == 0)
-                throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires {nameof(_cardRoots)}.");
-            if (_cardButtons == null || _cardButtons.Length != _cardRoots.Length)
-                throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires one {nameof(_cardButtons)} entry per card root.");
-            if (_cardNameLabels == null || _cardNameLabels.Length != _cardRoots.Length)
-                throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires one {nameof(_cardNameLabels)} entry per card root.");
-            if (_cardCategoryLabels == null || _cardCategoryLabels.Length != _cardRoots.Length)
-                throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires one {nameof(_cardCategoryLabels)} entry per card root.");
-            if (_cardCostLabels == null || _cardCostLabels.Length != _cardRoots.Length)
-                throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires one {nameof(_cardCostLabels)} entry per card root.");
-
-            for (var i = 0; i < _cardRoots.Length; i++)
-            {
-                if (_cardRoots[i] == null)
-                    throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires {nameof(_cardRoots)}[{i}].");
-                if (_cardButtons[i] == null)
-                    throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires {nameof(_cardButtons)}[{i}].");
-                if (_cardNameLabels[i] == null)
-                    throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires {nameof(_cardNameLabels)}[{i}].");
-                if (_cardCategoryLabels[i] == null)
-                    throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires {nameof(_cardCategoryLabels)}[{i}].");
-                if (_cardCostLabels[i] == null)
-                    throw new MissingReferenceException($"{nameof(BuildingMenuView)} requires {nameof(_cardCostLabels)}[{i}].");
             }
         }
 
