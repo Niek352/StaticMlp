@@ -64,8 +64,8 @@ namespace StaticMlp.Features.Buildings
             registry.RegisterComponent<BuildingMenuViewModel, BuildingMenuViewData>(
                 Binding);
 
-            windows.RegisterWindow<BuildingMenuWindow, EcsWindowNoData, BuildingMenuView>(
-                EcsResourcesWindowShellViewFactory.CreateLazy<BuildingMenuView>(BUILDING_MENU_VIEW_RESOURCE_PATH),
+            windows.RegisterWindow<BuildingMenuWindow, EcsWindowNoData, BuildingMenuShellView>(
+                EcsResourcesWindowShellViewFactory.CreateLazy<BuildingMenuShellView>(BUILDING_MENU_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Persistent,
                 persistentSortOrder: 80);
             windows.RegisterLinkedViewModel<BuildingMenuWindow, EcsWindowNoData, BuildingMenuSlot, BuildingMenuViewModel>(

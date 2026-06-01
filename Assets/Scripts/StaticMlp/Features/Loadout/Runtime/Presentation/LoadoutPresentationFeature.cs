@@ -17,8 +17,8 @@ namespace StaticMlp.Features.Loadout
             registry.RegisterComponent<LoadoutPreparationViewModel, LoadoutPreparationViewData>(
                 Binding);
 
-            windows.RegisterWindow<LoadoutPreparationWindow, EcsWindowNoData, LoadoutPreparationView>(
-                EcsResourcesWindowShellViewFactory.CreateLazy<LoadoutPreparationView>(BUILD_PREPARATION_VIEW_RESOURCE_PATH),
+            windows.RegisterWindow<LoadoutPreparationWindow, EcsWindowNoData, LoadoutPreparationShellView>(
+                EcsResourcesWindowShellViewFactory.CreateLazy<LoadoutPreparationShellView>(BUILD_PREPARATION_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Fullscreen);
             windows.RegisterLinkedViewModel<LoadoutPreparationWindow, EcsWindowNoData, LoadoutPreparationSlot, LoadoutPreparationViewModel>(
                 static _ => new LoadoutPreparationViewModel(),

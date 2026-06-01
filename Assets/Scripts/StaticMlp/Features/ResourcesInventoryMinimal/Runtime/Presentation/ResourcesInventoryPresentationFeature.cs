@@ -36,8 +36,8 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             registry.RegisterComponent<ResourcesInventoryHudViewModel, ResourcesInventoryHudViewData>(
                 binding: Binding);
 
-            windows.RegisterWindow<ResourcesInventoryHudWindow, EcsWindowNoData, ResourcesInventoryHudView>(
-                EcsResourcesWindowShellViewFactory.CreateLazy<ResourcesInventoryHudView>(INVENTORY_HUD_VIEW_PATH),
+            windows.RegisterWindow<ResourcesInventoryHudWindow, EcsWindowNoData, ResourcesInventoryHudShellView>(
+                EcsResourcesWindowShellViewFactory.CreateLazy<ResourcesInventoryHudShellView>(INVENTORY_HUD_VIEW_PATH),
                 EcsWindowLayer.Persistent,
                 persistentSortOrder: 20);
             windows.RegisterLinkedViewModel<ResourcesInventoryHudWindow, EcsWindowNoData, ResourcesInventoryHudSlot, ResourcesInventoryHudViewModel>(

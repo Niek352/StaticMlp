@@ -1,46 +1,58 @@
 using System;
 using Aspid.MVVM;
 using FFS.Libraries.StaticEcs;
-using StaticMlp.Features.Buildings;
-using StaticMlp.Features.Settlement.Workers;
 using StaticMlp.Networking;
-using StaticMlp.Networking.Requests;
 
 namespace StaticMlp.Features.Settlement
 {
     [ViewModel]
     public sealed partial class BuildingManagementPanelViewModel
     {
-        [OneWayBind] private BuildingPanelState _displayState;
+        [OneWayBind] private bool _isOpen;
+        [OneWayBind] private string _summary;
+        [OneWayBind] private string _primaryActionLabel;
+        [OneWayBind] private string _secondaryActionLabel;
+        [OneWayBind] private bool _primaryActionVisible;
+        [OneWayBind] private bool _secondaryActionVisible;
 
         private BuildingPanelState _sourceState;
+        private BuildingPanelState _displayState;
         private EntityGID _workbenchActionTarget;
         private int _workbenchActionIndex;
-
-        public event Action Changed;
-
-        public BuildingPanelState State => DisplayState;
 
         public void Apply(in BuildingManagementPanelViewData data)
         {
             _sourceState = data.State;
             ClampWorkbenchActionSelection(in _sourceState);
-            DisplayState = BuildDisplayState(in _sourceState);
+            ApplyDisplayState(BuildDisplayState(in _sourceState));
         }
 
-        public void HandlePrimaryAction()
+        [RelayCommand(CanExecute = nameof(CanPrimaryAction))]
+        private void PrimaryAction()
         {
-            HandlePanelAction(DisplayState.PrimaryAction);
+            HandlePanelAction(_displayState.PrimaryAction);
         }
 
-        public void HandleSecondaryAction()
+        [RelayCommand(CanExecute = nameof(CanSecondaryAction))]
+        private void SecondaryAction()
         {
-            HandlePanelAction(DisplayState.SecondaryAction);
+            HandlePanelAction(_displayState.SecondaryAction);
         }
 
-        public void Close()
+        [RelayCommand]
+        private void Close()
         {
             CW.SendEvent(new BuildingManagementPanelCloseIntent());
+        }
+
+        private bool CanPrimaryAction()
+        {
+            return _displayState.PrimaryAction.IsDefined && _displayState.PrimaryAction.Enabled;
+        }
+
+        private bool CanSecondaryAction()
+        {
+            return _displayState.SecondaryAction.IsDefined && _displayState.SecondaryAction.Enabled;
         }
 
         private void HandlePanelAction(in BuildingPanelAction action)
@@ -51,38 +63,26 @@ namespace StaticMlp.Features.Settlement
             if (!action.Enabled)
                 throw new InvalidOperationException($"Building panel action {action.Kind} is disabled: {action.DisabledReason}");
 
-            switch (action.Kind)
+            if (action.Kind == BuildingPanelActionKind.CycleWorkbenchAction)
             {
-                case BuildingPanelActionKind.DepositConstructionResources:
-                    SendDeposit(action.Target);
-                    return;
-                case BuildingPanelActionKind.ContributeBuildWork:
-                    SendBuild(action.Target);
-                    return;
-                case BuildingPanelActionKind.AssignWorker:
-                    SendWorkerAssignment(action, assigned: true);
-                    return;
-                case BuildingPanelActionKind.UnassignWorker:
-                    SendWorkerAssignment(action, assigned: false);
-                    return;
-                case BuildingPanelActionKind.CollectExtractionOutput:
-                    SendCollectExtractionOutput(action);
-                    return;
-                case BuildingPanelActionKind.DepositCarriedResourcesToStockpile:
-                    SendDepositCarriedResourcesToStockpile(action.Target);
-                    return;
-                case BuildingPanelActionKind.ClaimProductionOutput:
-                    SendClaimProductionOutput(action);
-                    return;
-                case BuildingPanelActionKind.SetProductionRecipe:
-                    SendSetProductionRecipe(action);
-                    return;
-                case BuildingPanelActionKind.CycleWorkbenchAction:
-                    CycleWorkbenchAction();
-                    return;
-                default:
-                    throw new InvalidOperationException($"Unsupported building panel action {action.Kind}.");
+                CycleWorkbenchAction();
+                return;
             }
+
+            CW.SendEvent(new BuildingManagementPanelActionIntent(action));
+        }
+
+        private void ApplyDisplayState(in BuildingPanelState state)
+        {
+            _displayState = state;
+            IsOpen = state.IsOpen;
+            Summary = BuildSummary(in state);
+            PrimaryActionVisible = state.PrimaryAction.IsDefined;
+            SecondaryActionVisible = state.SecondaryAction.IsDefined;
+            PrimaryActionLabel = state.PrimaryAction.IsDefined ? state.PrimaryAction.Label : string.Empty;
+            SecondaryActionLabel = state.SecondaryAction.IsDefined ? state.SecondaryAction.Label : string.Empty;
+            PrimaryActionCommand.NotifyCanExecuteChanged();
+            SecondaryActionCommand.NotifyCanExecuteChanged();
         }
 
         private BuildingPanelState BuildDisplayState(in BuildingPanelState source)
@@ -139,12 +139,7 @@ namespace StaticMlp.Features.Settlement
                 throw new InvalidOperationException("Workbench action cycling requires at least two actions.");
 
             _workbenchActionIndex = (_workbenchActionIndex + 1) % actionCount;
-            DisplayState = BuildDisplayState(in _sourceState);
-        }
-
-        partial void OnDisplayStateChanged(BuildingPanelState newValue)
-        {
-            Changed?.Invoke();
+            ApplyDisplayState(BuildDisplayState(in _sourceState));
         }
 
         private static int CountWorkbenchActions(in BuildingPanelState state)
@@ -200,10 +195,9 @@ namespace StaticMlp.Features.Settlement
                 return false;
             }
 
-            var recipe = ProductionRecipeCatalog.Get(new ProductionRecipeId(recipeId));
             action = new BuildingPanelAction(
                 BuildingPanelActionKind.SetProductionRecipe,
-                $"Set {recipe.Code}",
+                $"Set Recipe {recipeId}",
                 enabled: true,
                 disabledReason: string.Empty,
                 state.Target,
@@ -238,65 +232,31 @@ namespace StaticMlp.Features.Settlement
             return true;
         }
 
-        private static void SendDeposit(EntityGID target)
+        private static string BuildSummary(in BuildingPanelState state)
         {
-            if (!target.TryUnpack<ClientCoreWT>(out var site))
-                throw new InvalidOperationException($"Deposit construction target {target} is not a client entity.");
+            var title = string.IsNullOrEmpty(state.Title) ? "Building" : state.Title;
+            var summary = $"{title}\nKind: {state.Kind}";
 
-            var depositRequest = new DepositConstructionResourcesRequestEvent(
-                target,
-                ConstructionResourcesAccess.GetProjectedRemainingResources(site));
-            RequestApi.Send<DepositConstructionResourcesRequestEvent, DepositConstructionResourcesResultEvent>(depositRequest);
+            if (state.PrimaryAction.IsDefined)
+                summary += $"\nPrimary: {FormatActionStatus(in state.PrimaryAction)}";
+
+            if (state.SecondaryAction.IsDefined)
+                summary += $"\nSecondary: {FormatActionStatus(in state.SecondaryAction)}";
+
+            if (!string.IsNullOrEmpty(state.TransferFeedbackMessage))
+                summary += $"\nFeedback: {state.TransferFeedbackMessage}";
+
+            return summary;
         }
 
-        private static void SendBuild(EntityGID target)
+        private static string FormatActionStatus(in BuildingPanelAction action)
         {
-            var buildRequest = new BuildConstructionRequestEvent(
-                target,
-                ConstructionActionProfiles.PlayerBuildClickWork);
-            RequestApi.Send<BuildConstructionRequestEvent, BuildConstructionResultEvent>(buildRequest);
-        }
+            if (action.Enabled)
+                return $"{action.Label} (ready)";
 
-        private static void SendWorkerAssignment(in BuildingPanelAction action, bool assigned)
-        {
-            var request = new SetBuildingWorkerAssignmentRequestEvent(
-                action.Worker,
-                action.Target,
-                action.SlotIndex,
-                assigned);
-            RequestApi.Send<SetBuildingWorkerAssignmentRequestEvent, SetBuildingWorkerAssignmentResultEvent>(request);
-        }
-
-        private static void SendCollectExtractionOutput(in BuildingPanelAction action)
-        {
-            var request = new CollectExtractionOutputRequestEvent(
-                action.Target,
-                action.Resource,
-                action.Amount);
-            RequestApi.Send<CollectExtractionOutputRequestEvent, CollectExtractionOutputResultEvent>(request);
-        }
-
-        private static void SendDepositCarriedResourcesToStockpile(EntityGID target)
-        {
-            var request = new DepositCarriedResourcesToStockpileRequestEvent(target);
-            RequestApi.Send<DepositCarriedResourcesToStockpileRequestEvent, DepositCarriedResourcesToStockpileResultEvent>(request);
-        }
-
-        private static void SendClaimProductionOutput(in BuildingPanelAction action)
-        {
-            var request = new ClaimProductionOutputRequestEvent(
-                action.Target,
-                action.Resource,
-                action.Amount);
-            RequestApi.Send<ClaimProductionOutputRequestEvent, ClaimProductionOutputResultEvent>(request);
-        }
-
-        private static void SendSetProductionRecipe(in BuildingPanelAction action)
-        {
-            var request = new SetProductionRecipeRequestEvent(
-                action.Target,
-                action.RecipeId);
-            RequestApi.Send<SetProductionRecipeRequestEvent, SetProductionRecipeResultEvent>(request);
+            return string.IsNullOrEmpty(action.DisabledReason)
+                ? $"{action.Label} (locked)"
+                : $"{action.Label} (locked: {action.DisabledReason})";
         }
     }
 }

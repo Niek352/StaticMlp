@@ -1,4 +1,4 @@
-using System;
+using System.Text;
 using Aspid.MVVM;
 
 namespace StaticMlp.Features.ResourcesInventoryMinimal
@@ -6,18 +6,43 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
     [ViewModel]
     public sealed partial class ResourcesInventoryHudViewModel
     {
-        [OneWayBind] private ResourcesInventoryHudPresentation _presentation;
-
-        public event Action Changed;
+        [OneWayBind] private bool _isReady;
+        [OneWayBind] private string _summary;
 
         public void Apply(in ResourcesInventoryHudViewData data)
         {
-            Presentation = data.Presentation;
+            var presentation = data.Presentation;
+            IsReady = presentation.IsReady;
+            Summary = BuildSummary(in presentation);
         }
 
-        partial void OnPresentationChanged(ResourcesInventoryHudPresentation newValue)
+        private static string BuildSummary(in ResourcesInventoryHudPresentation presentation)
         {
-            Changed?.Invoke();
+            if (!presentation.IsReady)
+                return "Inventory: not ready";
+
+            var builder = new StringBuilder();
+            builder.Append("Inventory: ");
+            builder.Append(presentation.UsedSlots);
+            builder.Append(" / ");
+            builder.Append(presentation.Capacity);
+            builder.Append(" slots, ");
+            builder.Append(presentation.TotalAmount);
+            builder.Append(" total");
+
+            for (var i = 0; i < presentation.Slots.Length; i++)
+            {
+                var slot = presentation.Slots[i];
+                if (!slot.IsOccupied)
+                    continue;
+
+                builder.Append("\n");
+                builder.Append(slot.ResourceName);
+                builder.Append(": ");
+                builder.Append(slot.Amount);
+            }
+
+            return builder.ToString();
         }
     }
 }

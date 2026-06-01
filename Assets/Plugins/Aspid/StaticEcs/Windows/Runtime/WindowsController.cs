@@ -29,7 +29,7 @@ namespace Aspid.StaticEcs.Windows
         private bool _isDisposed;
 
         public void RegisterWindow<TWindow, TInput, TView>(
-            Func<TView> viewFactory,
+            EcsWindowShellViewFactoryMethod<TView> viewFactory,
             EcsWindowLayer layer = EcsWindowLayer.Popup,
             int? persistentSortOrder = null,
             bool? canBeClosedByEscape = null)

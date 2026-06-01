@@ -22,16 +22,16 @@ namespace StaticMlp.Features.Frontier
             registry.RegisterComponent<ThreatBannerViewModel, ThreatBannerViewData>(
                 EcsComponentBinding);
 
-            windows.RegisterWindow<ExpeditionSelectionWindow, EcsWindowNoData, ExpeditionSelectionView>(
-                EcsResourcesWindowShellViewFactory.CreateLazy<ExpeditionSelectionView>(EXPEDITION_SELECTION_VIEW_RESOURCE_PATH),
+            windows.RegisterWindow<ExpeditionSelectionWindow, EcsWindowNoData, ExpeditionSelectionShellView>(
+                EcsResourcesWindowShellViewFactory.CreateLazy<ExpeditionSelectionShellView>(EXPEDITION_SELECTION_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Fullscreen);
             windows.RegisterLinkedViewModel<ExpeditionSelectionWindow, EcsWindowNoData, ExpeditionSelectionSlot, ExpeditionSelectionViewModel>(
                 static _ => new ExpeditionSelectionViewModel(),
                 static _ => ResolveSingletonPresentationEntity<ExpeditionSelectionViewData>(),
                 EcsWindowOpenInputBindings.Ignore<ClientCoreWT, ExpeditionSelectionWindow, EcsWindowNoData, ExpeditionSelectionViewModel>);
 
-            windows.RegisterWindow<ThreatBannerWindow, EcsWindowNoData, ThreatBannerView>(
-                EcsResourcesWindowShellViewFactory.CreateLazy<ThreatBannerView>(THREAT_BANNER_VIEW_RESOURCE_PATH),
+            windows.RegisterWindow<ThreatBannerWindow, EcsWindowNoData, ThreatBannerShellView>(
+                EcsResourcesWindowShellViewFactory.CreateLazy<ThreatBannerShellView>(THREAT_BANNER_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Persistent,
                 persistentSortOrder: 200);
             windows.RegisterLinkedViewModel<ThreatBannerWindow, EcsWindowNoData, ThreatBannerSlot, ThreatBannerViewModel>(

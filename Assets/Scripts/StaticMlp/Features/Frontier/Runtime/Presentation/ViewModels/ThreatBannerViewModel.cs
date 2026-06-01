@@ -1,4 +1,3 @@
-using System;
 using Aspid.MVVM;
 
 namespace StaticMlp.Features.Frontier
@@ -6,18 +5,16 @@ namespace StaticMlp.Features.Frontier
     [ViewModel]
     public sealed partial class ThreatBannerViewModel
     {
-        [OneWayBind] private ThreatBannerState _state;
-
-        public event Action Changed;
+        [OneWayBind] private bool _isVisible;
+        [OneWayBind] private string _summary;
 
         public void Apply(in ThreatBannerViewData data)
         {
-            State = data.State;
-        }
-
-        partial void OnStateChanged(ThreatBannerState newValue)
-        {
-            Changed?.Invoke();
+            var state = data.State;
+            IsVisible = state.IsVisible;
+            Summary = state.IsVisible
+                ? $"Threat: {state.Phase}\nRaid: {state.RaidStatus}\nActivation tick: {state.ActivateAtTick}"
+                : string.Empty;
         }
     }
 }

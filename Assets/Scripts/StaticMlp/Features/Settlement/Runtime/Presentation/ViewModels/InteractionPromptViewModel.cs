@@ -1,4 +1,3 @@
-using System;
 using Aspid.MVVM;
 
 namespace StaticMlp.Features.Settlement
@@ -6,18 +5,16 @@ namespace StaticMlp.Features.Settlement
     [ViewModel]
     public sealed partial class InteractionPromptViewModel
     {
-        [OneWayBind] private InteractionPromptState _state;
-
-        public event Action Changed;
+        [OneWayBind] private bool _isVisible;
+        [OneWayBind] private string _summary;
 
         public void Apply(in InteractionPromptViewData data)
         {
-            State = data.State;
-        }
-
-        partial void OnStateChanged(InteractionPromptState newValue)
-        {
-            Changed?.Invoke();
+            var state = data.State;
+            IsVisible = state.IsVisible;
+            Summary = state.IsVisible
+                ? $"{state.InputHint}: {state.PromptLabel}\n{state.EffectDescription}"
+                : string.Empty;
         }
     }
 }

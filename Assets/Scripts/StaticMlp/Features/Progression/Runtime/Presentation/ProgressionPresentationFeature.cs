@@ -18,8 +18,8 @@ namespace StaticMlp.Features.Progression
             registry.RegisterComponent<RewardResultPopupViewModel, RewardResultPopupViewData>(
                 Binding);
 
-            windows.RegisterWindow<RewardResultPopupWindow, EcsWindowNoData, RewardResultPopupView>(
-                EcsResourcesWindowShellViewFactory.CreateLazy<RewardResultPopupView>(REWARD_RESULT_POPUP_VIEW_RESOURCE_PATH),
+            windows.RegisterWindow<RewardResultPopupWindow, EcsWindowNoData, RewardResultPopupShellView>(
+                EcsResourcesWindowShellViewFactory.CreateLazy<RewardResultPopupShellView>(REWARD_RESULT_POPUP_VIEW_RESOURCE_PATH),
                 EcsWindowLayer.Popup);
             windows.RegisterLinkedViewModel<RewardResultPopupWindow, EcsWindowNoData, RewardResultPopupSlot, RewardResultPopupViewModel>(
                 static _ => new RewardResultPopupViewModel(),

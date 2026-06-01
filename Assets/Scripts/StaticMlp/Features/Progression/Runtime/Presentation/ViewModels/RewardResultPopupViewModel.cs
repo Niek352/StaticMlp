@@ -1,4 +1,3 @@
-using System;
 using Aspid.MVVM;
 using StaticMlp.Networking;
 
@@ -7,29 +6,20 @@ namespace StaticMlp.Features.Progression
     [ViewModel]
     public sealed partial class RewardResultPopupViewModel
     {
-        [OneWayBind] private RewardResultPopupViewData _data;
-
-        public event Action Changed;
-
-        public static string DescribeReward(RewardPackageId rewardPackageId)
-        {
-            if (rewardPackageId == RewardPackageCatalog.RecoveredWarCacheId)
-                return "Recovered War Cache";
-
-            return $"Reward {rewardPackageId.Value}";
-        }
+        [OneWayBind] private string _summary;
 
         public void Apply(in RewardResultPopupViewData data)
         {
-            Data = data;
+            Summary =
+                $"Reward {data.RewardPackageId.Value}\n" +
+                $"Wood: +{data.GrantedWood}\n" +
+                $"Stone: +{data.GrantedStone}\n" +
+                $"Recovered cache: {data.GrantsRecoveredWarCacheFlag}\n" +
+                $"Threat raised: {data.ThreatRaised}";
         }
 
-        partial void OnDataChanged(RewardResultPopupViewData newValue)
-        {
-            Changed?.Invoke();
-        }
-
-        public void ClosePopup()
+        [RelayCommand]
+        private void ClosePopup()
         {
             CW.SendEvent(new RewardResultPopupCloseIntent());
         }
