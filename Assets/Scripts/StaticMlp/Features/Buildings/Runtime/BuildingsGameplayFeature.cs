@@ -62,7 +62,7 @@ namespace StaticMlp.Features.Buildings
             var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
             var registry = CW.GetResource<EcsLinkRegistry<ClientCoreWT>>();
             registry.RegisterComponent<BuildingMenuViewModel, BuildingMenuViewData>(
-                static (viewModel, in data) => viewModel.Apply(in data));
+                Binding);
 
             windows.RegisterWindow<BuildingMenuWindow, EcsWindowNoData, BuildingMenuView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<BuildingMenuView>(BUILDING_MENU_VIEW_RESOURCE_PATH),
@@ -85,6 +85,11 @@ namespace StaticMlp.Features.Buildings
             systems.Add(new StateDrivenEcsWindowHostSystem<ClientCoreWT, BuildingMenuWindow, BuildingMenuState>(
                 static (in BuildingMenuState state) => state.IsOpen), (short)(GameplaySystemOrder.ClientPresentation + 20));
             systems.Add(new ClientBuildingMenuBridgeSystem(), (short)(GameplaySystemOrder.ClientPresentation + 21));
+        }
+
+        private static void Binding(BuildingMenuViewModel viewModel, in BuildingMenuViewData data)
+        {
+            viewModel.Apply(in data);
         }
 
         public override void RegisterClientViewSync(ViewSyncBuilder views)

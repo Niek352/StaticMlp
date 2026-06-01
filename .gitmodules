@@ -1,0 +1,3 @@
+[submodule "Packages/com.projectdawn.navigation"]
+	path = Packages/com.projectdawn.navigation
+	url = https://github.com/Niek352/com.projectdawn.navigation.git

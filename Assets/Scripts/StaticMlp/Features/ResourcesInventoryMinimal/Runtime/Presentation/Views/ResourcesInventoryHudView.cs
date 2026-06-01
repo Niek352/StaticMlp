@@ -43,7 +43,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
 
         private void Render()
         {
-            var presentation = BoundViewModel.Presentation;
+            var presentation = BoundViewModel.PresentationBindable.Value;
             Render(in presentation);
         }
 

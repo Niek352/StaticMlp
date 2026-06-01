@@ -34,7 +34,7 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
             var registry = CW.GetResource<EcsLinkRegistry<ClientCoreWT>>();
             registry.RegisterComponent<ResourcesInventoryHudViewModel, ResourcesInventoryHudViewData>(
-                static (viewModel, in data) => viewModel.Apply(in data));
+                binding: Binding);
 
             windows.RegisterWindow<ResourcesInventoryHudWindow, EcsWindowNoData, ResourcesInventoryHudView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<ResourcesInventoryHudView>(INVENTORY_HUD_VIEW_PATH),
@@ -51,6 +51,11 @@ namespace StaticMlp.Features.ResourcesInventoryMinimal
             systems.Add(new ClientResourcesInventoryPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 29);
             systems.Add(new PersistentEcsWindowHostSystem<ClientCoreWT, ResourcesInventoryHudWindow>(), GameplaySystemOrder.ClientPresentation + 30);
             systems.Add(hudBridge, GameplaySystemOrder.ClientPresentation + 31);
+        }
+
+        private static void Binding(ResourcesInventoryHudViewModel viewModel, in ResourcesInventoryHudViewData data)
+        {
+            viewModel.Apply(in data);
         }
 
         public override void RegisterClientViewSync(ViewSyncBuilder views)

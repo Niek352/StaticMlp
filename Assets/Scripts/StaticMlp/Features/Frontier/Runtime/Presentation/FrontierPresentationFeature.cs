@@ -18,9 +18,9 @@ namespace StaticMlp.Features.Frontier
             var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
             var registry = CW.GetResource<EcsLinkRegistry<ClientCoreWT>>();
             registry.RegisterComponent<ExpeditionSelectionViewModel, ExpeditionSelectionViewData>(
-                static (viewModel, in data) => viewModel.Apply(in data));
+                Binding);
             registry.RegisterComponent<ThreatBannerViewModel, ThreatBannerViewData>(
-                static (viewModel, in data) => viewModel.Apply(in data));
+                EcsComponentBinding);
 
             windows.RegisterWindow<ExpeditionSelectionWindow, EcsWindowNoData, ExpeditionSelectionView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<ExpeditionSelectionView>(EXPEDITION_SELECTION_VIEW_RESOURCE_PATH),
@@ -44,6 +44,16 @@ namespace StaticMlp.Features.Frontier
             systems.Add(expeditionBridge, GameplaySystemOrder.ClientPresentation + 39);
             systems.Add(new PersistentEcsWindowHostSystem<ClientCoreWT, ThreatBannerWindow>(), GameplaySystemOrder.ClientPresentation + 40);
             systems.Add(threatBridge, GameplaySystemOrder.ClientPresentation + 41);
+        }
+
+        private static void EcsComponentBinding(ThreatBannerViewModel viewModel, in ThreatBannerViewData data)
+        {
+            viewModel.Apply(in data);
+        }
+
+        private static void Binding(ExpeditionSelectionViewModel viewModel, in ExpeditionSelectionViewData data)
+        {
+            viewModel.Apply(in data);
         }
 
         private static EntityGID ResolveSingletonPresentationEntity<TComponent>()

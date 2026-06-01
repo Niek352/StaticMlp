@@ -15,7 +15,7 @@ namespace StaticMlp.Features.Loadout
             var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
             var registry = CW.GetResource<EcsLinkRegistry<ClientCoreWT>>();
             registry.RegisterComponent<LoadoutPreparationViewModel, LoadoutPreparationViewData>(
-                static (viewModel, in data) => viewModel.Apply(in data));
+                Binding);
 
             windows.RegisterWindow<LoadoutPreparationWindow, EcsWindowNoData, LoadoutPreparationView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<LoadoutPreparationView>(BUILD_PREPARATION_VIEW_RESOURCE_PATH),
@@ -28,6 +28,11 @@ namespace StaticMlp.Features.Loadout
             systems.Add(new ClientLoadoutPresentationBootstrapSystem(), GameplaySystemOrder.ClientPresentation + 20);
             systems.Add(new ClientLoadoutPreparationIntentSystem(), GameplaySystemOrder.ClientPresentation + 24);
             systems.Add(new ClientLoadoutPreparationViewDataSystem(), GameplaySystemOrder.ClientPresentation + 25);
+        }
+
+        private static void Binding(LoadoutPreparationViewModel viewModel, in LoadoutPreparationViewData data)
+        {
+            viewModel.Apply(in data);
         }
 
         private static EntityGID ResolveSingletonPresentationEntity<TComponent>()

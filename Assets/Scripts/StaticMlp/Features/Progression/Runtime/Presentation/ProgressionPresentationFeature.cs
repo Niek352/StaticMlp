@@ -16,7 +16,7 @@ namespace StaticMlp.Features.Progression
             var windows = CW.GetResource<WindowsController<ClientCoreWT>>();
             var registry = CW.GetResource<EcsLinkRegistry<ClientCoreWT>>();
             registry.RegisterComponent<RewardResultPopupViewModel, RewardResultPopupViewData>(
-                static (viewModel, in data) => viewModel.Apply(in data));
+                Binding);
 
             windows.RegisterWindow<RewardResultPopupWindow, EcsWindowNoData, RewardResultPopupView>(
                 EcsResourcesWindowShellViewFactory.CreateLazy<RewardResultPopupView>(REWARD_RESULT_POPUP_VIEW_RESOURCE_PATH),
@@ -32,6 +32,11 @@ namespace StaticMlp.Features.Progression
             systems.Add(new StateDrivenEcsWindowHostSystem<ClientCoreWT, RewardResultPopupWindow, RewardResultPopupSession>(
                 static (in RewardResultPopupSession session) => session.IsVisible), GameplaySystemOrder.ClientPresentation + 44);
             systems.Add(bridge, GameplaySystemOrder.ClientPresentation + 45);
+        }
+
+        private static void Binding(RewardResultPopupViewModel viewModel, in RewardResultPopupViewData data)
+        {
+            viewModel.Apply(in data);
         }
 
         private static EntityGID ResolveSingletonPresentationEntity<TComponent>()

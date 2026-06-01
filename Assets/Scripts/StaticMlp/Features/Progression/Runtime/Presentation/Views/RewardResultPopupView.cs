@@ -46,7 +46,7 @@ namespace StaticMlp.Features.Progression
 
         private void Render()
         {
-            var data = BoundViewModel.Data;
+            var data = BoundViewModel.DataBindable.Value;
             Render(in data);
         }
 

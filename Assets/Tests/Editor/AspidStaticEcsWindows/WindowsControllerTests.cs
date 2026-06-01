@@ -411,8 +411,7 @@ namespace Aspid.StaticEcs.Windows.Tests
             InitializeRequestSystem();
 
             var registry = TestW.GetResource<EcsLinkRegistry<TestWorld>>();
-            registry.RegisterComponent<TestItemsViewModel, TestPresentation>(
-                static (viewModel, in presentation) => viewModel.ApplyPresentation(in presentation));
+            registry.RegisterComponent<TestItemsViewModel, TestPresentation>(Binding);
 
             TestW.SendEvent(new OpenMainWindowRequest(new TestInput(1)));
             _requestSystem.Update();
@@ -429,6 +428,11 @@ namespace Aspid.StaticEcs.Windows.Tests
 
             Assert.That(viewModel.PresentationValue, Is.EqualTo(23));
             Assert.That(viewModel.PresentationApplyCount, Is.EqualTo(2));
+        }
+
+        private static void Binding(TestItemsViewModel viewModel, in TestPresentation presentation)
+        {
+            viewModel.ApplyPresentation(in presentation);
         }
 
         [Test]
