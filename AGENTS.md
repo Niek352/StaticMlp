@@ -8,7 +8,7 @@ Load the relevant project skill before changing code:
 
 - [StaticMlp code writing](.agents/skills/staticmlp-code-writing/SKILL.md): use for ordinary C# gameplay, ECS, module, and system changes.
 - [StaticMlp networked feature](.agents/skills/staticmlp-networked-feature/SKILL.md): use for replicated components, replicated events, ownership, networking, or generated replication code.
-- [StaticMlp UI/MVC](.agents/skills/staticmlp-ui-mvc/SKILL.md): use for UI, MVC, presentation, view sync, MonoBehaviour, PrefabXML, or Canvas-facing changes.
+- [StaticMlp UI/MVVM](.agents/skills/staticmlp-ui-mvvm/SKILL.md): use for UI, Aspid.MVVM, Aspid.StaticEcs bindings, Aspid.StaticEcs.Windows, presentation, view sync, MonoBehaviour, PrefabXML, or Canvas-facing changes.
 
 ## Read More
 
@@ -19,8 +19,9 @@ Load the relevant project skill before changing code:
 - [StaticEcs quick reference](ai/static_ecs_reference.md)
 - [SimulationTime and ServerTick guide](ai/simulation_time_server_tick.md)
 - [Input feature guide](ai/input_feature.md)
-- [MVC usage guidelines](ai/mvc_usage_guidelines.md)
-- [MVC package review](ai/mvc_package_review.md)
+- [MVVM StaticEcs context handoff](ai/refactor/mvvm-static-ecs/00_context_handoff.md)
+- [MVVM StaticEcs architecture decision](ai/refactor/mvvm-static-ecs/01_architecture_decision.md)
+- [MVVM StaticEcs migration plan](ai/refactor/mvvm-static-ecs/02_migration_plan.md)
 - [ECS feature architecture layout](ai/ECS_Feature_Architecture_Layout_StaticEcs.md)
 - [Replication codegen notes](ai/replication_codegen_notes.md)
 - [Refactor backlog](ai/refactor/README.md)

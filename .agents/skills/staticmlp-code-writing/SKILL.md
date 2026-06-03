@@ -5,7 +5,7 @@ description: Use when changing C# gameplay, ECS systems, feature modules, domain
 
 # StaticMlp Code Writing
 
-Use this skill before editing ordinary gameplay/runtime C# code. If the change touches replication, ownership, transport, generated code, UI, MVC, or MonoBehaviour presentation, also use the matching specialized skill.
+Use this skill before editing ordinary gameplay/runtime C# code. If the change touches replication, ownership, transport, generated code, UI, MVVM, Aspid.StaticEcs.Windows, or MonoBehaviour presentation, also use the matching specialized skill.
 
 ## Required Context
 
@@ -42,7 +42,7 @@ For split features, choose the runtime boundary first:
 Assets/Scripts/StaticMlp/Features/<Feature>/Runtime/
   Contracts/       public contracts shared by logic/presentation/other modules
   Logic/           gameplay state, rules, server/client-core systems, validation
-  Presentation/    client-only view state, view sync, MVC, Unity-facing code
+  Presentation/    client-only view state, view sync, MVVM/windows, Unity-facing code
 ```
 
 Legacy unsplit features may keep existing `Runtime/<Bucket>` layout, but new or touched files must still use an approved bucket.
@@ -73,7 +73,7 @@ Validation/          explicit validation rules at trust/gameplay boundaries
 Queries/             named ECS/domain query helpers
 Seeds/               seed data and manifests
 Input/               feature-local input mapping/translation
-Controllers/         legacy MVC controllers and controller-like presentation mediators
+Controllers/         legacy controller-like presentation mediators; avoid for new UI
 ViewModels/          Aspid.MVVM ViewModels and MVVM command/state adapters
 Views/               passive view classes
 ViewParts/           IEntityViewPart/MonoBehaviour view parts

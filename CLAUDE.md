@@ -8,7 +8,7 @@ Load the relevant project skill before changing code:
 
 - [StaticMlp code writing](.claude/skills/staticmlp-code-writing/SKILL.md): use for ordinary C# gameplay, ECS, module, and system changes.
 - [StaticMlp networked feature](.claude/skills/staticmlp-networked-feature/SKILL.md): use for replicated components, replicated events, ownership, networking, or generated replication code.
-- [StaticMlp UI/MVC](.claude/skills/staticmlp-ui-mvc/SKILL.md): use for UI, MVC, presentation, view sync, MonoBehaviour, PrefabXML, or Canvas-facing changes.
+- [StaticMlp UI/MVVM](.claude/skills/staticmlp-ui-mvvm/SKILL.md): use for UI, Aspid.MVVM, Aspid.StaticEcs bindings, Aspid.StaticEcs.Windows, presentation, view sync, MonoBehaviour, PrefabXML, or Canvas-facing changes.
 
 ## Read More
 
@@ -19,8 +19,9 @@ Load the relevant project skill before changing code:
 - [StaticEcs quick reference](ai/static_ecs_reference.md)
 - [SimulationTime and ServerTick guide](ai/simulation_time_server_tick.md)
 - [Input feature guide](ai/input_feature.md)
-- [MVC usage guidelines](ai/mvc_usage_guidelines.md)
-- [MVC package review](ai/mvc_package_review.md)
+- [MVVM StaticEcs context handoff](ai/refactor/mvvm-static-ecs/00_context_handoff.md)
+- [MVVM StaticEcs architecture decision](ai/refactor/mvvm-static-ecs/01_architecture_decision.md)
+- [MVVM StaticEcs migration plan](ai/refactor/mvvm-static-ecs/02_migration_plan.md)
 - [ECS feature architecture layout](ai/ECS_Feature_Architecture_Layout_StaticEcs.md)
 - [Replication codegen notes](ai/replication_codegen_notes.md)
 - [Refactor backlog](ai/refactor/README.md)
@@ -50,7 +51,7 @@ Gameplay systems should only:
 - Keep gameplay, replication, transport, ownership, and presentation code in separate modules.
 - Split feature modules into `Runtime/Logic` and `Runtime/Presentation` when both concerns exist.
 - `Runtime/Logic` owns gameplay state, replicated contracts, simulation, validation, and server/client-core systems.
-- `Runtime/Presentation` owns client-only view state, view sync, visual systems, MVC, and Unity-facing presentation code.
+- `Runtime/Presentation` owns client-only view state, view sync, visual systems, MVVM/window presentation, and Unity-facing presentation code.
 - Do not place Unity presentation code, view components, or client-only visuals in `Runtime/Logic`.
 - Do not place gameplay rules, replicated state mutation, or server authority logic in `Runtime/Presentation`.
 - Put shared gameplay/bootstrap contracts in `Game.Core`; put ordinary gameplay features in their own `StaticMlp.Features.FeatureX` asmdef.
@@ -116,7 +117,7 @@ Do not replicate ownership tags directly. Replicate only `NetworkIdentity`, then
 - Null UI references are bugs. Fail fast instead of using defensive `if (x != null)` guards.
 - Do not write `ValidateReferences` or scene/hierarchy search helpers instead of explicit inspector wiring.
 - Feature `MonoBehaviour` classes must stay view-only: inspector references, Unity callbacks, passive rendering, and forwarding UI intent.
-- Feature UI composition and MVC lifecycle must be owned by ECS/bootstrap systems, not by feature `MonoBehaviour` classes.
+- Feature UI composition and MVVM/window lifecycle must be owned by ECS/bootstrap systems, not by feature `MonoBehaviour` classes.
 
 ## Code Style
 
