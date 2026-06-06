@@ -14,4 +14,5 @@
 
 ## Текущие документы
 
+- [`ui-roadmap.md`](ui-roadmap.md) - сводный UI roadmap: что есть сейчас, что нужно сверстать и какие legacy UI части не развивать.
 - [`settlement-stage1.md`](settlement-stage1.md) - Settlement HUD, interaction prompt, building management panel, building menu, placement и legacy Stage1 notes.

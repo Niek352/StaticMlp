@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Aspid.MVVM;
+using Aspid.Collections.Observable;
 using StaticMlp.Networking;
 
 namespace StaticMlp.Features.Buildings
@@ -11,46 +12,34 @@ namespace StaticMlp.Features.Buildings
         [OneWayBind] private bool _isOpen;
         [OneWayBind] private string _selectedBuildingName;
         [OneWayBind] private string _summary;
-
-        private BuildingMenuCardPresentation[] _cards = Array.Empty<BuildingMenuCardPresentation>();
+        [OneTimeBind] private readonly ObservableList<BuildingMenuCardViewModel> _cards = new();
 
         public void Apply(in BuildingMenuViewData data)
         {
             var presentation = data.Presentation;
-            _cards = presentation.Cards ?? Array.Empty<BuildingMenuCardPresentation>();
             IsOpen = presentation.IsOpen;
             SelectedBuildingName = presentation.SelectedBuildingName;
             Summary = BuildSummary(in presentation);
 
-            SelectCardCommand.NotifyCanExecuteChanged();
+            ApplyCards(presentation.Cards ?? Array.Empty<BuildingMenuCardPresentation>());
         }
 
         [RelayCommand]
-        private void CloseMenu()
+        private void Close()
         {
             CW.SendEvent(new BuildingMenuCloseIntent());
         }
 
-        [RelayCommand(CanExecute = nameof(CanSelectCard))]
-        private void SelectCard(int cardIndex)
+        private void ApplyCards(BuildingMenuCardPresentation[] cards)
         {
-            var card = GetCard(cardIndex);
-            CW.SendEvent(new BuildingMenuSelectIntent(card.BuildingId));
-        }
+            while (Cards.Count > cards.Length)
+                Cards.RemoveAt(Cards.Count - 1);
 
-        private bool CanSelectCard(int cardIndex)
-        {
-            return cardIndex >= 0
-                   && cardIndex < _cards.Length
-                   && _cards[cardIndex].IsAvailable;
-        }
+            while (Cards.Count < cards.Length)
+                Cards.Add(new BuildingMenuCardViewModel());
 
-        private BuildingMenuCardPresentation GetCard(int cardIndex)
-        {
-            if (!CanSelectCard(cardIndex))
-                throw new InvalidOperationException($"{nameof(BuildingMenuViewModel)} cannot select card slot {cardIndex}.");
-
-            return _cards[cardIndex];
+            for (var i = 0; i < cards.Length; i++)
+                Cards[i].Apply(in cards[i]);
         }
 
         private static string BuildSummary(in BuildingMenuPresentation presentation)
@@ -59,7 +48,7 @@ namespace StaticMlp.Features.Buildings
             builder.Append("Selected: ");
             builder.Append(presentation.SelectedBuildingName);
 
-            if (presentation.Categories != null && presentation.Categories.Length > 0)
+            if (presentation.Categories is { Length: > 0 })
             {
                 builder.Append("\nCategories: ");
                 for (var i = 0; i < presentation.Categories.Length; i++)
@@ -76,25 +65,6 @@ namespace StaticMlp.Features.Buildings
                     builder.Append(category.CardCount);
                     builder.Append(')');
                 }
-            }
-
-            if (presentation.Cards == null)
-                return builder.ToString();
-
-            for (var i = 0; i < presentation.Cards.Length; i++)
-            {
-                var card = presentation.Cards[i];
-                builder.Append("\n");
-                builder.Append(i);
-                builder.Append(": ");
-                if (card.IsSelected)
-                    builder.Append("> ");
-
-                builder.Append(card.DisplayName);
-                builder.Append(" [");
-                builder.Append(card.CategoryLabel);
-                builder.Append("] ");
-                builder.Append(card.IsAvailable ? card.CostLabel : $"Locked: {card.LockedReason}");
             }
 
             return builder.ToString();

@@ -26,7 +26,8 @@
         "StaticMlp.Features.Settlement.Logic",
         "StaticMlp.Features.Interaction",
         "StaticMlp.Features.OpenWorldGeneration.Contracts",
-        "Unity.Collections"
+        "Unity.Collections",
+        "Aspid.Collections.Observable"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.alexeytaranov.serializereferencedropdown": "https://github.com/AlexeyTaranov/SerializeReferenceDropdown.git",
     "com.annulusgames.unity-codegen": "https://github.com/AnnulusGames/UnityCodeGen.git?path=/Assets/UnityCodeGen",
     "com.codewriter.unity-prefab-xml": "https://github.com/codewriter-packages/Unity-Prefab-XML.git",
     "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#beta",

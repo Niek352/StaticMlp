@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Aspid.MVVM;
 using Aspid.MVVM.StarterKit;
 using UnityEngine;
@@ -16,7 +17,9 @@ namespace StaticMlp.Features.Buildings
         [RequireBinder(typeof(string))]
         [SerializeField] private MonoBinder[] _summary;
 
-        [SerializeField] private ButtonCommandBinder[] _closeMenuCommand;
-        [SerializeField] private ButtonCommandBinder<int>[] _selectCardCommand;
+        [RequireBinder(typeof(IReadOnlyList<IViewModel>))]
+        [SerializeField] private MonoBinder[] _cards;
+
+        [SerializeField] private ButtonCommandMonoBinder[] _closeCommand;
     }
 }
